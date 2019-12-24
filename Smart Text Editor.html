@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Smart Text Editor</title>
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEJQTFRFAAAA23yI1dXV0VdmzERVji87ycnJw8PDtz1M86xN8JQar6+viIiI7ogA1noApl8A5c+t3sGW2rqKKioqxKd8mIJgbs8VzwAAABZ0Uk5TAP///////////////////////////1SBjaMAAAA8SURBVHicY2DABxgZUflMzCysKHw2dg5kAU4udm4eFD4vHzqfn4p8AXS+oBAKn0FYSEQUxQfCwqh8dAAASZYC5vJ/xd8AAAAASUVORK5CYII="></link>
+</head>
+
+<body>
+  <button id="saveAs" class="saveAs" onclick=saveAs(userInput.value);>Save As...</button>
+  <button id="toggleText" class="toggleText" onclick="viewType0();">Text</button>
+  <button id="toggleCode" class="toggleCode" onclick="viewType1();">Code</button>
+  <button id="toggleSplit" class="toggleSplit" onclick="viewType2();">Split</button>
+  <button id="togglePreview" class="togglePreview" onclick="viewType3();">Preview</button>
+  <img id="logo" class="logo" alt="Logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEJQTFRFAAAA23yI1dXV0VdmzERVji87ycnJw8PDtz1M86xN8JQar6+viIiI7ogA1noApl8A5c+t3sGW2rqKKioqxKd8mIJgbs8VzwAAABZ0Uk5TAP///////////////////////////1SBjaMAAAA8SURBVHicY2DABxgZUflMzCysKHw2dg5kAU4udm4eFD4vHzqfn4p8AXS+oBAKn0FYSEQUxQfCwqh8dAAASZYC5vJ/xd8AAAAASUVORK5CYII="></img>
+  <p id="title" class="title">Smart Text Editor</p>
+  <p id="about" class="about">Inspired by <a href="https://www.editpad.org/" target="_blank">Edit Pad</a> and <a href="https://htmledit.squarefree.com/" target="_blank">Real-time HTML Editor</a></p>
+  <textarea id="userInput" class="userInput" spellcheck="false" onkeyup="myFunction();" placeholder="Welcome to the Smart Text Editor! This site was created to allow for easy text editing and HTML development within your browser!"></textarea>
+  <iframe id="preview" class="preview" src ""></iframe>
+</body>
+
+<style>
+  body {
+    font-family: sans-serif;
+    margin: 0px;
+    color: #aaaaaa;
+    background-color: #1a1a1a;
+  }
+  button {
+    font-family: sans-serif;
+    font-size: 14px;
+    position: fixed;
+    top: 10px;
+    width: 65px;
+    height: 22px;
+    color: #aaaaaa;
+    border: none;
+    background-color: #444444;
+    outline: none;
+    border-radius: 4px;
+  }
+  button:hover {
+    color: #ffffff;
+    background-color: #555555;
+    cursor: pointer;
+  }
+  .saveAs {
+    left: 10px;
+    width: 85px;
+  }
+  .toggleText {
+    left: 115px;
+  }
+  .toggleCode {
+    left: 185px;
+  }
+  .toggleSplit {
+    left: 255px;
+  }
+  .togglePreview {
+    left: 325px;
+  }
+  .logo {
+    position: fixed;
+    width: 25px;
+    height: 25px;
+    left: calc(50% - 75px);
+    top: 8px;
+    image-rendering: pixelated;
+  }
+  .title {
+    position: fixed;
+    left: calc(50% - 45px);
+    top: -5px;
+  }
+  .about {
+    position: fixed;
+    right: 10px;
+    top: -5px;
+  }
+  .userInput {
+    font-family: arial;
+    font-size: 15px;
+    position: fixed;
+    width: calc(100% - 4px);
+    height: calc(100% - 46px);
+    top: 42px;
+    background-color: #eee8aa;
+    color: #000000;
+    border: none;
+    resize: none;
+    outline: none;
+    white-space: nowrap;
+  }
+  ::placeholder {
+    color: #555;
+  }
+  .preview {
+    position: fixed;
+    width: 100%;
+    height: calc(100% - 46px);
+    bottom: 0px;
+    visibility: hidden;
+    background-color: #ffffff;
+    border: none;
+  }
+</style>
+
+<script>
+  function myFunction(){
+    if (viewType > 1) {
+      var blob = new Blob([userInput.value],{
+        type: 'text/html'
+      });
+      var newurl = window.URL.createObjectURL(blob);
+      document.getElementById("preview").src = newurl;
+    }
+  }
+  function saveAs(textInput){
+    var textBlob = new Blob([textInput],{
+      type: 'text/plain'
+    });
+    var downloadLink = document.createElement("a");
+    downloadLink.download = 'text.txt';
+    downloadLink.innerHTML = "Download File";
+    if (window.webkitURL != null){
+      downloadLink.href = window.webkitURL.createObjectURL(textBlob);
+    } else {
+      downloadLink.href = window.URL.createObjectURL(textBlob);
+      downloadLink.onclick = destroyClickedElement;
+      downloadLink.style.display = "none";
+      document.body.appendChild(downloadLink);
+    }
+    downloadLink.click();
+  }
+  var viewType = 0;
+  function viewType0(){
+    viewType = 0;
+    document.getElementById("userInput").style.height = "calc(100% - 46px)";
+    document.getElementById("userInput").style.background = "#eee8aa";
+    document.getElementById("userInput").style.color = "#000000";
+    document.getElementById("userInput").style.fontFamily = "arial";
+    document.getElementById("userInput").style.fontSize = "15px";
+    document.getElementById("userInput").style.visibility = "visible";
+    document.getElementById("preview").style.height = "calc(100% - 46px)";
+    document.getElementById("preview").style.visibility = "hidden";
+  }
+  function viewType1(){
+    viewType = 1;
+    document.getElementById("userInput").style.height = "calc(100% - 46px)";
+    document.getElementById("userInput").style.background = "#212121";
+    document.getElementById("userInput").style.color = "#ffffff";
+    document.getElementById("userInput").style.fontFamily = "monospace";
+    document.getElementById("userInput").style.fontSize = "13px";
+    document.getElementById("userInput").style.visibility = "visible";
+    document.getElementById("preview").style.height = "calc(100% - 46px)";
+    document.getElementById("preview").style.visibility = "hidden";
+  }
+  function viewType2(){
+    viewType = 2;
+    myFunction();
+    document.getElementById("userInput").style.height = "calc(50% - 25px)";
+    document.getElementById("userInput").style.background = "#212121";
+    document.getElementById("userInput").style.color = "#ffffff";
+    document.getElementById("userInput").style.fontFamily = "monospace";
+    document.getElementById("userInput").style.fontSize = "13px";
+    document.getElementById("userInput").style.visibility = "visible";
+    document.getElementById("preview").style.height = "calc(50% - 21px)";
+    document.getElementById("preview").style.visibility = "visible";
+  }
+  function viewType3(){
+    viewType = 3;
+    myFunction();
+    document.getElementById("userInput").style.height = "calc(50% - 25px)";
+    document.getElementById("userInput").style.background = "#212121";
+    document.getElementById("userInput").style.color = "#ffffff";
+    document.getElementById("userInput").style.fontFamily = "monospace";
+    document.getElementById("userInput").style.fontSize = "13px";
+    document.getElementById("userInput").style.visibility = "hidden";
+    document.getElementById("preview").style.height = "calc(100% - 42px)";
+    document.getElementById("preview").style.visibility = "visible";
+  }
+  window.onbeforeunload = function(){
+    return "Leave site? Changes you made may not be saved.";
+  };
+</script>
+
+</html>
