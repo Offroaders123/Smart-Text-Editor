@@ -3,125 +3,310 @@
 
 <head>
   <title>Smart Text Editor</title>
-  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEJQTFRFAAAA23yI1dXV0VdmzERVji87ycnJw8PDtz1M86xN8JQar6+viIiI7ogA1noApl8A5c+t3sGW2rqKKioqxKd8mIJgbs8VzwAAABZ0Uk5TAP///////////////////////////1SBjaMAAAA8SURBVHicY2DABxgZUflMzCysKHw2dg5kAU4udm4eFD4vHzqfn4p8AXS+oBAKn0FYSEQUxQfCwqh8dAAASZYC5vJ/xd8AAAAASUVORK5CYII="></link>
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEJQTFRFAAAA23yI1dXV0VdmzERVji87ycnJw8PDtz1M86xN8JQar6+viIiI7ogA1noApl8A5c+t3sGW2rqKKioqxKd8mIJgbs8VzwAAABZ0Uk5TAP///////////////////////////1SBjaMAAAA8SURBVHicY2DABxgZUflMzCysKHw2dg5kAU4udm4eFD4vHzqfn4p8AXS+oBAKn0FYSEQUxQfCwqh8dAAASZYC5vJ/xd8AAAAASUVORK5CYII=">
+  <style>
+    body {
+      margin: 0px;
+      font-family: sans-serif;
+      color: #aaaaaa;
+      background-color: #1a1a1a;
+      user-select: none;
+    }
+    button {
+      position: fixed;
+      width: 68px;
+      top: 10px;
+      height: 20px;
+      font-family: sans-serif;
+      font-size: 14px;
+      color: #aaaaaa;
+      background-color: #444444;
+      border: none;
+      border-radius: 4px;
+      outline: none;
+      box-shadow: 2px 3px 8px 0px rgba(0, 0, 0, 0.50);
+      transition: 0.125s;
+    }
+    button:hover {
+      color: #ffffff;
+      background-color: #555555;
+      cursor: pointer;
+    }
+    p {
+      height: 20px;
+      text-align: center;
+    }
+    a {
+      color: #aaaaaa;
+      transition: 0.125s;
+    }
+    a:hover {
+      color: #ffffff;
+    }
+    ::placeholder {
+      color: #555555;
+    }
+    #userInput {
+      position: fixed;
+      top: 40px;
+      width: calc(100% - 4px);
+      height: calc(100% - 40px - 4px);
+      font-family: arial;
+      font-size: 13px;
+      color: #000000;
+      background-color: #e8e5c6;
+      border: none;
+      outline: none;
+      white-space: nowrap;
+      resize: none;
+      transition: 0.50s;
+    }
+    #preview {
+      position: fixed;
+      bottom: 0px;
+      width: 100%;
+      height: 0%;
+      background-color: #ffffff;
+      border: none;
+      transition: 0.50s;
+    }
+    #splitSlider {
+      position: fixed;
+      top: calc(100% - 12px);
+      width: 100%;
+      height: 12px;
+      background-color: #444444;
+      cursor: ns-resize;
+      transition: 0.50s;
+    }
+    #file {
+      left: 10px;
+    }
+    #view {
+      left: 90px;
+    }
+    #tools {
+      left: 170px;
+    }
+    #title {
+      position: fixed;
+      left: calc(50% - 80px);
+      width: 156px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+    }
+    #titleIcon {
+      width: 24px;
+      height: 24px;
+      float: left;
+      image-rendering: pixelated;
+    }
+    #titleLabel {
+      width: 132px;
+      float: right;
+    }
+    #about {
+      position: fixed;
+      right: 10px;
+      top: -3px;
+      width: 308px;
+      height: 20px;
+      font-size: 14px;
+    }
+    .select {
+      position: fixed;
+      display: inline-block;
+    }
+    .list {
+      position: absolute;
+      width: 80px;
+      top: 30px;
+      background-color: #222222;
+      border-radius: 4px;
+      display: block;
+      box-shadow: 4px 6px 8px 0px rgba(0, 0, 0, 0.75);
+      transition: 0.125s;
+    }
+    .list .option {
+      font-size: 12px;
+      color: #aaaaaa;
+      border-radius: 4px;
+      padding: 8px 8px;
+      cursor: pointer;
+      transition: 0.125s;
+    }
+    .list .option:hover {
+      color: #ffffff;
+      background-color: #333333;
+    }
+    .hidden {
+      visibility: hidden;
+      opacity: 0;
+      transition: 0.125s;
+    }
+    .visible {
+      visibility: visible;
+      opacity: 1;
+      transition: 0.125s;
+    }
+  </style>
 </head>
 
 <body>
-  <button id="saveAs" class="saveAs" onclick=saveAs(userInput.value);>Save As...</button>
-  <button id="toggleText" class="toggleText" onclick="viewType0();">Text</button>
-  <button id="toggleCode" class="toggleCode" onclick="viewType1();">Code</button>
-  <button id="toggleSplit" class="toggleSplit" onclick="viewType2();">Split</button>
-  <button id="togglePreview" class="togglePreview" onclick="viewType3();">Preview</button>
-  <img id="logo" class="logo" alt="Logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEJQTFRFAAAA23yI1dXV0VdmzERVji87ycnJw8PDtz1M86xN8JQar6+viIiI7ogA1noApl8A5c+t3sGW2rqKKioqxKd8mIJgbs8VzwAAABZ0Uk5TAP///////////////////////////1SBjaMAAAA8SURBVHicY2DABxgZUflMzCysKHw2dg5kAU4udm4eFD4vHzqfn4p8AXS+oBAKn0FYSEQUxQfCwqh8dAAASZYC5vJ/xd8AAAAASUVORK5CYII="></img>
-  <p id="title" class="title">Smart Text Editor</p>
-  <p id="about" class="about">Inspired by <a href="https://www.editpad.org/" target="_blank">Edit Pad</a> and <a href="https://htmledit.squarefree.com/" target="_blank">Real-time HTML Editor</a></p>
-  <textarea id="userInput" class="userInput" spellcheck="false" onkeyup="myFunction();" placeholder="Welcome to the Smart Text Editor! This site was created to allow for easy text editing and HTML development within your browser!"></textarea>
-  <iframe id="preview" class="preview" src ""></iframe>
+  <textarea id="userInput" spellcheck="false" onkeyup="previewRefresh();" autofocus placeholder="Welcome to the Smart Text Editor! This site was created to allow for easy text editing and HTML development within your browser!"></textarea>
+  <iframe id="preview" class="hidden" src=""></iframe>
+  <div id="splitSlider" class="hidden"></div>
+  <div id="file" class="file select">
+    <button>File</button>
+    <div id="fileList" class="list hidden">
+      <div class="option" onclick="window.open(window.location.href, '_blank');">New</div>
+      <div class="option" onclick="saveAs(userInput.value);">Save As</div>
+    </div>
+  </div>
+  <div id="view" class="view select">
+    <button>View</button>
+    <div id="viewList" class="list hidden">
+      <div class="option" onclick="viewDefault();">Default</div>
+      <div class="option" onclick="viewCode();">Code</div>
+      <div class="option" onclick="viewSplit();">Split</div>
+      <div class="option" onclick="viewPreview();">Preview</div>
+    </div>
+  </div>
+  <div id="tools" class="tools select">
+    <button>Tools</button>
+    <div id="toolsList" class="list hidden">
+      <div class="option" onclick="linkOpen('https://htmlformatter.com/');">HTML Formatter</div>
+      <div class="option" onclick="linkOpen('http://jsonviewer.stack.hu/');">JSON Formatter</div>
+      <div class="option" onclick="linkOpen('http://www.unit-conversion.info/texttools/replace-text/');">Text Replacer</div>
+      <div class="option" onclick="linkOpen('https://www.diffchecker.com/');">Difference Finder</div>
+      <div class="option" onclick="linkOpen('https://cryptii.com/');">Text Encryptor</div>
+      <div class="option" onclick="linkOpen('https://www.base64-image.de/');">Image Data Converter</div>
+      <div class="option" onclick="linkOpen('https://keycode.info/');">Keycode Finder</div>
+    </div>
+  </div>
+  <div id="title">
+    <img id="titleIcon" alt="Icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEJQTFRFAAAA23yI1dXV0VdmzERVji87ycnJw8PDtz1M86xN8JQar6+viIiI7ogA1noApl8A5c+t3sGW2rqKKioqxKd8mIJgbs8VzwAAABZ0Uk5TAP///////////////////////////1SBjaMAAAA8SURBVHicY2DABxgZUflMzCysKHw2dg5kAU4udm4eFD4vHzqfn4p8AXS+oBAKn0FYSEQUxQfCwqh8dAAASZYC5vJ/xd8AAAAASUVORK5CYII=">
+    <p id="titleLabel">Smart Text Editor</p>
+  </div>
+  <p id="about">Inspired by <a href="https://htmledit.squarefree.com/" target="_blank">Real-time HTML Editor</a> and <a href="https://www.editpad.org/" target="_blank">Edit Pad</a>!</p>
 </body>
 
-<style>
-  body {
-    font-family: sans-serif;
-    margin: 0px;
-    color: #aaaaaa;
-    background-color: #1a1a1a;
-  }
-  button {
-    font-family: sans-serif;
-    font-size: 14px;
-    position: fixed;
-    top: 10px;
-    width: 65px;
-    height: 22px;
-    color: #aaaaaa;
-    border: none;
-    background-color: #444444;
-    outline: none;
-    border-radius: 4px;
-  }
-  button:hover {
-    color: #ffffff;
-    background-color: #555555;
-    cursor: pointer;
-  }
-  .saveAs {
-    left: 10px;
-    width: 85px;
-  }
-  .toggleText {
-    left: 115px;
-  }
-  .toggleCode {
-    left: 185px;
-  }
-  .toggleSplit {
-    left: 255px;
-  }
-  .togglePreview {
-    left: 325px;
-  }
-  .logo {
-    position: fixed;
-    width: 25px;
-    height: 25px;
-    left: calc(50% - 75px);
-    top: 8px;
-    image-rendering: pixelated;
-  }
-  .title {
-    position: fixed;
-    left: calc(50% - 45px);
-    top: -5px;
-  }
-  .about {
-    position: fixed;
-    right: 10px;
-    top: -5px;
-  }
-  .userInput {
-    font-family: arial;
-    font-size: 15px;
-    position: fixed;
-    width: calc(100% - 4px);
-    height: calc(100% - 46px);
-    top: 42px;
-    background-color: #eee8aa;
-    color: #000000;
-    border: none;
-    resize: none;
-    outline: none;
-    white-space: nowrap;
-  }
-  ::placeholder {
-    color: #555;
-  }
-  .preview {
-    position: fixed;
-    width: 100%;
-    height: calc(100% - 46px);
-    bottom: 0px;
-    visibility: hidden;
-    background-color: #ffffff;
-    border: none;
-  }
-</style>
-
 <script>
-  function myFunction(){
-    if (viewType > 1) {
+  file.addEventListener("mouseover",function(){
+    dropOpen("fileList");
+  });
+  file.addEventListener("mouseout",function(){
+    dropClose("fileList");
+  });
+  file.addEventListener("click",function(){
+    dropClose("fileList");
+  });
+  view.addEventListener("mouseover",function(){
+    dropOpen("viewList");
+  });
+  view.addEventListener("mouseout",function(){
+    dropClose("viewList");
+  });
+  view.addEventListener("click",function(){
+    dropClose("viewList");
+  });
+  tools.addEventListener("mouseover",function(){
+    dropOpen("toolsList");
+  });
+  tools.addEventListener("mouseout",function(){
+    dropClose("toolsList");
+  });
+  tools.addEventListener("click",function(){
+    dropClose("toolsList");
+  });
+  var dropActivated = 0;
+  function dropOpen(list){
+    if (dropActivated == 0){
+      document.getElementById(list).classList.toggle("hidden");
+      document.getElementById(list).classList.toggle("visible");
+      dropActivated = 1;
+    }
+  }
+  function dropClose(list){
+    if (dropActivated == 1){
+      document.getElementById(list).classList.toggle("hidden");
+      document.getElementById(list).classList.toggle("visible");
+      dropActivated = 0;
+    }
+  }
+  document.onkeyup = function(){
+    if (event.ctrlKey){
+      if (event.key == "N"){
+        window.open(window.location.href,"_blank");
+      }
+      if (event.key == "S"){
+        saveAs(userInput.value);
+      }
+      if (event.key == "!"){
+        viewDefault();
+      }
+      if (event.key == "@"){
+        viewCode();
+      }
+      if (event.key == "#"){
+        viewSplit();
+      }
+      if (event.key == "$"){
+        viewPreview();
+      }
+    }
+  };
+  function previewRefresh(){
+    if (userView > 1){
       var blob = new Blob([userInput.value],{
-        type: 'text/html'
+        type: "text/html"
       });
       var newurl = window.URL.createObjectURL(blob);
       document.getElementById("preview").src = newurl;
     }
   }
-  function saveAs(textInput){
-    var textBlob = new Blob([textInput],{
-      type: 'text/plain'
+  var sliderMove = 0,
+      textY = "calc(50% - 20px - 8px)",
+      previewY = "calc(50% - 20px - 8px)";
+      innerY = "";
+  splitSlider.addEventListener("mousedown",function(){
+    document.getElementById("userInput").style.pointerEvents = "none";
+    document.getElementById("userInput").style.transition = "none";
+    document.getElementById("preview").style.pointerEvents = "none";
+    document.getElementById("preview").style.transition = "none";
+    document.getElementById("splitSlider").style.transition = "none";
+    document.addEventListener("mousemove",getCursor);
+    document.addEventListener("mouseup",function(){
+      document.removeEventListener("mousemove",getCursor);
+    document.getElementById("userInput").style.pointerEvents = "auto";
+    document.getElementById("userInput").style.transition = "0.50s";
+    document.getElementById("preview").style.pointerEvents = "auto";
+    document.getElementById("preview").style.transition = "0.50s";
+    document.getElementById("splitSlider").style.transition = "0.50s";
+    });
+  });
+  function getCursor(){
+    sliderMove = event.clientY;
+    innerY = window.innerHeight - 80;
+    if (sliderMove <= 120){
+      sliderMove = 120;
+    }
+    if (sliderMove >= innerY){
+      sliderMove = window.innerHeight - 80;
+    }
+    document.getElementById("splitSlider").style.top = sliderMove - 6 + "px";
+    textY = "calc(" + sliderMove + "px - 40px - 10px)";
+    previewY = "calc(100% - 6px - " + sliderMove + "px)";
+    document.getElementById("userInput").style.height = textY;
+    document.getElementById("preview").style.height = previewY;
+  }
+  function saveAs(userInput){
+    var textBlob = new Blob([userInput],{
+      type: "text/plain"
     });
     var downloadLink = document.createElement("a");
-    downloadLink.download = 'text.txt';
+    downloadLink.download = "text.txt";
     downloadLink.innerHTML = "Download File";
     if (window.webkitURL != null){
       downloadLink.href = window.webkitURL.createObjectURL(textBlob);
@@ -133,52 +318,71 @@
     }
     downloadLink.click();
   }
-  var viewType = 0;
-  function viewType0(){
-    viewType = 0;
-    document.getElementById("userInput").style.height = "calc(100% - 46px)";
-    document.getElementById("userInput").style.background = "#eee8aa";
-    document.getElementById("userInput").style.color = "#000000";
+  function linkOpen(url){
+    window.open(url,"_blank").focus();
+  }
+  var userView = 0;
+  function viewDefault(){
+    userView = 0;
+    document.getElementById("userInput").style.height = "calc(100% - 40px - 4px)";
     document.getElementById("userInput").style.fontFamily = "arial";
-    document.getElementById("userInput").style.fontSize = "15px";
+    document.getElementById("userInput").style.color = "#000000";
+    document.getElementById("userInput").style.background = "#E8E5C6";
     document.getElementById("userInput").style.visibility = "visible";
-    document.getElementById("preview").style.height = "calc(100% - 46px)";
+    document.getElementById("userInput").style.opacity = "1";
+    document.getElementById("preview").style.height = "0%";
     document.getElementById("preview").style.visibility = "hidden";
+    document.getElementById("preview").style.opacity = "0";
+    document.getElementById("splitSlider").style.top = "calc(100% - 12px)";
+    document.getElementById("splitSlider").style.visibility = "hidden";
+    document.getElementById("splitSlider").style.opacity = "0";
   }
-  function viewType1(){
-    viewType = 1;
-    document.getElementById("userInput").style.height = "calc(100% - 46px)";
-    document.getElementById("userInput").style.background = "#212121";
-    document.getElementById("userInput").style.color = "#ffffff";
+  function viewCode(){
+    userView = 1;
+    document.getElementById("userInput").style.height = "calc(100% - 40px - 4px)";
     document.getElementById("userInput").style.fontFamily = "monospace";
-    document.getElementById("userInput").style.fontSize = "13px";
+    document.getElementById("userInput").style.color = "#ffffff";
+    document.getElementById("userInput").style.background = "#212121";
     document.getElementById("userInput").style.visibility = "visible";
-    document.getElementById("preview").style.height = "calc(100% - 46px)";
+    document.getElementById("userInput").style.opacity = "1";
+    document.getElementById("preview").style.height = "0%";
     document.getElementById("preview").style.visibility = "hidden";
+    document.getElementById("preview").style.opacity = "0";
+    document.getElementById("splitSlider").style.top = "calc(100% - 12px)";
+    document.getElementById("splitSlider").style.visibility = "hidden";
+    document.getElementById("splitSlider").style.opacity = "0";
   }
-  function viewType2(){
-    viewType = 2;
-    myFunction();
-    document.getElementById("userInput").style.height = "calc(50% - 25px)";
-    document.getElementById("userInput").style.background = "#212121";
-    document.getElementById("userInput").style.color = "#ffffff";
+  function viewSplit(){
+    userView = 2;
+    previewRefresh();
+    document.getElementById("userInput").style.height = "calc(50% - 20px - 8px)";
     document.getElementById("userInput").style.fontFamily = "monospace";
-    document.getElementById("userInput").style.fontSize = "13px";
+    document.getElementById("userInput").style.color = "#ffffff";
+    document.getElementById("userInput").style.background = "#212121";
     document.getElementById("userInput").style.visibility = "visible";
-    document.getElementById("preview").style.height = "calc(50% - 21px)";
+    document.getElementById("userInput").style.opacity = "1";
+    document.getElementById("preview").style.height = "calc(50% - 20px - 8px)";
     document.getElementById("preview").style.visibility = "visible";
+    document.getElementById("preview").style.opacity = "1";
+    document.getElementById("splitSlider").style.top = "calc(50% + 16px)";
+    document.getElementById("splitSlider").style.visibility = "visible";
+    document.getElementById("splitSlider").style.opacity = "1";
   }
-  function viewType3(){
-    viewType = 3;
-    myFunction();
-    document.getElementById("userInput").style.height = "calc(50% - 25px)";
-    document.getElementById("userInput").style.background = "#212121";
-    document.getElementById("userInput").style.color = "#ffffff";
+  function viewPreview(){
+    userView = 3;
+    previewRefresh();
+    document.getElementById("userInput").style.height = "calc(50% - 20px - 2px)";
     document.getElementById("userInput").style.fontFamily = "monospace";
-    document.getElementById("userInput").style.fontSize = "13px";
+    document.getElementById("userInput").style.color = "#ffffff";
+    document.getElementById("userInput").style.background = "#212121";
     document.getElementById("userInput").style.visibility = "hidden";
-    document.getElementById("preview").style.height = "calc(100% - 42px)";
+    document.getElementById("userInput").style.opacity = "0";
+    document.getElementById("preview").style.height = "calc(100% - 40px)";
     document.getElementById("preview").style.visibility = "visible";
+    document.getElementById("preview").style.opacity = "1";
+    document.getElementById("splitSlider").style.top = "28px";
+    document.getElementById("splitSlider").style.visibility = "hidden";
+    document.getElementById("splitSlider").style.opacity = "0";
   }
   window.onbeforeunload = function(){
     return "Leave site? Changes you made may not be saved.";
