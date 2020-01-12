@@ -3,269 +3,328 @@
 
 <head>
   <title>Smart Text Editor</title>
-  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEJQTFRFAAAA23yI1dXV0VdmzERVji87ycnJw8PDtz1M86xN8JQar6+viIiI7ogA1noApl8A5c+t3sGW2rqKKioqxKd8mIJgbs8VzwAAABZ0Uk5TAP///////////////////////////1SBjaMAAAA8SURBVHicY2DABxgZUflMzCysKHw2dg5kAU4udm4eFD4vHzqfn4p8AXS+oBAKn0FYSEQUxQfCwqh8dAAASZYC5vJ/xd8AAAAASUVORK5CYII=">
+  <link id="favicon" rel="icon" type="image/png">
   <style>
-    body {
-      margin: 0px;
+    * {
+      margin: 0;
+      padding: 0;
       font-family: sans-serif;
-      color: #aaaaaa;
-      background-color: #111111;
+      box-sizing: border-box;
       user-select: none;
     }
-    button {
-      position: fixed;
-      width: 68px;
-      top: 10px;
+    header {
+      position: sticky;
+      left: 0px;
+      top: 0px;
+      width: 100%;
+      min-height: 40px;
+      display: flex;
+      background: #111111;
+      box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.75);
+      z-index: 1;
+    }
+    #toolbar {
+      padding: 3px 5px;
+      width: 37.5%;
+    }
+    #toolbar span {
+      position: relative;
+      display: inline-block;
+    }
+    #toolbar button {
+      margin: 7px 5px;
+      width: 75px;
       height: 20px;
       font-family: sans-serif;
       font-size: 14px;
       color: #aaaaaa;
-      background-color: #333333;
-      border: none;
+      background: #333333;
       border-radius: 4px;
+      border: none;
       outline: none;
-      box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.75);
-      transition: 0.125s;
-    }
-    button:hover {
-      color: #ffffff;
-      background-color: #444444;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.75);
       cursor: pointer;
+      transition: all 0.125s ease;
     }
-    p {
-      height: 20px;
-      text-align: center;
+    #toolbar button:hover, .toolbar button:focus {
+      color: #ffffff;
+      background: #444444;
     }
-    a {
+    #toolbar button:focus + ul {
+      opacity: 1;
+      pointer-events: all;
+    }
+    #toolbar ul {
+      position: absolute;
+      margin: -7px 5px;
+      width: 185%;
+      background: #1a1a1a;
+      border-radius: 4px;
+      list-style: none;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.75);
+      z-index: 1;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.125s ease;
+    }
+    #toolbar li {
+      padding: 8px;
+      font-size: 12px;
+      color: #cccccc;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.125s ease;
+    }
+    #toolbar li:hover {
+      color: #ffffff;
+      background: #2a2a2a;
+    }
+    #toolbar li span {
+      float: right;
+      font-size: 11px;
+      color: #888888;
+      text-align: right;
+    }
+    #title {
+      width: 25%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #title img {
+      margin: 0 2px;
+      height: 26px;
+      image-rendering: pixelated;
+    }
+    #title p {
+      margin: 0 2px;
+      font-size: 16px;
       color: #aaaaaa;
-      transition: 0.125s;
     }
-    a:hover {
+    #attribution {
+      padding: 0 10px;
+      width: 37.5%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    #attribution p, a {
+      color: #aaaaaa;
+      font-size: 14px;
+      text-align: right;
+      transition: all 0.125s ease;
+    }
+    #attribution a:hover {
       color: #ffffff;
     }
-    ::placeholder {
-      color: #555555;
+    main {
+      position: absolute;
+      width: 100%;
+      height: calc(100% - 40px);
+      background: #171717;
     }
     #userInput {
-      position: fixed;
-      top: 40px;
-      width: calc(100% - 4px);
-      height: calc(100% - 40px - 4px);
-      font-family: arial;
+      position: absolute;
+      padding: 4px;
+      left: 0px;
+      top: 0px;
+      width: 100%;
       font-size: 13px;
-      color: #000000;
-      background-color: #e8e5c6;
       border: none;
       outline: none;
       white-space: nowrap;
       resize: none;
-      transition: 0.50s;
+      transition: all 0.50s ease;
+    }
+    #userInput.default {
+      height: 100%;
+      font-family: arial;
+      color: #000000;
+      background: #e8e5c6;
+    }
+    #userInput.code {
+      height: 100%;
+      font-family: monospace;
+      color: #ffffff;
+      background: #171717;
+    }
+    #userInput.split {
+      height: calc(50% - 6px);
+      font-family: monospace;
+      color: #ffffff;
+      background: #171717;
+    }
+    #userInput.preview {
+      height: calc(50% - 6px);
+      font-family: monospace;
+      color: #ffffff;
+      background: #171717;
+      opacity: 0;
+    }
+    #slider {
+      position: absolute;
+      width: 100%;
+      background: #333333;
+      box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.75);
+      z-index: 1;
+      cursor: row-resize;
+      transition: all 0.50s ease;
+    }
+    #slider.default, #slider.code {
+      bottom: 0px;
+      height: 0px;
+      opacity: 0;
+    }
+    #slider.split {
+      bottom: calc(50% - 6px);
+      height: 12px;
+      opacity: 1;
+    }
+    #slider.preview {
+      bottom: 100%;
+      height: 0px;
+      opacity: 0;
+    }
+    .inMotion {
+      pointer-events: none !important;
+      transition: none !important;
     }
     #preview {
-      position: fixed;
+      position: absolute;
+      left: 0px;
       bottom: 0px;
       width: 100%;
-      height: 0%;
-      background-color: #ffffff;
+      background: #ffffff;
       border: none;
-      transition: 0.50s;
+      user-select: auto;
+      transition: all 0.50s ease;
     }
-    #splitSlider {
-      position: fixed;
-      top: calc(100% - 12px);
-      width: 100%;
-      height: 12px;
-      background-color: #333333;
-      cursor: ns-resize;
-      transition: 0.50s;
-    }
-    #file {
-      left: 10px;
-    }
-    #view {
-      left: 90px;
-    }
-    #tools {
-      left: 170px;
-    }
-    #title {
-      position: fixed;
-      left: calc(50% - 80px);
-      width: 156px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-    }
-    #titleIcon {
-      width: 24px;
-      height: 24px;
-      float: left;
-      image-rendering: pixelated;
-    }
-    #titleLabel {
-      width: 132px;
-      float: right;
-    }
-    #about {
-      position: fixed;
-      right: 10px;
-      top: -3px;
-      width: 308px;
-      height: 20px;
-      font-size: 14px;
-    }
-    .select {
-      position: fixed;
-      display: inline-block;
-    }
-    .list {
-      position: absolute;
-      width: 160px;
-      top: 30px;
-      background-color: #1a1a1a;
-      border-radius: 4px;
-      display: block;
-      box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.75);
-      transition: 0.125s;
-    }
-    .list .option {
-      font-size: 12px;
-      color: #aaaaaa;
-      border-radius: 4px;
-      padding: 8px 8px;
-      cursor: pointer;
-      transition: 0.125s;
-    }
-    .list .option:hover {
-      color: #ffffff;
-      background-color: #2a2a2a;
-    }
-    .hidden {
-      visibility: hidden;
+    #preview.default, #preview.code {
+      height: 0%;
       opacity: 0;
-      transition: 0.125s;
     }
-    .visible {
-      visibility: visible;
-      opacity: 1;
-      transition: 0.125s;
+    #preview.split {
+      height: calc(50% - 6px);
+    }
+    #preview.preview {
+      height: 100%;
     }
   </style>
 </head>
 
 <body>
-  <textarea id="userInput" spellcheck="false" autofocus placeholder="Welcome to the Smart Text Editor! This site was created to allow for easy text editing and HTML development within your browser!"></textarea>
-  <iframe id="preview" class="hidden" src=""></iframe>
-  <div id="splitSlider" class="hidden"></div>
-  <div id="file" class="file select">
-    <button>File</button>
-    <div id="fileList" class="list hidden">
-      <div class="option" onclick="window.open(window.location.href,'_blank');">New</div>
-      <div class="option" onclick="saveAs(userInput.value);">Save As</div>
-    </div>
-  </div>
-  <div id="view" class="view select">
-    <button>View</button>
-    <div id="viewList" class="list hidden">
-      <div class="option" onclick="viewDefault();">Default</div>
-      <div class="option" onclick="viewCode();">Code</div>
-      <div class="option" onclick="viewSplit();">Split</div>
-      <div class="option" onclick="viewPreview();">Preview</div>
-    </div>
-  </div>
-  <div id="tools" class="tools select">
-    <button>Tools</button>
-    <div id="toolsList" class="list hidden">
-      <div class="option" onclick="linkOpen('https://htmlformatter.com/');">HTML Formatter</div>
-      <div class="option" onclick="linkOpen('http://jsonviewer.stack.hu/');">JSON Formatter</div>
-      <div class="option" onclick="linkOpen('http://www.unit-conversion.info/texttools/replace-text/');">Text Replacer</div>
-      <div class="option" onclick="linkOpen('https://www.diffchecker.com/');">Difference Finder</div>
-      <div class="option" onclick="linkOpen('https://cryptii.com/');">Text Encryptor</div>
-      <div class="option" onclick="linkOpen('https://www.base64-image.de/');">Image Data Converter</div>
-      <div class="option" onclick="linkOpen('https://keycode.info/');">Keycode Finder</div>
-    </div>
-  </div>
-  <div id="title">
-    <img id="titleIcon" alt="Icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEJQTFRFAAAA23yI1dXV0VdmzERVji87ycnJw8PDtz1M86xN8JQar6+viIiI7ogA1noApl8A5c+t3sGW2rqKKioqxKd8mIJgbs8VzwAAABZ0Uk5TAP///////////////////////////1SBjaMAAAA8SURBVHicY2DABxgZUflMzCysKHw2dg5kAU4udm4eFD4vHzqfn4p8AXS+oBAKn0FYSEQUxQfCwqh8dAAASZYC5vJ/xd8AAAAASUVORK5CYII=">
-    <p id="titleLabel">Smart Text Editor</p>
-  </div>
-  <p id="about">Inspired by <a href="https://htmledit.squarefree.com/" target="_blank">Real-time HTML Editor</a> and <a href="https://www.editpad.org/" target="_blank">Edit Pad</a>!</p>
+
+<header>
+  <span id="toolbar">
+    <span>
+      <button>File</button>
+      <ul>
+        <li onmousedown="window.open(window.location.href);">New<span>Ctrl + Shift + N</span></li>
+        <li onmousedown="saveAs(userInput.value);">Save As<span>Ctrl + Shift + S</span></li>
+      </ul>
+    </span>
+    <span>
+      <button>View</button>
+      <ul>
+        <li onmousedown="changeView('default');">Default<span>Ctrl + Shift + 1</span></li>
+        <li onmousedown="changeView('code');">Code<span>Ctrl + Shift + 2</span></li>
+        <li onmousedown="changeView('split');">Split<span>Ctrl + Shift + 3</span></li>
+        <li onmousedown="changeView('preview');">Preview<span>Ctrl + Shift + 4</span></li>
+      </ul>
+    </span>
+    <span>
+      <button>Tools</button>
+      <ul>
+        <li onmousedown="window.open('https://htmlformatter.com/');">HTML Formatter</li>
+        <li onmousedown="window.open('http://jsonviewer.stack.hu/');">JSON Formatter</li>
+        <li onmousedown="window.open('http://www.unit-conversion.info/texttools/replace-text/');">Text Replacer</li>
+        <li onmousedown="window.open('https://www.diffchecker.com/');">Difference Finder</li>
+        <li onmousedown="window.open('https://cryptii.com/');">Text Encryptor</li>
+        <li onmousedown="window.open('https://www.base64-image.de/');">Image to Base64 Converter</li>
+        <li onmousedown="window.open('https://keycode.info/');">Keycode Finder</li>
+      </ul>
+    </span>
+  </span>
+  <span id="title">
+    <img id="icon" alt="Icon">
+    <p>Smart Text Editor</p>
+  </span>
+  <span id="attribution">
+    <p>Inspired by <a href="https://htmledit.squarefree.com/">Real-Time HTML Editor</a> and <a href="https://www.editpad.org/">Edit Pad</a>!</p>
+  </span>
+</header>
+
+<main>
+  <textarea id="userInput" class="default" spellcheck="false" autofocus></textarea>
+  <div id="slider" class="default"></div>
+  <iframe id="preview" class="default"></iframe>
+</main>
+
 </body>
 
 <script>
-  var sourceChange = 0;
-  userInput.addEventListener("input",function(){
-    if (sourceChange == 0){
-      sourceChange = 1;
-    }
-    if (userView > 1){
-      previewRefresh();
-    }
-  });
-  file.addEventListener("mouseover",function(){
-    dropOpen("fileList");
-  });
-  file.addEventListener("mouseout",function(){
-    dropClose("fileList");
-  });
-  file.addEventListener("click",function(){
-    dropClose("fileList");
-  });
-  view.addEventListener("mouseover",function(){
-    dropOpen("viewList");
-  });
-  view.addEventListener("mouseout",function(){
-    dropClose("viewList");
-  });
-  view.addEventListener("click",function(){
-    dropClose("viewList");
-  });
-  tools.addEventListener("mouseover",function(){
-    dropOpen("toolsList");
-  });
-  tools.addEventListener("mouseout",function(){
-    dropClose("toolsList");
-  });
-  tools.addEventListener("click",function(){
-    dropClose("toolsList");
-  });
-  var dropActivated = 0;
-  function dropOpen(list){
-    if (dropActivated == 0){
-      document.getElementById(list).classList.toggle("hidden");
-      document.getElementById(list).classList.toggle("visible");
-      dropActivated = 1;
-    }
-  }
-  function dropClose(list){
-    if (dropActivated == 1){
-      document.getElementById(list).classList.toggle("hidden");
-      document.getElementById(list).classList.toggle("visible");
-      dropActivated = 0;
-    }
-  }
+  var iconData = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEJQTFRFAAAA23yI1dXV0VdmzERVji87ycnJw8PDtz1M86xN8JQar6+viIiI7ogA1noApl8A5c+t3sGW2rqKKioqxKd8mIJgbs8VzwAAABZ0Uk5TAP///////////////////////////1SBjaMAAAA8SURBVHicY2DABxgZUflMzCysKHw2dg5kAU4udm4eFD4vHzqfn4p8AXS+oBAKn0FYSEQUxQfCwqh8dAAASZYC5vJ/xd8AAAAASUVORK5CYII=",
+      inputData = "Welcome to the Smart Text Editor! This site was created to allow for easy text editing and HTML development within your browser!",
+      mainView = "default",
+      sourceChange = 0,
+      sliderMove = 0,
+      textY = "calc(50% - 6px)",
+      previewY = "calc(50% - 6px)";
+      innerY = "";
+
+  document.getElementById("favicon").href = iconData;
+  document.getElementById("icon").src = iconData;
+  document.getElementById("userInput").placeholder = inputData;
+
   window.onkeyup = function(){
     if (event.ctrlKey){
       if (event.key == "N"){
-        window.open(window.location.href,"_blank");
+        window.open(window.location.href);
       }
       if (event.key == "S"){
         saveAs(userInput.value);
       }
       if (event.key == "!"){
-        viewDefault();
+        changeView("default");
       }
       if (event.key == "@"){
-        viewCode();
+        changeView("code");
       }
       if (event.key == "#"){
-        viewSplit();
+        changeView("split");
       }
       if (event.key == "$"){
-        viewPreview();
+        changeView("preview");
       }
     }
   };
+  window.addEventListener("resize",function(){
+    if (mainView === "split"){
+      changeView("split");
+    }
+  });
+  window.onbeforeunload = function(){
+    return "Leave site? Changes you made may not be saved.";
+  };
+  function changeView(newView){
+    changeClass("userInput",newView);
+    changeClass("slider",newView);
+    changeClass("preview",newView);
+    mainView = newView;
+  }
+  function changeClass(element,newView){
+    document.getElementById(element).classList.remove(mainView);
+    document.getElementById(element).removeAttribute("style");
+    document.getElementById(element).classList.add(newView);
+  }
+  userInput.addEventListener("input",function(){
+    if (sourceChange == 0){
+      sourceChange = 1;
+    }
+    if (mainView === "split"){
+      previewRefresh();
+    }
+  });
   function previewRefresh(){
     var blob = new Blob([userInput.value],{
       type: "text/html"
@@ -274,47 +333,6 @@
     document.getElementById("preview").src = newurl;
     sourceChange = 0;
   }
-  var sliderMove = 0,
-      textY = "calc(50% - 20px - 8px)",
-      previewY = "calc(50% - 20px - 8px)";
-      innerY = "";
-  splitSlider.addEventListener("mousedown",function(){
-    document.getElementById("userInput").style.pointerEvents = "none";
-    document.getElementById("userInput").style.transition = "none";
-    document.getElementById("preview").style.pointerEvents = "none";
-    document.getElementById("preview").style.transition = "none";
-    document.getElementById("splitSlider").style.transition = "none";
-    document.addEventListener("mousemove",getCursor);
-    document.addEventListener("mouseup",function(){
-      document.removeEventListener("mousemove",getCursor);
-    document.getElementById("userInput").style.pointerEvents = "auto";
-    document.getElementById("userInput").style.transition = "0.50s";
-    document.getElementById("preview").style.pointerEvents = "auto";
-    document.getElementById("preview").style.transition = "0.50s";
-    document.getElementById("splitSlider").style.transition = "0.50s";
-    });
-  });
-  function getCursor(){
-    sliderMove = event.clientY;
-    innerY = window.innerHeight - 80;
-    if (sliderMove <= 120){
-      sliderMove = 120;
-    }
-    if (sliderMove >= innerY){
-      sliderMove = window.innerHeight - 80;
-    }
-    document.getElementById("splitSlider").style.top = sliderMove - 6 + "px";
-    textY = "calc(" + sliderMove + "px - 40px - 10px)";
-    previewY = "calc(100% - 6px - " + sliderMove + "px)";
-    document.getElementById("userInput").style.height = textY;
-    document.getElementById("preview").style.height = previewY;
-  }
-  window.onresize = resize;
-  function resize(){
-    if (userView == 2){
-      viewSplit();
-    }
-  };
   function saveAs(userInput){
     var textBlob = new Blob([userInput],{
       type: "text/plain"
@@ -332,79 +350,32 @@
     }
     downloadLink.click();
   }
-  function linkOpen(url){
-    window.open(url,"_blank").focus();
-  }
-  var userView = 0;
-  function viewDefault(){
-    userView = 0;
-    document.getElementById("userInput").style.height = "calc(100% - 40px - 4px)";
-    document.getElementById("userInput").style.fontFamily = "arial";
-    document.getElementById("userInput").style.color = "#000000";
-    document.getElementById("userInput").style.backgroundColor = "#e8e5c6";
-    document.getElementById("userInput").style.visibility = "visible";
-    document.getElementById("userInput").style.opacity = "1";
-    document.getElementById("preview").style.height = "0%";
-    document.getElementById("preview").style.visibility = "hidden";
-    document.getElementById("preview").style.opacity = "0";
-    document.getElementById("splitSlider").style.top = "calc(100% - 12px)";
-    document.getElementById("splitSlider").style.visibility = "hidden";
-    document.getElementById("splitSlider").style.opacity = "0";
-  }
-  function viewCode(){
-    userView = 1;
-    document.getElementById("userInput").style.height = "calc(100% - 40px - 4px)";
-    document.getElementById("userInput").style.fontFamily = "monospace";
-    document.getElementById("userInput").style.color = "#ffffff";
-    document.getElementById("userInput").style.backgroundColor = "#171717";
-    document.getElementById("userInput").style.visibility = "visible";
-    document.getElementById("userInput").style.opacity = "1";
-    document.getElementById("preview").style.height = "0%";
-    document.getElementById("preview").style.visibility = "hidden";
-    document.getElementById("preview").style.opacity = "0";
-    document.getElementById("splitSlider").style.top = "calc(100% - 12px)";
-    document.getElementById("splitSlider").style.visibility = "hidden";
-    document.getElementById("splitSlider").style.opacity = "0";
-  }
-  function viewSplit(){
-    userView = 2;
-    if (sourceChange == 1){
-      previewRefresh();
+  slider.addEventListener("mousedown",function(){
+    document.getElementById("userInput").classList.add("inMotion");
+    document.getElementById("preview").classList.add("inMotion");
+    document.addEventListener("mousemove",getCursor);
+      document.addEventListener("mouseup",function(){
+      document.removeEventListener("mousemove",getCursor);
+      document.getElementById("userInput").classList.remove("inMotion");
+      document.getElementById("slider").removeProperty("transition");
+      document.getElementById("preview").classList.remove("inMotion");
+    });
+  });
+  function getCursor(){
+    sliderMove = event.clientY - 40;
+    innerY = window.innerHeight - 120;
+    if (sliderMove <= 80){
+      sliderMove = 80;
     }
-    document.getElementById("userInput").style.height = "calc(50% - 20px - 8px)";
-    document.getElementById("userInput").style.fontFamily = "monospace";
-    document.getElementById("userInput").style.color = "#ffffff";
-    document.getElementById("userInput").style.backgroundColor = "#171717";
-    document.getElementById("userInput").style.visibility = "visible";
-    document.getElementById("userInput").style.opacity = "1";
-    document.getElementById("preview").style.height = "calc(50% - 20px - 8px)";
-    document.getElementById("preview").style.visibility = "visible";
-    document.getElementById("preview").style.opacity = "1";
-    document.getElementById("splitSlider").style.top = "calc(50% + 16px)";
-    document.getElementById("splitSlider").style.visibility = "visible";
-    document.getElementById("splitSlider").style.opacity = "1";
-  }
-  function viewPreview(){
-    userView = 3;
-    if (sourceChange == 1){
-      previewRefresh();
+    if (sliderMove >= innerY){
+      sliderMove = window.innerHeight - 120;
     }
-    document.getElementById("userInput").style.height = "calc(50% - 20px - 2px)";
-    document.getElementById("userInput").style.fontFamily = "monospace";
-    document.getElementById("userInput").style.color = "#ffffff";
-    document.getElementById("userInput").style.backgroundColor = "#171717";
-    document.getElementById("userInput").style.visibility = "hidden";
-    document.getElementById("userInput").style.opacity = "0";
-    document.getElementById("preview").style.height = "calc(100% - 40px)";
-    document.getElementById("preview").style.visibility = "visible";
-    document.getElementById("preview").style.opacity = "1";
-    document.getElementById("splitSlider").style.top = "28px";
-    document.getElementById("splitSlider").style.visibility = "hidden";
-    document.getElementById("splitSlider").style.opacity = "0";
+    textY = "calc(" + sliderMove + "px)";
+    previewY = "calc(100% - 6px - " + sliderMove + "px)";
+    document.getElementById("userInput").setAttribute("style","height: " + textY);
+    document.getElementById("slider").setAttribute("style","top: calc(" + sliderMove + "px - 6px) !important; transition: none !important");
+    document.getElementById("preview").setAttribute("style","height: " + previewY);
   }
-  window.onbeforeunload = function(){
-    return "Leave site? Changes you made may not be saved.";
-  };
 </script>
 
 </html>
