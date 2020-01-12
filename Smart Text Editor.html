@@ -9,7 +9,7 @@
       margin: 0px;
       font-family: sans-serif;
       color: #aaaaaa;
-      background-color: #1a1a1a;
+      background-color: #111111;
       user-select: none;
     }
     button {
@@ -20,16 +20,16 @@
       font-family: sans-serif;
       font-size: 14px;
       color: #aaaaaa;
-      background-color: #444444;
+      background-color: #333333;
       border: none;
       border-radius: 4px;
       outline: none;
-      box-shadow: 2px 3px 8px 0px rgba(0, 0, 0, 0.50);
+      box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.75);
       transition: 0.125s;
     }
     button:hover {
       color: #ffffff;
-      background-color: #555555;
+      background-color: #444444;
       cursor: pointer;
     }
     p {
@@ -75,7 +75,7 @@
       top: calc(100% - 12px);
       width: 100%;
       height: 12px;
-      background-color: #444444;
+      background-color: #333333;
       cursor: ns-resize;
       transition: 0.50s;
     }
@@ -120,12 +120,12 @@
     }
     .list {
       position: absolute;
-      width: 80px;
+      width: 160px;
       top: 30px;
-      background-color: #222222;
+      background-color: #1a1a1a;
       border-radius: 4px;
       display: block;
-      box-shadow: 4px 6px 8px 0px rgba(0, 0, 0, 0.75);
+      box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.75);
       transition: 0.125s;
     }
     .list .option {
@@ -138,7 +138,7 @@
     }
     .list .option:hover {
       color: #ffffff;
-      background-color: #333333;
+      background-color: #2a2a2a;
     }
     .hidden {
       visibility: hidden;
@@ -154,13 +154,13 @@
 </head>
 
 <body>
-  <textarea id="userInput" spellcheck="false" onkeyup="previewRefresh();" autofocus placeholder="Welcome to the Smart Text Editor! This site was created to allow for easy text editing and HTML development within your browser!"></textarea>
+  <textarea id="userInput" spellcheck="false" autofocus placeholder="Welcome to the Smart Text Editor! This site was created to allow for easy text editing and HTML development within your browser!"></textarea>
   <iframe id="preview" class="hidden" src=""></iframe>
   <div id="splitSlider" class="hidden"></div>
   <div id="file" class="file select">
     <button>File</button>
     <div id="fileList" class="list hidden">
-      <div class="option" onclick="window.open(window.location.href, '_blank');">New</div>
+      <div class="option" onclick="window.open(window.location.href,'_blank');">New</div>
       <div class="option" onclick="saveAs(userInput.value);">Save As</div>
     </div>
   </div>
@@ -193,6 +193,15 @@
 </body>
 
 <script>
+  var sourceChange = 0;
+  userInput.addEventListener("input",function(){
+    if (sourceChange == 0){
+      sourceChange = 1;
+    }
+    if (userView > 1){
+      previewRefresh();
+    }
+  });
   file.addEventListener("mouseover",function(){
     dropOpen("fileList");
   });
@@ -235,7 +244,7 @@
       dropActivated = 0;
     }
   }
-  document.onkeyup = function(){
+  window.onkeyup = function(){
     if (event.ctrlKey){
       if (event.key == "N"){
         window.open(window.location.href,"_blank");
@@ -258,13 +267,12 @@
     }
   };
   function previewRefresh(){
-    if (userView > 1){
-      var blob = new Blob([userInput.value],{
-        type: "text/html"
-      });
-      var newurl = window.URL.createObjectURL(blob);
-      document.getElementById("preview").src = newurl;
-    }
+    var blob = new Blob([userInput.value],{
+      type: "text/html"
+    });
+    var newurl = window.URL.createObjectURL(blob);
+    document.getElementById("preview").src = newurl;
+    sourceChange = 0;
   }
   var sliderMove = 0,
       textY = "calc(50% - 20px - 8px)",
@@ -301,6 +309,12 @@
     document.getElementById("userInput").style.height = textY;
     document.getElementById("preview").style.height = previewY;
   }
+  window.onresize = resize;
+  function resize(){
+    if (userView == 2){
+      viewSplit();
+    }
+  };
   function saveAs(userInput){
     var textBlob = new Blob([userInput],{
       type: "text/plain"
@@ -327,7 +341,7 @@
     document.getElementById("userInput").style.height = "calc(100% - 40px - 4px)";
     document.getElementById("userInput").style.fontFamily = "arial";
     document.getElementById("userInput").style.color = "#000000";
-    document.getElementById("userInput").style.background = "#E8E5C6";
+    document.getElementById("userInput").style.backgroundColor = "#e8e5c6";
     document.getElementById("userInput").style.visibility = "visible";
     document.getElementById("userInput").style.opacity = "1";
     document.getElementById("preview").style.height = "0%";
@@ -342,7 +356,7 @@
     document.getElementById("userInput").style.height = "calc(100% - 40px - 4px)";
     document.getElementById("userInput").style.fontFamily = "monospace";
     document.getElementById("userInput").style.color = "#ffffff";
-    document.getElementById("userInput").style.background = "#212121";
+    document.getElementById("userInput").style.backgroundColor = "#171717";
     document.getElementById("userInput").style.visibility = "visible";
     document.getElementById("userInput").style.opacity = "1";
     document.getElementById("preview").style.height = "0%";
@@ -354,11 +368,13 @@
   }
   function viewSplit(){
     userView = 2;
-    previewRefresh();
+    if (sourceChange == 1){
+      previewRefresh();
+    }
     document.getElementById("userInput").style.height = "calc(50% - 20px - 8px)";
     document.getElementById("userInput").style.fontFamily = "monospace";
     document.getElementById("userInput").style.color = "#ffffff";
-    document.getElementById("userInput").style.background = "#212121";
+    document.getElementById("userInput").style.backgroundColor = "#171717";
     document.getElementById("userInput").style.visibility = "visible";
     document.getElementById("userInput").style.opacity = "1";
     document.getElementById("preview").style.height = "calc(50% - 20px - 8px)";
@@ -370,11 +386,13 @@
   }
   function viewPreview(){
     userView = 3;
-    previewRefresh();
+    if (sourceChange == 1){
+      previewRefresh();
+    }
     document.getElementById("userInput").style.height = "calc(50% - 20px - 2px)";
     document.getElementById("userInput").style.fontFamily = "monospace";
     document.getElementById("userInput").style.color = "#ffffff";
-    document.getElementById("userInput").style.background = "#212121";
+    document.getElementById("userInput").style.backgroundColor = "#171717";
     document.getElementById("userInput").style.visibility = "hidden";
     document.getElementById("userInput").style.opacity = "0";
     document.getElementById("preview").style.height = "calc(100% - 40px)";
