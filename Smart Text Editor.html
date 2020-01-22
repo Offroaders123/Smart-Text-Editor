@@ -2,246 +2,306 @@
 <html>
 
 <head>
-  <title>Smart Text Editor</title>
-  <link id="favicon" rel="icon" type="image/png">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      font-family: sans-serif;
-      box-sizing: border-box;
-      user-select: none;
-    }
-    header {
-      position: sticky;
-      left: 0px;
-      top: 0px;
-      width: 100%;
-      min-height: 40px;
-      display: flex;
-      background: #111111;
-      box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.75);
-      z-index: 1;
-    }
-    #toolbar {
-      padding: 3px 5px;
-      width: 37.5%;
-    }
-    #toolbar span {
-      position: relative;
-      display: inline-block;
-    }
-    #toolbar button {
-      margin: 7px 5px;
-      width: 75px;
-      height: 20px;
-      font-family: sans-serif;
-      font-size: 14px;
-      color: #aaaaaa;
-      background: #333333;
-      border-radius: 4px;
-      border: none;
-      outline: none;
-      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.75);
-      cursor: pointer;
-      transition: all 0.125s ease;
-    }
-    #toolbar button:hover, .toolbar button:focus {
-      color: #ffffff;
-      background: #444444;
-    }
-    #toolbar button:focus + ul {
-      opacity: 1;
-      pointer-events: all;
-    }
-    #toolbar ul {
-      position: absolute;
-      margin: -7px 5px;
-      width: 185%;
-      background: #1a1a1a;
-      border-radius: 4px;
-      list-style: none;
-      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.75);
-      z-index: 1;
-      opacity: 0;
-      pointer-events: none;
-      transition: all 0.125s ease;
-    }
-    #toolbar li {
-      padding: 8px;
-      font-size: 12px;
-      color: #cccccc;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.125s ease;
-    }
-    #toolbar li:hover {
-      color: #ffffff;
-      background: #2a2a2a;
-    }
-    #toolbar li span {
-      float: right;
-      font-size: 11px;
-      color: #888888;
-      text-align: right;
-    }
-    #title {
-      width: 25%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #title img {
-      margin: 0 2px;
-      height: 26px;
-      image-rendering: pixelated;
-    }
-    #title p {
-      margin: 0 2px;
-      font-size: 16px;
-      color: #aaaaaa;
-    }
-    #attribution {
-      padding: 0 10px;
-      width: 37.5%;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-    }
-    #attribution p, a {
-      color: #aaaaaa;
-      font-size: 14px;
-      text-align: right;
-      transition: all 0.125s ease;
-    }
-    #attribution a:hover {
-      color: #ffffff;
-    }
-    main {
-      position: absolute;
-      width: 100%;
-      height: calc(100% - 40px);
-      background: #171717;
-    }
-    #userInput {
-      position: absolute;
-      padding: 4px;
-      left: 0px;
-      top: 0px;
-      width: 100%;
-      font-size: 13px;
-      border: none;
-      outline: none;
-      white-space: nowrap;
-      resize: none;
-      transition: all 0.50s ease;
-    }
-    #userInput.default {
-      height: 100%;
-      font-family: arial;
-      color: #000000;
-      background: #e8e5c6;
-    }
-    #userInput.code {
-      height: 100%;
-      font-family: monospace;
-      color: #ffffff;
-      background: #171717;
-    }
-    #userInput.split {
-      height: calc(50% - 6px);
-      font-family: monospace;
-      color: #ffffff;
-      background: #171717;
-    }
-    #userInput.preview {
-      height: calc(50% - 6px);
-      font-family: monospace;
-      color: #ffffff;
-      background: #171717;
-      opacity: 0;
-    }
-    #slider {
-      position: absolute;
-      width: 100%;
-      background: #333333;
-      box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.75);
-      z-index: 1;
-      cursor: row-resize;
-      transition: all 0.50s ease;
-    }
-    #slider.default, #slider.code {
-      bottom: 0px;
-      height: 0px;
-      opacity: 0;
-    }
-    #slider.split {
-      bottom: calc(50% - 6px);
-      height: 12px;
-      opacity: 1;
-    }
-    #slider.preview {
-      bottom: 100%;
-      height: 0px;
-      opacity: 0;
-    }
-    .inMotion {
-      pointer-events: none !important;
-      transition: none !important;
-    }
-    #preview {
-      position: absolute;
-      left: 0px;
-      bottom: 0px;
-      width: 100%;
-      background: #ffffff;
-      border: none;
-      user-select: auto;
-      transition: all 0.50s ease;
-    }
-    #preview.default, #preview.code {
-      height: 0%;
-      opacity: 0;
-    }
-    #preview.split {
-      height: calc(50% - 6px);
-    }
-    #preview.preview {
-      height: 100%;
-    }
-  </style>
+
+<title>Smart Text Editor</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link id="favicon" rel="icon" type="image/png">
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    box-sizing: border-box;
+    user-select: none;
+  }
+  #header {
+    position: sticky;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    min-height: 40px;
+    display: flex;
+    background: #171717;
+    z-index: 1;
+    transition: all 0.50s ease;
+  }
+  #header.default, header.code, header.split {
+    box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.75);
+  }
+  #header.preview {
+    box-shadow: none;
+  }
+  #toolbar {
+    padding: 3px 5px;
+    width: 37.5%;
+  }
+  #toolbar span {
+    position: relative;
+    display: inline-block;
+  }
+  #toolbar button {
+    margin: 7px 5px;
+    width: 75px;
+    height: 20px;
+    font-family: sans-serif;
+    font-size: 14px;
+    color: #aaaaaa;
+    background: #3a3a3a;
+    border-radius: 4px;
+    border: none;
+    outline: none;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.75);
+    cursor: pointer;
+    transition: all 0.125s ease;
+  }
+  #toolbar button:hover, #toolbar button:focus {
+    color: #ffffff;
+    background: #4a4a4a;
+  }
+  #toolbar button:focus + ul, #toolbar li:hover > ul {
+    opacity: 1;
+    pointer-events: all;
+  }
+  #toolbar ul {
+    position: absolute;
+    margin: -7px 5px;
+    width: 155px;
+    background: #1c1c1c;
+    border-radius: 4px;
+    list-style: none;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.75);
+    z-index: 1;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.125s ease;
+  }
+  #toolbar ul ul {
+    margin: -23px 147px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  #toolbar li {
+    padding: 8px;
+    font-size: 12px;
+    color: #cccccc;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.125s ease;
+  }
+  #toolbar li:hover {
+    color: #ffffff;
+    background: #2c2c2c;
+  }
+  #toolbar li input {
+    display: none;
+  }
+  #toolbar li i {
+    float: right;
+    padding: 1px;
+    font-size: 11px;
+    color: #777777;
+    text-align: right;
+  }
+  #title {
+    width: 25%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #title img {
+    margin: 0 2px;
+    height: 26px;
+    image-rendering: pixelated;
+  }
+  #title p {
+    margin: 0 2px;
+    font-size: 16px;
+    color: #aaaaaa;
+  }
+  #attribution {
+    padding: 0 10px;
+    width: 37.5%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  #attribution p, #attribution a {
+    color: #aaaaaa;
+    font-size: 14px;
+    text-align: right;
+    transition: all 0.125s ease;
+  }
+  #attribution a:hover {
+    color: #ffffff;
+  }
+  #main {
+    position: absolute;
+    width: 100%;
+    height: calc(100% - 40px);
+    background: #111111;
+  }
+  #userInput {
+    position: absolute;
+    padding: 4px;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    font-size: 13px;
+    border: none;
+    outline: none;
+    white-space: nowrap;
+    resize: none;
+    transition: all 0.50s ease;
+  }
+  #userInput::-webkit-scrollbar {
+    width: 20px;
+    height: 20px;
+  }
+  #userInput::-webkit-scrollbar-track, #userInput::-webkit-scrollbar-corner {
+    background: none;
+  }
+  #userInput::-webkit-scrollbar-thumb {
+    background-clip: content-box;
+    background-color: #7a7a7a;
+    border: 6px solid transparent;
+    border-radius: 16px;
+  }
+  #userInput.default {
+    height: 100%;
+    font-family: arial;
+    color: #000000;
+    background: #e5e2c9;
+  }
+  #userInput.code {
+    height: 100%;
+    font-family: monospace;
+    color: #ffffff;
+    background: #1d1d1d;
+  }
+  #userInput.split {
+    height: calc(50% - 8px);
+    font-family: monospace;
+    color: #ffffff;
+    background: #1d1d1d;
+  }
+  #userInput.preview {
+    height: 0px;
+    font-family: monospace;
+    color: #ffffff;
+    background: #1d1d1d;
+    opacity: 0;
+  }
+  #slider {
+    position: absolute;
+    width: 100%;
+    background: #3a3a3a;
+    box-shadow: 0px -1px 8px rgba(0, 0, 0, 0.75);
+    cursor: row-resize;
+    transition: all 0.50s ease, color 0.125s ease, background 0.125s ease;
+  }
+  #slider:hover, #slider:focus {
+    background: #4a4a4a;
+  }
+  #slider.default, #slider.code {
+    top: 100%;
+    height: 0px;
+    opacity: 0;
+  }
+  #slider.split {
+    top: calc(50% - 8px);
+    height: 16px;
+    opacity: 1;
+  }
+  #slider.preview {
+    top: 0px;
+    height: 0px;
+    opacity: 0;
+  }
+  #preview {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    width: 100%;
+    background: #ffffff;
+    border: none;
+    user-select: auto;
+    transition: all 0.50s ease;
+  }
+  #preview.default, #preview.code {
+    height: 0px;
+    opacity: 0;
+  }
+  #preview.split {
+    height: calc(50% - 8px);
+    opacity: 1;
+  }
+  #preview.preview {
+    height: 100%;
+    opacity: 1;
+  }
+</style>
+
 </head>
 
 <body>
 
-<header>
+<header id="header" class="default">
   <span id="toolbar">
     <span>
       <button>File</button>
       <ul>
-        <li onmousedown="window.open(window.location.href);">New<span>Ctrl + Shift + N</span></li>
-        <li onmousedown="saveAs(userInput.value);">Save As<span>Ctrl + Shift + S</span></li>
+        <li onmousedown="window.open(window.location.href);">Create<i>Ctrl + Shift + C</i></li>
+        <li onmousedown="document.getElementById('load').click();"><input id="load" type="file"></input>Load<i>Ctrl + Shift + L</i></li>
+        <li onmousedown="">Save<i>Ctrl + Shift + S</i></li>
+        <li>Save As...
+          <ul>
+            <li onmousedown="saveAs('txt');">Plain Text<i>.txt</i></li>
+            <li onmousedown="saveAs('html');">HTML<i>.html</i></li>
+            <li onmousedown="saveAs('css');">CSS<i>.css</i></li>
+            <li onmousedown="saveAs('js');">JavaScript<i>.js</i></li>
+            <li onmousedown="saveAs('json');">JSON<i>.json</i></li>
+            <li onmousedown="saveAs('py');">Python<i>.py</i></li>
+          </ul>
+        </li>
       </ul>
     </span>
     <span>
       <button>View</button>
       <ul>
-        <li onmousedown="changeView('default');">Default<span>Ctrl + Shift + 1</span></li>
-        <li onmousedown="changeView('code');">Code<span>Ctrl + Shift + 2</span></li>
-        <li onmousedown="changeView('split');">Split<span>Ctrl + Shift + 3</span></li>
-        <li onmousedown="changeView('preview');">Preview<span>Ctrl + Shift + 4</span></li>
+        <li onmousedown="changeView('default');">Default<i>Ctrl + Shift + 1</i></li>
+        <li onmousedown="changeView('code');">Code<i>Ctrl + Shift + 2</i></li>
+        <li onmousedown="changeView('split');">Split<i>Ctrl + Shift + 3</i></li>
+        <li onmousedown="changeView('preview');">Preview<i>Ctrl + Shift + 4</i></li>
       </ul>
     </span>
     <span>
       <button>Tools</button>
       <ul>
-        <li onmousedown="window.open('https://htmlformatter.com/');">HTML Formatter</li>
-        <li onmousedown="window.open('http://jsonviewer.stack.hu/');">JSON Formatter</li>
-        <li onmousedown="window.open('http://www.unit-conversion.info/texttools/replace-text/');">Text Replacer</li>
-        <li onmousedown="window.open('https://www.diffchecker.com/');">Difference Finder</li>
-        <li onmousedown="window.open('https://cryptii.com/');">Text Encryptor</li>
-        <li onmousedown="window.open('https://www.base64-image.de/');">Image to Base64 Converter</li>
-        <li onmousedown="window.open('https://keycode.info/');">Keycode Finder</li>
+        <li>Text Formatting...
+          <ul>
+            <li onmousedown="window.open('http://www.unit-conversion.info/texttools/replace-text/');">Text Replacer</li>
+            <li onmousedown="window.open('https://www.diffchecker.com/');">Difference Finder</li>
+            <li onmousedown="window.open('https://cryptii.com/');">Text Encryptor</li>
+          </ul>
+        </li>
+        <li>HTML...
+          <ul>
+            <li onmousedown="window.open('https://htmlformatter.com/');">HTML Formatter</li>
+          </ul>
+        </li>
+        <li>JavaScript...
+          <ul>
+            <li onmousedown="window.open('https://keycode.info/');">Keycode Finder</li>
+            <li onmousedown="window.open('https://www.base64-image.de/');">Image to Base64 Converter</li>
+          </ul>
+        </li>
+        <li>JSON...
+          <ul>
+            <li onmousedown="window.open('http://jsonviewer.stack.hu/');">JSON Formatter</li>
+          </ul>
+        </li>
       </ul>
     </span>
   </span>
@@ -254,8 +314,8 @@
   </span>
 </header>
 
-<main>
-  <textarea id="userInput" class="default" spellcheck="false" autofocus></textarea>
+<main id="main">
+  <textarea id="userInput" class="default" spellcheck="false" ></textarea>
   <div id="slider" class="default"></div>
   <iframe id="preview" class="default"></iframe>
 </main>
@@ -268,21 +328,21 @@
       mainView = "default",
       sourceChange = 0,
       sliderMove = 0,
-      textY = "calc(50% - 6px)",
-      previewY = "calc(50% - 6px)";
+      textY = "calc(50% - 8px)",
+      previewY = "calc(50% - 8px)";
       innerY = "";
 
   document.getElementById("favicon").href = iconData;
   document.getElementById("icon").src = iconData;
   document.getElementById("userInput").placeholder = inputData;
 
-  window.onkeyup = function(){
+  window.onkeyup = function(event){
     if (event.ctrlKey){
-      if (event.key == "N"){
+      if (event.key == "C"){
         window.open(window.location.href);
       }
-      if (event.key == "S"){
-        saveAs(userInput.value);
+      if (event.key == "L"){
+        document.getElementById('load').click();
       }
       if (event.key == "!"){
         changeView("default");
@@ -299,18 +359,17 @@
     }
   };
   window.addEventListener("resize",function(){
-    if (mainView === "split"){
+    if (mainView == "split"){
       changeView("split");
     }
   });
-  window.onbeforeunload = function(){
-    return "Leave site? Changes you made may not be saved.";
-  };
   function changeView(newView){
+    changeClass("header",newView);
     changeClass("userInput",newView);
     changeClass("slider",newView);
     changeClass("preview",newView);
     mainView = newView;
+    previewRefresh();
   }
   function changeClass(element,newView){
     document.getElementById(element).classList.remove(mainView);
@@ -321,44 +380,56 @@
     if (sourceChange == 0){
       sourceChange = 1;
     }
-    if (mainView === "split"){
+    if (mainView == "split"){
       previewRefresh();
     }
   });
   function previewRefresh(){
-    var blob = new Blob([userInput.value],{
-      type: "text/html"
-    });
-    var newurl = window.URL.createObjectURL(blob);
-    document.getElementById("preview").src = newurl;
-    sourceChange = 0;
+    if (sourceChange == 1){
+      document.getElementById("preview").src = window.URL.createObjectURL(new Blob([userInput.value],{type: "text/html"}));
+      sourceChange = 0;
+    }
   }
-  function saveAs(userInput){
-    var textBlob = new Blob([userInput],{
+  document.getElementById("load").addEventListener("change",function(event){
+    var reader = new FileReader();
+    reader.onload = function(event){
+      document.getElementById("userInput").textContent = event.target.result;
+      sourceChange = 1;
+      previewRefresh();
+      alert(document.getElementById('load').files[0].name);
+    };
+    reader.readAsText(event.target.files[0]);
+  });
+  function saveAs(fileType){
+    var textBlob = new Blob([userInput.value],{
       type: "text/plain"
     });
     var downloadLink = document.createElement("a");
-    downloadLink.download = "text.txt";
+    downloadLink.download = "Untitled." + fileType;
     downloadLink.innerHTML = "Download File";
     if (window.webkitURL != null){
       downloadLink.href = window.webkitURL.createObjectURL(textBlob);
     } else {
       downloadLink.href = window.URL.createObjectURL(textBlob);
       downloadLink.onclick = destroyClickedElement;
-      downloadLink.style.display = "none";
       document.body.appendChild(downloadLink);
     }
     downloadLink.click();
   }
   slider.addEventListener("mousedown",function(){
-    document.getElementById("userInput").classList.add("inMotion");
-    document.getElementById("preview").classList.add("inMotion");
+    document.getElementById("userInput").style.pointerEvents = "none";
+    document.getElementById("userInput").style.transition = "none";
+    document.getElementById("slider").style.transition = "background 0.125s ease";
+    document.getElementById("preview").style.pointerEvents = "none";
+    document.getElementById("preview").style.transition = "none";
     document.addEventListener("mousemove",getCursor);
-      document.addEventListener("mouseup",function(){
+    document.addEventListener("mouseup",function(){
       document.removeEventListener("mousemove",getCursor);
-      document.getElementById("userInput").classList.remove("inMotion");
-      document.getElementById("slider").removeProperty("transition");
-      document.getElementById("preview").classList.remove("inMotion");
+      document.getElementById("userInput").style.pointerEvents = "auto";
+      document.getElementById("userInput").style.transition = "all 0.50s ease";
+      document.getElementById("slider").style.transition = "all 0.50s ease, background 0.125s ease";
+      document.getElementById("preview").style.pointerEvents = "auto";
+      document.getElementById("preview").style.transition = "all 0.50s ease";
     });
   });
   function getCursor(){
@@ -370,12 +441,15 @@
     if (sliderMove >= innerY){
       sliderMove = window.innerHeight - 120;
     }
-    textY = "calc(" + sliderMove + "px)";
-    previewY = "calc(100% - 6px - " + sliderMove + "px)";
-    document.getElementById("userInput").setAttribute("style","height: " + textY);
-    document.getElementById("slider").setAttribute("style","top: calc(" + sliderMove + "px - 6px) !important; transition: none !important");
-    document.getElementById("preview").setAttribute("style","height: " + previewY);
-  }
+    textY = "calc(" + sliderMove + "px - 8px)";
+    previewY = "calc(100% - " + sliderMove + "px - 8px)";
+    document.getElementById("userInput").style.height = textY;
+    document.getElementById("slider").style.top = "calc(" + sliderMove + "px - 8px)";
+    document.getElementById("preview").style.height = previewY;
+  }/*
+  window.onbeforeunload = function(){
+    return "Leave site? Changes you made may not be saved.";
+  };*/
 </script>
 
 </html>
