@@ -94,12 +94,13 @@
     color: #ffffff;
     background: #2c2c2c;
   }
-  #toolbar li input {
+  #toolbar li input, #toolbar a {
     display: none;
   }
   #toolbar li i {
     float: right;
     padding: 1px;
+    font-style: normal;
     font-size: 11px;
     color: #777777;
     text-align: right;
@@ -295,6 +296,7 @@
           <ul>
             <li onmousedown="window.open('https://keycode.info/');">Keycode Finder</li>
             <li onmousedown="window.open('https://www.base64-image.de/');">Image to Base64 Converter</li>
+            <li onmousedown="window.open('https://base64.guru/converter/encode/audio/mp3');">MP3 to Base64 Converter</li>
           </ul>
         </li>
         <li>JSON...
@@ -304,6 +306,7 @@
         </li>
       </ul>
     </span>
+    <a id="save"></a>
   </span>
   <span id="title">
     <img id="icon" alt="Icon">
@@ -326,6 +329,7 @@
   var iconData = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEJQTFRFAAAA23yI1dXV0VdmzERVji87ycnJw8PDtz1M86xN8JQar6+viIiI7ogA1noApl8A5c+t3sGW2rqKKioqxKd8mIJgbs8VzwAAABZ0Uk5TAP///////////////////////////1SBjaMAAAA8SURBVHicY2DABxgZUflMzCysKHw2dg5kAU4udm4eFD4vHzqfn4p8AXS+oBAKn0FYSEQUxQfCwqh8dAAASZYC5vJ/xd8AAAAASUVORK5CYII=",
       inputData = "Welcome to the Smart Text Editor! This site was created to allow for easy text editing and HTML development within your browser!",
       mainView = "default",
+      loadedFileName = "",
       sourceChange = 0,
       sliderMove = 0,
       textY = "calc(50% - 8px)",
@@ -396,25 +400,20 @@
       document.getElementById("userInput").textContent = event.target.result;
       sourceChange = 1;
       previewRefresh();
-      alert(document.getElementById('load').files[0].name);
+      loadedFileName = document.getElementById("load").files[0].name;
     };
     reader.readAsText(event.target.files[0]);
   });
   function saveAs(fileType){
-    var textBlob = new Blob([userInput.value],{
-      type: "text/plain"
-    });
-    var downloadLink = document.createElement("a");
-    downloadLink.download = "Untitled." + fileType;
-    downloadLink.innerHTML = "Download File";
-    if (window.webkitURL != null){
-      downloadLink.href = window.webkitURL.createObjectURL(textBlob);
+    var fileBlob = new Blob([userInput.value], {type: "text/plain"});
+    var a = document.getElementById("save");
+    a.href = URL.createObjectURL(fileBlob);
+    if (loadedFileName != ""){
+      a.download = loadedFileName;
     } else {
-      downloadLink.href = window.URL.createObjectURL(textBlob);
-      downloadLink.onclick = destroyClickedElement;
-      document.body.appendChild(downloadLink);
+      a.download = "Untitled." + fileType;
     }
-    downloadLink.click();
+    a.click();
   }
   slider.addEventListener("mousedown",function(){
     document.getElementById("userInput").style.pointerEvents = "none";
