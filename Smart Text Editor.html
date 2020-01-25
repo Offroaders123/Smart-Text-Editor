@@ -16,12 +16,15 @@
     box-sizing: border-box;
     user-select: none;
   }
+  body {
+    overflow: hidden;
+  }
   #header {
     position: sticky;
     left: 0px;
     top: 0px;
     width: 100%;
-    min-height: 40px;
+    height: 40px;
     display: flex;
     background: #171717;
     z-index: 1;
@@ -34,15 +37,16 @@
     box-shadow: none;
   }
   #toolbar {
-    padding: 3px 5px;
-    width: 37.5%;
+    width: calc(50% - 85px);
+    margin-right: auto;
+    padding: 10px 5px;
   }
   #toolbar span {
     position: relative;
     display: inline-block;
   }
   #toolbar button {
-    margin: 7px 5px;
+    margin: 0 5px;
     width: 75px;
     height: 20px;
     font-family: sans-serif;
@@ -54,7 +58,7 @@
     outline: none;
     box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.75);
     cursor: pointer;
-    transition: all 0.125s ease;
+    transition: all 0.125s ease, width 0.75s ease;
   }
   #toolbar button:hover, #toolbar button:focus {
     color: #ffffff;
@@ -66,7 +70,7 @@
   }
   #toolbar ul {
     position: absolute;
-    margin: -7px 5px;
+    margin: 0 5px;
     width: 155px;
     background: #1c1c1c;
     border-radius: 4px;
@@ -106,36 +110,64 @@
     text-align: right;
   }
   #title {
-    width: 25%;
+    width: 170px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: none;
   }
   #title img {
     margin: 0 2px;
     height: 26px;
     image-rendering: pixelated;
+    transition: all 0.75s ease;
   }
   #title p {
     margin: 0 2px;
     font-size: 16px;
     color: #aaaaaa;
+    white-space: nowrap;
+    transition: all 0.75s ease;
   }
   #attribution {
-    padding: 0 10px;
-    width: 37.5%;
+    width: calc(50% - 85px);
+    padding: 0 7px;
     display: flex;
+    margin-left: auto;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center;
   }
-  #attribution p, #attribution a {
+  #attribution p, #attribution a { 
     color: #aaaaaa;
     font-size: 14px;
     text-align: right;
-    transition: all 0.125s ease;
+    transform-origin: right center;
+    transition: all 0.125s ease, transform 0.75s ease;
+    margin-left: auto;
   }
   #attribution a:hover {
     color: #ffffff;
+  }
+  @media only screen and (max-width: 900px){
+    #toolbar, #attribution {
+      width: calc(50% - 20px);
+    }
+    #title {
+      width: 40px;
+    }
+    #title p {
+      opacity: 0;
+      display: none;
+    }
+  }
+  @media only screen and (max-width: 800px){
+    #attribution p, #attribution a {
+      transform: scale(0.85);
+    }
+    #toolbar button {
+      width: 50px;
+      margin: 0 1px;
+    }
   }
   #main {
     position: absolute;
@@ -390,7 +422,8 @@
   });
   function previewRefresh(){
     if (sourceChange == 1){
-      document.getElementById("preview").src = window.URL.createObjectURL(new Blob([userInput.value],{type: "text/html"}));
+      var userContent = encodeURIComponent(userInput.value);
+      document.getElementById("preview").src = "data:text/html;charset=utf-8," + userContent;
       sourceChange = 0;
     }
   }
