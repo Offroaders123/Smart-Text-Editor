@@ -114,20 +114,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: none;
   }
   #title img {
     margin: 0 2px;
     height: 26px;
+    object-fit: contain;
     image-rendering: pixelated;
-    transition: all 0.75s ease;
   }
   #title p {
     margin: 0 2px;
     font-size: 16px;
     color: #aaaaaa;
     white-space: nowrap;
-    transition: all 0.75s ease;
   }
   #attribution {
     width: calc(50% - 85px);
@@ -186,7 +184,7 @@
     outline: none;
     white-space: nowrap;
     resize: none;
-    transition: all 0.50s ease;
+    transition: all 0.50s ease, padding 0s, border 0s;
   }
   #userInput::-webkit-scrollbar {
     width: 20px;
@@ -225,6 +223,11 @@
     color: #ffffff;
     background: #1d1d1d;
     opacity: 0;
+  }
+  #userInput.drag {
+    padding: 0;
+    border: 4px solid #0000ff;
+    z-index: 1;
   }
   #slider {
     position: absolute;
@@ -280,7 +283,7 @@
 
 <body>
 
-<header id="header" class="default">
+<header id="header" class="default" ondragover="disableDragover(event);" ondrop="disableDrop(event);">
   <span id="toolbar">
     <span>
       <button>File</button>
@@ -345,12 +348,12 @@
     <p>Smart Text Editor</p>
   </span>
   <span id="attribution">
-    <p>Inspired by <a href="https://htmledit.squarefree.com/">Real-Time HTML Editor</a> and <a href="https://www.editpad.org/">Edit Pad</a>!</p>
+    <p>Inspired by <a href="https://htmledit.squarefree.com/" target="_blank">Real-Time HTML Editor</a> and <a href="https://www.editpad.org/" target="_blank">Edit Pad</a>!</p>
   </span>
 </header>
 
-<main id="main">
-  <textarea id="userInput" class="default" spellcheck="false" ></textarea>
+<main id="main" ondragover="disableDragover(event);" ondrop="disableDrop(event);">
+  <textarea id="userInput" class="default" spellcheck="false" ondragover="loadDragover(event);" ondrop="loadDrop(event);" ></textarea>
   <div id="slider" class="default"></div>
   <iframe id="preview" class="default"></iframe>
 </main>
@@ -358,6 +361,32 @@
 </body>
 
 <script>
+  function loadDragover(event){
+    event.preventDefault();
+    event.stopPropagation();
+    event.dataTransfer.dropEffect = "copy";
+  }
+  function loadDrop(event){
+    event.preventDefault();
+    event.stopPropagation();
+    var reader = new FileReader();  
+    reader.onload = function(event){            
+      document.getElementById("userInput").value = event.target.result;
+      sourceChange = 1;
+      previewRefresh();
+      loadedFileName = event.dataTransfer.files[0].name;
+    }
+    reader.readAsText(event.dataTransfer.files[0],"UTF-8");
+  }
+  function disableDragover(event){
+    event.preventDefault();
+    event.stopPropagation();
+    event.dataTransfer.dropEffect = "none";
+  }
+  function disableDrop(event){
+    event.preventDefault();
+    event.stopPropagation();
+  }
   var iconData = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEJQTFRFAAAA23yI1dXV0VdmzERVji87ycnJw8PDtz1M86xN8JQar6+viIiI7ogA1noApl8A5c+t3sGW2rqKKioqxKd8mIJgbs8VzwAAABZ0Uk5TAP///////////////////////////1SBjaMAAAA8SURBVHicY2DABxgZUflMzCysKHw2dg5kAU4udm4eFD4vHzqfn4p8AXS+oBAKn0FYSEQUxQfCwqh8dAAASZYC5vJ/xd8AAAAASUVORK5CYII=",
       inputData = "Welcome to the Smart Text Editor! This site was created to allow for easy text editing and HTML development within your browser!",
       mainView = "default",
@@ -378,7 +407,7 @@
         window.open(window.location.href);
       }
       if (event.key == "L"){
-        document.getElementById('load').click();
+        document.getElementById("load").click();
       }
       if (event.key == "!"){
         changeView("default");
@@ -399,19 +428,6 @@
       changeView("split");
     }
   });
-  function changeView(newView){
-    changeClass("header",newView);
-    changeClass("userInput",newView);
-    changeClass("slider",newView);
-    changeClass("preview",newView);
-    mainView = newView;
-    previewRefresh();
-  }
-  function changeClass(element,newView){
-    document.getElementById(element).classList.remove(mainView);
-    document.getElementById(element).removeAttribute("style");
-    document.getElementById(element).classList.add(newView);
-  }
   userInput.addEventListener("input",function(){
     if (sourceChange == 0){
       sourceChange = 1;
@@ -420,34 +436,30 @@
       previewRefresh();
     }
   });
-  function previewRefresh(){
-    if (sourceChange == 1){
-      var userContent = encodeURIComponent(userInput.value);
-      document.getElementById("preview").src = "data:text/html;charset=utf-8," + userContent;
-      sourceChange = 0;
-    }
-  }
-  document.getElementById("load").addEventListener("change",function(event){
+  var dragTemp = document.getElementById("userInput").classList;
+  userInput.addEventListener("dragover",function(event){
+    dragTemp.add("drag");
+  });
+  userInput.addEventListener("dragleave",function(event){
+    dragTemp.remove("drag");
+  });
+  userInput.addEventListener("drop",function(event){
+    dragTemp.remove("drag");
+  });
+  preview.contentWindow.addEventListener("dragover",function(event){
+    disableDragover(event);
+  });
+  load.addEventListener("change",function(){
     var reader = new FileReader();
-    reader.onload = function(event){
-      document.getElementById("userInput").textContent = event.target.result;
+    reader.onload = function(){
+      document.getElementById("userInput").value = event.target.result;
       sourceChange = 1;
       previewRefresh();
       loadedFileName = document.getElementById("load").files[0].name;
     };
     reader.readAsText(event.target.files[0]);
+    document.getElementById("load").value = "";
   });
-  function saveAs(fileType){
-    var fileBlob = new Blob([userInput.value], {type: "text/plain"});
-    var a = document.getElementById("save");
-    a.href = URL.createObjectURL(fileBlob);
-    if (loadedFileName != ""){
-      a.download = loadedFileName;
-    } else {
-      a.download = "Untitled." + fileType;
-    }
-    a.click();
-  }
   slider.addEventListener("mousedown",function(){
     document.getElementById("userInput").style.pointerEvents = "none";
     document.getElementById("userInput").style.transition = "none";
@@ -464,6 +476,38 @@
       document.getElementById("preview").style.transition = "all 0.50s ease";
     });
   });
+  function previewRefresh(){
+    if (sourceChange == 1){
+      preview.contentWindow.document.open();
+      preview.contentWindow.document.write(userInput.value);
+      preview.contentWindow.document.close();
+      sourceChange = 0;
+    }
+  }
+  function changeView(newView){
+    changeClass("header",newView);
+    changeClass("userInput",newView);
+    changeClass("slider",newView);
+    changeClass("preview",newView);
+    mainView = newView;
+    previewRefresh();
+  }
+  function changeClass(element,newView){
+    document.getElementById(element).classList.remove(mainView);
+    document.getElementById(element).removeAttribute("style");
+    document.getElementById(element).classList.add(newView);
+  }
+  function saveAs(fileType){
+    var fileBlob = new Blob([userInput.value], {type: "text/plain"});
+    var a = document.getElementById("save");
+    a.href = URL.createObjectURL(fileBlob);
+    if (loadedFileName != ""){
+      a.download = loadedFileName;
+    } else {
+      a.download = "Untitled." + fileType;
+    }
+    a.click();
+  }
   function getCursor(){
     sliderMove = event.clientY - 40;
     innerY = window.innerHeight - 120;
