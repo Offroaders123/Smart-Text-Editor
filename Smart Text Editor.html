@@ -12,8 +12,8 @@
   * {
     margin: 0;
     padding: 0;
-    font-family: sans-serif;
     box-sizing: border-box;
+    font-family: sans-serif;
     user-select: none;
   }
   body {
@@ -21,8 +21,8 @@
   }
   #header {
     position: sticky;
-    left: 0px;
-    top: 0px;
+    left: 0;
+    top: 0;
     width: 100%;
     height: 40px;
     display: flex;
@@ -31,15 +31,15 @@
     transition: all 0.50s ease;
   }
   #header.default, header.code, header.split {
-    box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 1px 8px rgba(0,0,0,0.75);
   }
   #header.preview {
     box-shadow: none;
   }
   #toolbar {
-    width: calc(50% - 85px);
     margin-right: auto;
     padding: 10px 5px;
+    width: calc(50% - 85px);
   }
   #toolbar span {
     position: relative;
@@ -49,15 +49,14 @@
     margin: 0 5px;
     width: 75px;
     height: 20px;
-    font-family: sans-serif;
-    font-size: 14px;
     color: #aaaaaa;
+    font-size: 14px;
     background: #3a3a3a;
-    border-radius: 4px;
     border: none;
-    outline: none;
-    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.75);
+    border-radius: 4px;
     cursor: pointer;
+    outline: none;
     transition: all 0.125s ease, width 0.75s ease;
   }
   #toolbar button:hover, #toolbar button:focus {
@@ -73,23 +72,21 @@
     margin: 0 5px;
     width: 155px;
     background: #1c1c1c;
+    box-shadow: 0px 2px 4px rgba(0,0,0,0.75);
     border-radius: 4px;
-    list-style: none;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.75);
     z-index: 1;
     opacity: 0;
     pointer-events: none;
+    list-style: none;
     transition: all 0.125s ease;
   }
   #toolbar ul ul {
     margin: -23px 147px;
-    opacity: 0;
-    pointer-events: none;
   }
   #toolbar li {
     padding: 8px;
-    font-size: 12px;
     color: #cccccc;
+    font-size: 12px;
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.125s ease;
@@ -104,9 +101,9 @@
   #toolbar li i {
     float: right;
     padding: 1px;
-    font-style: normal;
-    font-size: 11px;
     color: #777777;
+    font-size: 11px;
+    font-style: normal;
     text-align: right;
   }
   #title {
@@ -123,25 +120,25 @@
   }
   #title p {
     margin: 0 2px;
-    font-size: 16px;
     color: #aaaaaa;
+    font-size: 16px;
     white-space: nowrap;
   }
   #attribution {
-    width: calc(50% - 85px);
     padding: 0 7px;
-    display: flex;
     margin-left: auto;
+    width: calc(50% - 85px);
+    display: flex;
     align-items: center;
     justify-content: center;
   }
   #attribution p, #attribution a { 
+    margin-left: auto;
     color: #aaaaaa;
     font-size: 14px;
     text-align: right;
     transform-origin: right center;
     transition: all 0.125s ease, transform 0.75s ease;
-    margin-left: auto;
   }
   #attribution a:hover {
     color: #ffffff;
@@ -163,8 +160,8 @@
       transform: scale(0.85);
     }
     #toolbar button {
-      width: 50px;
       margin: 0 1px;
+      width: 50px;
     }
   }
   #main {
@@ -176,15 +173,47 @@
   #userInput {
     position: absolute;
     padding: 4px;
-    left: 0px;
-    top: 0px;
+    left: 0;
+    top: 0;
     width: 100%;
     font-size: 13px;
     border: none;
-    outline: none;
     white-space: nowrap;
     resize: none;
+    outline: none;
     transition: all 0.50s ease, padding 0s, border 0s;
+  }
+  #userInput.default {
+    height: 100%;
+    color: #000000;
+    font-family: arial;
+    background: #e5e2c9;
+  }
+  #userInput.code, #userInput.split, #userInput.preview {
+    color: #ffffff;
+    font-family: monospace;
+    background: #1d1d1d;
+  }
+  #userInput.code {
+    height: 100%;
+  }
+  #userInput.split {
+    height: calc(50% - 8px);
+  }
+  #userInput.preview {
+    height: 0;
+    opacity: 0;
+  }
+  #userInput.drag {
+    padding: 0;
+    border: 4px solid rgba(0,0,255,0.75);
+    z-index: 1;
+  }
+  #userInput.default.drag {
+    background: #aaaaea;
+  }
+  #userInput.code.drag, #userInput.split.drag, #userInput.preview.drag {
+    background: #161656;
   }
   #userInput::-webkit-scrollbar {
     width: 20px;
@@ -199,97 +228,63 @@
     border: 6px solid transparent;
     border-radius: 16px;
   }
-  #userInput.default {
-    height: 100%;
-    font-family: arial;
-    color: #000000;
-    background: #e5e2c9;
-  }
-  #userInput.code {
-    height: 100%;
-    font-family: monospace;
-    color: #ffffff;
-    background: #1d1d1d;
-  }
-  #userInput.split {
-    height: calc(50% - 8px);
-    font-family: monospace;
-    color: #ffffff;
-    background: #1d1d1d;
-  }
-  #userInput.preview {
-    height: 0px;
-    font-family: monospace;
-    color: #ffffff;
-    background: #1d1d1d;
-    opacity: 0;
-  }
-  #userInput.drag {
-    padding: 0;
-    border: 4px solid #0000ff;
-    z-index: 1;
-  }
   #slider {
     position: absolute;
     width: 100%;
     background: #3a3a3a;
-    box-shadow: 0px -1px 8px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px -1px 8px rgba(0,0,0,0.75);
     cursor: row-resize;
     transition: all 0.50s ease, color 0.125s ease, background 0.125s ease;
   }
-  #slider:hover, #slider:focus {
-    background: #4a4a4a;
-  }
   #slider.default, #slider.code {
     top: 100%;
-    height: 0px;
+    height: 0;
     opacity: 0;
   }
   #slider.split {
     top: calc(50% - 8px);
     height: 16px;
-    opacity: 1;
   }
   #slider.preview {
-    top: 0px;
-    height: 0px;
+    top: 0;
+    height: 0;
     opacity: 0;
+  }
+  #slider:hover, #slider:focus {
+    background: #4a4a4a;
   }
   #preview {
     position: absolute;
-    left: 0px;
-    bottom: 0px;
+    left: 0;
+    bottom: 0;
     width: 100%;
     background: #ffffff;
     border: none;
-    user-select: auto;
     transition: all 0.50s ease;
   }
   #preview.default, #preview.code {
-    height: 0px;
+    height: 0;
     opacity: 0;
   }
   #preview.split {
     height: calc(50% - 8px);
-    opacity: 1;
   }
   #preview.preview {
     height: 100%;
-    opacity: 1;
   }
 </style>
 
 </head>
 
-<body>
+<body ondragover="disableDragover(event);" ondrop="disableDrop(event);">
 
-<header id="header" class="default" ondragover="disableDragover(event);" ondrop="disableDrop(event);">
+<header id="header" class="default">
   <span id="toolbar">
     <span>
       <button>File</button>
       <ul>
-        <li onmousedown="window.open(window.location.href);">Create<i>Ctrl + Shift + C</i></li>
-        <li onmousedown="document.getElementById('load').click();"><input id="load" type="file"></input>Load<i>Ctrl + Shift + L</i></li>
+        <li onmousedown="window.open(window.location.href,'_blank');">Create<i>Ctrl + Shift + C</i></li>
+        <li onmousedown="load.click();"><input id="load" type="file"></input>Load<i>Ctrl + Shift + L</i></li>
         <li onmousedown="">Save<i>Ctrl + Shift + S</i></li>
         <li>Save As...
           <ul>
@@ -317,26 +312,26 @@
       <ul>
         <li>Text Formatting...
           <ul>
-            <li onmousedown="window.open('http://www.unit-conversion.info/texttools/replace-text/');">Text Replacer</li>
-            <li onmousedown="window.open('https://www.diffchecker.com/');">Difference Finder</li>
-            <li onmousedown="window.open('https://cryptii.com/');">Text Encryptor</li>
+            <li onmousedown="window.open('http://www.unit-conversion.info/texttools/replace-text/','_blank');">Text Replacer</li>
+            <li onmousedown="window.open('https://www.diffchecker.com/','_blank');">Difference Finder</li>
+            <li onmousedown="window.open('https://cryptii.com/','_blank');">Text Encryptor</li>
           </ul>
         </li>
         <li>HTML...
           <ul>
-            <li onmousedown="window.open('https://htmlformatter.com/');">HTML Formatter</li>
+            <li onmousedown="window.open('https://htmlformatter.com/','_blank');">HTML Formatter</li>
           </ul>
         </li>
         <li>JavaScript...
           <ul>
-            <li onmousedown="window.open('https://keycode.info/');">Keycode Finder</li>
-            <li onmousedown="window.open('https://www.base64-image.de/');">Image to Base64 Converter</li>
-            <li onmousedown="window.open('https://base64.guru/converter/encode/audio/mp3');">MP3 to Base64 Converter</li>
+            <li onmousedown="window.open('https://keycode.info/','_blank');">Keycode Finder</li>
+            <li onmousedown="window.open('https://www.base64-image.de/','_blank');">Image to Base64 Converter</li>
+            <li onmousedown="window.open('https://base64.guru/converter/encode/audio/mp3','_blank');">MP3 to Base64 Converter</li>
           </ul>
         </li>
         <li>JSON...
           <ul>
-            <li onmousedown="window.open('http://jsonviewer.stack.hu/');">JSON Formatter</li>
+            <li onmousedown="window.open('http://jsonviewer.stack.hu/','_blank');">JSON Formatter</li>
           </ul>
         </li>
       </ul>
@@ -352,7 +347,7 @@
   </span>
 </header>
 
-<main id="main" ondragover="disableDragover(event);" ondrop="disableDrop(event);">
+<main id="main">
   <textarea id="userInput" class="default" spellcheck="false" ondragover="loadDragover(event);" ondrop="loadDrop(event);" ></textarea>
   <div id="slider" class="default"></div>
   <iframe id="preview" class="default"></iframe>
@@ -361,34 +356,8 @@
 </body>
 
 <script>
-  function loadDragover(event){
-    event.preventDefault();
-    event.stopPropagation();
-    event.dataTransfer.dropEffect = "copy";
-  }
-  function loadDrop(event){
-    event.preventDefault();
-    event.stopPropagation();
-    var reader = new FileReader();  
-    reader.onload = function(event){            
-      document.getElementById("userInput").value = event.target.result;
-      sourceChange = 1;
-      previewRefresh();
-      loadedFileName = event.dataTransfer.files[0].name;
-    }
-    reader.readAsText(event.dataTransfer.files[0],"UTF-8");
-  }
-  function disableDragover(event){
-    event.preventDefault();
-    event.stopPropagation();
-    event.dataTransfer.dropEffect = "none";
-  }
-  function disableDrop(event){
-    event.preventDefault();
-    event.stopPropagation();
-  }
   var iconData = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEJQTFRFAAAA23yI1dXV0VdmzERVji87ycnJw8PDtz1M86xN8JQar6+viIiI7ogA1noApl8A5c+t3sGW2rqKKioqxKd8mIJgbs8VzwAAABZ0Uk5TAP///////////////////////////1SBjaMAAAA8SURBVHicY2DABxgZUflMzCysKHw2dg5kAU4udm4eFD4vHzqfn4p8AXS+oBAKn0FYSEQUxQfCwqh8dAAASZYC5vJ/xd8AAAAASUVORK5CYII=",
-      inputData = "Welcome to the Smart Text Editor! This site was created to allow for easy text editing and HTML development within your browser!",
+      placeholderData = "Welcome to the Smart Text Editor! This site was created to allow for easy text editing and HTML development within your browser!",
       mainView = "default",
       loadedFileName = "",
       sourceChange = 0,
@@ -397,17 +366,17 @@
       previewY = "calc(50% - 8px)";
       innerY = "";
 
-  document.getElementById("favicon").href = iconData;
-  document.getElementById("icon").src = iconData;
-  document.getElementById("userInput").placeholder = inputData;
+  favicon.href = iconData;
+  icon.src = iconData;
+  userInput.placeholder = placeholderData;
 
   window.onkeyup = function(event){
     if (event.ctrlKey){
       if (event.key == "C"){
-        window.open(window.location.href);
+        window.open(window.location.href,'_blank');
       }
       if (event.key == "L"){
-        document.getElementById("load").click();
+        load.click();
       }
       if (event.key == "!"){
         changeView("default");
@@ -436,44 +405,66 @@
       previewRefresh();
     }
   });
-  var dragTemp = document.getElementById("userInput").classList;
   userInput.addEventListener("dragover",function(event){
-    dragTemp.add("drag");
+    userInput.classList.add("drag");
   });
   userInput.addEventListener("dragleave",function(event){
-    dragTemp.remove("drag");
+    userInput.classList.remove("drag");
   });
   userInput.addEventListener("drop",function(event){
-    dragTemp.remove("drag");
-  });
-  preview.contentWindow.addEventListener("dragover",function(event){
-    disableDragover(event);
+    userInput.classList.remove("drag");
   });
   load.addEventListener("change",function(){
     var reader = new FileReader();
     reader.onload = function(){
-      document.getElementById("userInput").value = event.target.result;
+      userInput.value = event.target.result;
       sourceChange = 1;
       previewRefresh();
-      loadedFileName = document.getElementById("load").files[0].name;
+      loadedFileName = load.files[0].name;
     };
     reader.readAsText(event.target.files[0]);
-    document.getElementById("load").value = "";
+    load.value = "";
   });
+  function loadDragover(event){
+    event.preventDefault();
+    event.stopPropagation();
+    event.dataTransfer.dropEffect = "copy";
+  }
+  function loadDrop(event){
+    event.preventDefault();
+    event.stopPropagation();
+    var reader = new FileReader();  
+    reader.onload = function(event){            
+      userInput.value = event.target.result;
+      sourceChange = 1;
+      previewRefresh();
+      loadedFileName = event.dataTransfer.files[0].name;
+    }
+    reader.readAsText(event.dataTransfer.files[0],"utf-8");
+  }
+  function disableDragover(event){
+    event.preventDefault();
+    event.stopPropagation();
+    event.dataTransfer.dropEffect = "none";
+  }
+  function disableDrop(event){
+    event.preventDefault();
+    event.stopPropagation();
+  }
   slider.addEventListener("mousedown",function(){
-    document.getElementById("userInput").style.pointerEvents = "none";
-    document.getElementById("userInput").style.transition = "none";
-    document.getElementById("slider").style.transition = "background 0.125s ease";
-    document.getElementById("preview").style.pointerEvents = "none";
-    document.getElementById("preview").style.transition = "none";
+    userInput.style.pointerEvents = "none";
+    userInput.style.transition = "none";
+    slider.style.transition = "background 0.125s ease";
+    preview.style.pointerEvents = "none";
+    preview.style.transition = "none";
     document.addEventListener("mousemove",getCursor);
     document.addEventListener("mouseup",function(){
       document.removeEventListener("mousemove",getCursor);
-      document.getElementById("userInput").style.pointerEvents = "auto";
-      document.getElementById("userInput").style.transition = "all 0.50s ease";
-      document.getElementById("slider").style.transition = "all 0.50s ease, background 0.125s ease";
-      document.getElementById("preview").style.pointerEvents = "auto";
-      document.getElementById("preview").style.transition = "all 0.50s ease";
+      userInput.style.pointerEvents = "auto";
+      userInput.style.transition = "all 0.50s ease";
+      slider.style.transition = "all 0.50s ease, background 0.125s ease";
+      preview.style.pointerEvents = "auto";
+      preview.style.transition = "all 0.50s ease";
     });
   });
   function previewRefresh(){
@@ -483,6 +474,10 @@
       preview.contentWindow.document.close();
       sourceChange = 0;
     }
+    preview.contentWindow.addEventListener("dragover",function(event){
+      disableDragover(event);
+      disableDrop(event);
+    });
   }
   function changeView(newView){
     changeClass("header",newView);
@@ -499,14 +494,13 @@
   }
   function saveAs(fileType){
     var fileBlob = new Blob([userInput.value], {type: "text/plain"});
-    var a = document.getElementById("save");
-    a.href = URL.createObjectURL(fileBlob);
+    save.href = URL.createObjectURL(fileBlob);
     if (loadedFileName != ""){
-      a.download = loadedFileName;
+      save.download = loadedFileName;
     } else {
-      a.download = "Untitled." + fileType;
+      save.download = "Untitled." + fileType;
     }
-    a.click();
+    save.click();
   }
   function getCursor(){
     sliderMove = event.clientY - 40;
@@ -519,9 +513,9 @@
     }
     textY = "calc(" + sliderMove + "px - 8px)";
     previewY = "calc(100% - " + sliderMove + "px - 8px)";
-    document.getElementById("userInput").style.height = textY;
-    document.getElementById("slider").style.top = "calc(" + sliderMove + "px - 8px)";
-    document.getElementById("preview").style.height = previewY;
+    userInput.style.height = textY;
+    slider.style.top = "calc(" + sliderMove + "px - 8px)";
+    preview.style.height = previewY;
   }/*
   window.onbeforeunload = function(){
     return "Leave site? Changes you made may not be saved.";
