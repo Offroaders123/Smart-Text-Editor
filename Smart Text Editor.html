@@ -28,7 +28,7 @@
     display: flex;
     background: #171717;
     z-index: 1;
-    transition: all 0.50s ease;
+    transition: all 0.5s ease;
   }
   #header.default, header.code, header.split {
     box-shadow: 0px 1px 8px rgba(0,0,0,0.75);
@@ -57,7 +57,7 @@
     border-radius: 4px;
     cursor: pointer;
     outline: none;
-    transition: all 0.125s ease, width 0.75s ease;
+    transition: all 0.125s ease, width 0.5s ease;
   }
   #toolbar button:hover, #toolbar button:focus {
     color: #ffffff;
@@ -138,7 +138,7 @@
     font-size: 14px;
     text-align: right;
     transform-origin: right center;
-    transition: all 0.125s ease, transform 0.75s ease;
+    transition: all 0.125s ease, transform 0.5s ease;
   }
   #attribution a:hover {
     color: #ffffff;
@@ -181,12 +181,11 @@
     white-space: nowrap;
     resize: none;
     outline: none;
-    transition: all 0.50s ease, padding 0s, border 0s;
+    transition: all 0.5s ease;
   }
   #userInput.default {
     height: 100%;
     color: #000000;
-    font-family: arial;
     background: #e5e2c9;
   }
   #userInput.code, #userInput.split, #userInput.preview {
@@ -205,14 +204,15 @@
     opacity: 0;
   }
   #userInput.drag {
-    padding: 0;
-    border: 4px solid rgba(0,0,255,0.75);
-    z-index: 1;
+    box-shadow: 0 0 0px 4px #0000ff inset;
+    transition: all 0.125s ease;
   }
   #userInput.default.drag {
+    color: #000080;
     background: #aaaaea;
   }
   #userInput.code.drag, #userInput.split.drag, #userInput.preview.drag {
+    color: #7f7fff;
     background: #161656;
   }
   #userInput::-webkit-scrollbar {
@@ -223,6 +223,8 @@
     background: none;
   }
   #userInput::-webkit-scrollbar-thumb {
+    width: 40px;
+    height: 40px;
     background-clip: content-box;
     background-color: #7a7a7a;
     border: 6px solid transparent;
@@ -234,7 +236,7 @@
     background: #3a3a3a;
     box-shadow: 0px -1px 8px rgba(0,0,0,0.75);
     cursor: row-resize;
-    transition: all 0.50s ease, color 0.125s ease, background 0.125s ease;
+    transition: all 0.5s ease, color 0.125s ease, background 0.125s ease;
   }
   #slider.default, #slider.code {
     top: 100%;
@@ -260,7 +262,7 @@
     width: 100%;
     background: #ffffff;
     border: none;
-    transition: all 0.50s ease;
+    transition: all 0.5s ease;
   }
   #preview.default, #preview.code {
     height: 0;
@@ -304,7 +306,11 @@
         <li onmousedown="changeView('default');">Default<i>Ctrl + Shift + 1</i></li>
         <li onmousedown="changeView('code');">Code<i>Ctrl + Shift + 2</i></li>
         <li onmousedown="changeView('split');">Split<i>Ctrl + Shift + 3</i></li>
-        <li onmousedown="changeView('preview');">Preview<i>Ctrl + Shift + 4</i></li>
+        <li onmousedown="changeView('preview');">Preview<i>Ctrl + Shift + 4</i>
+          <ul>
+            <li onmousedown="fullPreview();">Open in New Window</li>
+          </ul>
+        </li>
       </ul>
     </span>
     <span>
@@ -461,10 +467,10 @@
     document.addEventListener("mouseup",function(){
       document.removeEventListener("mousemove",getCursor);
       userInput.style.pointerEvents = "auto";
-      userInput.style.transition = "all 0.50s ease";
-      slider.style.transition = "all 0.50s ease, background 0.125s ease";
+      userInput.style.transition = "all 0.5s ease";
+      slider.style.transition = "all 0.5s ease, background 0.125s ease";
       preview.style.pointerEvents = "auto";
-      preview.style.transition = "all 0.50s ease";
+      preview.style.transition = "all 0.5s ease";
     });
   });
   function previewRefresh(){
@@ -501,6 +507,10 @@
       save.download = "Untitled." + fileType;
     }
     save.click();
+  }
+  function fullPreview(){
+    var w = window.open();
+    w.document.write(userInput.value);
   }
   function getCursor(){
     sliderMove = event.clientY - 40;
