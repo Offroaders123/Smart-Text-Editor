@@ -6,18 +6,18 @@
 <title>Smart Text Editor</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link id="favicon" rel="icon" type="image/png">
+<link id="favicon" rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEJQTFRFAAAA23yI1dXV0VdmzERVji87ycnJw8PDtz1M86xN8JQar6+viIiI7ogA1noApl8A5c+t3sGW2rqKKioqxKd8mIJgbs8VzwAAABZ0Uk5TAP///////////////////////////1SBjaMAAAA8SURBVHicY2DABxgZUflMzCysKHw2dg5kAU4udm4eFD4vHzqfn4p8AXS+oBAKn0FYSEQUxQfCwqh8dAAASZYC5vJ/xd8AAAAASUVORK5CYII=" type="image/png">
 
 <style>
   * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
     font-family: sans-serif;
-    user-select: none;
+    box-sizing: border-box;
   }
   body {
     overflow: hidden;
+    user-select: none;
   }
   #header {
     position: sticky;
@@ -30,8 +30,8 @@
     z-index: 1;
     transition: all 0.5s ease;
   }
-  #header.default, header.code, header.split {
-    box-shadow: 0px 1px 8px rgba(0,0,0,0.75);
+  #header.default, #header.code, #header.split {
+    box-shadow: 0 1px 8px rgba(0,0,0,0.75);
   }
   #header.preview {
     box-shadow: none;
@@ -41,7 +41,7 @@
     padding: 10px 5px;
     width: calc(50% - 85px);
   }
-  #toolbar span {
+  #toolbar div {
     position: relative;
     display: inline-block;
   }
@@ -53,7 +53,7 @@
     font-size: 14px;
     background: #3a3a3a;
     border: none;
-    box-shadow: 0px 2px 8px rgba(0,0,0,0.75);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.75);
     border-radius: 4px;
     cursor: pointer;
     outline: none;
@@ -72,7 +72,7 @@
     margin: 0 5px;
     width: 155px;
     background: #1c1c1c;
-    box-shadow: 0px 2px 4px rgba(0,0,0,0.75);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.75);
     border-radius: 4px;
     z-index: 1;
     opacity: 0;
@@ -98,13 +98,11 @@
   #toolbar li input, #toolbar a {
     display: none;
   }
-  #toolbar li i {
+  #toolbar li span {
     float: right;
     padding: 1px;
     color: #777777;
     font-size: 11px;
-    font-style: normal;
-    text-align: right;
   }
   #title {
     width: 170px;
@@ -113,13 +111,11 @@
     justify-content: center;
   }
   #title img {
-    margin: 0 2px;
-    height: 26px;
-    object-fit: contain;
-    image-rendering: pixelated;
+    margin: 0 3px;
+    height: 24px;
   }
   #title p {
-    margin: 0 2px;
+    margin: 0 3px;
     color: #aaaaaa;
     font-size: 16px;
     white-space: nowrap;
@@ -156,12 +152,21 @@
     }
   }
   @media only screen and (max-width: 800px){
-    #attribution p, #attribution a {
-      transform: scale(0.85);
-    }
     #toolbar button {
       margin: 0 1px;
       width: 50px;
+    }
+    #attribution p, #attribution a {
+      transform: scale(0.85);
+    }
+  }
+  @media only screen and (max-width: 500px){
+    #toolbar button {
+      margin: 0 1px;
+      width: 40px;
+    }
+    #attribution p, #attribution a {
+      transform: scale(0.65);
     }
   }
   #main {
@@ -204,7 +209,7 @@
     opacity: 0;
   }
   #userInput.drag {
-    box-shadow: 0 0 0px 4px #0000ff inset;
+    box-shadow: 0 0 0 4px #0000ff inset;
     transition: all 0.125s ease;
   }
   #userInput.default.drag {
@@ -234,7 +239,7 @@
     position: absolute;
     width: 100%;
     background: #3a3a3a;
-    box-shadow: 0px -1px 8px rgba(0,0,0,0.75);
+    box-shadow: 0 -1px 8px rgba(0,0,0,0.75);
     cursor: row-resize;
     transition: all 0.5s ease, color 0.125s ease, background 0.125s ease;
   }
@@ -252,7 +257,7 @@
     height: 0;
     opacity: 0;
   }
-  #slider:hover, #slider:focus {
+  #slider:hover {
     background: #4a4a4a;
   }
   #preview {
@@ -281,39 +286,36 @@
 <body ondragover="disableDragover(event);" ondrop="disableDrop(event);">
 
 <header id="header" class="default">
-  <span id="toolbar">
-    <span>
+  <div id="toolbar">
+    <div>
       <button>File</button>
       <ul>
-        <li onmousedown="window.open(window.location.href,'_blank');">Create<i>Ctrl + Shift + C</i></li>
-        <li onmousedown="load.click();"><input id="load" type="file"></input>Load<i>Ctrl + Shift + L</i></li>
-        <li onmousedown="">Save<i>Ctrl + Shift + S</i></li>
+        <li onmousedown="window.open(window.location.href,'_blank');">Create<span>Ctrl + Shift + C</span></li>
+        <li onmousedown="load.click();"><input id="load" type="file">Load<span>Ctrl + Shift + L</span></li>
+        <li onmousedown="saveAs('');">Save<span>Ctrl + Shift + S</span></li>
         <li>Save As...
           <ul>
-            <li onmousedown="saveAs('txt');">Plain Text<i>.txt</i></li>
-            <li onmousedown="saveAs('html');">HTML<i>.html</i></li>
-            <li onmousedown="saveAs('css');">CSS<i>.css</i></li>
-            <li onmousedown="saveAs('js');">JavaScript<i>.js</i></li>
-            <li onmousedown="saveAs('json');">JSON<i>.json</i></li>
-            <li onmousedown="saveAs('py');">Python<i>.py</i></li>
+            <li onmousedown="saveAs('txt');">Plain Text<span>.txt</span></li>
+            <li onmousedown="saveAs('html');">HTML<span>.html</span></li>
+            <li onmousedown="saveAs('css');">CSS<span>.css</span></li>
+            <li onmousedown="saveAs('js');">JavaScript<span>.js</span></li>
+            <li onmousedown="saveAs('json');">JSON<span>.json</span></li>
+            <li onmousedown="saveAs('svg');">SVG<span>.svg</span></li>
+            <li onmousedown="saveAs('py');">Python<span>.py</span></li>
           </ul>
         </li>
       </ul>
-    </span>
-    <span>
+    </div>
+    <div>
       <button>View</button>
       <ul>
-        <li onmousedown="changeView('default');">Default<i>Ctrl + Shift + 1</i></li>
-        <li onmousedown="changeView('code');">Code<i>Ctrl + Shift + 2</i></li>
-        <li onmousedown="changeView('split');">Split<i>Ctrl + Shift + 3</i></li>
-        <li onmousedown="changeView('preview');">Preview<i>Ctrl + Shift + 4</i>
-          <ul>
-            <li onmousedown="fullPreview();">Open in New Window</li>
-          </ul>
-        </li>
+        <li onmousedown="changeView('default');">Default<span>Ctrl + Shift + 1</span></li>
+        <li onmousedown="changeView('code');">Code<span>Ctrl + Shift + 2</span></li>
+        <li onmousedown="changeView('split');">Split<span>Ctrl + Shift + 3</span></li>
+        <li onmousedown="changeView('preview');">Preview<span>Ctrl + Shift + 4</span></li>
       </ul>
-    </span>
-    <span>
+    </div>
+    <div>
       <button>Tools</button>
       <ul>
         <li>Text Formatting...
@@ -326,6 +328,7 @@
         <li>HTML...
           <ul>
             <li onmousedown="window.open('https://htmlformatter.com/','_blank');">HTML Formatter</li>
+            <li onmousedown="window.open('https://www.svgminify.com/','_blank');">SVG Simplifier</li>
           </ul>
         </li>
         <li>JavaScript...
@@ -341,48 +344,39 @@
           </ul>
         </li>
       </ul>
-    </span>
+    </div>
     <a id="save"></a>
-  </span>
-  <span id="title">
-    <img id="icon" alt="Icon">
+  </div>
+  <div id="title">
+    <img id="icon" src="pencil.svg" alt="">
     <p>Smart Text Editor</p>
-  </span>
-  <span id="attribution">
+  </div>
+  <div id="attribution">
     <p>Inspired by <a href="https://htmledit.squarefree.com/" target="_blank">Real-Time HTML Editor</a> and <a href="https://www.editpad.org/" target="_blank">Edit Pad</a>!</p>
-  </span>
+  </div>
 </header>
 
 <main id="main">
-  <textarea id="userInput" class="default" spellcheck="false" ondragover="loadDragover(event);" ondrop="loadDrop(event);" ></textarea>
+  <textarea id="userInput" class="default" placeholder="Welcome to the Smart Text Editor! This site was created to allow for easy text editing and HTML development within your browser!" spellcheck="false" autofocus></textarea>
   <div id="slider" class="default"></div>
   <iframe id="preview" class="default"></iframe>
 </main>
 
-</body>
-
 <script>
-  var iconData = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEJQTFRFAAAA23yI1dXV0VdmzERVji87ycnJw8PDtz1M86xN8JQar6+viIiI7ogA1noApl8A5c+t3sGW2rqKKioqxKd8mIJgbs8VzwAAABZ0Uk5TAP///////////////////////////1SBjaMAAAA8SURBVHicY2DABxgZUflMzCysKHw2dg5kAU4udm4eFD4vHzqfn4p8AXS+oBAKn0FYSEQUxQfCwqh8dAAASZYC5vJ/xd8AAAAASUVORK5CYII=",
-      placeholderData = "Welcome to the Smart Text Editor! This site was created to allow for easy text editing and HTML development within your browser!",
-      mainView = "default",
+  var mainView = "default",
       loadedFileName = "",
-      sourceChange = 0,
-      sliderMove = 0,
-      textY = "calc(50% - 8px)",
-      previewY = "calc(50% - 8px)";
-      innerY = "";
+      sourceChange = 0;
 
-  favicon.href = iconData;
-  icon.src = iconData;
-  userInput.placeholder = placeholderData;
-
-  window.onkeyup = function(event){
+  document.addEventListener("keydown",function(event){
     if (event.ctrlKey){
       if (event.key == "C"){
         window.open(window.location.href,'_blank');
       }
       if (event.key == "L"){
         load.click();
+      }
+      if (event.key == "S"){
+        saveAs("");
       }
       if (event.key == "!"){
         changeView("default");
@@ -397,7 +391,7 @@
         changeView("preview");
       }
     }
-  };
+  });
   window.addEventListener("resize",function(){
     if (mainView == "split"){
       changeView("split");
@@ -412,12 +406,14 @@
     }
   });
   userInput.addEventListener("dragover",function(event){
+    loadDragover(event);
     userInput.classList.add("drag");
   });
   userInput.addEventListener("dragleave",function(event){
     userInput.classList.remove("drag");
   });
   userInput.addEventListener("drop",function(event){
+    loadDrop(event);
     userInput.classList.remove("drag");
   });
   load.addEventListener("change",function(){
@@ -426,36 +422,35 @@
       userInput.value = event.target.result;
       sourceChange = 1;
       previewRefresh();
-      loadedFileName = load.files[0].name;
     };
+    loadedFileName = load.files[0].name;
     reader.readAsText(event.target.files[0]);
-    load.value = "";
   });
-  function loadDragover(event){
+  function captureEvent(event){
     event.preventDefault();
-    event.stopPropagation();
+    event.stopImmediatePropagation();
+  }
+  function loadDragover(event){
+    captureEvent(event);
     event.dataTransfer.dropEffect = "copy";
   }
   function loadDrop(event){
-    event.preventDefault();
-    event.stopPropagation();
+    captureEvent(event);
     var reader = new FileReader();  
     reader.onload = function(event){            
       userInput.value = event.target.result;
       sourceChange = 1;
       previewRefresh();
-      loadedFileName = event.dataTransfer.files[0].name;
     }
+    loadedFileName = event.dataTransfer.files[0].name;
     reader.readAsText(event.dataTransfer.files[0],"utf-8");
   }
   function disableDragover(event){
-    event.preventDefault();
-    event.stopPropagation();
+    captureEvent(event);
     event.dataTransfer.dropEffect = "none";
   }
   function disableDrop(event){
-    event.preventDefault();
-    event.stopPropagation();
+    captureEvent(event);
   }
   slider.addEventListener("mousedown",function(){
     userInput.style.pointerEvents = "none";
@@ -501,18 +496,22 @@
   function saveAs(fileType){
     var fileBlob = new Blob([userInput.value], {type: "text/plain"});
     save.href = URL.createObjectURL(fileBlob);
-    if (loadedFileName != ""){
-      save.download = loadedFileName;
+    if (fileType == ""){
+      if (loadedFileName != ""){
+        save.download = loadedFileName;
+      } else {
+        save.download = "Untitled.txt";
+      }
     } else {
       save.download = "Untitled." + fileType;
     }
     save.click();
   }
-  function fullPreview(){
-    var w = window.open();
-    w.document.write(userInput.value);
-  }
   function getCursor(){
+    var sliderMove = 0,
+        textY = "calc(50% - 8px)",
+        previewY = "calc(50% - 8px)",
+        innerY = "";
     sliderMove = event.clientY - 40;
     innerY = window.innerHeight - 120;
     if (sliderMove <= 80){
@@ -526,10 +525,12 @@
     userInput.style.height = textY;
     slider.style.top = "calc(" + sliderMove + "px - 8px)";
     preview.style.height = previewY;
-  }/*
+  }
   window.onbeforeunload = function(){
     return "Leave site? Changes you made may not be saved.";
-  };*/
+  };
 </script>
+
+</body>
 
 </html>
