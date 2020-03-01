@@ -4,9 +4,9 @@
 <head>
 
 <title>Smart Text Editor</title>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link id="favicon" rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEJQTFRFAAAA23yI1dXV0VdmzERVji87ycnJw8PDtz1M86xN8JQar6+viIiI7ogA1noApl8A5c+t3sGW2rqKKioqxKd8mIJgbs8VzwAAABZ0Uk5TAP///////////////////////////1SBjaMAAAA8SURBVHicY2DABxgZUflMzCysKHw2dg5kAU4udm4eFD4vHzqfn4p8AXS+oBAKn0FYSEQUxQfCwqh8dAAASZYC5vJ/xd8AAAAASUVORK5CYII=" type="image/png">
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEJQTFRFAAAA23yI1dXV0VdmzERVji87ycnJw8PDtz1M86xN8JQar6+viIiI7ogA1noApl8A5c+t3sGW2rqKKioqxKd8mIJgbs8VzwAAABZ0Uk5TAP///////////////////////////1SBjaMAAAA8SURBVHicY2DABxgZUflMzCysKHw2dg5kAU4udm4eFD4vHzqfn4p8AXS+oBAKn0FYSEQUxQfCwqh8dAAASZYC5vJ/xd8AAAAASUVORK5CYII=">
 
 <style>
   * {
@@ -19,16 +19,78 @@
     overflow: hidden;
     user-select: none;
   }
-  #header {
-    position: sticky;
-    left: 0;
-    top: 0;
+  #backdrop {
+    position: absolute;
     width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    pointer-events: none;
+    z-index: 2;
+    animation: backdrop 2s;
+  }
+  @keyframes backdrop {
+    10%, 90% {
+      backdrop-filter: blur(4px);
+    }
+  }
+  #start {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    background: #101010;
+    border-radius: 14px;
+    box-shadow: 0 4px 4px rgba(0,0,0,0.75);
+    opacity: 0;
+    animation: start 2s;
+  }
+  @keyframes start {
+    0% {
+      transform: scale(0.01);
+    }
+    15%, 85% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    100% {
+      transform: translateY(calc(50vh + 50%));
+    }
+  }
+  #start div {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  #start svg {
+    margin: 0 8px;
+    width: 70px;
+    height: 70px;
+  }
+  #start span {
+    color: #aaaaaa;
+    font-size: 22px;
+    text-align: center;
+  }
+  #start section {
+    margin: 0 8px;
+    color: #ffffff;
+    font-size: 42px;
+  }
+  #header {
+    padding: 0 10px;
+    position: relative;
+    width: 100vw;
     height: 40px;
     display: flex;
+    justify-content: space-between;
+    align-items: center;
     background: #171717;
     z-index: 1;
-    transition: all 0.5s ease;
+    transition: padding 0.5s ease;
   }
   #header.default, #header.code, #header.split {
     box-shadow: 0 1px 8px rgba(0,0,0,0.75);
@@ -37,16 +99,21 @@
     box-shadow: none;
   }
   #toolbar {
-    margin-right: auto;
-    padding: 10px 5px;
-    width: calc(50% - 85px);
+    display: flex;
   }
   #toolbar div {
+    margin: 0 6px;
     position: relative;
     display: inline-block;
+    transition: margin 0.5s ease;
+  }
+  #toolbar div:first-child {
+    margin-left: 0;
+  }
+  #toolbar div:last-child {
+    margin-right: 0;
   }
   #toolbar button {
-    margin: 0 5px;
     width: 75px;
     height: 20px;
     color: #aaaaaa;
@@ -69,7 +136,6 @@
   }
   #toolbar ul {
     position: absolute;
-    margin: 0 5px;
     width: 155px;
     background: #1c1c1c;
     box-shadow: 0 2px 4px rgba(0,0,0,0.75);
@@ -78,13 +144,16 @@
     opacity: 0;
     pointer-events: none;
     list-style: none;
-    transition: all 0.125s ease;
+    transition: opacity 0.125s ease;
   }
   #toolbar ul ul {
-    margin: -23px 147px;
+    transform: translate(calc(100% - 8.2px),calc(50% - 15px));
   }
   #toolbar li {
     padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     color: #cccccc;
     font-size: 12px;
     border-radius: 4px;
@@ -95,94 +164,110 @@
     color: #ffffff;
     background: #2c2c2c;
   }
+  #toolbar li:hover > svg {
+    fill: #ffffff;
+  }
   #toolbar li input, #toolbar a {
     display: none;
   }
   #toolbar li span {
-    float: right;
-    padding: 1px;
     color: #777777;
     font-size: 11px;
   }
-  #title {
-    width: 170px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  #toolbar li svg {
+    width: 12px;
+    height: 12px;
+    fill: #777777;
+    transition: fill 0.125s ease;
   }
-  #title img {
-    margin: 0 3px;
+  #title {
+    position: absolute;
+    left: calc(50% - 75px);
+    width: 150px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: left 0.5s ease;
+  }
+  #title svg {
+    margin: 2px;
+    width: 24px;
     height: 24px;
   }
-  #title p {
-    margin: 0 3px;
+  #title span {
     color: #aaaaaa;
     font-size: 16px;
     white-space: nowrap;
+    transform-origin: left center;
+    transition: all 0.5s ease, left 0s;
   }
   #attribution {
-    padding: 0 7px;
-    margin-left: auto;
-    width: calc(50% - 85px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 50%;
+    transform-origin: right center;
+    transition: transform 0.5s ease;
   }
   #attribution p, #attribution a { 
-    margin-left: auto;
     color: #aaaaaa;
     font-size: 14px;
     text-align: right;
-    transform-origin: right center;
-    transition: all 0.125s ease, transform 0.5s ease;
+    transition: color 0.125s ease;
   }
   #attribution a:hover {
     color: #ffffff;
   }
   @media only screen and (max-width: 900px){
-    #toolbar, #attribution {
-      width: calc(50% - 20px);
-    }
     #title {
-      width: 40px;
+      left: calc(50% - 12px);
     }
-    #title p {
+    #title svg {
+      margin: 0;
+    }
+    #title span {
       opacity: 0;
-      display: none;
+      transform: scaleX(0);
     }
   }
   @media only screen and (max-width: 800px){
+    #header {
+      padding: 0 8px;
+    }
+    #toolbar div {
+      margin: 0 4px;
+    }
     #toolbar button {
-      margin: 0 1px;
       width: 50px;
     }
-    #attribution p, #attribution a {
+    #attribution {
       transform: scale(0.85);
     }
   }
   @media only screen and (max-width: 500px){
+    #header {
+      padding: 0 4px;
+    }
+    #toolbar div {
+      margin: 0 2px;
+    }
     #toolbar button {
-      margin: 0 1px;
       width: 40px;
     }
-    #attribution p, #attribution a {
+    #attribution {
       transform: scale(0.65);
     }
   }
   #main {
     position: absolute;
     width: 100%;
-    height: calc(100% - 40px);
+    height: calc(100vh - 40px);
     background: #111111;
   }
   #userInput {
     position: absolute;
-    padding: 4px;
     left: 0;
     top: 0;
     width: 100%;
     font-size: 13px;
-    border: none;
+    border: 4px solid;
     white-space: nowrap;
     resize: none;
     outline: none;
@@ -192,11 +277,13 @@
     height: 100%;
     color: #000000;
     background: #e5e2c9;
+    border-color: #e5e2c9;
   }
   #userInput.code, #userInput.split, #userInput.preview {
     color: #ffffff;
     font-family: monospace;
     background: #1d1d1d;
+    border-color: #1d1d1d;
   }
   #userInput.code {
     height: 100%;
@@ -209,8 +296,8 @@
     opacity: 0;
   }
   #userInput.drag {
-    box-shadow: 0 0 0 4px #0000ff inset;
-    transition: all 0.125s ease;
+    border-color: #0000ff;
+    transition: all 0.25s ease;
   }
   #userInput.default.drag {
     color: #000080;
@@ -221,8 +308,8 @@
     background: #161656;
   }
   #userInput::-webkit-scrollbar {
-    width: 20px;
-    height: 20px;
+    width: 12px;
+    height: 12px;
   }
   #userInput::-webkit-scrollbar-track, #userInput::-webkit-scrollbar-corner {
     background: none;
@@ -232,7 +319,7 @@
     height: 40px;
     background-clip: content-box;
     background-color: #7a7a7a;
-    border: 6px solid transparent;
+    border: 2px solid transparent;
     border-radius: 16px;
   }
   #slider {
@@ -241,7 +328,7 @@
     background: #3a3a3a;
     box-shadow: 0 -1px 8px rgba(0,0,0,0.75);
     cursor: row-resize;
-    transition: all 0.5s ease, color 0.125s ease, background 0.125s ease;
+    transition: all 0.5s ease, background 0.125s ease;
   }
   #slider.default, #slider.code {
     top: 100%;
@@ -283,7 +370,64 @@
 
 </head>
 
+<svg style="position: absolute;">
+  <symbol id="pencil" viewBox="0 0 512 512">
+    <defs>
+      <linearGradient id="wood" x1="-22.662" x2="-32.039" y1="-27.117" y2="-27.117" gradientTransform="matrix(-9.3466 -9.3775 9.3775 -9.3466 0 0)" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#e5cfad" offset="0"/>
+        <stop stop-color="#dec196" offset="0.25"/>
+        <stop stop-color="#daba8a" offset="0.5"/>
+        <stop stop-color="#c4a77c" offset="0.75"/>
+        <stop stop-color="#988260" offset="1"/>
+      </linearGradient>
+      <linearGradient id="paint" x1="22.338" x2="31.811" y1="15.409" y2="15.409" gradientTransform="matrix(9.4412 9.4724 -9.4724 9.4412 0 0)" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#f3ac4d" offset="0"/>
+        <stop stop-color="#f0941a" offset="0.25"/>
+        <stop stop-color="#ee8800" offset="0.5"/>
+        <stop stop-color="#d67a00" offset="0.75"/>
+        <stop stop-color="#a65f00" offset="1"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="22.267" x2="31.751" y1="-8.6537" y2="-8.6537" gradientTransform="matrix(9.4527 9.484 -9.484 9.4527 0 0)" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#d5d5d5" offset="0"/>
+        <stop stop-color="#c9c9c9" offset="0.25"/>
+        <stop stop-color="#c3c3c3" offset="0.5"/>
+        <stop stop-color="#afafaf" offset="0.75"/>
+        <stop stop-color="#888888" offset="1"/>
+      </linearGradient>
+      <linearGradient id="eraser" x1="22.164" x2="31.683" y1="-14.141" y2="-14.141" gradientTransform="matrix(9.4872 9.5187 -9.5187 9.4872 0 0)" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#db7c88" offset="0"/>
+        <stop stop-color="#d15766" offset="0.25"/>
+        <stop stop-color="#cc4455" offset="0.5"/>
+        <stop stop-color="#b73d4c" offset="0.75"/>
+        <stop stop-color="#8e2f3b" offset="1"/>
+      </linearGradient>
+    </defs>
+    <path d="m170.77 428.71-168.7 81.953 81.054-169.89z" fill="url(#wood)"/>
+    <path d="m54.396 484.82-52.657 25.846 25.566-53.027z" fill="#2a2a2a"/>
+    <path d="m314.47 108.52c-9.7304 9.7626 2.2127 37.574 26.676 62.118 24.463 24.544 52.182 36.527 61.913 26.764l-231.03 231.8c-9.7304 9.7626-37.45-2.2201-61.913-26.764-24.463-24.544-36.406-52.355-26.676-62.118z" fill="url(#paint)"/>
+    <path d="m365.73 56.454c-9.827 9.8595 2.2347 37.947 26.94 62.734 24.706 24.788 52.7 36.889 62.527 27.03l-55.137 55.319c-9.827 9.8595-37.821-2.2421-62.527-27.03-24.706-24.788-36.767-52.875-26.94-62.734z" fill="url(#metal)"/>
+    <path d="m417.17 4.7679c-9.8787 9.9114 2.2886 38.189 27.176 63.159 24.888 24.97 53.072 37.178 62.95 27.266l-54.165 54.344c-9.8787 9.9114-38.063-2.2962-62.95-27.266-24.888-24.97-37.055-53.247-27.176-63.159z" fill="url(#eraser)"/>
+    <path d="m417.17 4.7679c9.8787-9.9114 38.063 2.2962 62.95 27.266 24.888 24.97 37.055 53.247 27.176 63.159s-38.062-2.2962-62.95-27.266c-24.888-24.97-37.055-53.247-27.176-63.159z" fill="#db7c88"/>
+  </symbol>
+  <symbol id="arrow" viewBox="0 0 512 512">
+    <path d="m112.66 0 286.68 256-286.68 256z"/>
+  </symbol>
+</svg>
+
 <body ondragover="disableDragover(event);" ondrop="disableDrop(event);">
+
+<div id="backdrop">
+  <div id="start">
+    <div>
+      <svg>
+        <use href="#pencil"/>
+      </svg>
+      <section>Smart Text Editor</section>
+    </div>
+    <span>Welcome to the Smart Text Editor!</span>
+    <span>Created by Brandon Bennett</span>
+  </div>
+</div>
 
 <header id="header" class="default">
   <div id="toolbar">
@@ -294,6 +438,9 @@
         <li onmousedown="load.click();"><input id="load" type="file">Load<span>Ctrl + Shift + L</span></li>
         <li onmousedown="saveAs('');">Save<span>Ctrl + Shift + S</span></li>
         <li>Save As...
+          <svg>
+            <use href="#arrow"/>
+          </svg>
           <ul>
             <li onmousedown="saveAs('txt');">Plain Text<span>.txt</span></li>
             <li onmousedown="saveAs('html');">HTML<span>.html</span></li>
@@ -313,12 +460,16 @@
         <li onmousedown="changeView('code');">Code<span>Ctrl + Shift + 2</span></li>
         <li onmousedown="changeView('split');">Split<span>Ctrl + Shift + 3</span></li>
         <li onmousedown="changeView('preview');">Preview<span>Ctrl + Shift + 4</span></li>
+        <li onmousedown="openDisplay();">Display<span>Ctrl + Shift + 5</span></li>
       </ul>
     </div>
     <div>
       <button>Tools</button>
       <ul>
         <li>Text Formatting...
+          <svg>
+            <use href="#arrow"/>
+          </svg>
           <ul>
             <li onmousedown="window.open('http://www.unit-conversion.info/texttools/replace-text/','_blank');">Text Replacer</li>
             <li onmousedown="window.open('https://www.diffchecker.com/','_blank');">Difference Finder</li>
@@ -326,12 +477,18 @@
           </ul>
         </li>
         <li>HTML...
+          <svg>
+            <use href="#arrow"/>
+          </svg>
           <ul>
             <li onmousedown="window.open('https://htmlformatter.com/','_blank');">HTML Formatter</li>
             <li onmousedown="window.open('https://www.svgminify.com/','_blank');">SVG Simplifier</li>
           </ul>
         </li>
         <li>JavaScript...
+          <svg>
+            <use href="#arrow"/>
+          </svg>
           <ul>
             <li onmousedown="window.open('https://keycode.info/','_blank');">Keycode Finder</li>
             <li onmousedown="window.open('https://www.base64-image.de/','_blank');">Image to Base64 Converter</li>
@@ -339,17 +496,21 @@
           </ul>
         </li>
         <li>JSON...
+          <svg>
+            <use href="#arrow"/>
+          </svg>
           <ul>
             <li onmousedown="window.open('http://jsonviewer.stack.hu/','_blank');">JSON Formatter</li>
           </ul>
         </li>
       </ul>
     </div>
-    <a id="save"></a>
   </div>
   <div id="title">
-    <img id="icon" src="pencil.svg" alt="">
-    <p>Smart Text Editor</p>
+    <svg>
+      <use href="#pencil"/>
+    </svg>
+    <span>Smart Text Editor</span>
   </div>
   <div id="attribution">
     <p>Inspired by <a href="https://htmledit.squarefree.com/" target="_blank">Real-Time HTML Editor</a> and <a href="https://www.editpad.org/" target="_blank">Edit Pad</a>!</p>
@@ -357,20 +518,32 @@
 </header>
 
 <main id="main">
-  <textarea id="userInput" class="default" placeholder="Welcome to the Smart Text Editor! This site was created to allow for easy text editing and HTML development within your browser!" spellcheck="false" autofocus></textarea>
+  <textarea id="userInput" class="default" placeholder="Welcome to the Smart Text Editor! This site was created to allow for easy text editing and HTML development within your browser!" spellcheck="false"></textarea>
   <div id="slider" class="default"></div>
   <iframe id="preview" class="default"></iframe>
 </main>
 
 <script>
-  var mainView = "default",
-      loadedFileName = "",
-      sourceChange = 0;
-
-  document.addEventListener("keydown",function(event){
+  var mainView = "default", loadedFileName = null, sourceChange = 0, mustSave = 0;
+  window.addEventListener("load",function(){
+    if (window == window.parent){
+      userInput.focus();
+    }
+    if (window != window.parent){
+      backdrop.style.animation = "none";
+      start.style.animation = "none";
+    }
+  });
+  window.addEventListener("beforeunload",function(event){
+    if (window == window.parent && mustSave == 1){
+      event.preventDefault();
+      event.returnValue = "";
+    }
+  });
+  window.addEventListener("keydown",function(event){
     if (event.ctrlKey){
       if (event.key == "C"){
-        window.open(window.location.href,'_blank');
+        window.open(window.location.href,"_blank");
       }
       if (event.key == "L"){
         load.click();
@@ -390,6 +563,9 @@
       if (event.key == "$"){
         changeView("preview");
       }
+      if (event.key == "%"){
+        openDisplay();
+      }
     }
   });
   window.addEventListener("resize",function(){
@@ -400,6 +576,9 @@
   userInput.addEventListener("input",function(){
     if (sourceChange == 0){
       sourceChange = 1;
+    }
+    if (mustSave == 0){
+      mustSave = 1;
     }
     if (mainView == "split"){
       previewRefresh();
@@ -415,6 +594,7 @@
   userInput.addEventListener("drop",function(event){
     loadDrop(event);
     userInput.classList.remove("drag");
+    mustSave = 0;
   });
   load.addEventListener("change",function(){
     var reader = new FileReader();
@@ -470,6 +650,7 @@
   });
   function previewRefresh(){
     if (sourceChange == 1){
+      preview.src = "";
       preview.contentWindow.document.open();
       preview.contentWindow.document.write(userInput.value);
       preview.contentWindow.document.close();
@@ -493,11 +674,18 @@
     document.getElementById(element).removeAttribute("style");
     document.getElementById(element).classList.add(newView);
   }
+  function openDisplay(){
+    var display = window.open();
+    display.document.open();
+    display.document.write(userInput.value);
+    display.document.close();
+  }
   function saveAs(fileType){
     var fileBlob = new Blob([userInput.value], {type: "text/plain"});
+    var save = document.createElement("a");
     save.href = URL.createObjectURL(fileBlob);
     if (fileType == ""){
-      if (loadedFileName != ""){
+      if (loadedFileName != null){
         save.download = loadedFileName;
       } else {
         save.download = "Untitled.txt";
@@ -506,6 +694,7 @@
       save.download = "Untitled." + fileType;
     }
     save.click();
+    mustSave = 0;
   }
   function getCursor(){
     var sliderMove = 0,
@@ -526,9 +715,6 @@
     slider.style.top = "calc(" + sliderMove + "px - 8px)";
     preview.style.height = previewY;
   }
-  window.onbeforeunload = function(){
-    return "Leave site? Changes you made may not be saved.";
-  };
 </script>
 
 </body>
