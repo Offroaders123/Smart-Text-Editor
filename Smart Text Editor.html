@@ -16,81 +16,26 @@
     box-sizing: border-box;
   }
   body {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     user-select: none;
   }
-  #backdrop {
+  #svg {
     position: absolute;
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    pointer-events: none;
-    z-index: 2;
-    animation: backdrop 2s;
-  }
-  @keyframes backdrop {
-    10%, 90% {
-      backdrop-filter: blur(4px);
-    }
-  }
-  #start {
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-around;
-    background: #101010;
-    border-radius: 14px;
-    box-shadow: 0 4px 4px rgba(0,0,0,0.75);
-    opacity: 0;
-    animation: start 2s;
-  }
-  @keyframes start {
-    0% {
-      transform: scale(0.01);
-    }
-    15%, 85% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    100% {
-      transform: translateY(calc(50vh + 50%));
-    }
-  }
-  #start div {
-    margin-bottom: 24px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  #start svg {
-    margin: 0 8px;
-    width: 70px;
-    height: 70px;
-  }
-  #start span {
-    color: #aaaaaa;
-    font-size: 22px;
-    text-align: center;
-  }
-  #start section {
-    margin: 0 8px;
-    color: #ffffff;
-    font-size: 42px;
   }
   #header {
-    padding: 0 10px;
+    padding: 0 min(1.5vw, 10px);
     position: relative;
-    width: 100vw;
     height: 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: #171717;
     z-index: 1;
-    transition: padding 0.5s ease;
+    transition: box-shadow 0.5s ease;
   }
   #header.default, #header.code, #header.split {
     box-shadow: 0 1px 8px rgba(0,0,0,0.75);
@@ -102,10 +47,9 @@
     display: flex;
   }
   #toolbar div {
-    margin: 0 6px;
+    margin: 0 min(0.75vw, 6px);
     position: relative;
     display: inline-block;
-    transition: margin 0.5s ease;
   }
   #toolbar div:first-child {
     margin-left: 0;
@@ -114,17 +58,17 @@
     margin-right: 0;
   }
   #toolbar button {
-    width: 75px;
-    height: 20px;
+    width: min(11vw, 75px);
+    height: min(5vw, 20px);
     color: #aaaaaa;
-    font-size: 14px;
+    font-size: min(3.5vw, 14px);
     background: #3a3a3a;
     border: none;
     box-shadow: 0 2px 8px rgba(0,0,0,0.75);
-    border-radius: 4px;
+    border-radius: min(1vw, 4px);
     cursor: pointer;
     outline: none;
-    transition: all 0.125s ease, width 0.5s ease;
+    transition: all 0.125s ease, width 0s;
   }
   #toolbar button:hover, #toolbar button:focus {
     color: #ffffff;
@@ -136,27 +80,25 @@
   }
   #toolbar ul {
     position: absolute;
-    width: 155px;
+    width: min(35vw, 155px);
     background: #1c1c1c;
     box-shadow: 0 2px 4px rgba(0,0,0,0.75);
-    border-radius: 4px;
+    border-radius: min(1vw, 4px);
     z-index: 1;
     opacity: 0;
     pointer-events: none;
     list-style: none;
     transition: opacity 0.125s ease;
   }
-  #toolbar ul ul {
-    transform: translate(calc(100% - 8.2px),calc(50% - 15px));
-  }
   #toolbar li {
-    padding: 8px;
+    padding: min(1.75vw, 8px);
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
     color: #cccccc;
-    font-size: 12px;
-    border-radius: 4px;
+    font-size: min(2.75vw, 12px);
+    border-radius: min(1vw, 4px);
     cursor: pointer;
     transition: all 0.125s ease;
   }
@@ -172,13 +114,18 @@
   }
   #toolbar li span {
     color: #777777;
-    font-size: 11px;
+    font-size: min(2.5vw, 11px);
   }
   #toolbar li svg {
-    width: 12px;
-    height: 12px;
+    width: min(2.75vw, 12px);
+    height: min(2.75vw, 12px);
     fill: #777777;
     transition: fill 0.125s ease;
+  }
+  #toolbar ul ul {
+    position: absolute;
+    left: 100%;
+    top: 0;
   }
   #title {
     position: absolute;
@@ -194,7 +141,7 @@
     width: 24px;
     height: 24px;
   }
-  #title span {
+  #title section {
     color: #aaaaaa;
     font-size: 16px;
     white-space: nowrap;
@@ -202,14 +149,14 @@
     transition: all 0.5s ease, left 0s;
   }
   #attribution {
-    width: 50%;
-    transform-origin: right center;
-    transition: transform 0.5s ease;
-  }
-  #attribution p, #attribution a { 
-    color: #aaaaaa;
-    font-size: 14px;
+    max-width: 35%;
+    display: flex;
     text-align: right;
+    transition: font-size 0.5s ease;
+  }
+  #attribution span, #attribution a {
+    color: #aaaaaa;
+    font-size: min(2vw, 14px);
     transition: color 0.125s ease;
   }
   #attribution a:hover {
@@ -222,43 +169,14 @@
     #title svg {
       margin: 0;
     }
-    #title span {
+    #title section {
       opacity: 0;
       transform: scaleX(0);
     }
   }
-  @media only screen and (max-width: 800px){
-    #header {
-      padding: 0 8px;
-    }
-    #toolbar div {
-      margin: 0 4px;
-    }
-    #toolbar button {
-      width: 50px;
-    }
-    #attribution {
-      transform: scale(0.85);
-    }
-  }
-  @media only screen and (max-width: 500px){
-    #header {
-      padding: 0 4px;
-    }
-    #toolbar div {
-      margin: 0 2px;
-    }
-    #toolbar button {
-      width: 40px;
-    }
-    #attribution {
-      transform: scale(0.65);
-    }
-  }
   #main {
-    position: absolute;
-    width: 100%;
-    height: calc(100vh - 40px);
+    position: relative;
+    flex: 1;
     background: #111111;
   }
   #userInput {
@@ -344,7 +262,7 @@
     height: 0;
     opacity: 0;
   }
-  #slider:hover {
+  #slider.active, #slider:hover {
     background: #4a4a4a;
   }
   #preview {
@@ -366,11 +284,70 @@
   #preview.preview {
     height: 100%;
   }
+  #menu {
+    position: absolute;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    pointer-events: none;
+    z-index: 2;
+    animation: menu 2s;
+  }
+  @keyframes menu {
+    10%, 90% {
+      backdrop-filter: blur(4px);
+    }
+  }
+  #welcome {
+    padding: 2vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    background: #101010;
+    border-radius: 1vw;
+    box-shadow: 0 0.25vw 0.25vw rgba(0,0,0,0.75);
+    opacity: 0;
+    animation: welcome 2s;
+  }
+  @keyframes welcome {
+    0% {
+      transform: scale(0.01);
+    }
+    15%, 85% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    100% {
+      transform: translateY(calc(50vh + 50%));
+    }
+  }
+  #welcome div {
+    margin-bottom: 1.75vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  #welcome svg {
+    margin: 0 0.5vw;
+    width: 5vw;
+    height: 5vw;
+  }
+  #welcome section {
+    margin: 0 0.5vw;
+    color: #ffffff;
+    font-size: 3vw;
+  }
+  #welcome span {
+    color: #aaaaaa;
+    font-size: 1.5vw;
+    text-align: center;
+  }
 </style>
 
-</head>
-
-<svg style="position: absolute;">
+<svg id="svg">
   <symbol id="pencil" viewBox="0 0 512 512">
     <defs>
       <linearGradient id="wood" x1="-22.662" x2="-32.039" y1="-27.117" y2="-27.117" gradientTransform="matrix(-9.3466 -9.3775 9.3775 -9.3466 0 0)" gradientUnits="userSpaceOnUse">
@@ -414,20 +391,9 @@
   </symbol>
 </svg>
 
-<body ondragover="disableDragover(event);" ondrop="disableDrop(event);">
+</head>
 
-<div id="backdrop">
-  <div id="start">
-    <div>
-      <svg>
-        <use href="#pencil"/>
-      </svg>
-      <section>Smart Text Editor</section>
-    </div>
-    <span>Welcome to the Smart Text Editor!</span>
-    <span>Created by Brandon Bennett</span>
-  </div>
-</div>
+<body>
 
 <header id="header" class="default">
   <div id="toolbar">
@@ -438,9 +404,7 @@
         <li onmousedown="load.click();"><input id="load" type="file">Load<span>Ctrl + Shift + L</span></li>
         <li onmousedown="saveAs('');">Save<span>Ctrl + Shift + S</span></li>
         <li>Save As...
-          <svg>
-            <use href="#arrow"/>
-          </svg>
+          <svg><use href="#arrow"/></svg>
           <ul>
             <li onmousedown="saveAs('txt');">Plain Text<span>.txt</span></li>
             <li onmousedown="saveAs('html');">HTML<span>.html</span></li>
@@ -448,7 +412,6 @@
             <li onmousedown="saveAs('js');">JavaScript<span>.js</span></li>
             <li onmousedown="saveAs('json');">JSON<span>.json</span></li>
             <li onmousedown="saveAs('svg');">SVG<span>.svg</span></li>
-            <li onmousedown="saveAs('py');">Python<span>.py</span></li>
           </ul>
         </li>
       </ul>
@@ -467,9 +430,7 @@
       <button>Tools</button>
       <ul>
         <li>Text Formatting...
-          <svg>
-            <use href="#arrow"/>
-          </svg>
+          <svg><use href="#arrow"/></svg>
           <ul>
             <li onmousedown="window.open('http://www.unit-conversion.info/texttools/replace-text/','_blank');">Text Replacer</li>
             <li onmousedown="window.open('https://www.diffchecker.com/','_blank');">Difference Finder</li>
@@ -477,18 +438,14 @@
           </ul>
         </li>
         <li>HTML...
-          <svg>
-            <use href="#arrow"/>
-          </svg>
+          <svg><use href="#arrow"/></svg>
           <ul>
             <li onmousedown="window.open('https://htmlformatter.com/','_blank');">HTML Formatter</li>
             <li onmousedown="window.open('https://www.svgminify.com/','_blank');">SVG Simplifier</li>
           </ul>
         </li>
         <li>JavaScript...
-          <svg>
-            <use href="#arrow"/>
-          </svg>
+          <svg><use href="#arrow"/></svg>
           <ul>
             <li onmousedown="window.open('https://keycode.info/','_blank');">Keycode Finder</li>
             <li onmousedown="window.open('https://www.base64-image.de/','_blank');">Image to Base64 Converter</li>
@@ -496,9 +453,7 @@
           </ul>
         </li>
         <li>JSON...
-          <svg>
-            <use href="#arrow"/>
-          </svg>
+          <svg><use href="#arrow"/></svg>
           <ul>
             <li onmousedown="window.open('http://jsonviewer.stack.hu/','_blank');">JSON Formatter</li>
           </ul>
@@ -507,13 +462,11 @@
     </div>
   </div>
   <div id="title">
-    <svg>
-      <use href="#pencil"/>
-    </svg>
-    <span>Smart Text Editor</span>
+    <svg><use href="#pencil"/></svg>
+    <section>Smart Text Editor</section>
   </div>
   <div id="attribution">
-    <p>Inspired by <a href="https://htmledit.squarefree.com/" target="_blank">Real-Time HTML Editor</a> and <a href="https://www.editpad.org/" target="_blank">Edit Pad</a>!</p>
+    <span>Inspired by <a href="https://htmledit.squarefree.com/" target="_blank">Real-Time HTML Editor</a> and <a href="https://www.editpad.org/" target="_blank">Edit Pad</a>!</span>
   </div>
 </header>
 
@@ -523,15 +476,25 @@
   <iframe id="preview" class="default"></iframe>
 </main>
 
+<div id="menu">
+  <div id="welcome">
+    <div>
+      <svg><use href="#pencil"/></svg>
+      <section>Smart Text Editor</section>
+    </div>
+    <span>Welcome to the Smart Text Editor!</span>
+    <span>Created by Brandon Bennett</span>
+  </div>
+</div>
+
 <script>
   var mainView = "default", loadedFileName = null, sourceChange = 0, mustSave = 0;
   window.addEventListener("load",function(){
     if (window == window.parent){
       userInput.focus();
-    }
-    if (window != window.parent){
-      backdrop.style.animation = "none";
-      start.style.animation = "none";
+    } else {
+      menu.style.animation = "none";
+      welcome.style.animation = "none";
     }
   });
   window.addEventListener("beforeunload",function(event){
@@ -573,14 +536,18 @@
       changeView("split");
     }
   });
+  document.body.addEventListener("dragover",function(){
+    disableDragover(event);
+  });
+  document.body.addEventListener("drop",function(){
+    disableDrop(event);
+  });
   userInput.addEventListener("input",function(){
     if (sourceChange == 0){
       sourceChange = 1;
     }
-    if (mustSave == 0){
-      mustSave = 1;
-    }
-    if (mainView == "split"){
+    mustSave = 1;
+    if ((mainView == "split") || (mainView == "preview")){
       previewRefresh();
     }
   });
@@ -592,9 +559,9 @@
     userInput.classList.remove("drag");
   });
   userInput.addEventListener("drop",function(event){
+    captureEvent(event);
     loadDrop(event);
     userInput.classList.remove("drag");
-    mustSave = 0;
   });
   load.addEventListener("change",function(){
     var reader = new FileReader();
@@ -615,15 +582,26 @@
     event.dataTransfer.dropEffect = "copy";
   }
   function loadDrop(event){
-    captureEvent(event);
-    var reader = new FileReader();  
-    reader.onload = function(event){            
+    if (mustSave == 1){
+    }
+    var reader = new FileReader();
+    var file = event.dataTransfer.files[0];
+    reader.addEventListener("load",function(event){            
       userInput.value = event.target.result;
       sourceChange = 1;
       previewRefresh();
+    });
+    reader.readAsText(file,"UTF-8");
+    loadedFileName = file.name;
+    var type = file.type;
+    if ((type == "text/html") || (type == "image/svg+xml")){
+      changeView("split");
+    } else if ((type == "text/css") || (type == "text/javascript") || (type == "text/json")){
+      changeView("code");
+    } else {
+      changeView("default");
     }
-    loadedFileName = event.dataTransfer.files[0].name;
-    reader.readAsText(event.dataTransfer.files[0],"utf-8");
+    mustSave = 0;
   }
   function disableDragover(event){
     captureEvent(event);
@@ -633,16 +611,20 @@
     captureEvent(event);
   }
   slider.addEventListener("mousedown",function(){
+    document.body.style.cursor = "row-resize";
     userInput.style.pointerEvents = "none";
     userInput.style.transition = "none";
+    slider.classList.add("active");
     slider.style.transition = "background 0.125s ease";
     preview.style.pointerEvents = "none";
     preview.style.transition = "none";
-    document.addEventListener("mousemove",getCursor);
-    document.addEventListener("mouseup",function(){
-      document.removeEventListener("mousemove",getCursor);
+    document.body.addEventListener("mousemove",getCursor);
+    document.body.addEventListener("mouseup",function(){
+      document.body.removeEventListener("mousemove",getCursor);
+      document.body.style.cursor = "auto";
       userInput.style.pointerEvents = "auto";
       userInput.style.transition = "all 0.5s ease";
+      slider.classList.remove("active");
       slider.style.transition = "all 0.5s ease, background 0.125s ease";
       preview.style.pointerEvents = "auto";
       preview.style.transition = "all 0.5s ease";
@@ -697,10 +679,7 @@
     mustSave = 0;
   }
   function getCursor(){
-    var sliderMove = 0,
-        textY = "calc(50% - 8px)",
-        previewY = "calc(50% - 8px)",
-        innerY = "";
+    var sliderMove = 0, textY = "calc(50% - 8px)", previewY = "calc(50% - 8px)", innerY = "";
     sliderMove = event.clientY - 40;
     innerY = window.innerHeight - 120;
     if (sliderMove <= 80){
