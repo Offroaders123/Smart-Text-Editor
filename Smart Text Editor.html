@@ -97,11 +97,6 @@
   #toolbar div:last-child, #replacer button:last-child {
     margin-right: 0;
   }
-  #toolbar button:focus + ul, #toolbar li:hover > ul {
-    opacity: 1;
-    pointer-events: all;
-    transform: scaleY(1);
-  }
   #toolbar ul {
     position: absolute;
     min-width: min(35vw, 155px);
@@ -128,9 +123,6 @@
     cursor: pointer;
     transition: color 0.125s ease, background 0.125s ease;
   }
-  #toolbar li input, #toolbar li a {
-    display: none;
-  }
   #toolbar li span {
     margin-left: min(4vw, 16px);
     color: #777777;
@@ -141,6 +133,9 @@
     height: min(2.75vw, 12px);
     fill: #777777;
     transition: fill 0.125s ease;
+  }
+  #toolbar li input[type="file"], #toolbar li a {
+    display: none;
   }
   #toolbar li:hover {
     color: #ffffff;
@@ -156,10 +151,23 @@
     transform: scaleX(0);
     transform-origin: left center;
   }
+  #toolbar button:focus + ul, #toolbar li:hover > ul {
+    opacity: 1;
+    pointer-events: all;
+    transform: scale(1);
+  }
   @media only screen and (max-height: 300px){
     #toolbar ul ul {
-      max-height: min(18vw, 60px);
+      min-width: 100%;
+      max-height: min(14vw, 60px);
+      left: 0;
+      top: 100%;
+      transform: scaleY(0);
+      transform-origin: top center;
       overflow-y: auto;
+    }
+    #toolbar li svg {
+      transform: rotate(90deg);
     }
   }
   #title {
@@ -601,7 +609,7 @@
   <div id="slider" class="default">
     <div>▲<br>▼</div>
   </div>
-  <iframe id="preview" class="default"></iframe>
+  <iframe id="preview" class="default" src="about:blank"></iframe>
 </main>
 
 <div id="menu">
@@ -702,7 +710,7 @@
     importFile(event);
   });
   function importFile(event){
-    var reader = new FileReader(), validTypes = ["text","font","image","audio"], validSubtypes = ["plain","css","javascript","json","html","svg+xml"], mimeType = load.files[0].type;
+    var reader = new FileReader(), validTypes = ["text","image","audio"], validSubtypes = ["plain","css","javascript","json","html","svg+xml"], mimeType = load.files[0].type;
     function mimeDivision(index){
       return mimeType.split("/")[index];
     }
@@ -712,12 +720,12 @@
     if (validTypes.includes(mimeDivision(0))){
       if (validTypes[0] == mimeDivision(0)){
         reader.readAsText(load.files[0],"UTF-8");
-        loadedFile = load.files[0].name;
         reader.addEventListener("loadend",function(){
           userInput.value = reader.result;
           sourceChange = 1;
           previewRefresh();
         });
+        loadedFile = load.files[0].name;
         if (validSubtypes[0] == mimeDivision(1)){
           changeView("default");
         }
@@ -728,10 +736,12 @@
           changeView("split");
         }
       }
-      if (validTypes.slice(1,4).includes(mimeDivision(0))){
+      if (validTypes.slice(1,3).includes(mimeDivision(0))){
         reader.readAsDataURL(load.files[0]);
         reader.addEventListener("loadend",function(){
           userInput.setRangeText(reader.result);
+          sourceChange = 1;
+          previewRefresh();
         });
       }
       mustSave = 0;
@@ -752,6 +762,7 @@
       save.download = "Untitled." + extension;
     }
     save.click();
+    loadedFile = save.download;
     mustSave = 0;
   }
   function changeView(newView){
@@ -787,12 +798,12 @@
     modify.value = "";
   }
   function importHTMLTemplate(){
-    userInput.value = decodeURI("%3C!DOCTYPE%20html%3E%0A%3Chtml%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1.0%22%3E%0A%3Clink%20rel=%22icon%22%20type=%22image/%22%20href=%22%22%3E%0A%0A%3Cstyle%3E%0A%20%20*%20%7B%0A%20%20%20%20margin:%200;%0A%20%20%20%20padding:%200;%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cheader%3E%0A%3C/header%3E%0A%0A%3Cmain%3E%0A%3C/main%3E%0A%0A%3Cfooter%3E%0A%3C/footer%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E");
+    userInput.value = decodeURI("%3C!DOCTYPE%20html%3E%0A%3Chtml%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1.0%22%3E%0A%3Clink%20rel=%22icon%22%20type=%22%22%20href=%22%22%3E%0A%0A%3Cstyle%3E%0A%20%20*%20%7B%0A%20%20%20%20margin:%200;%0A%20%20%20%20padding:%200;%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20width:%20100vw;%0A%20%20%20%20height:%20100vh;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E");
     changeView("split");
   }
   function previewRefresh(){
     if (sourceChange == 1){
-      preview.src = "";
+      preview.src = "about:blank";
       preview.contentWindow.document.open();
       preview.contentWindow.document.write(userInput.value);
       preview.contentWindow.document.close();
