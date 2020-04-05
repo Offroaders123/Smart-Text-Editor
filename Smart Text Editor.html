@@ -15,6 +15,21 @@
     font-family: sans-serif;
     box-sizing: border-box;
   }
+  :root {
+    --container-dark: #171717;
+    --container-medium: #1c1c1c;
+    --container-medium-hover: #2c2c2c;
+    --container-light: #ffffff;
+
+    --text-dark: #aaaaaa;
+    --text-medium: #cccccc;
+    --text-info: #777777;
+    --text-light: #ffffff;
+    --text-hover: #ffffff;
+
+    --button-medium: #3a3a3a;
+    --button-medium-hover: #4a4a4a;
+  }
   body {
     width: 100vw;
     height: 100vh;
@@ -29,9 +44,9 @@
   button {
     width: min(11vw, 75px);
     height: min(5vw, 20px);
-    color: #aaaaaa;
+    color: var(--text-dark);
     font-size: min(3.5vw, 14px);
-    background: #3a3a3a;
+    background: var(--button-medium);
     border: none;
     border-radius: min(1vw, 4px);
     box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) rgba(0,0,0,0.75);
@@ -40,8 +55,8 @@
     transition: color 0.125s ease, background 0.125s ease, width 0s;
   }
   button:hover, #toolbar button:focus {
-    color: #ffffff;
-    background: #4a4a4a;
+    color: var(--text-hover);
+    background: var(--button-medium-hover);
   }
   textarea {
     font-size: 13px;
@@ -75,7 +90,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #171717;
+    background: var(--container-dark);
     z-index: 2;
     transition: box-shadow 0.5s ease;
   }
@@ -88,7 +103,7 @@
   #toolbar {
     display: flex;
   }
-  #toolbar div, #replacer button {
+  #toolbar div {
     margin: 0 min(0.75vw, 6px);
   }
   #toolbar div:first-child, #replacer button:first-child {
@@ -100,7 +115,7 @@
   #toolbar ul {
     position: absolute;
     min-width: min(35vw, 155px);
-    background: #1c1c1c;
+    background: var(--container-medium);
     border-radius: min(1vw, 4px);
     box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) rgba(0,0,0,0.75);
     z-index: 1;
@@ -117,32 +132,33 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #cccccc;
+    color: var(--text-medium);
     font-size: min(2.75vw, 12px);
     border-radius: min(1vw, 4px);
+    white-space: nowrap;
     cursor: pointer;
     transition: color 0.125s ease, background 0.125s ease;
   }
   #toolbar li span {
     margin-left: min(4vw, 16px);
-    color: #777777;
+    color: var(--text-info);
     font-size: min(2.5vw, 11px);
   }
   #toolbar li svg {
     width: min(2.75vw, 12px);
     height: min(2.75vw, 12px);
-    fill: #777777;
+    fill: var(--text-info);
     transition: fill 0.125s ease;
   }
   #toolbar li input[type="file"], #toolbar li a {
     display: none;
   }
   #toolbar li:hover {
-    color: #ffffff;
-    background: #2c2c2c;
+    color: var(--text-hover);
+    background: var(--container-medium-hover);
   }
   #toolbar li:hover > svg {
-    fill: #ffffff;
+    fill: var(--text-hover);
   }
   #toolbar ul ul {
     position: absolute;
@@ -156,10 +172,10 @@
     pointer-events: all;
     transform: scale(1);
   }
-  @media only screen and (max-height: 300px){
+  @media only screen and (max-height: 325px){
     #toolbar ul ul {
       min-width: 100%;
-      max-height: min(14vw, 60px);
+      max-height: min(24vh, 60px);
       left: 0;
       top: 100%;
       transform: scaleY(0);
@@ -168,6 +184,16 @@
     }
     #toolbar li svg {
       transform: rotate(90deg);
+    }
+  }
+  @media only screen and (max-height: 200px){
+    #toolbar ul {
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    #toolbar ul ul {
+      max-height: initial;
+      overflow-y: initial;
     }
   }
   #title {
@@ -184,104 +210,11 @@
     height: 24px;
   }
   #title section {
-    color: #aaaaaa;
+    color: var(--text-dark);
     font-size: 16px;
     white-space: nowrap;
     transform-origin: left center;
     transition: all 0.5s ease, left 0s;
-  }
-  #attribution {
-    max-width: 35%;
-    display: flex;
-    text-align: right;
-    transition: font-size 0.5s ease;
-  }
-  #attribution span, #attribution a {
-    color: #aaaaaa;
-    font-size: min(2vw, 14px);
-    transition: color 0.125s ease;
-  }
-  #attribution a:hover {
-    color: #ffffff;
-  }
-  #replacer {
-    margin: min(1.5vw, 10px);
-    padding: min(1.5vw, 10px);
-    position: absolute;
-    right: 0;
-    top: 100%;
-    max-height: calc(100vh - 60px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: #171717;
-    border-radius: min(1vw, 4px);
-    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) rgba(0,0,0,0.75);
-    opacity: 0;
-    pointer-events: none;
-    transform: scaleY(0);
-    transform-origin: top center;
-    transition: opacity 0.25s ease, transform 0.25s ease;
-  }
-  #replacer div {
-    display: flex;
-  }
-  #replacer div:nth-child(1) {
-    margin-bottom: min(1.5vw, 10px);
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-  }
-  #replacer section {
-    padding: 0 min(25vw, 70px);
-    color: #aaaaaa;
-    font-size: min(4vw, 16px);
-  }
-  #replacer svg {
-    position: absolute;
-    right: min(2.75vw, 12px);
-    width: min(2.75vw, 12px);
-    height: min(2.75vw, 12px);
-    fill: #aaaaaa;
-    cursor: pointer;
-    transition: fill 0.125s ease;
-  }
-  #replacer svg:hover {
-    fill: #ffffff;
-  }
-  #replacer div:nth-child(2) {
-    width: 100%;
-    flex-direction: column;
-    align-items: center;
-    overflow-y: auto;
-  }
-  #replacer textarea {
-    margin-bottom: min(1.5vw, 10px);
-    padding: 4px;
-    width: 100%;
-    height: min(8vw, 75px);
-    flex-shrink: 0;
-    color: #ffffff;
-    background: #212121;
-    border-radius: min(1vw, 4px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.75) inset;
-  }
-  #header.code > #replacer textarea, #header.split > #replacer textarea, #header.preview > #replacer textarea {
-    font-family: monospace;
-  }
-  #replacer textarea:last-child {
-    margin-bottom: 0;
-  }
-  #replacer div:nth-child(3) {
-    margin-top: min(1.5vw, 10px);
-  }
-  #replacer button {
-    width: min(15vw, 75px);
-  }
-  #replacer.active {
-    opacity: 1;
-    pointer-events: all;
-    transform: scaleY(1);
   }
   @media only screen and (max-width: 900px){
     #title {
@@ -294,6 +227,100 @@
       opacity: 0;
       transform: scaleX(0);
     }
+  }
+  #attribution {
+    max-width: 35%;
+    display: flex;
+    text-align: right;
+    transition: font-size 0.5s ease;
+  }
+  #attribution span, #attribution a {
+    color: var(--text-dark);
+    font-size: min(2vw, 14px);
+    transition: color 0.125s ease;
+  }
+  #attribution a:hover {
+    color: var(--text-hover);
+  }
+  .widget {
+    margin: min(1.5vw, 10px);
+    padding: min(1.5vw, 10px);
+    position: absolute;
+    right: 0;
+    top: 100%;
+    max-height: calc(100vh - 60px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--container-dark);
+    border-radius: min(1vw, 4px);
+    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) rgba(0,0,0,0.75);
+    opacity: 0;
+    pointer-events: none;
+    overflow-y: auto;
+    transform: scaleY(0);
+    transform-origin: top center;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .widget div {
+    display: flex;
+  }
+  .widget div:nth-child(1) {
+    margin-bottom: min(1.5vw, 10px);
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+  .widget section {
+    color: var(--text-dark);
+    font-size: min(4vw, 16px);
+  }
+  .widget svg {
+    position: absolute;
+    right: min(2.75vw, 12px);
+    width: min(2.75vw, 12px);
+    height: min(2.75vw, 12px);
+    fill: #aaaaaa;
+    cursor: pointer;
+    transition: fill 0.125s ease;
+  }
+  .widget svg:hover {
+    fill: var(--text-hover);
+  }
+  .widget div:nth-child(2) {
+    width: 100%;
+    min-height: 40px;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .widget textarea {
+    margin-bottom: min(1.5vw, 10px);
+    padding: 4px;
+    width: 100%;
+    height: 75px;
+    min-height: 40px;
+    color: var(--text-light);
+    background: #212121;
+    border-radius: min(1vw, 4px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.75) inset;
+  }
+  #header.code > .widget textarea, #header.split > .widget textarea, #header.preview > .widget textarea {
+    font-family: monospace;
+  }
+  .widget textarea:last-child {
+    margin-bottom: 0;
+  }
+  .widget div:nth-child(3) {
+    margin-top: min(1.5vw, 10px);
+  }
+  .widget button {
+    margin: 0 min(0.75vw, 6px);
+    width: min(15vw, 75px);
+  }
+  .widget.active {
+    opacity: 1;
+    pointer-events: all;
+    transform: scaleY(1);
   }
   #main {
     position: relative;
@@ -315,7 +342,7 @@
     border-color: #e5e2c9;
   }
   #userInput.code, #userInput.split, #userInput.preview {
-    color: #ffffff;
+    color: var(--text-light);
     font-family: monospace;
     background: #1d1d1d;
     border-color: #1d1d1d;
@@ -348,7 +375,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #3a3a3a;
+    background: var(--button-medium);
     box-shadow: 0 -1px 8px rgba(0,0,0,0.75);
     cursor: row-resize;
     transition: all 0.5s ease, background 0.125s ease;
@@ -369,9 +396,9 @@
   }
   #slider div {
     padding: min(0.5vw, 2px);
-    color: #aaaaaa;
+    color: var(--text-dark);
     font-size: min(2.75vw, 12px);
-    background: #3a3a3a;
+    background: var(--button-medium);
     border-radius: min(1vw, 4px);
     box-shadow: 0 min(-0.25vw, -1px) min(2vw, 8px) rgba(0,0,0,0.75);
     opacity: 0;
@@ -381,13 +408,13 @@
     transition: color 0.125s ease, background 0.125s ease, opacity 0.125s ease, transform 0.125s ease;
   }
   #slider.active > div, #slider:hover > div {
-    color: #ffffff;
-    background: #4a4a4a;
+    color: var(--text-hover);
+    background: var(--button-medium-hover);
     opacity: 1;
     transform: scaleY(1);
   }
   #slider.active, #slider:hover {
-    background: #4a4a4a;
+    background: var(--button-medium-hover);
     transition: background 0.125s ease;
   }
   #preview {
@@ -395,7 +422,7 @@
     left: 0;
     bottom: 0;
     width: 100%;
-    background: #ffffff;
+    background: var(--container-light);
     border: none;
     transition: all 0.5s ease;
   }
@@ -466,11 +493,11 @@
   }
   #welcome section {
     margin: 0 0.5vw;
-    color: #ffffff;
+    color: var(--text-light);
     font-size: 3vw;
   }
   #welcome span {
-    color: #aaaaaa;
+    color: var(--text-dark);
     font-size: 1.5vw;
     text-align: center;
   }
@@ -478,6 +505,10 @@
     animation: none;
   }
 </style>
+
+</head>
+
+<body>
 
 <svg id="svg">
   <symbol id="pencil" viewBox="0 0 512 512">
@@ -525,10 +556,6 @@
     <path d="m1.5795 65.78 64.201-64.201 190.22 190.22 190.22-190.22 64.201 64.201-190.22 190.22 190.22 190.22-64.201 64.201-190.22-190.22-190.22 190.22-64.201-64.201 190.22-190.22z"/>
   </symbol>
 </svg>
-
-</head>
-
-<body>
 
 <header id="header" class="default">
   <div id="toolbar">
@@ -587,7 +614,7 @@
   <div id="attribution">
     <span>Inspired by <a href="https://htmledit.squarefree.com/" target="_blank">Real-Time HTML Editor</a> and <a href="https://www.editpad.org/" target="_blank">Edit Pad</a>!</span>
   </div>
-  <div id="replacer">
+  <div id="replacer" class="widget">
     <div>
       <section>Replace Text</section>
       <svg onmousedown="replacer.classList.remove('active');"><use href="#close"></use></svg>
@@ -697,7 +724,7 @@
       sourceChange = 1;
     }
     mustSave = 1;
-    if ((view == "split") || (view == "preview")){
+    if (view == "split" || view == "preview"){
       previewRefresh();
     }
   });
@@ -714,7 +741,7 @@
     function mimeDivision(index){
       return mimeType.split("/")[index];
     }
-    if ((mimeDivision(1) == validSubtypes[3]) || (mimeDivision(1) == validSubtypes[5])){
+    if (mimeDivision(1) == validSubtypes[3] || mimeDivision(1) == validSubtypes[5]){
       mimeType = mimeType.replace(mimeDivision(0),validTypes[0]);
     }
     if (validTypes.includes(mimeDivision(0))){
@@ -787,6 +814,8 @@
   }
   function activateReplacer(){
     userInput.value = userInput.value.split(locate.value).join(modify.value);
+    sourceChange = 1;
+    previewRefresh();
   }
   function flipReplacer(){
     var temp = locate.value;
@@ -799,6 +828,7 @@
   }
   function importHTMLTemplate(){
     userInput.value = decodeURI("%3C!DOCTYPE%20html%3E%0A%3Chtml%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1.0%22%3E%0A%3Clink%20rel=%22icon%22%20type=%22%22%20href=%22%22%3E%0A%0A%3Cstyle%3E%0A%20%20*%20%7B%0A%20%20%20%20margin:%200;%0A%20%20%20%20padding:%200;%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20width:%20100vw;%0A%20%20%20%20height:%20100vh;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E");
+    sourceChange = 1;
     changeView("split");
   }
   function previewRefresh(){
