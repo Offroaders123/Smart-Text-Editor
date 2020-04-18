@@ -54,16 +54,254 @@
     outline: none;
     transition: color 0.125s ease, background 0.125s ease, width 0s;
   }
-  button:hover, #toolbar button:focus {
+  button:hover, .dropdown button:focus {
     color: var(--text-hover);
     background: var(--button-medium-hover);
   }
-  textarea {
+  textarea, input[type="text"] {
     font-size: 13px;
     border: none;
+    outline: none;
+  }
+  textarea {
     white-space: nowrap;
     resize: none;
+  }
+  input[type="range"] {
+    height: min(5vw, 20px);
+    background: none;
+    cursor: pointer;
     outline: none;
+    -webkit-appearance: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    margin-top: -7px;
+    width: min(2.75vw, 12px);
+    height: min(5vw, 20px);
+    background: var(--button-medium);
+    border: none;
+    border-radius: min(1vw, 4px);
+    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) rgba(0,0,0,0.75);
+    transition: background 0.125s ease;
+    -webkit-appearance: none;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: min(1.5vw, 6px);
+    background: var(--container-medium);
+    border-radius: min(0.5vw, 2px);
+    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) rgba(0,0,0,0.75);
+    transition: background 0.125s ease;
+  }
+  input[type="range"]:hover::-webkit-slider-thumb {
+    background: var(--button-medium-hover);
+  }
+  input[type=range]:hover::-webkit-slider-runnable-track {
+    background: var(--container-medium-hover);
+  }
+  label {
+    color: var(--text-dark);
+    font-size: min(3.5vw, 14px);
+  }
+  .dropdown ul {
+    position: absolute;
+    min-width: min(35vw, 155px);
+    background: var(--container-medium);
+    border-radius: min(1vw, 4px);
+    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) rgba(0,0,0,0.75);
+    z-index: 1;
+    opacity: 0;
+    pointer-events: none;
+    list-style: none;
+    transform: scaleY(0);
+    transform-origin: top center;
+    transition: opacity 0.125s ease, transform 0.125s ease;
+  }
+  .dropdown li {
+    padding: min(1.75vw, 8px);
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-medium);
+    font-size: min(2.75vw, 12px);
+    border-radius: min(1vw, 4px);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 0.125s ease, background 0.125s ease;
+  }
+  .dropdown li span {
+    margin-left: min(4vw, 16px);
+    color: var(--text-info);
+    font-size: min(2.5vw, 11px);
+  }
+  .dropdown li svg {
+    width: min(2.75vw, 12px);
+    height: min(2.75vw, 12px);
+    fill: var(--text-info);
+    transition: fill 0.125s ease;
+  }
+  .dropdown li input[type="file"], .dropdown li a {
+    display: none;
+  }
+  .dropdown li:hover {
+    color: var(--text-hover);
+    background: var(--container-medium-hover);
+  }
+  .dropdown li:hover > svg {
+    fill: var(--text-hover);
+  }
+  .dropdown ul ul {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+  .dropdown button:focus + ul, .dropdown li:hover > ul {
+    opacity: 1;
+    pointer-events: all;
+    transform: scale(1);
+  }
+  @media only screen and (max-height: 325px){
+    .dropdown ul ul {
+      min-width: 100%;
+      max-height: min(24vh, 60px);
+      left: 0;
+      top: 100%;
+      transform: scaleY(0);
+      transform-origin: top center;
+      overflow-y: auto;
+    }
+    .dropdown li svg {
+      transform: rotate(90deg);
+    }
+  }
+  @media only screen and (max-height: 200px){
+    .dropdown ul {
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    .dropdown ul ul {
+      max-height: initial;
+      overflow-y: initial;
+    }
+  }
+  .widget {
+    margin: min(1.5vw, 10px);
+    padding: min(1.5vw, 10px);
+    position: absolute;
+    right: 0;
+    top: 100%;
+    min-width: 180px;
+    max-height: calc(100vh - 60px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--container-dark);
+    border-radius: min(1vw, 4px);
+    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) rgba(0,0,0,0.75);
+    opacity: 0;
+    pointer-events: none;
+    overflow-y: auto;
+    transform: scaleY(0);
+    transform-origin: top center;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .widget div {
+    display: flex;
+  }
+  .widget div:nth-child(1) {
+    margin-bottom: min(1.5vw, 10px);
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+  .widget section {
+    color: var(--text-dark);
+    font-size: min(4vw, 16px);
+  }
+  .widget svg {
+    position: absolute;
+    right: min(2.75vw, 12px);
+    width: min(2.75vw, 12px);
+    height: min(2.75vw, 12px);
+    fill: #aaaaaa;
+    cursor: pointer;
+    transition: fill 0.125s ease;
+  }
+  .widget svg:hover {
+    fill: var(--text-hover);
+  }
+  .widget div:nth-child(2) {
+    width: 100%;
+    min-height: 40px;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .widget textarea, .widget input[type="text"] {
+    padding: 4px;
+    color: var(--text-light);
+    background: #212121;
+    border-radius: min(1vw, 4px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.75) inset;
+  }
+  .widget textarea {
+    margin-bottom: min(1.5vw, 10px);
+    width: 100%;
+    height: 75px;
+    min-height: 40px;
+  }
+  #header.code > .widget textarea, #header.split > .widget textarea, #header.preview > .widget input[type="text"], #header.code > .widget input[type="text"], #header.split > .widget input[type="text"], #header.preview > .widget input[type="text"] {
+    font-family: monospace;
+  }
+  .widget textarea:last-child {
+    margin-bottom: 0;
+  }
+  #picker div:nth-child(2) {
+    padding: 8px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+  #picker div:nth-child(2) div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  #canvas {
+    margin-right: 24px;
+    width: 86px;
+    height: 86px;
+    border: none;
+    border-radius: min(1vw, 4px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.75) inset;
+  }
+  #hexText {
+    margin-top: 12px;
+    margin-right: 24px;
+    width: 86px;
+  }
+  .widget div:nth-child(3) {
+    margin-top: min(1.5vw, 10px);
+  }
+  .widget div:nth-child(3) > * {
+    margin: 0 min(0.75vw, 6px);
+  }
+  .widget div:nth-child(3) > button {
+    width: min(15vw, 75px);
+  }
+  .widget div:nth-child(3) > :first-child {
+    margin-left: 0;
+  }
+  .widget div:nth-child(3) > :last-child {
+    margin-right: 0;
+  }
+  .widget.active {
+    opacity: 1;
+    pointer-events: all;
+    transform: scaleY(1);
   }
   ::-webkit-scrollbar {
     width: min(3vw, 12px);
@@ -103,98 +341,14 @@
   #toolbar {
     display: flex;
   }
-  #toolbar div {
+  #toolbar > * {
     margin: 0 min(0.75vw, 6px);
   }
-  #toolbar div:first-child, #replacer button:first-child {
+  #toolbar > :first-child {
     margin-left: 0;
   }
-  #toolbar div:last-child, #replacer button:last-child {
+  #toolbar > :last-child {
     margin-right: 0;
-  }
-  #toolbar ul {
-    position: absolute;
-    min-width: min(35vw, 155px);
-    background: var(--container-medium);
-    border-radius: min(1vw, 4px);
-    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) rgba(0,0,0,0.75);
-    z-index: 1;
-    opacity: 0;
-    pointer-events: none;
-    list-style: none;
-    transform: scaleY(0);
-    transform-origin: top center;
-    transition: opacity 0.125s ease, transform 0.125s ease;
-  }
-  #toolbar li {
-    padding: min(1.75vw, 8px);
-    position: relative;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--text-medium);
-    font-size: min(2.75vw, 12px);
-    border-radius: min(1vw, 4px);
-    white-space: nowrap;
-    cursor: pointer;
-    transition: color 0.125s ease, background 0.125s ease;
-  }
-  #toolbar li span {
-    margin-left: min(4vw, 16px);
-    color: var(--text-info);
-    font-size: min(2.5vw, 11px);
-  }
-  #toolbar li svg {
-    width: min(2.75vw, 12px);
-    height: min(2.75vw, 12px);
-    fill: var(--text-info);
-    transition: fill 0.125s ease;
-  }
-  #toolbar li input[type="file"], #toolbar li a {
-    display: none;
-  }
-  #toolbar li:hover {
-    color: var(--text-hover);
-    background: var(--container-medium-hover);
-  }
-  #toolbar li:hover > svg {
-    fill: var(--text-hover);
-  }
-  #toolbar ul ul {
-    position: absolute;
-    left: 100%;
-    top: 0;
-    transform: scaleX(0);
-    transform-origin: left center;
-  }
-  #toolbar button:focus + ul, #toolbar li:hover > ul {
-    opacity: 1;
-    pointer-events: all;
-    transform: scale(1);
-  }
-  @media only screen and (max-height: 325px){
-    #toolbar ul ul {
-      min-width: 100%;
-      max-height: min(24vh, 60px);
-      left: 0;
-      top: 100%;
-      transform: scaleY(0);
-      transform-origin: top center;
-      overflow-y: auto;
-    }
-    #toolbar li svg {
-      transform: rotate(90deg);
-    }
-  }
-  @media only screen and (max-height: 200px){
-    #toolbar ul {
-      max-height: 60vh;
-      overflow-y: auto;
-    }
-    #toolbar ul ul {
-      max-height: initial;
-      overflow-y: initial;
-    }
   }
   #title {
     position: absolute;
@@ -241,86 +395,6 @@
   }
   #attribution a:hover {
     color: var(--text-hover);
-  }
-  .widget {
-    margin: min(1.5vw, 10px);
-    padding: min(1.5vw, 10px);
-    position: absolute;
-    right: 0;
-    top: 100%;
-    max-height: calc(100vh - 60px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: var(--container-dark);
-    border-radius: min(1vw, 4px);
-    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) rgba(0,0,0,0.75);
-    opacity: 0;
-    pointer-events: none;
-    overflow-y: auto;
-    transform: scaleY(0);
-    transform-origin: top center;
-    transition: opacity 0.25s ease, transform 0.25s ease;
-  }
-  .widget div {
-    display: flex;
-  }
-  .widget div:nth-child(1) {
-    margin-bottom: min(1.5vw, 10px);
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-  }
-  .widget section {
-    color: var(--text-dark);
-    font-size: min(4vw, 16px);
-  }
-  .widget svg {
-    position: absolute;
-    right: min(2.75vw, 12px);
-    width: min(2.75vw, 12px);
-    height: min(2.75vw, 12px);
-    fill: #aaaaaa;
-    cursor: pointer;
-    transition: fill 0.125s ease;
-  }
-  .widget svg:hover {
-    fill: var(--text-hover);
-  }
-  .widget div:nth-child(2) {
-    width: 100%;
-    min-height: 40px;
-    flex-direction: column;
-    overflow-y: auto;
-  }
-  .widget textarea {
-    margin-bottom: min(1.5vw, 10px);
-    padding: 4px;
-    width: 100%;
-    height: 75px;
-    min-height: 40px;
-    color: var(--text-light);
-    background: #212121;
-    border-radius: min(1vw, 4px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.75) inset;
-  }
-  #header.code > .widget textarea, #header.split > .widget textarea, #header.preview > .widget textarea {
-    font-family: monospace;
-  }
-  .widget textarea:last-child {
-    margin-bottom: 0;
-  }
-  .widget div:nth-child(3) {
-    margin-top: min(1.5vw, 10px);
-  }
-  .widget button {
-    margin: 0 min(0.75vw, 6px);
-    width: min(15vw, 75px);
-  }
-  .widget.active {
-    opacity: 1;
-    pointer-events: all;
-    transform: scaleY(1);
   }
   #main {
     position: relative;
@@ -457,14 +531,14 @@
     }
   }
   #welcome {
-    padding: 2vw;
+    padding: min(6vh, 2vw);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-around;
     background: #101010;
-    border-radius: 1vw;
-    box-shadow: 0 0.25vw 0.25vw rgba(0,0,0,0.75);
+    border-radius: min(3vh, 1vw);
+    box-shadow: 0 min(0.75vh, 0.25vw) min(0.75vh, 0.25vw) rgba(0,0,0,0.75);
     opacity: 0;
     animation: welcome 2s;
   }
@@ -481,24 +555,24 @@
     }
   }
   #welcome div {
-    margin-bottom: 1.75vw;
+    margin-bottom: min(5.25vh, 1.75vw);
     display: flex;
     justify-content: center;
     align-items: center;
   }
   #welcome svg {
-    margin: 0 0.5vw;
-    width: 5vw;
-    height: 5vw;
+    margin: 0 min(1.5vh, 0.5vw);
+    width: min(15vh, 5vw);
+    height: min(15vh, 5vw);
   }
   #welcome section {
-    margin: 0 0.5vw;
+    margin: 0 min(1.5vh, 0.5vw);
     color: var(--text-light);
-    font-size: 3vw;
+    font-size: min(9vh, 3vw);
   }
   #welcome span {
     color: var(--text-dark);
-    font-size: 1.5vw;
+    font-size: min(4.5vh, 1.5vw);
     text-align: center;
   }
   #menu.disabled, #welcome.disabled {
@@ -559,7 +633,7 @@
 
 <header id="header" class="default">
   <div id="toolbar">
-    <div>
+    <div class="dropdown">
       <button>File</button>
       <ul>
         <li onmousedown="window.open(window.location.href,'_blank');">Create<span>Ctrl + Shift + C</span></li>
@@ -578,7 +652,7 @@
         </li>
       </ul>
     </div>
-    <div>
+    <div class="dropdown">
       <button>View</button>
       <ul>
         <li onmousedown="changeView('default');">Default<span>Ctrl + Shift + 1</span></li>
@@ -588,10 +662,11 @@
         <li onmousedown="openDisplay();">Display<span>Ctrl + Shift + 5</span></li>
       </ul>
     </div>
-    <div>
+    <div class="dropdown">
       <button>Tools</button>
       <ul>
-        <li onmousedown="replacer.classList.add('active');">Replace Text<span>Ctrl + Shift + F</span></li>
+        <li onmousedown="openWidget('replacer');">Replace Text<span>Ctrl + Shift + F</span></li>
+        <li onmousedown="openWidget('picker');">Color Picker<span>Ctrl + Shift + J</span></li>
         <li onmousedown="importHTMLTemplate();">Import HTML Template<span>Ctrl + Shift + H</span></li>
         <li>Online Resources...
           <svg><use href="#arrow"/></svg>
@@ -600,6 +675,7 @@
             <li onmousedown="window.open('https://htmlformatter.com/','_blank');">HTML Formatter</li>
             <li onmousedown="window.open('http://jsonviewer.stack.hu/','_blank');">JSON Formatter</li>
             <li onmousedown="window.open('https://www.svgminify.com/','_blank');">SVG Simplifier</li>
+            <li onmousedown="window.open('https://www.uuidgenerator.net/','_blank');">UUID Generator</li>
             <li onmousedown="window.open('https://cryptii.com/','_blank');">Text Encryptor</li>
             <li onmousedown="window.open('https://keycode.info/','_blank');">Keycode Finder</li>
           </ul>
@@ -617,7 +693,7 @@
   <div id="replacer" class="widget">
     <div>
       <section>Replace Text</section>
-      <svg onmousedown="replacer.classList.remove('active');"><use href="#close"></use></svg>
+      <svg onmousedown="closeWidget('replacer');"><use href="#close"></use></svg>
     </div>
     <div>
       <textarea id="locate" placeholder="Text to locate..." spellcheck="false"></textarea>
@@ -627,6 +703,30 @@
       <button onmousedown="activateReplacer();">Replace</button>
       <button onmousedown="flipReplacer();">Flip</button>
       <button onmousedown="clearReplacer();">Clear</button>
+    </div>
+  </div>
+  <div id="picker" class="widget">
+    <div>
+      <section>Color Picker</section>
+      <svg onmousedown="closeWidget('picker');"><use href="#close"></use></svg>
+    </div>
+    <div>
+      <div>
+        <span id="canvas"></span>
+        <input id="hexText" type="text" value="#ff0000" maxlength="7" oninput="hex();" spellcheck="false" autocomplete="off">
+      </div>
+      <div>
+        <label for="red">Red</label>
+        <input id="red" type="range" min="0" max="255" oninput="slide();">
+        <label for="green">Green</label>
+        <input id="green" type="range" min="0" max="255" oninput="slide();">
+        <label for="blue">Blue</label>
+        <input id="blue" type="range" min="0" max="255" oninput="slide();">
+      </div>
+    </div>
+    <div style="margin: 0;">
+      <button onmousedown="hexCopy();">Copy</button>
+      <button onmousedown="hexInsert();">Insert</button>
     </div>
   </div>
 </header>
@@ -660,10 +760,9 @@
       welcome.classList.add("disabled");
     }
   });
-  window.addEventListener("beforeunload",function(event){
+  window.addEventListener("beforeunload",function(){
     if (window == window.parent && mustSave == 1){
-      event.preventDefault();
-      event.returnValue = "";
+      event.returnValue = "Changes you made may not be saved.";
     }
   });
   window.addEventListener("keydown",function(event){
@@ -693,7 +792,10 @@
         openDisplay();
       }
       if (event.key == "F"){
-        replacer.classList.toggle("active");
+        openWidget("replacer");
+      }
+      if (event.key == "J"){
+        openWidget("picker");
       }
       if (event.key == "H"){
         importHTMLTemplate();
@@ -716,13 +818,18 @@
   document.documentElement.addEventListener("drop",function(event){
     event.preventDefault();
     userInput.classList.remove("drag");
-    load.files = event.dataTransfer.files;
-    importFile(event);
+    if (event.dataTransfer.types.includes("Files")){
+      load.files = event.dataTransfer.files;
+      importFile(event);
+    } else {
+      userInput.setRangeText(event.dataTransfer.getData("text"));
+      sourceChange = 1;
+      mustSave = 1;
+      previewRefresh();
+    }
   });
   userInput.addEventListener("input",function(){
-    if (sourceChange == 0){
-      sourceChange = 1;
-    }
+    sourceChange = 1;
     mustSave = 1;
     if (view == "split" || view == "preview"){
       previewRefresh();
@@ -750,6 +857,7 @@
         reader.addEventListener("loadend",function(){
           userInput.value = reader.result;
           sourceChange = 1;
+          mustSave = 0;
           previewRefresh();
         });
         loadedFile = load.files[0].name;
@@ -768,10 +876,10 @@
         reader.addEventListener("loadend",function(){
           userInput.setRangeText(reader.result);
           sourceChange = 1;
+          mustSave = 1;
           previewRefresh();
         });
       }
-      mustSave = 0;
     } else {
       alert("Sorry, that file type isn't supported.");
     }
@@ -812,9 +920,25 @@
     display.document.write(userInput.value);
     display.document.close();
   }
+  function openWidget(element){
+    var widget = document.getElementById(element);
+    if (widget.classList.contains("active")){
+      widget.classList.toggle("active");
+    } else {
+      var widgets = document.getElementsByClassName("widget");
+      for (i = 0; i < widgets.length; i++){
+        widgets[i].classList.remove("active");
+      }
+      widget.classList.add("active");
+    }
+  }
+  function closeWidget(element){
+    document.getElementById(element).classList.remove("active");
+  }
   function activateReplacer(){
     userInput.value = userInput.value.split(locate.value).join(modify.value);
     sourceChange = 1;
+    mustSave = 1;
     previewRefresh();
   }
   function flipReplacer(){
@@ -862,6 +986,55 @@
     document.body.removeEventListener("mousemove",setScaling);
     document.body.removeEventListener("mouseup",removeScaling);
     toggleScaling();
+  }
+  var color;
+
+  hex();
+
+  function hex(){
+    var get = hexText.value.replace("#","");
+    if (get.length == 3 || get.length == 6){
+      color = get;
+      if (color.length == 3){
+        color = color.match(/.{1}/g);
+        for (i = 0; i < color.length; i++){
+          color[i] = color[i] + color[i];
+        }
+      }
+      if (color.length == 6){
+        color = color.match(/.{1,2}/g);
+      }
+      for (i = 0; i < color.length; i++){
+        color[i] = parseInt(color[i],16);
+      }
+      red.value = color[0];
+      green.value = color[1];
+      blue.value = color[2];
+      color = "#" + hexify(red.value) + hexify(green.value) + hexify(blue.value);
+      canvas.style.background = color;
+    }
+  }
+  function slide(){
+    color = "#" + hexify(red.value) + hexify(green.value) + hexify(blue.value);
+    canvas.style.background = color;
+    hexText.value = color;
+  }
+  function hexify(input){
+    var output = parseInt(input).toString(16);
+    if (output.length == 1){
+      output = 0 + output;
+    }
+    return output;
+  }
+  function hexCopy(){
+    hexText.select();
+    document.execCommand("copy");
+  }
+  function hexInsert(){
+    userInput.setRangeText(hexText.value);
+    sourceChange = 1;
+    mustSave = 1;
+    previewRefresh();
   }
 </script>
 
