@@ -8,6 +8,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEJQTFRFAAAA23yI1dXV0VdmzERVji87ycnJw8PDtz1M86xN8JQar6+viIiI7ogA1noApl8A5c+t3sGW2rqKKioqxKd8mIJgbs8VzwAAABZ0Uk5TAP///////////////////////////1SBjaMAAAA8SURBVHicY2DABxgZUflMzCysKHw2dg5kAU4udm4eFD4vHzqfn4p8AXS+oBAKn0FYSEQUxQfCwqh8dAAASZYC5vJ/xd8AAAAASUVORK5CYII=">
 
+<script>var preferences</script>
+<script src="preferences.js"></script>
+<script>
+  if (preferences){
+    preferences = JSON.stringify(preferences,null,2).split('{').join('').split('  "').join('--').split('_').join('-').split('":').join(':').split(' "').join(' ').split(',').join('').split('"').join(';').split('}').join(''); 
+    if (applyOnEditorOpen){
+      document.documentElement.setAttribute("style",preferences);
+    }
+  }
+</script>
+
 <style>
   * {
     margin: 0;
@@ -15,45 +26,79 @@
     box-sizing: border-box;
     font-family: "Arial", sans-serif;
   }
-  :root {
+  html {
+    --body: #111111;
+
     --container-dark: #171717;
     --container-medium: #1c1c1c;
     --container-medium-hover: #2c2c2c;
     --container-light: #ffffff;
 
+    --button: #3a3a3a;
+    --button-hover: #4a4a4a;
+
+    --textarea-dark: #1d1d1d;
+    --textarea-medium: #212121;
+    --textarea-light: #e5e2c9;
+    --textarea-drag-dark-color: #7f7fff;
+    --textarea-drag-dark-background: #161656;
+    --textarea-drag-light-color: #000080;
+    --textarea-drag-light-background: #aaaaea;
+    --textarea-drag-border: #0000ff;
+
+    --box-shadow-color: #000000bf;
+    --dialog-blur: blur(4px);
+
+    --text-super-dark: #000000;
     --text-dark: #aaaaaa;
     --text-medium: #cccccc;
     --text-info: #777777;
     --text-light: #ffffff;
     --text-hover: #ffffff;
 
-    --button-medium: #3a3a3a;
-    --button-medium-hover: #4a4a4a;
+    --scrollbar: #7a7a7a;
+    --scrollbar-hover: #9a9a9a;
+
+    --animation: 2s;
+    --transition-slow: 0.5s;
+    --transition-medium: 0.25s;
+    --transition-fast: 0.125s;
+  }
+  @media (prefers-reduced-motion: reduce), (update: slow) {
+    html {
+      --animation: 1.75s;
+      --transition-slow: 0s;
+      --transition-medium: 0s;
+      --transition-fast: 0s;
+    }
   }
   body {
     width: 100vw;
     height: 100vh;
     display: flex;
     flex-direction: column;
+    background: var(--body);
     overflow: hidden;
     user-select: none;
   }
   button {
-    width: min(11vw, 75px);
+    padding: 0 min(1vw, 8px);
+    min-width: min(8vw, 75px);
     height: min(5vw, 20px);
     color: var(--text-dark);
-    font-size: min(3.5vw, 14px);
-    background: var(--button-medium);
+    font-size: min(2.5vw, 14px);
+    background: var(--button);
     border: none;
     border-radius: min(1vw, 4px);
-    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) rgba(0,0,0,0.75);
+    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
     cursor: pointer;
     outline: none;
-    transition: color 0.125s ease, background 0.125s ease, width 0s;
+    transition: var(--transition-fast);
+    transition-property: color, background;
   }
   button:hover, .dropdown button:focus {
     color: var(--text-hover);
-    background: var(--button-medium-hover);
+    background: var(--button-hover);
   }
   textarea, input[type="text"] {
     font-size: 13px;
@@ -83,22 +128,22 @@
     margin-top: -7px;
     width: min(2.75vw, 12px);
     height: min(5vw, 20px);
-    background: var(--button-medium);
+    background: var(--button);
     border: none;
     border-radius: min(1vw, 4px);
-    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) rgba(0,0,0,0.75);
-    transition: background 0.125s ease;
+    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
+    transition: background var(--transition-fast);
     -webkit-appearance: none;
   }
   ::-webkit-slider-runnable-track {
     height: min(1.5vw, 6px);
     background: var(--container-medium);
     border-radius: min(0.5vw, 2px);
-    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) rgba(0,0,0,0.75);
-    transition: background 0.125s ease;
+    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
+    transition: background var(--transition-fast);
   }
   :hover::-webkit-slider-thumb {
-    background: var(--button-medium-hover);
+    background: var(--button-hover);
   }
   :hover::-webkit-slider-runnable-track {
     background: var(--container-medium-hover);
@@ -107,16 +152,19 @@
     width: min(3vw, 12px);
     height: min(3vw, 12px);
   }
-  ::-webkit-scrollbar-track, #userInput::-webkit-scrollbar-corner {
+  ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner {
     background: none;
   }
   ::-webkit-scrollbar-thumb {
     width: min(9vw, 36px);
     height: min(9vw, 36px);
     background-clip: content-box;
-    background-color: #7a7a7a;
+    background-color: var(--scrollbar);
     border: min(0.5vw, 2px) solid transparent;
     border-radius: min(4vw, 16px);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-hover);
   }
   #svg {
     position: absolute;
@@ -130,20 +178,28 @@
     align-items: center;
     background: var(--container-dark);
     z-index: 2;
-    transition: box-shadow 0.5s ease;
+    transition: box-shadow var(--transition-slow);
   }
   #header.default, #header.code, #header.split {
-    box-shadow: 0 1px 8px rgba(0,0,0,0.75);
+    box-shadow: 0 1px 8px var(--box-shadow-color);
   }
   #header.split.vertical {
-    box-shadow: -50vw 1px 8px rgba(0,0,0,0.75);
+    box-shadow: -50vw 1px 8px var(--box-shadow-color);
   }
-  #header.preview {
+  #header.preview.horizontal {
     box-shadow: none;
+  }
+  #header.preview.vertical {
+    box-shadow: -100vw 1px 8px transparent;
   }
   #header.resize, #userInput.resize, #preview.resize {
     pointer-events: none;
     transition: none;
+  }
+  #header button:focus + ul, #header li:hover > ul {
+    opacity: 1;
+    pointer-events: all;
+    transform: scale(1);
   }
   #header .toolbar {
     display: flex;
@@ -159,32 +215,33 @@
   }
   #header .title {
     position: absolute;
-    left: calc(50% - 75px);
-    width: 150px;
+    left: 50%;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    transition: left 0.5s ease;
+    transform: translateX(-50%);
+    transition: transform var(--transition-slow);
   }
   #header .title svg {
     width: 24px;
     height: 24px;
+    flex-shrink: 0;
   }
   #header .title section {
+    margin-left: 5px;
     color: var(--text-dark);
     font-size: 16px;
     white-space: nowrap;
     transform-origin: left center;
-    transition: all 0.5s ease, left 0s;
+    transition: var(--transition-slow);
+    transition-property: margin-left, opacity, transform;
   }
   @media (max-width: 900px){
     #header .title {
-      left: calc(50% - 12px);
-    }
-    #header .title svg {
-      margin: 0;
+      transform: translateX(-12px);
     }
     #header .title section {
+      margin-left: 0;
       opacity: 0;
       transform: scaleX(0);
     }
@@ -193,12 +250,11 @@
     max-width: 35%;
     display: flex;
     text-align: right;
-    transition: font-size 0.5s ease;
   }
   #header .attribution span, #header .attribution a {
     color: var(--text-dark);
     font-size: min(2vw, 14px);
-    transition: color 0.125s ease;
+    transition: color var(--transition-fast);
   }
   #header .attribution a:hover {
     color: var(--text-hover);
@@ -206,7 +262,6 @@
   #main {
     position: relative;
     flex: 1;
-    background: #111111;
   }
   #main.horizontal.resize {
     cursor: row-resize;
@@ -219,19 +274,19 @@
     left: 0;
     top: 0;
     border: 4px solid;
-    transition: all 0.5s ease;
+    transition: var(--transition-slow);
   }
   #userInput.default {
     --size: 100%;
-    color: #000000;
-    background: #e5e2c9;
-    border-color: #e5e2c9;
+    color: var(--text-super-dark);
+    background: var(--textarea-light);
+    border-color: var(--textarea-light);
   }
   #userInput.code, #userInput.split, #userInput.preview {
     color: var(--text-light);
     font-family: monospace;
-    background: #1d1d1d;
-    border-color: #1d1d1d;
+    background: var(--textarea-dark);
+    border-color: var(--textarea-dark);
   }
   #userInput.code {
     --size: 100%;
@@ -252,29 +307,29 @@
     height: 100%;
   }
   #userInput.drag {
-    border-color: #0000ff;
-    transition: all 0.25s ease;
+    border-color: var(--textarea-drag-border);
+    transition: var(--transition-medium);
   }
   #userInput.default.drag {
-    color: #000080;
-    background: #aaaaea;
+    color: var(--textarea-drag-light-color);
+    background: var(--textarea-drag-light-background);
   }
   #userInput.code.drag, #userInput.split.drag, #userInput.preview.drag {
-    color: #7f7fff;
-    background: #161656;
+    color: var(--textarea-drag-dark-color);
+    background: var(--textarea-drag-dark-background);
   }
   #scaler {
     position: absolute;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: var(--button-medium);
-    box-shadow: 0 -1px 8px rgba(0,0,0,0.75);
-    transition: all 0.5s ease, background 0.125s ease;
+    background: var(--button);
+    box-shadow: 0 -1px 8px var(--box-shadow-color);
+    transition: var(--transition-slow), background var(--transition-fast);
   }
   #scaler.active, #scaler:hover {
-    background: var(--button-medium-hover);
-    transition: background 0.125s ease;
+    background: var(--button-hover);
+    transition: background var(--transition-fast);
   }
   #scaler.default, #scaler.code {
     --axis: 0;
@@ -308,18 +363,19 @@
     padding: min(0.5vw, 2px);
     color: var(--text-dark);
     font-size: min(2.75vw, 12px);
-    background: var(--button-medium);
+    background: var(--button);
     border-radius: min(1vw, 4px);
-    box-shadow: 0 0 min(2vw, 8px) min(0.25vw, 1px) rgba(0,0,0,0.75);
+    box-shadow: 0 0 min(2vw, 8px) min(0.25vw, 1px) var(--box-shadow-color);
     opacity: 0;
     z-index: 1;
     transform: scale(0) var(--rotate);
     transform-origin: center center;
-    transition: color 0.125s ease, background 0.125s ease, opacity 0.125s ease, transform 0.125s ease;
+    transition: var(--transition-fast);
+    transition-property: color, background, opacity, transform;
   }
   #scaler.active > .handle, #scaler:hover > .handle {
     color: var(--text-hover);
-    background: var(--button-medium-hover);
+    background: var(--button-hover);
     opacity: 1;
     transform: scale(1) var(--rotate);
   }
@@ -329,7 +385,7 @@
     bottom: 0;
     background: var(--container-light);
     border: none;
-    transition: all 0.5s ease;
+    transition: var(--transition-slow);
   }
   #preview.default, #preview.code {
     --size: 0;
@@ -350,28 +406,25 @@
     align-items: center;
     pointer-events: none;
     z-index: 2;
-    animation: dialog 2s;
-    transition: all 0.25s ease;
+    animation: dialog var(--animation);
+    transition: backdrop-filter var(--transition-medium);
   }
   #dialog.active {
-    backdrop-filter: blur(4px);
+    backdrop-filter: var(--dialog-blur);
     pointer-events: all;
   }
   #dialog.onload {
-    animation: dialog-onload 2s;
+    animation: dialog-onload var(--animation);
   }
   @keyframes dialog-onload {
-    10%, 90% {
-      backdrop-filter: blur(4px);
+    15%, 85% {
+      backdrop-filter: var(--dialog-blur);
     }
   }
   #dialog.onload > #welcome {
-    animation: dialog-item-onload 2s;
+    animation: dialog-item-onload var(--animation);
   }
   @keyframes dialog-item-onload {
-    0% {
-      transform: scale(0);
-    }
     15%, 85% {
       opacity: 1;
       transform: scale(1);
@@ -380,19 +433,33 @@
       transform: translateY(calc(50vh + 50%));
     }
   }
+  @media (prefers-reduced-motion: reduce), (update: slow) {
+    @keyframes dialog-onload {
+      0%, 100% {
+        backdrop-filter: var(--dialog-blur);
+      }
+    }
+    @keyframes dialog-item-onload {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  }
   .dropdown ul {
     position: absolute;
     min-width: min(35vw, 155px);
     background: var(--container-medium);
     border-radius: min(1vw, 4px);
-    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) rgba(0,0,0,0.75);
+    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow-color);
     z-index: 1;
     opacity: 0;
     pointer-events: none;
     list-style: none;
     transform: scaleY(0);
     transform-origin: top center;
-    transition: opacity 0.125s ease, transform 0.125s ease;
+    transition: var(--transition-fast);
+    transition-property: opacity, transform;
   }
   .dropdown li {
     padding: min(1.75vw, 8px);
@@ -405,7 +472,8 @@
     border-radius: min(1vw, 4px);
     white-space: nowrap;
     cursor: pointer;
-    transition: color 0.125s ease, background 0.125s ease;
+    transition: var(--transition-fast);
+    transition-property: color, background;
   }
   .dropdown li span {
     margin-left: min(4vw, 16px);
@@ -416,7 +484,7 @@
     width: min(2.75vw, 12px);
     height: min(2.75vw, 12px);
     fill: var(--text-info);
-    transition: fill 0.125s ease;
+    transition: fill var(--transition-fast);
   }
   .dropdown li input[type="file"], .dropdown li a {
     display: none;
@@ -435,12 +503,7 @@
     transform: scaleX(0);
     transform-origin: left center;
   }
-  .dropdown button:focus + ul, .dropdown li:hover > ul {
-    opacity: 1;
-    pointer-events: all;
-    transform: scale(1);
-  }
-  @media (max-width: 550px), (max-height: 350px){
+  @media (max-width: 550px), (max-height: 375px){
     .dropdown ul ul {
       min-width: 100%;
       max-height: min(24vh, 60px);
@@ -477,13 +540,14 @@
     align-items: center;
     background: var(--container-dark);
     border-radius: min(1vw, 4px);
-    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) rgba(0,0,0,0.75);
+    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow-color);
     opacity: 0;
     pointer-events: none;
     overflow-y: auto;
     transform: scaleY(0);
     transform-origin: top center;
-    transition: opacity 0.25s ease, transform 0.25s ease;
+    transition: var(--transition-medium);
+    transition-property: opacity, transform;
   }
   .widget.active {
     opacity: 1;
@@ -508,9 +572,9 @@
     right: min(2.75vw, 12px);
     width: min(2.75vw, 12px);
     height: min(2.75vw, 12px);
-    fill: #aaaaaa;
+    fill: var(--text-dark);
     cursor: pointer;
-    transition: fill 0.125s ease;
+    transition: fill var(--transition-fast);
   }
   .widget .header svg:hover {
     fill: var(--text-hover);
@@ -532,9 +596,9 @@
   .widget textarea, .widget input[type="text"] {
     padding: 4px;
     color: var(--text-light);
-    background: #212121;
+    background: var(--textarea-medium);
     border-radius: min(1vw, 4px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.75) inset;
+    box-shadow: 0 2px 4px var(--box-shadow-color) inset;
   }
   #header.code > .widget textarea, #header.split > .widget textarea, #header.preview > .widget input[type="text"], #header.code > .widget input[type="text"], #header.split > .widget input[type="text"], #header.preview > .widget input[type="text"] {
     font-family: monospace;
@@ -553,10 +617,13 @@
     min-width: min(21.5vw, 86px);
     min-height: min(21.5vw, 86px);
     border-radius: min(1vw, 4px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.75) inset;
+    box-shadow: 0 2px 4px var(--box-shadow-color) inset;
   }
   #colorInput {
     width: min(21.5vw, 86px);
+  }
+  #encoderInput {
+    height: 150px;
   }
   .widget .toolbar {
     margin-top: min(1.5vw, 10px);
@@ -580,12 +647,13 @@
     flex-direction: column;
     align-items: center;
     justify-content: space-around;
-    background: #101010;
+    background: var(--container-dark);
     border-radius: min(3vh, 1vw);
-    box-shadow: 0 min(0.75vh, 0.25vw) min(0.75vh, 0.25vw) rgba(0,0,0,0.75);
+    box-shadow: 0 min(0.75vh, 0.25vw) min(0.75vh, 0.25vw) var(--box-shadow-color);
     opacity: 0;
     transform: scale(0);
-    transition: all 0.25s ease;
+    transition: var(--transition-medium);
+    transition-property: opacity, transform;
   }
   .dialog-item.active {
     opacity: 1;
@@ -612,9 +680,9 @@
     right: min(2.75vw, 12px);
     width: min(2.75vw, 12px);
     height: min(2.75vw, 12px);
-    fill: #aaaaaa;
+    fill: var(--text-dark);
     cursor: pointer;
-    transition: fill 0.125s ease;
+    transition: fill var(--transition-fast);
   }
   .dialog-item .header .close:hover {
     fill: var(--text-hover);
@@ -676,6 +744,10 @@
   <symbol id="arrow" viewBox="0 0 512 512">
     <path d="m112.66 0 286.68 256-286.68 256z"/>
   </symbol>
+  <symbol id="check" viewBox="0 0 512 512">
+    <path d="m63.346 191.15 192.72 192.72-63.402 63.402-192.72-192.72z"/>
+    <path d="m129.5 383.87 319.15-319.15 63.402 63.402-319.15 319.15z"/>
+  </symbol>
   <symbol id="close" viewBox="0 0 512 512">
     <path d="m1.5795 65.78 64.201-64.201 190.22 190.22 190.22-190.22 64.201 64.201-190.22 190.22 190.22 190.22-64.201 64.201-190.22-190.22-190.22 190.22-64.201-64.201 190.22-190.22z"/>
   </symbol>
@@ -718,6 +790,7 @@
       <ul>
         <li onmousedown="openWidget('replacer');">Replace Text<span>Ctrl + Shift + F</span></li>
         <li onmousedown="openWidget('picker');">Color Picker<span>Ctrl + Shift + K</span></li>
+        <li onmousedown="openWidget('encoder');">URI Encoder<span>Ctrl + Shift + Y</span></li>
         <li onmousedown="confirmOverwrite(insertTemplate);">Import HTML Template<span>Ctrl + Shift + H</span></li>
         <li>Online Resources...
           <svg><use href="#arrow"/></svg>
@@ -731,6 +804,12 @@
             <li onmousedown="window.open('https://keycode.info/','_blank');">Keycode Finder</li>
           </ul>
         </li>
+      </ul>
+    </div>
+    <div class="dropdown">
+      <button>Settings</button>
+      <ul>
+        <li onmousedown="openDialog('prefMenu');">Preferences</li>
       </ul>
     </div>
   </div>
@@ -783,10 +862,26 @@
       <button onmouseup="deletePicker();">Delete</button>
     </div>
   </div>
+  <div id="encoder" class="widget">
+    <div class="header">
+      <section>URI Encoder</section>
+      <svg onmousedown="closeWidget('encoder');"><use href="#close"></use></svg>
+    </div>
+    <div class="content">
+      <div class="item expand">
+        <textarea id="encoderInput" placeholder="Input text..." spellcheck="false"></textarea>
+      </div>
+    </div>
+    <div class="toolbar">
+      <button onmouseup="activateEncoder('encode');">Encode</button>
+      <button onmouseup="activateEncoder('decode');">Decode</button>
+      <button onmouseup="clearEncoder();">Clear</button>
+    </div>
+  </div>
 </header>
 
 <main id="main" class="horizontal">
-  <textarea id="userInput" class="default horizontal" placeholder="Welcome to the Smart Text Editor! This site was created to allow for easy text editing and HTML development within your browser!" spellcheck="false"></textarea>
+  <textarea id="userInput" class="default horizontal" placeholder="Welcome to the Smart Text Editor! This site was created to allow for easy text editing and code development within your browser!" spellcheck="false"></textarea>
   <div id="scaler" class="default horizontal">
     <div class="handle">▲<br>▼</div>
   </div>
@@ -804,18 +899,28 @@
       <span>Created by Brandon Bennett</span>
     </div>
   </div>
+  <div id="prefMenu" class="dialog-item">
+    <div class="header">
+      <section>Preferences</section>
+      <svg onmousedown="closeDialog('prefMenu');" class="close"><use href="#close"/></svg>
+    </div>
+    <div class="content">
+      <span>Create a custom color scheme<br>for the editor with this template!<br>---</span>
+      <span>More options other than<br>styling will be coming soon!</span>
+      <button style="margin-top: 10px; height: 40px;" onmouseup="confirmOverwrite(insertPrefs);">Create a new Preferences File<br>(Or by Ctrl + Shift + O)</button>
+      <button style="margin-top: 10px; height: 40px;" onmouseup="togglePreferences();">Toggle Current Preferences<br>(Or by Ctrl + Shift + P)</button>
+    </div>
+  </div>
 </div>
 
 <script>
-  var view = "default", orientation = "horizontal", loadedFile = undefined, sourceChange = false, mustSave = false, storedColor;
-  window.addEventListener("load",function(){
-    if (window == window.parent){
-      userInput.focus();
-    } else {
-      dialog.classList.remove("onload");
-    }
-    colorInputRefresh();
-  });
+  var view = "default", orientation = "horizontal", loadedFile = undefined, editType = "default", editorSource, sourceChange = false, mustSave = false, storedColor;
+  if (window == window.parent){
+    userInput.focus();
+  } else {
+    dialog.classList.remove("onload");
+  }
+  colorInputRefresh();
   window.addEventListener("beforeunload",function(){
     if (window == window.parent && mustSave == true){
       event.returnValue = "Changes you made may not be saved.";
@@ -824,45 +929,81 @@
   window.addEventListener("keydown",function(event){
     if (event.ctrlKey){
       if (event.key == "C"){
+        blockShortcut(event);
         window.open(window.location.href,"_blank");
       }
       if (event.key == "L"){
+        blockShortcut(event);
         load.click();
       }
       if (event.key == "S"){
+        blockShortcut(event);
         saveAs();
       }
       if (event.key == "!"){
+        blockShortcut(event);
         changeView("default");
       }
       if (event.key == "@"){
+        blockShortcut(event);
         changeView("code");
       }
       if (event.key == "#"){
+        blockShortcut(event);
         changeView("split");
       }
       if (event.key == "$"){
+        blockShortcut(event);
         changeView("preview");
       }
       if (event.key == "%"){
+        blockShortcut(event);
         changeOrientation();
       }
       if (event.key == "^"){
+        blockShortcut(event);
         openDisplay();
       }
       if (event.key == "F"){
+        blockShortcut(event);
         openWidget("replacer");
       }
+      if (event.key == "G"){
+        blockShortcut(event);
+        insertColor();
+      }
       if (event.key == "K"){
+        blockShortcut(event);
         openWidget("picker");
       }
+      if (event.key == "Y"){
+        blockShortcut(event);
+        openWidget("encoder");
+      }
       if (event.key == "H"){
+        blockShortcut(event);
         confirmOverwrite(insertTemplate);
+      }
+      if (event.key == "O"){
+        blockShortcut(event);
+        confirmOverwrite(insertPrefs);
+      }
+      if (event.key == "P"){
+        blockShortcut(event);
+        togglePreferences();
       }
     }
   });
   window.addEventListener("resize",function(){
     if (view == "split"){
+      if (orientation == "vertical"){
+        if (!header.getAttribute("style")){
+          header.classList.add("resize");
+          setTimeout(function(){
+            header.classList.remove("resize");
+          }, 50);
+        }
+      }
       changeView("split");
     }
   });
@@ -913,6 +1054,10 @@
     } else {
       action(event);
     }
+  }
+  function blockShortcut(event){
+    event.preventDefault();
+    event.stopPropagation();
   }
   function importFile(event){
     var reader = new FileReader(), validTypes = ["text","image","audio"], validSubtypes = ["plain","css","javascript","json","html","svg+xml"], mimeType = load.files[0].type;
@@ -970,9 +1115,9 @@
   }
   function changeView(newView){
     var elements = ["header","userInput","scaler","preview"];
-    for (i = 0; i < elements.length; i++){
-      changeClass(elements[i],view,newView);
-    }
+    elements.forEach(function(item){
+      changeClass(item,view,newView);
+    });
     view = newView;
     previewRefresh();
   }
@@ -986,9 +1131,9 @@
     }
     changeView("code");
     setTimeout(function(){
-      for (i = 0; i < elements.length; i++){
-        changeClass(elements[i],orientation,newOrientation);
-      }
+      elements.forEach(function(item){
+        changeClass(item,orientation,newOrientation);
+      });
       scaler.style.transition = "none";
       preview.style.transition = "none";
       orientation = newOrientation;
@@ -1003,9 +1148,14 @@
     document.getElementById(element).classList.add(newVariable);
   }
   function openDisplay(){
-    var display = window.open();
+    var screenDimensions = [window.screen.width, window.screen.height], display = window.open("","_blank","left=" + (screenDimensions[0] / 6) + ",top=" + (screenDimensions[1] / 6 - 40) + ",width=" + (screenDimensions[0] * 2/3) + ",height=" + (screenDimensions[1] * 2/3));
     display.document.open();
-    display.document.write(userInput.value);
+    if (editType == "default"){
+      display.document.write(userInput.value);
+    }
+    if (editType == "preferences"){
+      display.document.write("<!DOCTYPE html><html><script>" + userInput.value + "<\/script>" + editorSource + "<\/html>");
+    }
     display.document.close();
   }
   function textEdit(type,text){
@@ -1028,10 +1178,10 @@
     if (widget.classList.contains("active")){
       widget.classList.toggle("active");
     } else {
-      var widgets = document.getElementsByClassName("widget");
-      for (i = 0; i < widgets.length; i++){
-        widgets[i].classList.remove("active");
-      }
+      var widgets = Array.from(document.getElementsByClassName("widget"));
+      widgets.forEach(function(item){
+        item.classList.remove("active");
+      });
       widget.classList.add("active");
     }
   }
@@ -1059,16 +1209,16 @@
       storedColor = get;
       if (storedColor.length == 3){
         storedColor = storedColor.match(/.{1}/g);
-        for (i = 0; i < storedColor.length; i++){
-          storedColor[i] = storedColor[i] + storedColor[i];
-        }
+        storedColor.forEach(function(item,index){
+          storedColor[index] = item + item;
+        });
       }
       if (storedColor.length == 6){
         storedColor = storedColor.match(/.{1,2}/g);
       }
-      for (i = 0; i < storedColor.length; i++){
-        storedColor[i] = parseInt(storedColor[i],16);
-      }
+      storedColor.forEach(function(item,index){
+        storedColor[index] = parseInt(item,16);
+      });
       red.value = storedColor[0];
       green.value = storedColor[1];
       blue.value = storedColor[2];
@@ -1104,6 +1254,25 @@
       textEdit("delete",selectionCount);
     }
   }
+  function insertColor(){
+    if (!picker.classList.contains("active")){
+      openWidget("picker");
+    }
+    colorInput.value = window.getSelection();
+    colorInput.focus();
+    colorInputRefresh();
+  }
+  function activateEncoder(encoding){
+    if (encoding == "encode"){
+      encoderInput.value = encodeURI(encoderInput.value);
+    }
+    if (encoding == "decode"){
+      encoderInput.value = decodeURI(encoderInput.value);
+    }
+  }
+  function clearEncoder(){
+    encoderInput.value = "";
+  }
   function insertTemplate(){
     userInput.value = decodeURI("%3C!DOCTYPE%20html%3E%0A%3Chtml%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1.0%22%3E%0A%3Clink%20rel=%22icon%22%20type=%22%22%20href=%22%22%3E%0A%0A%3Cstyle%3E%0A%20%20*%20%7B%0A%20%20%20%20margin:%200;%0A%20%20%20%20padding:%200;%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20width:%20100vw;%0A%20%20%20%20height:%20100vh;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cmain%3E%0A%3C/main%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E");
     sourceChange = true;
@@ -1112,12 +1281,13 @@
   function openDialog(element){
     var dialogItem = document.getElementById(element);
     if (dialogItem.classList.contains("active")){
+      dialog.classList.remove("active");
       dialogItem.classList.toggle("active");
     } else {
-      var dialogs = document.getElementsByClassName("dialog-item");
-      for (i = 0; i < dialogs.length; i++){
-        dialogs[i].classList.remove("active");
-      }
+      var dialogs = Array.from(document.getElementsByClassName("dialog-item"));
+      dialogs.forEach(function(item){
+        item.classList.remove("active");
+      });
       dialog.classList.add("active");
       dialogItem.classList.add("active");
     }
@@ -1130,10 +1300,18 @@
     if (sourceChange == true){
       preview.src = "about:blank";
       preview.contentWindow.document.open();
-      preview.contentWindow.document.write(userInput.value);
+      if (editType == "default"){
+        preview.contentWindow.document.write(userInput.value);
+      }
+      if (editType == "preferences"){
+        preview.contentWindow.document.write("<!DOCTYPE html><html><script>" + userInput.value + "<\/script>" + editorSource + "<\/html>");
+      }
       preview.contentWindow.document.close();
       sourceChange = false;
     }
+  }
+  function getSource(){
+    editorSource = document.documentElement.innerHTML.replace('src="preferences.js"><','><');
   }
   function toggleScaling(){
     header.classList.toggle("resize");
@@ -1170,7 +1348,7 @@
       preview.style.height = "calc(100% - " + cursorOffset + "px - 8px)";
     }
     if (orientation == "vertical"){
-      header.style.boxShadow = "calc(-100vw + " + cursorOffset + "px) 1px 8px rgba(0,0,0,0.75)";
+      header.style.boxShadow = "calc(-100vw + " + cursorOffset + "px) 1px 8px var(--box-shadow-color)";
       userInput.style.width = "calc(" + cursorOffset + "px - 8px)";
       scaler.style.right = "calc(100% - " + cursorOffset + "px - 8px)";
       preview.style.width = "calc(100% - " + cursorOffset + "px - 8px)";
@@ -1180,6 +1358,24 @@
     document.body.removeEventListener("mousemove",setScaling);
     document.body.removeEventListener("mouseup",removeScaling);
     toggleScaling();
+  }
+  function togglePreferences(){
+    if (applyOnEditorOpen){
+      document.documentElement.removeAttribute("style");
+      applyOnEditorOpen = false;
+    } else {
+      document.documentElement.setAttribute("style",preferences);
+      applyOnEditorOpen = true;
+    }
+  }
+  function insertPrefs(){
+    closeDialog("prefMenu");
+    userInput.value = decodeURI("/*---%20Smart%20Text%20Editor%20Preferences%20File%20---*/%0A%0A//%20For%20this%20to%20be%20applied,%20save%20this%20file%20in%20the%20same%20folder%20as%20your%20installation%20of%20Smart%20Text%20Editor.%0A//%20The%20name%20of%20this%20file%20will%20automatically%20be%20named%20to%20'preferences.js'%20after%20inserting%20this%20template.%20No%20need%20to%20type%20it%20out%20when%20selecting%20'Save'%20or%20pressing%20'Ctrl%20+%20Shift%20+%20S'!%0A//%20Not%20all%20values%20need%20to%20be%20present%20if%20you%20only%20want%20to%20change%20a%20few%20of%20them.%20More%20will%20be%20added%20later!%0A//%20They%20can%20be%20in%20any%20order%20if%20you%20would%20like%20to%20rearrange%20them%20as%20well.%0A%0A%0A//%20If%20you%20would%20like%20these%20preferences%20to%20not%20apply%20automatically%20when%20opening%20the%20text%20editor,%20change%20'applyOnEditorOpen'%20to%20false.%0AapplyOnEditorOpen%20=%20true;%0A%0A%0A//%20This%20object%20is%20using%20JSON%20syntax%20to%20store%20the%20data.%0A//%20More%20info%20about%20JSON%20on%20MDN:%20https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON%0Apreferences%20=%20%7B%0A%20%20%22body%22:%20%22#111111%22,%0A%0A%20%20%22container_dark%22:%20%22#171717%22,%0A%20%20%22container_medium%22:%20%22#1c1c1c%22,%0A%20%20%22container_medium_hover%22:%20%22#2c2c2c%22,%0A%20%20%22container_light%22:%20%22#ffffff%22,%0A%0A%20%20%22button%22:%20%22#3a3a3a%22,%0A%20%20%22button_hover%22:%20%22#4a4a4a%22,%0A%0A%20%20%22textarea_dark%22:%20%22#1d1d1d%22,%0A%20%20%22textarea_medium%22:%20%22#212121%22,%0A%20%20%22textarea_light%22:%20%22#e5e2c9%22,%0A%20%20%22textarea_drag_dark_color%22:%20%22#7f7fff%22,%0A%20%20%22textarea_drag_dark_background%22:%20%22#161656%22,%0A%20%20%22textarea_drag_light_color%22:%20%22#000080%22,%0A%20%20%22textarea_drag_light_background%22:%20%22#aaaaea%22,%0A%20%20%22textarea_drag_border%22:%20%22#0000ff%22,%0A%0A%20%20%22box_shadow_color%22:%20%22#000000bf%22,%0A%20%20%22dialog_blur%22:%20%22blur(4px)%22,%0A%0A%20%20%22text_super_dark%22:%20%22#000000%22,%0A%20%20%22text_dark%22:%20%22#aaaaaa%22,%0A%20%20%22text_medium%22:%20%22#cccccc%22,%0A%20%20%22text_info%22:%20%22#777777%22,%0A%20%20%22text_light%22:%20%22#ffffff%22,%0A%20%20%22text_hover%22:%20%22#ffffff%22,%0A%0A%20%20%22scrollbar%22:%20%22#7a7a7a%22,%0A%20%20%22scrollbar_hover%22:%20%22#9a9a9a%22,%0A%0A%20%20%22animation%22:%20%222s%22,%0A%20%20%22transition_slow%22:%20%220.5s%22,%0A%20%20%22transition_medium%22:%20%220.25s%22,%0A%20%20%22transition_fast%22:%20%220.125s%22%0A%7D;");
+    loadedFile = "preferences.js";
+    getSource();
+    editType = "preferences";
+    sourceChange = true;
+    changeView("split");
   }
 </script>
 
