@@ -7,9 +7,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link id="favicon" rel="icon" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Cousine&family=Rubik&display=swap" rel="stylesheet">
 
 <script>
-  var windowParent;
+  var windowParent, removeTransitions = "--transition-slow: 0s; --transition-medium: 0s; --transition-fast: 0s";
   if (window == window.parent){
     windowParent = true;
   } else {
@@ -17,8 +18,8 @@
     console.clear();
   }
   if (windowParent){
-    document.documentElement.style = "--transition-slow: 0s; --transition-medium: 0s; --transition-fast: 0s";
-    document.documentElement.style.opacity = "0";
+    document.documentElement.style = removeTransitions;
+    document.documentElement.classList.add("fade");
   }
 </script>
 
@@ -31,8 +32,8 @@
   }
   html {
     --body: #111111;
-    --font-family-sans-serif: "Arial", sans-serif;
-    --font-family-monospace: "Consolas", monospace;
+    --font-family-sans-serif: "Rubik", sans-serif;
+    --font-family-monospace: "Cousine", monospace;
 
     --container-dark: #171717;
     --container-medium: #1c1c1c;
@@ -56,10 +57,11 @@
     --textarea-drag-light-background: #aaaaea;
     --textarea-drag-border: #0000ff;
 
-    --border-radius: min(1vw, 4px);
+    --card-background: #17171760;
+
+    --border-radius: min(1.25vw, 5px);
     --box-shadow-color: #000000bf;
     --outline: var(--text-medium);
-    --modal-blur: blur(4px);
 
     --text-super-dark: #000000;
     --text-dark: #aaaaaa;
@@ -67,6 +69,8 @@
     --text-info: #777777;
     --text-light: #ffffff;
     --text-hover: #ffffff;
+    --text-selection-color: var(--text-super-dark);
+    --text-selection-background: #b4d5ffbf;
 
     --scrollbar: #7a7a7a;
     --scrollbar-hover: #9a9a9a;
@@ -75,15 +79,12 @@
     --transition-medium: 0.25s;
     --transition-fast: 0.125s;
 
-    background: #808080;
-    transition: opacity 0.25s;
+    --fade-opacity: 0;
+    --fade-pointer-events: none;
   }
-  @media (prefers-reduced-motion: reduce), (update: slow) {
-    html {
-      --transition-slow: 0s;
-      --transition-medium: 0s;
-      --transition-fast: 0s;
-    }
+  html.fade {
+    --fade-opacity: 1;
+    --fade-pointer-events: all;
   }
   body {
     width: 100vw;
@@ -94,20 +95,34 @@
     overflow: hidden;
     user-select: none;
   }
+  body::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: var(--container-medium);
+    opacity: var(--fade-opacity);
+    pointer-events: var(--fade-pointer-events);
+    z-index: 3;
+    transition: opacity 0.25s;
+  }
   button {
     padding: min(0.5vw, 2px) min(1vw, 8px);
     min-width: min(8vw, 75px);
     color: var(--text-dark);
-    font-size: min(2.5vw, 14px);
+    font-size: min(2.5vw, 14.5px);
     background: var(--button);
     border: none;
     border-radius: var(--border-radius);
-    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color), 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
+    box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow-color), 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
     --focus-border: transparent;
     cursor: pointer;
     outline: none;
     transition: var(--transition-fast);
     transition-property: color, background;
+  }
+  button::-moz-focus-inner {
+    border: none;
   }
   button:hover, button:focus {
     color: var(--text-hover);
@@ -117,13 +132,25 @@
     --focus-border: var(--outline);
   }
   textarea, [type="text"] {
+    --color: var(--text-super-dark);
+    color: var(--color);
     font-size: 13px;
     border: none;
     outline: none;
   }
   textarea {
+    font-family: var(--font-family-sans-serif);
     white-space: pre;
     resize: none;
+  }
+  ::placeholder {
+    color: var(--color);
+    opacity: 0.55;
+    white-space: pre-wrap;
+  }
+  ::selection {
+    color: var(--text-selection-color);
+    background: var(--text-selection-background);
   }
   [type="range"] {
     margin-bottom: min(1vw, 4px);
@@ -148,7 +175,20 @@
     transition: background var(--transition-fast);
     -webkit-appearance: none;
   }
+  ::-moz-range-thumb {
+    margin-top: calc(min(1.75vw, 7px) * -1);
+    width: min(2.75vw, 12px);
+    height: min(5vw, 20px);
+    background: var(--range-thumb);
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
+    transition: background var(--transition-fast);
+  }
   :hover::-webkit-slider-thumb, :focus::-webkit-slider-thumb {
+    background: var(--range-thumb-hover);
+  }
+  :hover::-moz-range-thumb, :focus::-moz-range-thumb {
     background: var(--range-thumb-hover);
   }
   ::-webkit-slider-runnable-track {
@@ -158,7 +198,17 @@
     box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
     transition: background var(--transition-fast);
   }
+  ::-moz-range-track {
+    height: min(1.5vw, 6px);
+    background: var(--range-track);
+    border-radius: var(--border-radius);
+    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
+    transition: background var(--transition-fast);
+  }
   :hover::-webkit-slider-runnable-track, :focus::-webkit-slider-runnable-track {
+    background: var(--range-track-hover);
+  }
+  :hover::-moz-range-track, :focus::-moz-range-track {
     background: var(--range-track-hover);
   }
   svg.button {
@@ -205,7 +255,7 @@
     top: calc(min(3vw, 12px) * -1);
     border: min(3vw, 12px) solid transparent;
     border-top-color: var(--container-medium-hover);
-    filter: drop-shadow(0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow-color));
+    filter: drop-shadow(0 min(0.5vw, 2px) min(0.25vw, 1px) var(--box-shadow-color));
     transform-origin: top center;
   }
   [data-tooltip]:hover::before, [data-tooltip]:hover::after {
@@ -231,7 +281,7 @@
   ::-webkit-scrollbar-thumb:hover {
     background-color: var(--scrollbar-hover);
   }
-  #icons {
+  #logo, #icons {
     position: absolute;
   }
   #header {
@@ -314,7 +364,7 @@
   }
   #header .attribution span, #header .attribution a {
     color: var(--text-dark);
-    font-size: min(2vw, 14px);
+    font-size: min(2vw, 14.5px);
   }
   #header .attribution a {
     border-radius: calc(var(--border-radius) * 0.5);
@@ -352,13 +402,13 @@
   }
   #userInput.text {
     --size: 100%;
-    color: var(--text-super-dark);
+    --color: var(--text-super-dark);
     background: var(--textarea-light);
     border-color: var(--textarea-light);
-    white-space: normal;
+    white-space: pre-wrap;
   }
   #userInput.code, #userInput.split, #userInput.preview {
-    color: var(--text-light);
+    --color: var(--text-light);
     background: var(--textarea-dark);
     border-color: var(--textarea-dark);
   }
@@ -386,11 +436,11 @@
     transition: var(--transition-medium);
   }
   #userInput.text.drag {
-    color: var(--textarea-drag-light-color);
+    --color: var(--textarea-drag-light-color);
     background: var(--textarea-drag-light-background);
   }
   #userInput.code.drag, #userInput.split.drag, #userInput.preview.drag {
-    color: var(--textarea-drag-dark-color);
+    --color: var(--textarea-drag-dark-color);
     background: var(--textarea-drag-dark-background);
   }
   #scaler {
@@ -485,35 +535,43 @@
     box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow-color);
     white-space: nowrap;
     visibility: hidden;
-    opacity: 0;
     pointer-events: none;
     transition: var(--transition-medium);
     transition-property: visibility, opacity, transform;
   }
-  .card.widget {
-    margin: min(2vw, 10px);
+  .card.widget, .card.modal {
+    opacity: 0;
+  }
+  .card.widget, .card.notification {
     padding: min(2vw, 10px);
     position: absolute;
     right: 0;
-    top: 0;
     min-width: min(50vw, 250px);
     max-height: calc(100% - min(3vw, 20px));
     border-radius: var(--border-radius);
     overflow-y: auto;
+  }
+  .card.widget {
+    margin: min(2vw, 10px);
+    top: 0;
     transform: scaleY(0);
     transform-origin: top center;
   }
-  .card.modal {
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    z-index: 1;
-    transform-origin: center center;
+  .card.notification {
+    margin: min(4vw, 20px);
+    bottom: 0;
+    z-index: 2;
+    transform: translateX(calc(100% + min(8vw, 40px)));
   }
   .card.modal {
     padding: min(2.6vw, 16px);
+    position: fixed;
+    left: 50%;
+    top: 50%;
     min-width: min(35vw, 225px);
+    z-index: 1;
     border-radius: calc(var(--border-radius) * 2);
+    transform-origin: center center;
     transform: translate(-50%,-50%) scale(0);
   }
   .card.modal.scale {
@@ -522,13 +580,13 @@
     z-index: 2;
     transform: translate(-50%,50vh) scale(1);
   }
-  #cardBlur {
+  #cardBackground {
     position: fixed;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    backdrop-filter: var(--modal-blur);
+    background: var(--card-background);
     visibility: hidden;
     opacity: 0;
     pointer-events: none;
@@ -536,13 +594,22 @@
     transition: var(--transition-medium);
     transition-property: visibility, opacity;
   }
-  .card.active, #cardBlur.active {
+  .card.active, #cardBackground.active {
     visibility: visible;
     opacity: 1;
     pointer-events: all;
   }
   .card.widget.active {
     transform: scaleY(1);
+  }
+  .card.notification.active {
+    animation: notification var(--transition-medium) ease var(--transition-medium);
+    transform: translateX(0);
+  }
+  @keyframes notification {
+    50% {
+      transform: scale(1.1);
+    }
   }
   .card.modal.active {
     transform: translate(-50%,-50%) scale(1);
@@ -554,7 +621,7 @@
     justify-content: center;
     align-items: center;
   }
-  .card.widget .header {
+  .card.widget .header, .card.notification .header {
     margin-bottom: min(1.5vw, 10px);
   }
   .card.modal .header {
@@ -563,7 +630,7 @@
   .card.modal.scale .header {
     margin-bottom: min(5.25vh, 1.75vw);
   }
-  .card.widget .header section {
+  .card.widget .header section, .card.notification .header section {
     font-size: min(3vw, 16px);
   }
   .card.modal .header section {
@@ -575,15 +642,15 @@
   }
   .card .header .pencil {
     margin-right: min(3vw, 10px);
-    width: min(3vw, 40px);
-    height: min(3vw, 40px);
+    width: min(5vw, 24px);
+    height: min(5vw, 24px);
   }
   .card.modal.scale .header .pencil {
     margin-right: min(3vh, 1vw);
     width: min(15vh, 5vw);
     height: min(15vh, 5vw);
   }
-  .card.widget svg.button.close {
+  .card.widget svg.button.close, .card.notification svg.button.close {
     width: min(2.75vw, 12px);
     height: min(2.75vw, 12px);
   }
@@ -605,7 +672,7 @@
     font-size: min(3.25vw, 18px);
   }
   .card.modal .content span {
-    font-size: min(2vw, 14px);
+    font-size: min(2vw, 14.5px);
   }
   .card.modal.scale .content span {
     font-size: min(4.5vh, 1.5vw);
@@ -617,7 +684,7 @@
     flex-direction: column;
     align-items: center;
     color: var(--text-dark);
-    font-size: min(3vw, 14px);
+    font-size: min(3vw, 14.5px);
   }
   .card .content .item:last-child {
     margin-right: 0;
@@ -636,7 +703,7 @@
   }
   .card textarea, .card [type="text"] {
     padding: 4px;
-    color: var(--text-light);
+    --color: var(--text-light);
     background: var(--textarea-medium);
     border-radius: var(--border-radius);
     box-shadow: 0 2px 4px var(--box-shadow-color) inset;
@@ -664,23 +731,11 @@
   #colorInput {
     width: min(20vw, 86px);
   }
-  #red {
-    --range-thumb-hover: #bb2222;
-    --range-track-hover: #660000;
-  }
-  #green {
-    --range-thumb-hover: #22bb22;
-    --range-track-hover: #006600;
-  }
-  #blue {
-    --range-thumb-hover: #2222bb;
-    --range-track-hover: #000066;
-  }
   .card .toolbar {
     display: flex;
     justify-content: center;
   }
-  .card.widget .toolbar {
+  .card.widget .toolbar, .card.notification .toolbar {
     margin-top: min(2vw, 10px);
   }
   .card.modal .toolbar {
@@ -718,7 +773,7 @@
     justify-content: space-between;
     align-items: center;
     color: var(--text-medium);
-    font-size: min(2.75vw, 12px);
+    font-size: min(2.75vw, 12.5px);
     border-radius: var(--border-radius);
     white-space: nowrap;
     cursor: pointer;
@@ -751,8 +806,8 @@
     position: absolute;
     left: 100%;
     top: 0;
-    transform: scaleX(0);
-    transform-origin: left center;
+    transform: scale(0);
+    transform-origin: left top;
   }
   @media (max-width: 550px), (max-height: 375px){
     .dropdown ul ul {
@@ -805,7 +860,7 @@
     justify-content: center;
     align-items: center;
     color: var(--text-medium);
-    font-size: min(2vw, 14px);
+    font-size: min(2vw, 14.5px);
     cursor: pointer;
     transition: color var(--transition-fast);
   }
@@ -814,10 +869,11 @@
     padding: min(0.25vw, 1px);
     width: min(2.5vw, 18px);
     height: min(2.5vw, 18px);
+    fill: transparent;
     background: var(--container-medium);
     border: min(0.25vw, 2px) solid var(--text-dark);
     border-radius: var(--border-radius);
-    fill: transparent;
+    box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow-color);
   }
   .checkbox [type="checkbox"]:hover + label {
     color: var(--text-hover);
@@ -845,38 +901,38 @@
 
 <body>
 
-<svg id="icons">
+<svg id="logo">
+  <defs>
+    <linearGradient id="wood" x1="-22.662" x2="-32.039" y1="-27.117" y2="-27.117" gradientTransform="matrix(-9.3466 -9.3775 9.3775 -9.3466 0 0)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e5cfad" offset="0"/>
+      <stop stop-color="#dec196" offset="0.25"/>
+      <stop stop-color="#daba8a" offset="0.5"/>
+      <stop stop-color="#c4a77c" offset="0.75"/>
+      <stop stop-color="#988260" offset="1"/>
+    </linearGradient>
+    <linearGradient id="paint" x1="22.338" x2="31.811" y1="15.409" y2="15.409" gradientTransform="matrix(9.4412 9.4724 -9.4724 9.4412 0 0)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f3ac4d" offset="0"/>
+      <stop stop-color="#f0941a" offset="0.25"/>
+      <stop stop-color="#ee8800" offset="0.5"/>
+      <stop stop-color="#d67a00" offset="0.75"/>
+      <stop stop-color="#a65f00" offset="1"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="22.267" x2="31.751" y1="-8.6537" y2="-8.6537" gradientTransform="matrix(9.4527 9.484 -9.484 9.4527 0 0)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#d5d5d5" offset="0"/>
+      <stop stop-color="#c9c9c9" offset="0.25"/>
+      <stop stop-color="#c3c3c3" offset="0.5"/>
+      <stop stop-color="#afafaf" offset="0.75"/>
+      <stop stop-color="#888888" offset="1"/>
+    </linearGradient>
+    <linearGradient id="eraser" x1="22.164" x2="31.683" y1="-14.141" y2="-14.141" gradientTransform="matrix(9.4872 9.5187 -9.5187 9.4872 0 0)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#db7c88" offset="0"/>
+      <stop stop-color="#d15766" offset="0.25"/>
+      <stop stop-color="#cc4455" offset="0.5"/>
+      <stop stop-color="#b73d4c" offset="0.75"/>
+      <stop stop-color="#8e2f3b" offset="1"/>
+    </linearGradient>
+  </defs>
   <symbol id="pencil" viewBox="0 0 512 512">
-    <defs>
-      <linearGradient id="wood" x1="-22.662" x2="-32.039" y1="-27.117" y2="-27.117" gradientTransform="matrix(-9.3466 -9.3775 9.3775 -9.3466 0 0)" gradientUnits="userSpaceOnUse">
-        <stop stop-color="#e5cfad" offset="0"/>
-        <stop stop-color="#dec196" offset="0.25"/>
-        <stop stop-color="#daba8a" offset="0.5"/>
-        <stop stop-color="#c4a77c" offset="0.75"/>
-        <stop stop-color="#988260" offset="1"/>
-      </linearGradient>
-      <linearGradient id="paint" x1="22.338" x2="31.811" y1="15.409" y2="15.409" gradientTransform="matrix(9.4412 9.4724 -9.4724 9.4412 0 0)" gradientUnits="userSpaceOnUse">
-        <stop stop-color="#f3ac4d" offset="0"/>
-        <stop stop-color="#f0941a" offset="0.25"/>
-        <stop stop-color="#ee8800" offset="0.5"/>
-        <stop stop-color="#d67a00" offset="0.75"/>
-        <stop stop-color="#a65f00" offset="1"/>
-      </linearGradient>
-      <linearGradient id="metal" x1="22.267" x2="31.751" y1="-8.6537" y2="-8.6537" gradientTransform="matrix(9.4527 9.484 -9.484 9.4527 0 0)" gradientUnits="userSpaceOnUse">
-        <stop stop-color="#d5d5d5" offset="0"/>
-        <stop stop-color="#c9c9c9" offset="0.25"/>
-        <stop stop-color="#c3c3c3" offset="0.5"/>
-        <stop stop-color="#afafaf" offset="0.75"/>
-        <stop stop-color="#888888" offset="1"/>
-      </linearGradient>
-      <linearGradient id="eraser" x1="22.164" x2="31.683" y1="-14.141" y2="-14.141" gradientTransform="matrix(9.4872 9.5187 -9.5187 9.4872 0 0)" gradientUnits="userSpaceOnUse">
-        <stop stop-color="#db7c88" offset="0"/>
-        <stop stop-color="#d15766" offset="0.25"/>
-        <stop stop-color="#cc4455" offset="0.5"/>
-        <stop stop-color="#b73d4c" offset="0.75"/>
-        <stop stop-color="#8e2f3b" offset="1"/>
-      </linearGradient>
-    </defs>
     <path d="m170.77 428.71-168.7 81.953 81.054-169.89z" fill="url(#wood)"/>
     <path d="m54.396 484.82-52.657 25.846 25.566-53.027z" fill="#2a2a2a"/>
     <path d="m314.47 108.52c-9.7304 9.7626 2.2127 37.574 26.676 62.118 24.463 24.544 52.182 36.527 61.913 26.764l-231.03 231.8c-9.7304 9.7626-37.45-2.2201-61.913-26.764-24.463-24.544-36.406-52.355-26.676-62.118z" fill="url(#paint)"/>
@@ -884,6 +940,8 @@
     <path d="m417.17 4.7679c-9.8787 9.9114 2.2886 38.189 27.176 63.159 24.888 24.97 53.072 37.178 62.95 27.266l-54.165 54.344c-9.8787 9.9114-38.063-2.2962-62.95-27.266-24.888-24.97-37.055-53.247-27.176-63.159z" fill="url(#eraser)"/>
     <path d="m417.17 4.7679c9.8787-9.9114 38.063 2.2962 62.95 27.266 24.888 24.97 37.055 53.247 27.176 63.159s-38.062-2.2962-62.95-27.266c-24.888-24.97-37.055-53.247-27.176-63.159z" fill="#db7c88"/>
   </symbol>
+</svg>
+<svg id="icons">
   <symbol id="arrow" viewBox="0 0 512 512">
     <path d="m112.66 0 286.68 256-286.68 256z"/>
   </symbol>
@@ -940,11 +998,12 @@
           <svg><use href="#arrow"/></svg>
           <ul>
             <li onmousedown="window.open('https://www.diffchecker.com/','_blank');">Difference Finder</li>
-            <li onmousedown="window.open('https://htmlformatter.com/','_blank');">HTML Formatter</li>
+            <li onmousedown="window.open('https://webformatter.com/','_blank');">Code Formatter</li>
+            <li onmousedown="window.open('https://caniuse.com/','_blank');">Compatibility Checker</li>
             <li onmousedown="window.open('https://www.svgminify.com/','_blank');">SVG Simplifier</li>
+            <li onmousedown="window.open('https://keycode.info/','_blank');">Keycode Finder</li>
             <li onmousedown="window.open('https://www.uuidgenerator.net/','_blank');">UUID Generator</li>
             <li onmousedown="window.open('https://cryptii.com/','_blank');">Text Encryptor</li>
-            <li onmousedown="window.open('https://keycode.info/','_blank');">Keycode Finder</li>
           </ul>
         </li>
       </ul>
@@ -963,12 +1022,12 @@
 </header>
 
 <main id="main" class="text horizontal">
-  <textarea id="userInput" class="text horizontal" placeholder="Welcome to the Smart Text Editor! This site was created to allow for easy text editing and code development within your browser!" spellcheck="false"></textarea>
+  <textarea id="userInput" class="text horizontal" placeholder="Welcome to the Smart Text Editor! This site was created to allow for easy text editing and code development within your browser!" spellcheck="false" autocomplete="off"></textarea>
   <div id="scaler" class="text horizontal">
     <div class="handle">▲<br>▼</div>
   </div>
   <iframe id="preview" class="text horizontal" src="about:blank"></iframe>
-  <div id="cardBlur"></div>
+  <div id="cardBackground"></div>
   <div id="welcome" class="card modal scale">
     <div class="header">
       <svg class="pencil"><use href="#pencil"></use></svg>
@@ -988,8 +1047,8 @@
     </div>
     <div class="content">
       <div class="item expand">
-        <textarea id="locate" placeholder="Text to locate..." spellcheck="false"></textarea>
-        <textarea id="modify" placeholder="Replace with..." spellcheck="false"></textarea>
+        <textarea id="locate" placeholder="Text to locate..." spellcheck="false" autocomplete="off"></textarea>
+        <textarea id="modify" placeholder="Replace with..." spellcheck="false" autocomplete="off"></textarea>
       </div>
     </div>
     <div class="toolbar">
@@ -1006,21 +1065,21 @@
     <div class="content">
       <div class="item">
         <span id="colorPreview"></span>
-        <input id="colorInput" type="text" value="#ff7f00" maxlength="7" spellcheck="false" autocomplete="off">
+        <input id="colorInput" type="text" value="#ffa500" maxlength="7" spellcheck="false" autocomplete="off">
       </div>
       <div class="item">
-        <label for="red">Red</label>
-        <input id="red" type="range" min="0" max="255" oninput="channelRefresh();">
-        <label for="green">Green</label>
-        <input id="green" type="range" min="0" max="255" oninput="channelRefresh();">
-        <label for="blue">Blue</label>
-        <input id="blue" type="range" min="0" max="255" oninput="channelRefresh();">
+        <label for="redChannel">Red</label>
+        <input id="redChannel" type="range" min="0" max="255" style="--range-thumb-hover: #bb2222; --range-track-hover: #660000;" oninput="channelRefresh();">
+        <label for="greenChannel">Green</label>
+        <input id="greenChannel" type="range" min="0" max="255" style="--range-thumb-hover: #22bb22; --range-track-hover: #006600;" oninput="channelRefresh();">
+        <label for="blueChannel">Blue</label>
+        <input id="blueChannel" type="range" min="0" max="255" style="--range-thumb-hover: #2222bb; --range-track-hover: #000066;" oninput="channelRefresh();">
       </div>
     </div>
     <div class="toolbar">
       <button onmouseup="colorInput.select(); document.execCommand('copy');">Copy</button>
-      <button onmouseup="textEdit('insert',storedColor); channelRefresh(); insertColor = true;">Insert</button>
-      <button onmouseup="var selectionCount = userInput.selectionEnd - userInput.selectionStart; if (selectionCount != 0){ textEdit('delete',selectionCount); } insertColor = false;">Delete</button>
+      <button onmouseup="textEdit('insert',storedColor,true); channelRefresh(); insertColor = true;">Insert</button>
+      <button onmouseup="var selectionCount = userInput.selectionEnd - userInput.selectionStart; if (selectionCount != 0){ textEdit('delete',selectionCount,true); } insertColor = false;">Delete</button>
     </div>
   </div>
   <div id="formatter" class="card widget">
@@ -1030,7 +1089,7 @@
     </div>
     <div class="content">
       <div class="item expand">
-        <textarea id="formatterInput" class="expand" placeholder="Place JSON here..." spellcheck="false"></textarea>
+        <textarea id="formatterInput" class="expand" placeholder="Place JSON here..." spellcheck="false" autocomplete="off"></textarea>
       </div>
     </div>
     <div class="toolbar">
@@ -1046,7 +1105,7 @@
     </div>
     <div class="content">
       <div class="item expand">
-        <textarea id="encoderInput" class="expand" placeholder="Place text here..." spellcheck="false"></textarea>
+        <textarea id="encoderInput" class="expand" placeholder="Place text here..." spellcheck="false" autocomplete="off"></textarea>
       </div>
     </div>
     <div class="toolbar">
@@ -1088,7 +1147,7 @@
           </div>
         </div>
         <div class="divider"></div>
-        <div class="checkbox" data-tooltip="Refresh manually using Ctrl + Space when disabled">
+        <div class="checkbox" data-tooltip="Refresh manually using Ctrl + Enter when disabled">
           <input id="refreshSetting" type="checkbox" oninput="updateCheckbox('refresh');" checked>
           <label for="refreshSetting"><svg class="button"><use href="#check"></use></svg>Automatically Refresh Preview</label>
         </div>
@@ -1102,23 +1161,27 @@
         </div>
       </div>
     </div>
-    <span style="margin-top: 10px; color: #ffcd00; font-size: min(2.75vw, 12px);">&#9888; At the moment, these only<br>take effect on page reload</span>
     <div class="toolbar">
       <button style="--button-hover: #bb2222;" onmouseup="resetSettings();">Reset All Settings</button>
+    </div>
+  </div>
+  <div id="reset" class="card notification">
+    <div class="header"><svg class="pencil"><use href="#pencil"></use></svg>
+      <section>Reset Settings</section>
+    </div>
+    <div class="content">
+      <div class="item">Your settings have been reset!</div>
     </div>
   </div>
 </main>
 
 <script>
   var storage = window.localStorage, view = "text", orientation = "horizontal", refresh = "true", title = "true", transitions = "true", loadedFile = undefined, sourceChange = false, mustSave = false, activeWidget = undefined, activeModal = undefined, storedColor, insertColor = false, encodeComponent = false;
-  favicon.href = `data:image/svg+xml,${encodeURIComponent(pencil.outerHTML.split("symbol").join("svg").split('"').join("'").split("\n").join("").split("  ").join("").split("id='pencil'").join("xmlns='http://www.w3.org/2000/svg'"))}`;
+  favicon.href = `data:image/svg+xml,${encodeURIComponent(logo.outerHTML.split("<svg ").join("<svg xmlns='http://www.w3.org/2000/svg' ").split("</svg>").join("<use href='#pencil'></use></svg>"))}`;
   if (windowParent){
-    loadSettings();
+    loadSettings("initial");
     setTimeout(function(){
-      document.documentElement.style.opacity = "1";
-      if (transitions == "true"){
-        document.documentElement.removeAttribute("style");
-      }
+      document.documentElement.classList.remove("fade");
     }, 50);
     if (title == "true"){
       setTimeout(function(){
@@ -1128,11 +1191,12 @@
         if (activeModal == "welcome"){
           closeCard("welcome");
         }
-      }, 1700);
+      }, 2100);
     }
     userInput.focus();
   }
   colorInputRefresh();
+  forceRefresh();
   window.addEventListener("beforeunload",function(){
     if (windowParent && mustSave){
       event.returnValue = "Changes you made may not be saved.";
@@ -1180,19 +1244,11 @@
         blockShortcut(event);
         openDisplay();
       }
-      if (event.key == " "){
+      if (event.key == "Enter"){
         blockShortcut(event);
         if (view == "split"){
-          var store = refresh;
-          refresh = "true";
-          sourceChange = true;
-          previewRefresh();
-          refresh = store;
+          forceRefresh();
         }
-      }
-      if (event.key == "U"){
-        blockShortcut(event);
-        openCard("settings");
       }
       if (event.key == "F"){
         blockShortcut(event);
@@ -1217,6 +1273,10 @@
       if (event.key == "H"){
         blockShortcut(event);
         confirmOverwrite(insertTemplate);
+      }
+      if (event.key == ">"){
+        blockShortcut(event);
+        openCard("settings");
       }
     }
   });
@@ -1248,7 +1308,7 @@
       load.files = event.dataTransfer.files;
       confirmOverwrite(importFile,event);
     } else {
-      textEdit("insert",event.dataTransfer.getData("text"));
+      textEdit("insert",event.dataTransfer.getData("text"),true);
     }
   });
   userInput.addEventListener("input",function(){
@@ -1273,10 +1333,10 @@
   });
   colorInput.addEventListener("input",function(){
     colorInputRefresh();
-    textEdit("insert",storedColor);
+    textEdit("insert",storedColor,true);
     colorInput.focus();
   });
-  cardBlur.addEventListener("click",function(){
+  cardBackground.addEventListener("click",function(){
     if (activeModal == "welcome"){
       userInput.focus();
     }
@@ -1285,15 +1345,19 @@
   welcome.addEventListener("click",function(){
     closeCard("welcome");
   });
-  function loadSettings(){
+  function loadSettings(input){
     var storedView = storage.getItem("view");
     if (storedView != undefined){
-      changeView(storedView);
+      if (input == "initial"){
+        changeView(storedView);
+      }
       updateSelect("view",storedView);
     }
     var storedOrientation = storage.getItem("orientation");
     if (storedOrientation != undefined){
-      changeOrientation(storedOrientation);
+      if (input == "initial"){
+        changeOrientation(storedOrientation);
+      }
       updateSelect("orientation",storedOrientation);
     }
     var storedRefresh = storage.getItem("refresh");
@@ -1306,21 +1370,29 @@
       title = storedTitle;
       updateCheckbox("title",storedTitle);
     }
-    var storedTransitions = storage.getItem("transitions");
-    if (storedTransitions != undefined){
-      transitions = storedTransitions;
-      updateCheckbox("transitions",storedTransitions);
-    }
+    setTimeout(function(){
+      var storedTransitions = storage.getItem("transitions");
+      if (storedTransitions != undefined){
+        changeTransitions(storedTransitions);
+        updateCheckbox("transitions",storedTransitions);
+      } else {
+        changeTransitions(transitions);
+      }
+    }, 50);
   }
   function resetSettings(){
     var ask = confirm("Are you sure you want to reset all settings?\nThis cannot be undone.");
     if (ask){
       updateSelect("view","text");
       updateSelect("orientation","horizontal");
+      refresh = "true";
       updateCheckbox("refresh","true");
+      title = "true";
       updateCheckbox("title","true");
+      changeTransitions("true");
       updateCheckbox("transitions","true");
       storage.clear();
+      openCard("reset");
     }
   }
   function updateSetting(item,value){
@@ -1389,16 +1461,26 @@
     document.getElementById(element).removeAttribute("style");
     document.getElementById(element).classList.add(newVariable);
   }
+  function changeTransitions(input){
+    var newTransition = input;
+    if (newTransition == "true"){
+      document.documentElement.removeAttribute("style");
+    }
+    if (newTransition == "false"){
+      document.documentElement.style = removeTransitions;
+    }
+    transitions = newTransition;
+  }
   function confirmOverwrite(action,event){
     if (mustSave){
       var ask = confirm("Changes you made may not be saved.");
       if (ask){
         action(event);
-        closeCard("welcome");
+        closeCard(activeModal);
       }
     } else {
       action(event);
-      closeCard("welcome");
+      closeCard(activeModal);
     }
   }
   function blockShortcut(event){
@@ -1439,7 +1521,7 @@
       if (validTypes.slice(1,3).includes(mimeDivision(0))){
         reader.readAsDataURL(load.files[0]);
         reader.addEventListener("loadend",function(){
-          textEdit("insert",reader.result);
+          textEdit("insert",reader.result,true);
         });
       }
     } else {
@@ -1468,9 +1550,11 @@
     display.document.write(userInput.value);
     display.document.close();
   }
-  function textEdit(type,text){
+  function textEdit(type,text,focus){
     var cursor = userInput.selectionStart;
-    userInput.focus();
+    if (focus == true){
+      userInput.focus();
+    }
     if (type == "insert"){
       userInput.setRangeText(text);
       userInput.setSelectionRange(cursor,cursor + text.length);
@@ -1488,27 +1572,36 @@
     var cardType = card.classList[1];
     if (card.classList.contains("active")){
       card.classList.toggle("active");
-      if (card.classList.contains("modal")){
-        cardBlur.classList.toggle("active");
+      if (cardType == "modal"){
+        cardBackground.classList.toggle("active");
       }
     } else {
       var cards = Array.from(document.getElementsByClassName("card"));
-      cards.forEach(function(item){
-        var itemType = item.classList[1];
-        if (itemType == cardType || itemType == "modal"){
-          item.classList.remove("active");
-        }
-      });
-      cardBlur.classList.remove("active");
+      if (cardType != "notification"){
+        cards.forEach(function(item){
+          var itemType = item.classList[1];
+          if (itemType == cardType || itemType == "modal"){
+            item.classList.remove("active");
+          }
+        });
+      }
+      if (cardType != "notification" && cardType != "modal"){
+        cardBackground.classList.remove("active");
+      }
       card.classList.add("active");
-      if (card.classList.contains("modal")){
-        cardBlur.classList.add("active");
+      if (cardType == "notification"){
+        setTimeout(function(){
+          closeCard(element);
+        }, 3000);
+      }
+      if (cardType == "modal"){
+        cardBackground.classList.add("active");
       }
     }
-    if (cardType = "widget"){
+    if (cardType == "widget"){
       activeWidget = element;
     }
-    if (cardType = "modal"){
+    if (cardType == "modal"){
       activeModal = element;
     }
   }
@@ -1516,14 +1609,19 @@
     var card = document.getElementById(element);
     var cardType = card.classList[1];
     document.getElementById(element).classList.remove("active");
-    cardBlur.classList.remove("active");
+    if (cardType == "modal"){
+      cardBackground.classList.remove("active");
+    }
     if (activeModal == "welcome" && windowParent){
       userInput.focus();
     }
-    if (cardType = "widget"){
+    if (activeModal == "settings" && windowParent){
+      loadSettings();
+    }
+    if (cardType == "widget"){
       activeWidget = undefined;
     }
-    if (cardType = "modal"){
+    if (cardType == "modal"){
       activeModal = undefined;
     }
   }
@@ -1549,21 +1647,20 @@
       storedColor.forEach(function(item,index){
         storedColor[index] = parseInt(item,16);
       });
-      red.value = storedColor[0];
-      green.value = storedColor[1];
-      blue.value = storedColor[2];
-      storedColor = "#" + convertHex(red.value) + convertHex(green.value) + convertHex(blue.value);
+      redChannel.value = storedColor[0];
+      greenChannel.value = storedColor[1];
+      blueChannel.value = storedColor[2];
+      storedColor = "#" + convertHex(redChannel.value) + convertHex(greenChannel.value) + convertHex(blueChannel.value);
       colorPreview.style.background = storedColor;
     }
   }
   function channelRefresh(){
-    storedColor = "#" + convertHex(red.value) + convertHex(green.value) + convertHex(blue.value);
+    storedColor = "#" + convertHex(redChannel.value) + convertHex(greenChannel.value) + convertHex(blueChannel.value);
     colorPreview.style.background = storedColor;
     colorInput.value = storedColor;
     if (insertColor){
-      textEdit("insert",storedColor);
+      textEdit("insert",storedColor,true);
     }
-    colorInput.focus();
   }
   function convertHex(channel){
     var hex = parseInt(channel).toString(16);
@@ -1612,6 +1709,13 @@
     userInput.value = decodeURI("%3C!DOCTYPE%20html%3E%0A%3Chtml%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1.0%22%3E%0A%3Clink%20rel=%22icon%22%20type=%22%22%20href=%22%22%3E%0A%0A%3Cstyle%3E%0A%20%20*%20%7B%0A%20%20%20%20margin:%200;%0A%20%20%20%20padding:%200;%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20width:%20100vw;%0A%20%20%20%20height:%20100vh;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cmain%3E%0A%3C/main%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E");
     sourceChange = true;
     changeView("split");
+  }
+  function forceRefresh(){
+    var store = refresh;
+    refresh = "true";
+    sourceChange = true;
+    previewRefresh();
+    refresh = store;
   }
   function previewRefresh(){
     if (refresh == "true" && sourceChange){
