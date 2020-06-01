@@ -7,6 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link id="favicon" rel="icon" type="image/svg+xml">
+<link id="appIcon" rel="apple-touch-icon" sizes="16x16" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEJQTFRFAAAA23yI1dXV0VdmzERVji87ycnJw8PDtz1M86xN8JQar6+viIiI7ogA1noApl8A5c+t3sGW2rqKKioqxKd8mIJgbs8VzwAAABZ0Uk5TAP///////////////////////////1SBjaMAAAA8SURBVHicY2DABxgZUflMzCysKHw2dg5kAU4udm4eFD4vHzqfn4p8AXS+oBAKn0FYSEQUxQfCwqh8dAAASZYC5vJ/xd8AAAAASUVORK5CYII=">
 <link href="https://fonts.googleapis.com/css2?family=Cousine&family=Rubik&display=swap" rel="stylesheet">
 
 <script>
@@ -124,7 +125,7 @@
   button::-moz-focus-inner {
     border: none;
   }
-  button:hover, button:focus {
+  button:hover, button:focus, .dropdown:focus-within > button {
     color: var(--text-hover);
     background: var(--button-hover);
   }
@@ -137,6 +138,13 @@
     font-size: 13px;
     border: none;
     outline: none;
+  }
+  @supports (-webkit-touch-callout: none) {
+    textarea, [type="text"] {
+      font-size: 16px;
+      border-radius: 0;
+      -webkit-appearance: none;
+    }
   }
   textarea {
     font-family: var(--font-family-sans-serif);
@@ -776,6 +784,9 @@
     color: var(--text-medium);
     font-size: min(2.75vw, 12.5px);
     border-radius: var(--border-radius);
+    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
+    --focus-border: transparent;
+    outline: none;
     white-space: nowrap;
     cursor: pointer;
     transition: var(--transition-fast);
@@ -796,11 +807,14 @@
   .dropdown li [type="file"], .dropdown li a {
     display: none;
   }
-  .dropdown li:hover {
+  .dropdown li:hover, .dropdown li:focus, .dropdown li:focus-within {
     color: var(--text-hover);
     background: var(--container-medium-hover);
   }
-  .dropdown li:hover > svg {
+  .dropdown li:focus {
+    --focus-border: var(--outline);
+  }
+  .dropdown li:hover > svg, .dropdown li:focus > svg, .dropdown li:focus-within > svg {
     fill: var(--text-hover);
   }
   .dropdown ul ul {
@@ -834,7 +848,7 @@
       overflow-y: initial;
     }
   }
-  .dropdown button:focus + ul, .dropdown li:hover > ul {
+  .dropdown:focus-within > ul, .dropdown li:focus-within > ul {
     visibility: visible;
     opacity: 1;
     pointer-events: all;
@@ -960,18 +974,18 @@
     <div class="dropdown">
       <button>File</button>
       <ul>
-        <li onmousedown="window.open(window.location.href,'_blank');">New<span>Ctrl + Shift + C</span></li>
-        <li onmousedown="load.click();"><input id="load" type="file">Open<span>Ctrl + Shift + L</span></li>
-        <li onmousedown="saveAs();"><a id="save"></a>Save<span>Ctrl + Shift + S</span></li>
+        <li onclick="window.open(window.location.href,'_blank');">New<span>Ctrl + Shift + C</span></li>
+        <li onclick="load.click();"><input id="load" type="file">Open<span>Ctrl + Shift + L</span></li>
+        <li onclick="saveAs();"><a id="save"></a>Save<span>Ctrl + Shift + S</span></li>
         <li>Save As...
           <svg><use href="#arrow"/></svg>
           <ul>
-            <li onmousedown="saveAs('txt');">Plain Text<span>.txt</span></li>
-            <li onmousedown="saveAs('html');">HTML<span>.html</span></li>
-            <li onmousedown="saveAs('css');">CSS<span>.css</span></li>
-            <li onmousedown="saveAs('js');">JavaScript<span>.js</span></li>
-            <li onmousedown="saveAs('json');">JSON<span>.json</span></li>
-            <li onmousedown="saveAs('svg');">SVG<span>.svg</span></li>
+            <li onclick="saveAs('txt');">Plain Text<span>.txt</span></li>
+            <li onclick="saveAs('html');">HTML<span>.html</span></li>
+            <li onclick="saveAs('css');">CSS<span>.css</span></li>
+            <li onclick="saveAs('js');">JavaScript<span>.js</span></li>
+            <li onclick="saveAs('json');">JSON<span>.json</span></li>
+            <li onclick="saveAs('svg');">SVG<span>.svg</span></li>
           </ul>
         </li>
       </ul>
@@ -979,38 +993,38 @@
     <div class="dropdown">
       <button>View</button>
       <ul>
-        <li onmousedown="changeView('text');">Text<span>Ctrl + Shift + 1</span></li>
-        <li onmousedown="changeView('code');">Code<span>Ctrl + Shift + 2</span></li>
-        <li onmousedown="changeView('split');">Split<span>Ctrl + Shift + 3</span></li>
-        <li onmousedown="changeView('preview');">Preview<span>Ctrl + Shift + 4</span></li>
-        <li onmousedown="changeOrientation();">Orientation<span>Ctrl + Shift + 5</span></li>
-        <li onmousedown="openDisplay();">Display<span>Ctrl + Shift + 6</span></li>
+        <li onclick="changeView('text');">Text<span>Ctrl + Shift + 1</span></li>
+        <li onclick="changeView('code');">Code<span>Ctrl + Shift + 2</span></li>
+        <li onclick="changeView('split');">Split<span>Ctrl + Shift + 3</span></li>
+        <li onclick="changeView('preview');">Preview<span>Ctrl + Shift + 4</span></li>
+        <li onclick="changeOrientation();">Orientation<span>Ctrl + Shift + 5</span></li>
+        <li onclick="openDisplay();">Display<span>Ctrl + Shift + 6</span></li>
       </ul>
     </div>
     <div class="dropdown">
       <button>Tools</button>
       <ul>
-        <li onmousedown="openCard('replacer');">Replace Text<span>Ctrl + Shift + F</span></li>
-        <li onmousedown="openCard('picker');">Color Picker<span>Ctrl + Shift + K</span></li>
-        <li onmousedown="openCard('formatter');">JSON Formatter<span>Ctrl + Shift + R</span></li>
-        <li onmousedown="openCard('encoder');">URI Encoder<span>Ctrl + Shift + Y</span></li>
-        <li onmousedown="confirmOverwrite(insertTemplate);">Import HTML Template<span>Ctrl + Shift + H</span></li>
+        <li onclick="openCard('replacer');">Replace Text<span>Ctrl + Shift + F</span></li>
+        <li onclick="openCard('picker');">Color Picker<span>Ctrl + Shift + K</span></li>
+        <li onclick="openCard('formatter');">JSON Formatter<span>Ctrl + Shift + R</span></li>
+        <li onclick="openCard('encoder');">URI Encoder<span>Ctrl + Shift + Y</span></li>
+        <li onclick="confirmOverwrite(insertTemplate);">Import HTML Template<span>Ctrl + Shift + H</span></li>
         <li>Online Resources...
           <svg><use href="#arrow"/></svg>
           <ul>
-            <li onmousedown="window.open('https://www.diffchecker.com/','_blank');">Difference Finder</li>
-            <li onmousedown="window.open('https://webformatter.com/','_blank');">Code Formatter</li>
-            <li onmousedown="window.open('https://caniuse.com/','_blank');">Compatibility Checker</li>
-            <li onmousedown="window.open('https://www.svgminify.com/','_blank');">SVG Simplifier</li>
-            <li onmousedown="window.open('https://keycode.info/','_blank');">Keycode Finder</li>
-            <li onmousedown="window.open('https://www.uuidgenerator.net/','_blank');">UUID Generator</li>
-            <li onmousedown="window.open('https://cryptii.com/','_blank');">Text Encryptor</li>
+            <li onclick="window.open('https://www.diffchecker.com/','_blank');">Difference Finder</li>
+            <li onclick="window.open('https://webformatter.com/','_blank');">Code Formatter</li>
+            <li onclick="window.open('https://caniuse.com/','_blank');">Compatibility Checker</li>
+            <li onclick="window.open('https://www.svgminify.com/','_blank');">SVG Simplifier</li>
+            <li onclick="window.open('https://keycode.info/','_blank');">Keycode Finder</li>
+            <li onclick="window.open('https://www.uuidgenerator.net/','_blank');">UUID Generator</li>
+            <li onclick="window.open('https://cryptii.com/','_blank');">Text Encryptor</li>
           </ul>
         </li>
       </ul>
     </div>
     <div>
-      <button onmousedown="openCard('settings');">Settings</button>
+      <button onclick="openCard('settings');">Settings</button>
     </div>
   </div>
   <div class="title">
@@ -1044,7 +1058,7 @@
   <div id="replacer" class="card widget">
     <div class="header">
       <section>Replace Text</section>
-      <svg class="button close" onmousedown="closeCard('replacer');"><use href="#close"></use></svg>
+      <svg class="button close" onclick="closeCard('replacer');"><use href="#close"></use></svg>
     </div>
     <div class="content">
       <div class="item expand">
@@ -1061,7 +1075,7 @@
   <div id="picker" class="card widget">
     <div class="header">
       <section>Color Picker</section>
-      <svg class="button close" onmousedown="closeCard('picker');"><use href="#close"></use></svg>
+      <svg class="button close" onclick="closeCard('picker');"><use href="#close"></use></svg>
     </div>
     <div class="content">
       <div class="item">
@@ -1086,7 +1100,7 @@
   <div id="formatter" class="card widget">
     <div class="header">
       <section>JSON Formatter</section>
-      <svg class="button close" onmousedown="closeCard('formatter');"><use href="#close"></use></svg>
+      <svg class="button close" onclick="closeCard('formatter');"><use href="#close"></use></svg>
     </div>
     <div class="content">
       <div class="item expand">
@@ -1102,7 +1116,7 @@
   <div id="encoder" class="card widget">
     <div class="header">
       <section>URI Encoder</section>
-      <svg class="button close" onmousedown="closeCard('encoder');"><use href="#close"></use></svg>
+      <svg class="button close" onclick="closeCard('encoder');"><use href="#close"></use></svg>
     </div>
     <div class="content">
       <div class="item expand">
@@ -1124,7 +1138,7 @@
   <div id="settings" class="card modal">
     <div class="header">
       <section>Settings</section>
-      <svg class="button close" onmousedown="closeCard('settings');"><use href="#close"></use></svg>
+      <svg class="button close" onclick="closeCard('settings');"><use href="#close"></use></svg>
     </div>
     <div class="content">
       <div class="item list">
@@ -1132,9 +1146,9 @@
           <div class="dropdown">
             <button id="viewSetting">Text</button>
             <ul>
-              <li onmousedown="updateSelect('view','text');">Text</li>
-              <li onmousedown="updateSelect('view','code');">Code</li>
-              <li onmousedown="updateSelect('view','split');">Split</li>
+              <li onclick="updateSelect('view','text');">Text</li>
+              <li onclick="updateSelect('view','code');">Code</li>
+              <li onclick="updateSelect('view','split');">Split</li>
             </ul>
           </div>
         </div>
@@ -1142,8 +1156,8 @@
           <div class="dropdown">
             <button id="orientationSetting">Horizontal</button>
             <ul>
-              <li onmousedown="updateSelect('orientation','horizontal');">Horizontal</li>
-              <li onmousedown="updateSelect('orientation','vertical');">Vertical</li>
+              <li onclick="updateSelect('orientation','horizontal');">Horizontal</li>
+              <li onclick="updateSelect('orientation','vertical');">Vertical</li>
             </ul>
           </div>
         </div>
@@ -1163,7 +1177,7 @@
       </div>
     </div>
     <div class="toolbar">
-      <button style="--button-hover: #bb2222;" onmouseup="resetSettings();">Reset All Settings</button>
+      <button style="--button-hover: #bb2222;" onclick="resetSettings();">Reset All Settings</button>
     </div>
   </div>
   <div id="reset" class="card notification">
@@ -1178,26 +1192,61 @@
 
 <script>
   var storage = window.localStorage, view = "text", orientation = "horizontal", refresh = "true", title = "true", transitions = "true", loadedFile = undefined, sourceChange = false, mustSave = false, activeWidget = undefined, activeModal = undefined, storedColor, insertColor = false, encodeComponent = false;
-  favicon.href = `data:image/svg+xml,${encodeURIComponent(logo.outerHTML.split("<svg ").join("<svg xmlns='http://www.w3.org/2000/svg' ").split("</svg>").join("<use href='#pencil'></use></svg>"))}`;
-  if (windowParent){
-    loadSettings("initial");
-    setTimeout(function(){
-      document.documentElement.classList.remove("fade");
-    }, 50);
-    if (title == "true"){
+  var pencil = `data:image/svg+xml,${encodeURIComponent(logo.outerHTML.split("<svg ").join("<svg xmlns='http://www.w3.org/2000/svg' ").split("</svg>").join("<use href='#pencil'></use></svg>"))}`;
+  favicon.href = pencil;
+  window.addEventListener("load",function(){
+    if (windowParent){
+      loadSettings("initial");
       setTimeout(function(){
-        openCard("welcome");
-      }, 100);
-      setTimeout(function(){
-        if (activeModal == "welcome"){
-          closeCard("welcome");
-        }
-      }, 2100);
+        document.documentElement.classList.remove("fade");
+      }, 50);
+      if (title == "true"){
+        setTimeout(function(){
+          openCard("welcome");
+        }, 100);
+        setTimeout(function(){
+          if (activeModal == "welcome"){
+            closeCard("welcome");
+          }
+        }, 2100);
+      }
+      userInput.focus();
     }
-    userInput.focus();
-  }
-  colorInputRefresh();
-  forceRefresh();
+    colorInputRefresh();
+    forceRefresh();
+  });
+  var dropdowns = Array.from(document.getElementsByClassName("dropdown"));
+  dropdowns.forEach(function(item){
+    var indexItems = Array.from(item.getElementsByTagName("li"));
+    indexItems.forEach(function(thing){
+      thing.addEventListener("keydown",function(event){
+        if (event.key == "Enter"){
+          event.preventDefault();
+          event.stopPropagation();
+          thing.click();
+          thing.blur();
+        }
+      });
+      thing.setAttribute("tabindex","0");
+    });
+  });
+  var checkboxes = Array.from(document.getElementsByClassName("checkbox"));
+  checkboxes.forEach(function(item){
+    item.addEventListener("keydown",function(event){
+      if (event.key == "Enter"){
+        event.preventDefault();
+        event.stopPropagation();
+        item.getElementsByTagName("label")[0].click();
+      }
+    });
+    item.setAttribute("tabindex","0");
+  });
+  var buttons = Array.from(document.getElementsByTagName("button"));
+  buttons.forEach(function(item){
+    item.addEventListener("click",function(){
+      this.focus();
+    });
+  });
   window.addEventListener("beforeunload",function(){
     if (windowParent && mustSave){
       event.returnValue = "Changes you made may not be saved.";
@@ -1329,6 +1378,12 @@
     document.body.addEventListener("mousemove",setScaling);
     document.body.addEventListener("mouseup",removeScaling);
     document.body.addEventListener("mouseleave",removeScaling);
+  });
+  scaler.addEventListener("touchstart",function(){
+    toggleScaling();
+    document.body.addEventListener("touchmove",setScalingTouch);
+    document.body.addEventListener("touchend",removeScaling);
+    document.body.addEventListener("touchcancel",removeScaling);
   });
   load.addEventListener("change",function(event){
     confirmOverwrite(importFile,event);
@@ -1770,10 +1825,48 @@
       preview.style.width = `calc(100% - ${cursorOffset}px - 8px)`;
     }
   }
+  function setScalingTouch(event){
+    var cursorOffset, windowAxis;
+    if (orientation == "horizontal"){
+      cursorOffset = event.touches[0].clientY - header.offsetHeight;
+      windowAxis = window.innerHeight;
+    }
+    if (orientation == "vertical"){
+      cursorOffset = event.touches[0].event.clientX;
+      windowAxis = window.innerWidth;
+    }
+    if (cursorOffset <= 80){
+      cursorOffset = 80;
+    }
+    if (orientation == "horizontal"){
+      if (cursorOffset >= windowAxis - 80 - header.offsetHeight){
+        cursorOffset = windowAxis - 80 - header.offsetHeight;
+      }
+    }
+    if (orientation == "vertical"){
+      if (cursorOffset >= windowAxis - 80){
+        cursorOffset = windowAxis - 80;
+      }
+    }
+    if (orientation == "horizontal"){
+      userInput.style.height = `calc(${cursorOffset}px - 8px)`;
+      scaler.style.bottom = `calc(100% - ${cursorOffset}px - 8px)`;
+      preview.style.height = `calc(100% - ${cursorOffset}px - 8px)`;
+    }
+    if (orientation == "vertical"){
+      header.style.boxShadow = `calc(-100vw + ${cursorOffset}px) 1px 8px var(--box-shadow-color)`;
+      userInput.style.width = `calc(${cursorOffset}px - 8px)`;
+      scaler.style.right = `calc(100% - ${cursorOffset}px - 8px)`;
+      preview.style.width = `calc(100% - ${cursorOffset}px - 8px)`;
+    }
+  }
   function removeScaling(event){
     document.body.removeEventListener("mousemove",setScaling);
     document.body.removeEventListener("mouseup",removeScaling);
     document.body.removeEventListener("mouseleave",removeScaling);
+    document.body.removeEventListener("touchmove",setScalingTouch);
+    document.body.removeEventListener("touchend",removeScaling);
+    document.body.removeEventListener("touchcancel",removeScaling);
     toggleScaling();
   }
 </script>
