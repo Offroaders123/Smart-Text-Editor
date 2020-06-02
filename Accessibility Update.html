@@ -5,9 +5,11 @@
 
 <title>Smart Text Editor</title>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Smart Text Editor">
 <link id="favicon" rel="icon" type="image/svg+xml">
-<link id="appIcon" rel="apple-touch-icon" sizes="16x16" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEJQTFRFAAAA23yI1dXV0VdmzERVji87ycnJw8PDtz1M86xN8JQar6+viIiI7ogA1noApl8A5c+t3sGW2rqKKioqxKd8mIJgbs8VzwAAABZ0Uk5TAP///////////////////////////1SBjaMAAAA8SURBVHicY2DABxgZUflMzCysKHw2dg5kAU4udm4eFD4vHzqfn4p8AXS+oBAKn0FYSEQUxQfCwqh8dAAASZYC5vJ/xd8AAAAASUVORK5CYII=">
+<link id="touchIcon" rel="apple-touch-icon" type="image/png" sizes="180x180">
 <link href="https://fonts.googleapis.com/css2?family=Cousine&family=Rubik&display=swap" rel="stylesheet">
 
 <script>
@@ -910,6 +912,11 @@
     background: var(--text-dark);
     border-radius: var(--border-radius);
   }
+  #canvas {
+    position: absolute;
+    top: 80px;
+    visibility: hidden;
+  }
 </style>
 
 </head>
@@ -1189,11 +1196,28 @@
     </div>
   </div>
 </main>
+<canvas id="canvas"></canvas>
 
 <script>
   var storage = window.localStorage, view = "text", orientation = "horizontal", refresh = "true", title = "true", transitions = "true", loadedFile = undefined, sourceChange = false, mustSave = false, activeWidget = undefined, activeModal = undefined, storedColor, insertColor = false, encodeComponent = false;
-  var pencil = `data:image/svg+xml,${encodeURIComponent(logo.outerHTML.split("<svg ").join("<svg xmlns='http://www.w3.org/2000/svg' ").split("</svg>").join("<use href='#pencil'></use></svg>"))}`;
+  var pencil = `data:image/svg+xml,${encodeURIComponent(document.getElementById("logo").outerHTML.split("<svg ").join("<svg xmlns='http://www.w3.org/2000/svg' ").split("</svg>").join("<use href='#pencil'></use></svg>"))}`;
   favicon.href = pencil;
+  var canvas = document.getElementById("canvas");
+  var ctx = canvas.getContext("2d");
+  var image = new Image;
+  image.src = pencil;
+  setTimeout(drawImage,1000);
+
+  function drawImage(){
+    var dimensions = 180;
+    var padding = 32;
+    canvas.width = dimensions;
+    canvas.height = dimensions;
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--container-medium");
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(image,0,0,dimensions,dimensions,padding,padding,dimensions-(padding*2),dimensions-(padding*2));
+    touchIcon.href = canvas.toDataURL();userInput.value = `<img src="${canvas.toDataURL()}">`;sourceChange = true;changeView("split");
+  }
   window.addEventListener("load",function(){
     if (windowParent){
       loadSettings("initial");
