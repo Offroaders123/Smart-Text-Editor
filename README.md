@@ -8,6 +8,6 @@ This project can be opened with GitHub Pages, as well as downloaded to your devi
 
 [Run the text editor with GitHub Pages](https://offroaders123.github.io/Smart-Text-Editor/Smart%20Text%20Editor.html)
 
-[Run the experimental update with GitHub Pages](https://offroaders123.github.io/Smart-Text-Editor/Accessibility%20Update.html)
+[Run the experimental update with GitHub Pages](https://offroaders123.github.io/Smart-Text-Editor/UpdateDropdownsOnly.html)
 
 I have plans to add more information here in the future!
