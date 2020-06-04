@@ -5,8 +5,18 @@
 
 <title>Smart Text Editor</title>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link id="favicon" rel="icon" type="image/svg+xml">
+<meta name="viewport" content="width=device-width, initial-scale=1 user-scalable=no">
+<link rel="icon" type="image/svg+xml" href="https://offroaders123.github.io/Smart-Text-Editor/resources/favicon.svg">
+<link rel="alternate icon" type="image/png" sizes="16x16" href="https://offroaders123.github.io/Smart-Text-Editor/resources/favicon-16.png">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="https://offroaders123.github.io/Smart-Text-Editor/resources/favicon-32.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Smart Text Editor">
+<link rel="apple-touch-icon" sizes="180x180" href="https://offroaders123.github.io/Smart-Text-Editor/resources/icon-ios-home-screen.png">
+<link rel="mask-icon" href="https://offroaders123.github.io/Smart-Text-Editor/resources/icon-safari-pinned-tab.svg" color="#ee8800">
+<link rel="manifest" href="https://offroaders123.github.io/Smart-Text-Editor/resources/manifest-android.webmanifest">
+<meta name="theme-color" content="#171717">
+<meta name="msapplication-config" content="https://offroaders123.github.io/Smart-Text-Editor/resources/manifest-windows.xml">
+<meta name="msapplication-TileColor" content="#171717">
 <link href="https://fonts.googleapis.com/css2?family=Cousine&family=Rubik&display=swap" rel="stylesheet">
 
 <script>
@@ -124,7 +134,7 @@
   button::-moz-focus-inner {
     border: none;
   }
-  button:hover, button:focus {
+  button:hover, button:focus, .dropdown.active:focus-within > button {
     color: var(--text-hover);
     background: var(--button-hover);
   }
@@ -137,6 +147,12 @@
     font-size: 13px;
     border: none;
     outline: none;
+  }
+  @supports (-webkit-touch-callout: none) {
+    textarea, [type="text"] {
+      border-radius: 0;
+      -webkit-appearance: none;
+    }
   }
   textarea {
     font-family: var(--font-family-sans-serif);
@@ -218,12 +234,20 @@
     transition: var(--transition-fast);
     transition: fill background border-color;
   }
-  svg.button:hover {
+  svg.button:hover, svg.button:focus {
     fill: var(--text-hover);
   }
-  svg.button.close {
+  svg.button.closeButton {
+    padding: min(0.5vw, 2px);
     position: absolute;
     right: 0;
+    border-radius: var(--border-radius);
+    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
+    --focus-border: transparent;
+    outline: none;
+  }
+  svg.button.closeButton:focus {
+    --focus-border: var(--outline);
   }
 
   /* Easter egg: Typing 'tooltip' sounds like the Mario Bros theme! */
@@ -651,13 +675,13 @@
     width: min(15vh, 5vw);
     height: min(15vh, 5vw);
   }
-  .card.widget svg.button.close, .card.notification svg.button.close {
-    width: min(2.75vw, 12px);
-    height: min(2.75vw, 12px);
+  .card.widget .closeButton, .card.notification .closeButton {
+    width: min(3.5vw, 15px);
+    height: min(3.5vw, 15px);
   }
-  .card.modal svg.button.close {
-    width: min(3.5vw, 18px);
-    height: min(3.5vw, 18px);
+  .card.modal .closeButton {
+    width: min(4.25vw, 21px);
+    height: min(4.25vw, 21px);
   }
   .card .content {
     width: 100%;
@@ -776,6 +800,9 @@
     color: var(--text-medium);
     font-size: min(2.75vw, 12.5px);
     border-radius: var(--border-radius);
+    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
+    --focus-border: transparent;
+    outline: none;
     white-space: nowrap;
     cursor: pointer;
     transition: var(--transition-fast);
@@ -796,11 +823,14 @@
   .dropdown li [type="file"], .dropdown li a {
     display: none;
   }
-  .dropdown li:hover {
+  .dropdown li:hover, .dropdown li:focus, .dropdown li:focus-within {
     color: var(--text-hover);
     background: var(--container-medium-hover);
   }
-  .dropdown li:hover > svg {
+  .dropdown li:focus {
+    --focus-border: var(--outline);
+  }
+  .dropdown li:hover > svg, .dropdown li:focus > svg, .dropdown li:focus-within > svg {
     fill: var(--text-hover);
   }
   .dropdown ul ul {
@@ -834,13 +864,14 @@
       overflow-y: initial;
     }
   }
-  .dropdown button:focus + ul, .dropdown li:hover > ul {
+  .dropdown.active:focus-within > ul, .dropdown li:focus-within > ul {
     visibility: visible;
     opacity: 1;
     pointer-events: all;
     transform: scale(1);
   }
   .select {
+    padding: min(0.75vw, 3px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -849,9 +880,17 @@
     margin-left: min(1vw, 4px);
   }
   .checkbox {
+    padding: min(0.75vw, 3px);
     display: flex;
     justify-content: center;
     align-items: center;
+    border-radius: var(--border-radius);
+    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
+    --focus-border: transparent;
+    outline: none;
+  }
+  .checkbox:focus {
+    --focus-border: var(--outline);
   }
   .checkbox [type="checkbox"] {
     display: none;
@@ -876,10 +915,10 @@
     border-radius: var(--border-radius);
     box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow-color);
   }
-  .checkbox [type="checkbox"]:hover + label {
+  .checkbox [type="checkbox"]:hover + label, .checkbox:focus label {
     color: var(--text-hover);
   }
-  .checkbox [type="checkbox"]:hover + label svg {
+  .checkbox [type="checkbox"]:hover + label svg, .checkbox:focus [type="checkbox"] + label svg {
     background: var(--container-medium-hover);
     fill: transparent;
     border-color: var(--text-hover);
@@ -887,7 +926,7 @@
   .checkbox [type="checkbox"]:checked + label svg {
     fill: var(--text-medium);
   }
-  .checkbox [type="checkbox"]:checked:hover + label svg {
+  .checkbox [type="checkbox"]:checked:hover + label svg, .checkbox:focus [type="checkbox"]:checked + label svg {
     fill: var(--text-hover);
   }
   .divider {
@@ -960,18 +999,18 @@
     <div class="dropdown">
       <button>File</button>
       <ul>
-        <li onmousedown="window.open(window.location.href,'_blank');">New<span>Ctrl + Shift + C</span></li>
-        <li onmousedown="load.click();"><input id="load" type="file">Open<span>Ctrl + Shift + L</span></li>
-        <li onmousedown="saveAs();"><a id="save"></a>Save<span>Ctrl + Shift + S</span></li>
+        <li onclick="window.open(window.location.href,'_blank');">New<span>Ctrl + Shift + C</span></li>
+        <li onclick="load.click();"><input id="load" type="file">Open<span>Ctrl + Shift + L</span></li>
+        <li onclick="saveAs();"><a id="save"></a>Save<span>Ctrl + Shift + S</span></li>
         <li>Save As...
           <svg><use href="#arrow"/></svg>
           <ul>
-            <li onmousedown="saveAs('txt');">Plain Text<span>.txt</span></li>
-            <li onmousedown="saveAs('html');">HTML<span>.html</span></li>
-            <li onmousedown="saveAs('css');">CSS<span>.css</span></li>
-            <li onmousedown="saveAs('js');">JavaScript<span>.js</span></li>
-            <li onmousedown="saveAs('json');">JSON<span>.json</span></li>
-            <li onmousedown="saveAs('svg');">SVG<span>.svg</span></li>
+            <li onclick="saveAs('txt');">Plain Text<span>.txt</span></li>
+            <li onclick="saveAs('html');">HTML<span>.html</span></li>
+            <li onclick="saveAs('css');">CSS<span>.css</span></li>
+            <li onclick="saveAs('js');">JavaScript<span>.js</span></li>
+            <li onclick="saveAs('json');">JSON<span>.json</span></li>
+            <li onclick="saveAs('svg');">SVG<span>.svg</span></li>
           </ul>
         </li>
       </ul>
@@ -979,38 +1018,38 @@
     <div class="dropdown">
       <button>View</button>
       <ul>
-        <li onmousedown="changeView('text');">Text<span>Ctrl + Shift + 1</span></li>
-        <li onmousedown="changeView('code');">Code<span>Ctrl + Shift + 2</span></li>
-        <li onmousedown="changeView('split');">Split<span>Ctrl + Shift + 3</span></li>
-        <li onmousedown="changeView('preview');">Preview<span>Ctrl + Shift + 4</span></li>
-        <li onmousedown="changeOrientation();">Orientation<span>Ctrl + Shift + 5</span></li>
-        <li onmousedown="openDisplay();">Display<span>Ctrl + Shift + 6</span></li>
+        <li onclick="changeView('text');">Text<span>Ctrl + Shift + 1</span></li>
+        <li onclick="changeView('code');">Code<span>Ctrl + Shift + 2</span></li>
+        <li onclick="changeView('split');">Split<span>Ctrl + Shift + 3</span></li>
+        <li onclick="changeView('preview');">Preview<span>Ctrl + Shift + 4</span></li>
+        <li onclick="changeOrientation();">Orientation<span>Ctrl + Shift + 5</span></li>
+        <li onclick="openDisplay();">Display<span>Ctrl + Shift + 6</span></li>
       </ul>
     </div>
     <div class="dropdown">
       <button>Tools</button>
       <ul>
-        <li onmousedown="openCard('replacer');">Replace Text<span>Ctrl + Shift + F</span></li>
-        <li onmousedown="openCard('picker');">Color Picker<span>Ctrl + Shift + K</span></li>
-        <li onmousedown="openCard('formatter');">JSON Formatter<span>Ctrl + Shift + R</span></li>
-        <li onmousedown="openCard('encoder');">URI Encoder<span>Ctrl + Shift + Y</span></li>
-        <li onmousedown="confirmOverwrite(insertTemplate);">Import HTML Template<span>Ctrl + Shift + H</span></li>
+        <li onclick="openCard('replacer');">Replace Text<span>Ctrl + Shift + F</span></li>
+        <li onclick="openCard('picker');">Color Picker<span>Ctrl + Shift + K</span></li>
+        <li onclick="openCard('formatter');">JSON Formatter<span>Ctrl + Shift + R</span></li>
+        <li onclick="openCard('encoder');">URI Encoder<span>Ctrl + Shift + Y</span></li>
+        <li onclick="confirmOverwrite(insertTemplate);">Import HTML Template<span>Ctrl + Shift + H</span></li>
         <li>Online Resources...
           <svg><use href="#arrow"/></svg>
           <ul>
-            <li onmousedown="window.open('https://www.diffchecker.com/','_blank');">Difference Finder</li>
-            <li onmousedown="window.open('https://webformatter.com/','_blank');">Code Formatter</li>
-            <li onmousedown="window.open('https://caniuse.com/','_blank');">Compatibility Checker</li>
-            <li onmousedown="window.open('https://www.svgminify.com/','_blank');">SVG Simplifier</li>
-            <li onmousedown="window.open('https://keycode.info/','_blank');">Keycode Finder</li>
-            <li onmousedown="window.open('https://www.uuidgenerator.net/','_blank');">UUID Generator</li>
-            <li onmousedown="window.open('https://cryptii.com/','_blank');">Text Encryptor</li>
+            <li onclick="window.open('https://www.diffchecker.com/','_blank');">Difference Finder</li>
+            <li onclick="window.open('https://webformatter.com/','_blank');">Code Formatter</li>
+            <li onclick="window.open('https://caniuse.com/','_blank');">Compatibility Checker</li>
+            <li onclick="window.open('https://www.svgminify.com/','_blank');">SVG Simplifier</li>
+            <li onclick="window.open('https://keycode.info/','_blank');">Keycode Finder</li>
+            <li onclick="window.open('https://www.uuidgenerator.net/','_blank');">UUID Generator</li>
+            <li onclick="window.open('https://cryptii.com/','_blank');">Text Encryptor</li>
           </ul>
         </li>
       </ul>
     </div>
     <div>
-      <button onmousedown="openCard('settings');">Settings</button>
+      <button onclick="openCard('settings');">Settings</button>
     </div>
   </div>
   <div class="title">
@@ -1044,7 +1083,7 @@
   <div id="replacer" class="card widget">
     <div class="header">
       <section>Replace Text</section>
-      <svg class="button close" onmousedown="closeCard('replacer');"><use href="#close"></use></svg>
+      <svg class="button closeButton" onclick="closeCard('replacer');"><use href="#close"></use></svg>
     </div>
     <div class="content">
       <div class="item expand">
@@ -1053,15 +1092,15 @@
       </div>
     </div>
     <div class="toolbar">
-      <button onmouseup="activateReplacer();">Replace</button>
-      <button onmouseup="var store = locate.value; locate.value = modify.value; modify.value = store;">Flip</button>
-      <button onmouseup="locate.value = ''; modify.value = '';">Clear</button>
+      <button onclick="activateReplacer();">Replace</button>
+      <button onclick="var store = locate.value; locate.value = modify.value; modify.value = store;">Flip</button>
+      <button onclick="locate.value = ''; modify.value = '';">Clear</button>
     </div>
   </div>
   <div id="picker" class="card widget">
     <div class="header">
       <section>Color Picker</section>
-      <svg class="button close" onmousedown="closeCard('picker');"><use href="#close"></use></svg>
+      <svg class="button closeButton" onclick="closeCard('picker');"><use href="#close"></use></svg>
     </div>
     <div class="content">
       <div class="item">
@@ -1078,15 +1117,15 @@
       </div>
     </div>
     <div class="toolbar">
-      <button onmouseup="colorInput.select(); document.execCommand('copy');">Copy</button>
-      <button onmouseup="textEdit('insert',storedColor,true); channelRefresh(); insertColor = true;">Insert</button>
-      <button onmouseup="var selectionCount = userInput.selectionEnd - userInput.selectionStart; if (selectionCount != 0){ textEdit('delete',selectionCount,true); } insertColor = false;">Delete</button>
+      <button onclick="colorInput.select(); document.execCommand('copy');">Copy</button>
+      <button onclick="textEdit('insert',storedColor,true); channelRefresh(); insertColor = true;">Insert</button>
+      <button onclick="var selectionCount = userInput.selectionEnd - userInput.selectionStart; if (selectionCount != 0){ textEdit('delete',selectionCount,true); } insertColor = false;">Delete</button>
     </div>
   </div>
   <div id="formatter" class="card widget">
     <div class="header">
       <section>JSON Formatter</section>
-      <svg class="button close" onmousedown="closeCard('formatter');"><use href="#close"></use></svg>
+      <svg class="button closeButton" onclick="closeCard('formatter');"><use href="#close"></use></svg>
     </div>
     <div class="content">
       <div class="item expand">
@@ -1094,15 +1133,15 @@
       </div>
     </div>
     <div class="toolbar">
-      <button onmouseup="activateFormatter('  ');">Format</button>
-      <button onmouseup="activateFormatter('');">Collapse</button>
-      <button onmouseup="formatterInput.value = '';">Clear</button>
+      <button onclick="activateFormatter('  ');">Format</button>
+      <button onclick="activateFormatter('');">Collapse</button>
+      <button onclick="formatterInput.value = '';">Clear</button>
     </div>
   </div>
   <div id="encoder" class="card widget">
     <div class="header">
       <section>URI Encoder</section>
-      <svg class="button close" onmousedown="closeCard('encoder');"><use href="#close"></use></svg>
+      <svg class="button closeButton" onclick="closeCard('encoder');"><use href="#close"></use></svg>
     </div>
     <div class="content">
       <div class="item expand">
@@ -1110,9 +1149,9 @@
       </div>
     </div>
     <div class="toolbar">
-      <button onmouseup="activateEncoder('encode');">Encode</button>
-      <button onmouseup="activateEncoder('decode');">Decode</button>
-      <button onmouseup="encoderInput.value = '';">Clear</button>
+      <button onclick="activateEncoder('encode');">Encode</button>
+      <button onclick="activateEncoder('decode');">Decode</button>
+      <button onclick="encoderInput.value = '';">Clear</button>
     </div>
     <div class="toolbar">
       <div class="checkbox" data-tooltip="Encodes more special characters">
@@ -1124,7 +1163,7 @@
   <div id="settings" class="card modal">
     <div class="header">
       <section>Settings</section>
-      <svg class="button close" onmousedown="closeCard('settings');"><use href="#close"></use></svg>
+      <svg class="button closeButton" onclick="closeCard('settings');"><use href="#close"></use></svg>
     </div>
     <div class="content">
       <div class="item list">
@@ -1132,9 +1171,9 @@
           <div class="dropdown">
             <button id="viewSetting">Text</button>
             <ul>
-              <li onmousedown="updateSelect('view','text');">Text</li>
-              <li onmousedown="updateSelect('view','code');">Code</li>
-              <li onmousedown="updateSelect('view','split');">Split</li>
+              <li onclick="updateSelect('view','text');">Text</li>
+              <li onclick="updateSelect('view','code');">Code</li>
+              <li onclick="updateSelect('view','split');">Split</li>
             </ul>
           </div>
         </div>
@@ -1142,8 +1181,8 @@
           <div class="dropdown">
             <button id="orientationSetting">Horizontal</button>
             <ul>
-              <li onmousedown="updateSelect('orientation','horizontal');">Horizontal</li>
-              <li onmousedown="updateSelect('orientation','vertical');">Vertical</li>
+              <li onclick="updateSelect('orientation','horizontal');">Horizontal</li>
+              <li onclick="updateSelect('orientation','vertical');">Vertical</li>
             </ul>
           </div>
         </div>
@@ -1163,7 +1202,7 @@
       </div>
     </div>
     <div class="toolbar">
-      <button style="--button-hover: #bb2222;" onmouseup="resetSettings();">Reset All Settings</button>
+      <button style="--button-hover: #bb2222;" onclick="resetSettings();">Reset All Settings</button>
     </div>
   </div>
   <div id="reset" class="card notification">
@@ -1178,26 +1217,116 @@
 
 <script>
   var storage = window.localStorage, view = "text", orientation = "horizontal", refresh = "true", title = "true", transitions = "true", loadedFile = undefined, sourceChange = false, mustSave = false, activeWidget = undefined, activeModal = undefined, storedColor, insertColor = false, encodeComponent = false;
-  favicon.href = `data:image/svg+xml,${encodeURIComponent(logo.outerHTML.split("<svg ").join("<svg xmlns='http://www.w3.org/2000/svg' ").split("</svg>").join("<use href='#pencil'></use></svg>"))}`;
-  if (windowParent){
-    loadSettings("initial");
-    setTimeout(function(){
-      document.documentElement.classList.remove("fade");
-    }, 50);
-    if (title == "true"){
-      setTimeout(function(){
-        openCard("welcome");
-      }, 100);
-      setTimeout(function(){
-        if (activeModal == "welcome"){
-          closeCard("welcome");
+
+// --- Dropdown section
+  var dropdowns = Array.from(document.getElementsByClassName("dropdown"));
+  dropdowns.forEach(function(dropdown){
+    var button = dropdown.getElementsByTagName("button")[0];
+    var list = dropdown.getElementsByTagName("ul")[0];
+    var listItems = Array.from(dropdown.getElementsByTagName("li"));
+    listItems.forEach(function(listItem){
+      var subListPresent = listItem.getElementsByTagName("ul")[0];
+      if (subListPresent == undefined){
+        listItem.addEventListener("click",function(){
+          setTimeout(function(){
+            dropdowns.forEach(function(dropdown){
+              dropdown.classList.remove("active");
+            });
+          }, 50);
+        });
+      }
+      listItem.addEventListener("keydown",function(event){
+        if (event.key == "Enter"){
+          listItem.click();
         }
-      }, 2100);
+      });
+      listItem.setAttribute("tabindex","0");
+      if (subListPresent != undefined){
+        listItem.setAttribute("data-list","");
+        listItem.addEventListener("mouseenter",function(){
+          if (dropdown.classList.contains("active")){
+            listItem.focus();
+          }
+        });
+      }
+    });
+    button.addEventListener("click",function(){
+      dropdowns.forEach(function(dropdown){
+        dropdown.classList.toggle("active");
+        if (dropdown.classList.contains("active")){
+          document.body.addEventListener("click",disableDropdown);
+        }
+        function disableDropdown(event){
+          if (dropdown.contains(event.target)) return;
+          dropdowns.forEach(function(dropdown){
+            if (dropdown.classList.contains("active")) return;
+            dropdown.classList.remove("active");
+            document.body.removeEventListener("click",disableDropdown);
+          });
+        }
+        function hoverDropdown(){
+          button.focus();
+        }
+      });
+    });
+    button.addEventListener("mouseenter",function(){
+      if (dropdown.classList.contains("active")){
+        button.focus();
+      }
+    });
+  });
+// --- Dropdown section
+
+  var checkboxes = Array.from(document.getElementsByClassName("checkbox"));
+  checkboxes.forEach(function(item){
+    item.addEventListener("keydown",function(event){
+      if (event.key == "Enter"){
+        blockShortcut(event);
+        item.getElementsByTagName("label")[0].click();
+      }
+    });
+    item.setAttribute("tabindex","0");
+  });
+
+  var buttons = Array.from(document.getElementsByTagName("button"));
+  buttons.forEach(function(item){
+    item.addEventListener("click",function(){
+      item.focus();
+    });
+  });
+
+  var closeButtons = Array.from(document.getElementsByClassName("closeButton"));
+  closeButtons.forEach(function(closeButton){
+    closeButton.addEventListener("keydown",function(){
+      if (event.key == "Enter"){
+        blockShortcut(event);
+        closeButton.onclick();
+      }
+    });
+    closeButton.setAttribute("tabindex","0");
+  });
+
+  window.addEventListener("load",function(){
+    if (windowParent){
+      loadSettings("initial");
+      setTimeout(function(){
+        document.documentElement.classList.remove("fade");
+      }, 50);
+      if (title == "true"){
+        setTimeout(function(){
+          openCard("welcome");
+        }, 100);
+        setTimeout(function(){
+          if (activeModal == "welcome"){
+            closeCard("welcome");
+          }
+        }, 2100);
+      }
+      userInput.focus();
     }
-    userInput.focus();
-  }
-  colorInputRefresh();
-  forceRefresh();
+    colorInputRefresh();
+    forceRefresh();
+  });
   window.addEventListener("beforeunload",function(){
     if (windowParent && mustSave){
       event.returnValue = "Changes you made may not be saved.";

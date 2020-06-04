@@ -6,8 +6,8 @@ This is a project that I am working on in my free time, and it has turn into som
 ## How to Use
 This project can be opened with GitHub Pages, as well as downloaded to your device if you would like it to access local files for building HTML projects.
 
-[Run the text editor with GitHub Pages](https://offroaders123.github.io/Smart-Text-Editor/Smart%20Text%20Editor.html)
+[Run Smart Text Editor with GitHub Pages](https://offroaders123.github.io/Smart-Text-Editor/Smart%20Text%20Editor.html)
 
-[Run the experimental update with GitHub Pages](https://offroaders123.github.io/Smart-Text-Editor/UpdateDropdownsOnly.html)
+[Run the old experimental update with GitHub Pages](https://offroaders123.github.io/Smart-Text-Editor/OLD%20Test%20Update.html)
 
 I have plans to add more information here in the future!
