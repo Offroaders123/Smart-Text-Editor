@@ -159,6 +159,22 @@
     white-space: pre;
     resize: none;
   }
+  a {
+    color: var(--text-dark);
+    font-size: min(2vw, 14.5px);
+    border-radius: calc(var(--border-radius) * 0.5);
+    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
+    --focus-border: transparent;
+    outline: none;
+    transition: var(--transition-fast);
+    transition-property: color;
+  }
+  a:hover, a:focus {
+    color: var(--text-hover);
+  }
+  a:focus {
+    --focus-border: var(--outline);
+  }
   ::placeholder {
     color: var(--color);
     opacity: 0.55;
@@ -387,23 +403,9 @@
     display: flex;
     text-align: right;
   }
-  #header .attribution span, #header .attribution a {
+  #header .attribution span {
     color: var(--text-dark);
     font-size: min(2vw, 14.5px);
-  }
-  #header .attribution a {
-    border-radius: calc(var(--border-radius) * 0.5);
-    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
-    --focus-border: transparent;
-    outline: none;
-    transition: var(--transition-fast);
-    transition-property: color;
-  }
-  #header .attribution a:hover, #header .attribution a:focus {
-    color: var(--text-hover);
-  }
-  #header .attribution a:focus {
-    --focus-border: var(--outline);
   }
   #main {
     position: relative;
@@ -1203,6 +1205,9 @@
     </div>
     <div class="toolbar">
       <button style="--button-hover: #bb2222;" onclick="resetSettings();">Reset All Settings</button>
+    </div>
+    <div class="toolbar">
+      <a href="https://github.com/Offroaders123/Smart-Text-Editor/blob/master/README.md" target="_blank">Go to GitHub Repository</a>
     </div>
   </div>
   <div id="reset" class="card notification">
