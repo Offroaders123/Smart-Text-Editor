@@ -5,16 +5,15 @@
 
 <title>Smart Text Editor</title>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<link rel="icon" type="image/svg+xml" href="https://offroaders123.github.io/Smart-Text-Editor/resources/favicon.svg">
-<link rel="alternate icon" type="image/png" sizes="16x16" href="https://offroaders123.github.io/Smart-Text-Editor/resources/favicon-16.png">
-<link rel="alternate icon" type="image/png" sizes="32x32" href="https://offroaders123.github.io/Smart-Text-Editor/resources/favicon-32.png">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="manifest" href="https://offroaders123.github.io/Smart-Text-Editor/manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Smart Text Editor">
-<link rel="apple-touch-icon" sizes="180x180" href="https://offroaders123.github.io/Smart-Text-Editor/resources/icon-ios-home-screen.png">
-<link rel="mask-icon" href="https://offroaders123.github.io/Smart-Text-Editor/resources/icon-macos-pinned-tab.svg" color="#ee8800">
-<link rel="manifest" href="https://offroaders123.github.io/Smart-Text-Editor/resources/manifest-android.webmanifest">
-<meta name="msapplication-config" content="https://offroaders123.github.io/Smart-Text-Editor/resources/manifest-windows.xml">
+<link rel="icon" type="image/svg+xml" href="https://offroaders123.github.io/Smart-Text-Editor/resources/icon.svg">
+<link rel="alternate icon" type="image/png" sizes="16x16" href="https://offroaders123.github.io/Smart-Text-Editor/resources/icon-16.png">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="https://offroaders123.github.io/Smart-Text-Editor/resources/icon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://offroaders123.github.io/Smart-Text-Editor/resources/icon-apple-touch-icon.png">
+<link rel="mask-icon" href="https://offroaders123.github.io/Smart-Text-Editor/resources/icon-mask-icon.svg" color="#ee8800">
 <link href="https://fonts.googleapis.com/css2?family=Cousine&family=Rubik&display=swap" rel="stylesheet">
 
 <script>
@@ -1062,7 +1061,7 @@
 </header>
 
 <main id="main" class="text horizontal">
-  <textarea id="userInput" class="text horizontal" placeholder="Welcome to the Smart Text Editor! This site was created to allow for text editing and code development within your browser!" spellcheck="false" autocomplete="off"></textarea>
+  <textarea id="userInput" class="text horizontal" placeholder="Welcome to the Smart Text Editor! This site was created to allow for text editing and code development within your browser!" spellcheck="false" autocorrect="off" autocomplete="off"></textarea>
   <div id="scaler" class="text horizontal">
     <div class="handle">▲<br>▼</div>
   </div>
@@ -1087,8 +1086,8 @@
     </div>
     <div class="content">
       <div class="item expand">
-        <textarea id="locate" placeholder="Text to locate..." spellcheck="false" autocomplete="off"></textarea>
-        <textarea id="modify" placeholder="Replace with..." spellcheck="false" autocomplete="off"></textarea>
+        <textarea id="locate" placeholder="Text to locate..." spellcheck="false" autocorrect="off" autocomplete="off"></textarea>
+        <textarea id="modify" placeholder="Replace with..." spellcheck="false" autocorrect="off" autocomplete="off"></textarea>
       </div>
     </div>
     <div class="toolbar">
@@ -1105,7 +1104,7 @@
     <div class="content">
       <div class="item">
         <span id="colorPreview"></span>
-        <input id="colorInput" type="text" value="#ffa500" maxlength="7" spellcheck="false" autocomplete="off">
+        <input id="colorInput" type="text" value="#ffa500" maxlength="7" spellcheck="false" autocorrect="off" autocomplete="off">
       </div>
       <div class="item">
         <label for="redChannel">Red</label>
@@ -1129,7 +1128,7 @@
     </div>
     <div class="content">
       <div class="item expand">
-        <textarea id="formatterInput" class="expand" placeholder="Place JSON here..." spellcheck="false" autocomplete="off"></textarea>
+        <textarea id="formatterInput" class="expand" placeholder="Place JSON here..." spellcheck="false" autocorrect="off" autocomplete="off"></textarea>
       </div>
     </div>
     <div class="toolbar">
@@ -1145,7 +1144,7 @@
     </div>
     <div class="content">
       <div class="item expand">
-        <textarea id="encoderInput" class="expand" placeholder="Place text here..." spellcheck="false" autocomplete="off"></textarea>
+        <textarea id="encoderInput" class="expand" placeholder="Place text here..." spellcheck="false" autocorrect="off" autocomplete="off"></textarea>
       </div>
     </div>
     <div class="toolbar">
@@ -1205,7 +1204,7 @@
       <button style="--button-hover: #bb2222;" onclick="resetSettings();">Reset All Settings</button>
     </div>
     <div class="toolbar">
-      <a href="https://github.com/Offroaders123/Smart-Text-Editor/blob/master/README.md" target="_blank">Go to GitHub Repository</a>
+      <a href="https://github.com/Offroaders123/Smart-Text-Editor/" target="_blank">Go to GitHub Repository</a>
     </div>
   </div>
   <div id="reset" class="card notification">
@@ -1335,7 +1334,7 @@
     }
     colorInputRefresh();
     forceRefresh();
-    if ("serviceWorker" in navigator && window.location.protocol != "file:"){
+    if ("serviceWorker" in navigator && windowParent && window.location.protocol == "https:"){
       navigator.serviceWorker.register("https://offroaders123.github.io/Smart-Text-Editor/service-worker.js");
     }
   });
@@ -1631,9 +1630,7 @@
     event.stopPropagation();
   }
   function importFile(event){
-    if (activeModal){
-      closeCard(activeModal);
-    }
+    closeCard(activeModal);
     var reader = new FileReader(), validTypes = ["text","image","audio"], validSubtypes = ["plain","css","javascript","json","html","svg+xml"], mimeType = load.files[0].type;
     function mimeDivision(index){
       return mimeType.split("/")[index];
@@ -1683,6 +1680,9 @@
     } else {
       save.download = `Untitled.${extension}`;
     }
+    save.addEventListener("click",function(event){
+      event.stopPropagation();
+    });
     save.click();
     loadedFile = save.download;
     mustSave = false;
@@ -1749,6 +1749,9 @@
     }
   }
   function closeCard(element){
+    if (activeModal == undefined){
+      return;
+    }
     var card = document.getElementById(element);
     var cardType = card.classList[1];
     document.getElementById(element).classList.remove("active");

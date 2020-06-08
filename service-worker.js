@@ -1,5 +1,4 @@
-const cacheName = 1.03;
-
+const cacheName = 1.13;
 self.addEventListener("activate",function(event){
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -13,7 +12,6 @@ self.addEventListener("activate",function(event){
     })
   );
 });
-
 self.addEventListener("fetch",function(event){
   event.respondWith(
     fetch(event.request).then((resolve) => {

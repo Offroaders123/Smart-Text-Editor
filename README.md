@@ -1,3 +1,4 @@
+![Smart Text Editor](https://offroaders123.github.io/Smart-Text-Editor/resources/icon-32.png)
 # Smart Text Editor
 The text editor that requires only a browser and a keyboard (virtual keyboards as well)!
 
@@ -5,9 +6,11 @@ This is a project that I am working on in my free time, and it has turned into s
 I have started to implement features similar to that of a Progressive Web App, so it can be opened/used through the browser like most websites, or as close to a normal desktop/smartphone/tablet app as possible! I personally find the idea super interesting, so I will continue to learn more about it.
 
 ## How to Use
-This project can be opened with GitHub Pages, as well as added as a shortcut to your device's desktop, app drawer, toolbar, or home screen!
+This project can be opened with GitHub Pages, as well as installed to your device's desktop, app drawer, toolbar, or home screen!
 
-[Open Smart Text Editor with GitHub Pages](https://offroaders123.github.io/Smart-Text-Editor/Smart%20Text%20Editor.html)
+*A note ahead of time: If you are using Grammarly or another text editing-focused extension on lower-end hardware, I have run into performance issues when editing large files with Smart Text Editor, so I recommend disabling it for use with Smart Text Editor if it isn't neccesary for your task at hand (If you aren't writing an essay or something with normal grammar/spelling). However, this is just for performance concerns, so if your device can handle it, it is perfectly fine to leave such extensions enabled!*
+
+### [Open Smart Text Editor with GitHub Pages](https://offroaders123.github.io/Smart-Text-Editor/Smart%20Text%20Editor.html)
 
 A list of instructions to add a shortcut to your device can be found below:
 
@@ -15,7 +18,7 @@ A list of instructions to add a shortcut to your device can be found below:
 1. Open Smart Text Editor from the link above in Google Chrome
 2. Click the plus button located on the right side of the Chrome address bar input field at the top of the browser window
 3. Select "Install" from the option menu
-4. A shortcut should now be present on your desktop or in your app drawer!
+4. A shortcut should now be present on your desktop, start menu, or app drawer!
 
 ### Safari on iOS and iPadOS
 1. Open Smart Text Editor from the link above in Safari
