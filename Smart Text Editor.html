@@ -1336,10 +1336,7 @@
     colorInputRefresh();
     forceRefresh();
     if ("serviceWorker" in navigator && window.location.protocol != "file:"){
-      navigator.serviceWorker
-        .register("https://offroaders123.github.io/Smart-Text-Editor/service-worker.js")
-        .then(reg => console.log("Service Worker Registered!"))
-        .catch(err => console.log(`Service Worker Error: ${err}`));
+      navigator.serviceWorker.register("https://offroaders123.github.io/Smart-Text-Editor/service-worker.js");
     }
   });
   window.addEventListener("beforeunload",function(){

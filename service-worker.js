@@ -1,4 +1,4 @@
-const cacheName = 1;
+const cacheName = 1.03;
 
 self.addEventListener("activate",function(event){
   event.waitUntil(

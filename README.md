@@ -12,15 +12,13 @@ This project can be opened with GitHub Pages, as well as added as a shortcut to 
 A list of instructions to add a shortcut to your device can be found below:
 
 ### Google Chrome on Windows and Chrome OS
-(Use on Windows hasn't been tested yet, but it should be something like this)
-1. Open the text editor from the link above in Google Chrome
-2. Click the button with the three dots, located in the top-right of the Chrome browser window
-3. Hover over the "More Tools" option, then select "Create Shortcut"
-4. Decide if you would like the site to open in a separate window by checking or not checking the checkbox option
-5. A shortcut should now be present on your desktop/app drawer!
+1. Open Smart Text Editor from the link above in Google Chrome
+2. Click the plus button located on the right side of the Chrome address bar input field at the top of the browser window
+3. Select "Install" from the option menu
+4. A shortcut should now be present on your desktop or in your app drawer!
 
 ### Safari on iOS and iPadOS
-1. Open the text editor from the link above in Safari
+1. Open Smart Text Editor from the link above in Safari
 2. Tap the share button with the arrow pointing up, located in the...
  - iOS: Bottom of the screen on the toolbar
  - iPadOS: Top-right of the screen on the toolbar
