@@ -244,7 +244,7 @@
     fill: var(--text-dark);
     cursor: pointer;
     transition: var(--transition-fast);
-    transition: fill background border-color;
+    transition-property: fill, background, border-color;
   }
   svg.button:hover, svg.button:focus {
     fill: var(--text-hover);
@@ -858,8 +858,8 @@
       overflow-y: auto;
     }
     .dropdown ul ul {
-      max-height: initial;
-      overflow-y: initial;
+      max-height: unset;
+      overflow-y: unset;
     }
   }
   .dropdown.active:focus-within > ul, .dropdown li:focus-within > ul {
@@ -990,8 +990,11 @@
   <symbol id="close" viewBox="0 0 512 512">
     <path d="m1.5795 65.78 64.201-64.201 190.22 190.22 190.22-190.22 64.201 64.201-190.22 190.22 190.22 190.22-64.201 64.201-190.22-190.22-190.22 190.22-64.201-64.201 190.22-190.22z"/>
   </symbol>
+  <symbol id="refresh" viewBox="0 0 512 512">
+    <path d="m510.27 285.75c-13.893 118.73-108.1 212.04-226.96 224.79-118.86 12.751-230.71-58.451-269.47-171.53-38.761-113.08 5.8941-237.93 107.58-300.78 101.68-62.846 233.32-46.955 317.13 38.282l-37.067 36.446c-66.79-67.929-171.7-80.593-252.74-30.508-81.036 50.084-116.62 149.58-85.733 239.7 30.89 90.117 120.03 146.86 214.75 136.7 94.721-10.161 169.8-84.522 180.87-179.14z"/>
+    <path d="m512 189.01v-189.01l-188.98 189.01z"/>
+  </symbol>
 </svg>
-
 <header id="header" class="text horizontal">
   <div class="toolbar">
     <div class="dropdown">
@@ -1027,6 +1030,7 @@
     <div class="dropdown">
       <button>Tools</button>
       <ul>
+        <li onclick="touchTools.classList.toggle('active');">Toggle Touch Tools</li>
         <li onclick="openCard('replacer');">Replace Text<span>Ctrl + Shift + F</span></li>
         <li onclick="openCard('picker');">Color Picker<span>Ctrl + Shift + K</span></li>
         <li onclick="openCard('formatter');">JSON Formatter<span>Ctrl + Shift + R</span></li>
@@ -1066,6 +1070,79 @@
     <div class="handle">▲<br>▼</div>
   </div>
   <iframe id="preview" class="text horizontal" src="about:blank"></iframe>
+  <div id="touchTools">
+    <button onclick="changeState('undo');">&#8630;</button>
+    <button onclick="changeState('redo');">&#8631;</button>
+    <button onclick="if (view == 'split'){ forceRefresh(); }"><svg><use href="#refresh"></use></svg></button>
+    <button onclick="insertText('<');"><</button>
+    <button onclick="insertText('>');">></button>
+    <button onclick="insertText('{');">{</button>
+    <button onclick="insertText('}');">}</button>
+    <button onclick="insertText('[');">[</button>
+    <button onclick="insertText(']');">]</button>
+  </div><style>
+  #touchTools {
+    margin: min(1.5vw, 10px);
+    padding: min(1.5vw, 10px);
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: var(--container-dark);
+    border-radius: calc(var(--border-radius) * 2);
+    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow-color);
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: var(--transition-slow);
+    transition-property: visibility, opacity, pointer-events;
+  }
+  #touchTools > * {
+    margin: 0 min(0.75vw, 6px);
+  }
+  #touchTools > :first-child {
+    margin-left: 0;
+  }
+  #touchTools > :last-child {
+    margin-right: 0;
+  }
+  #touchTools button {
+    width: min(6vw, 32px);
+    height: min(6vw, 32px);
+    min-width: unset;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+  }
+  #touchTools button svg {
+    width: min(3vw, 12px);
+    height: min(3vw, 12px);
+    fill: var(--text-dark);
+    transition: fill var(--transition-fast);
+  }
+  #touchTools button:hover > svg, #touchTools button:focus > svg {
+    fill: var(--text-hover);
+  }
+  #touchTools.active {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: all;
+  }
+</style><script>
+  function changeState(history){
+    userInput.focus();
+    document.execCommand(history);
+  }
+  function insertText(text){
+    userInput.focus();
+    document.execCommand("insertText",false,text);
+  }
+  if ("ontouchstart" in document.documentElement){
+    touchTools.classList.add("active");
+  }
+</script>
   <div id="cardBackground"></div>
   <div id="welcome" class="card modal scale">
     <div class="header">
@@ -1299,7 +1376,9 @@
   var buttons = Array.from(document.getElementsByTagName("button"));
   buttons.forEach(function(item){
     item.addEventListener("click",function(){
-      item.focus();
+      if (touchTools.contains(item) == false){
+        item.focus();
+      }
     });
   });
 

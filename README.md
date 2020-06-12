@@ -12,7 +12,7 @@ This project can be opened with GitHub Pages, as well as installed to your devic
 
 ### [Open Smart Text Editor with GitHub Pages](https://offroaders123.github.io/Smart-Text-Editor/Smart%20Text%20Editor.html)
 
-A list of instructions to add a shortcut to your device can be found below:
+A list of instructions to add a shortcut for Smart Text Editor to your device can be found below:
 
 ### Google Chrome on Windows and Chrome OS
 1. Open Smart Text Editor from the link above in Google Chrome
