@@ -560,25 +560,30 @@
     visibility: hidden;
     pointer-events: none;
     transition: var(--transition-medium);
-    transition-property: visibility, opacity, transform;
+    transition-property: max-height, visibility, opacity, transform;
   }
-  .card.widget, .card.modal {
+  .card.widget, .card.editing, .card.modal {
     opacity: 0;
   }
-  .card.widget, .card.notification {
+  .card.widget, .card.editing, .card.notification {
     padding: min(2vw, 10px);
     position: absolute;
     right: 0;
-    min-width: min(50vw, 250px);
     max-height: calc(100% - min(3vw, 20px));
     border-radius: var(--border-radius);
     overflow-y: auto;
   }
-  .card.widget {
+  .card.widget, .card.notification {
+    min-width: min(50vw, 250px);
+  }
+  .card.widget, .card.editing {
     margin: min(2vw, 10px);
-    top: 0;
     transform: scaleY(0);
     transform-origin: top center;
+  }
+  .card.editing {
+    flex-direction: row;
+    border-radius: calc(var(--border-radius) * 2);
   }
   .card.notification {
     margin: min(4vw, 20px);
@@ -622,7 +627,7 @@
     opacity: 1;
     pointer-events: all;
   }
-  .card.widget.active {
+  .card.widget.active, .card.editing.active {
     transform: scaleY(1);
   }
   .card.notification.active {
@@ -637,6 +642,49 @@
   .card.modal.active {
     transform: translate(-50%,-50%) scale(1);
   }
+
+
+/* vvvvvvvvvv Editing Tool Stuffs vvvvvvvvvv */
+
+
+  .card.editing > * {
+    margin: 0 min(0.75vw, 6px);
+  }
+  .card.editing > :first-child {
+    margin-left: 0;
+  }
+  .card.editing > :last-child {
+    margin-right: 0;
+  }
+  .card.editing button {
+    width: min(5vw, 28px);
+    height: min(6vw, 32px);
+    min-width: unset;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .card.editing button svg {
+    width: min(2.25vw, 12px);
+    height: min(2.25vw, 12px);
+    fill: var(--text-dark);
+    transition: fill var(--transition-fast);
+  }
+  .card.editing button:hover > svg, .card.editing button:focus > svg {
+    fill: var(--text-hover);
+  }
+  .card.editing.active ~ .card.widget {
+    max-height: calc(100% - min(3vw, 20px) - min(19vw, 62px));
+    transform: translateY(min(19vw, 62px)) scaleY(0);
+  }
+  .card.editing.active ~ .card.widget.active {
+    transform: translateY(min(19vw, 62px)) scaleY(1);
+  }
+
+
+/* ^^^^^^^^^^^^ Editing Tool Stuffs ^^^^^^^^^^^^ */
+
+
   .card .header {
     position: relative;
     width: 100%;
@@ -1030,7 +1078,7 @@
     <div class="dropdown">
       <button>Tools</button>
       <ul>
-        <li onclick="touchTools.classList.toggle('active');">Toggle Touch Tools</li>
+        <li onclick="openCard('editingTools');">Editing Tools<span>Ctrl + Shift + E</span></li>
         <li onclick="openCard('replacer');">Replace Text<span>Ctrl + Shift + F</span></li>
         <li onclick="openCard('picker');">Color Picker<span>Ctrl + Shift + K</span></li>
         <li onclick="openCard('formatter');">JSON Formatter<span>Ctrl + Shift + R</span></li>
@@ -1065,12 +1113,12 @@
 </header>
 
 <main id="main" class="text horizontal">
-  <textarea id="userInput" class="text horizontal" placeholder="Welcome to the Smart Text Editor! This site was created to allow for text editing and code development within your browser!" spellcheck="false" autocorrect="off" autocomplete="off"></textarea>
+  <textarea id="userInput" class="text horizontal" placeholder="Welcome to the Smart Text Editor! This site was created to allow for text editing and code development within your browser!" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"></textarea>
   <div id="scaler" class="text horizontal">
     <div class="handle">▲<br>▼</div>
   </div>
   <iframe id="preview" class="text horizontal" src="about:blank"></iframe>
-  <div id="touchTools">
+  <div id="editingTools" class="card editing">
     <button onclick="changeState('undo');">&#8630;</button>
     <button onclick="changeState('redo');">&#8631;</button>
     <button onclick="if (view == 'split'){ forceRefresh(); }"><svg><use href="#refresh"></use></svg></button>
@@ -1080,69 +1128,7 @@
     <button onclick="insertText('}');">}</button>
     <button onclick="insertText('[');">[</button>
     <button onclick="insertText(']');">]</button>
-  </div><style>
-  #touchTools {
-    margin: min(1.5vw, 10px);
-    padding: min(1.5vw, 10px);
-    position: absolute;
-    bottom: 0;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    background: var(--container-dark);
-    border-radius: calc(var(--border-radius) * 2);
-    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow-color);
-    visibility: hidden;
-    opacity: 0;
-    pointer-events: none;
-    transition: var(--transition-slow);
-    transition-property: visibility, opacity, pointer-events;
-  }
-  #touchTools > * {
-    margin: 0 min(0.75vw, 6px);
-  }
-  #touchTools > :first-child {
-    margin-left: 0;
-  }
-  #touchTools > :last-child {
-    margin-right: 0;
-  }
-  #touchTools button {
-    width: min(6vw, 32px);
-    height: min(6vw, 32px);
-    min-width: unset;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-  }
-  #touchTools button svg {
-    width: min(3vw, 12px);
-    height: min(3vw, 12px);
-    fill: var(--text-dark);
-    transition: fill var(--transition-fast);
-  }
-  #touchTools button:hover > svg, #touchTools button:focus > svg {
-    fill: var(--text-hover);
-  }
-  #touchTools.active {
-    visibility: visible;
-    opacity: 1;
-    pointer-events: all;
-  }
-</style><script>
-  function changeState(history){
-    userInput.focus();
-    document.execCommand(history);
-  }
-  function insertText(text){
-    userInput.focus();
-    document.execCommand("insertText",false,text);
-  }
-  if ("ontouchstart" in document.documentElement){
-    touchTools.classList.add("active");
-  }
-</script>
+  </div>
   <div id="cardBackground"></div>
   <div id="welcome" class="card modal scale">
     <div class="header">
@@ -1163,8 +1149,8 @@
     </div>
     <div class="content">
       <div class="item expand">
-        <textarea id="locate" placeholder="Text to locate..." spellcheck="false" autocorrect="off" autocomplete="off"></textarea>
-        <textarea id="modify" placeholder="Replace with..." spellcheck="false" autocorrect="off" autocomplete="off"></textarea>
+        <textarea id="locate" placeholder="Text to locate..." spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"></textarea>
+        <textarea id="modify" placeholder="Replace with..." spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"></textarea>
       </div>
     </div>
     <div class="toolbar">
@@ -1181,7 +1167,7 @@
     <div class="content">
       <div class="item">
         <span id="colorPreview"></span>
-        <input id="colorInput" type="text" value="#ffa500" maxlength="7" spellcheck="false" autocorrect="off" autocomplete="off">
+        <input id="colorInput" type="text" value="#ffa500" maxlength="7" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off">
       </div>
       <div class="item">
         <label for="redChannel">Red</label>
@@ -1205,7 +1191,7 @@
     </div>
     <div class="content">
       <div class="item expand">
-        <textarea id="formatterInput" class="expand" placeholder="Place JSON here..." spellcheck="false" autocorrect="off" autocomplete="off"></textarea>
+        <textarea id="formatterInput" class="expand" placeholder="Place JSON here..." spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"></textarea>
       </div>
     </div>
     <div class="toolbar">
@@ -1221,7 +1207,7 @@
     </div>
     <div class="content">
       <div class="item expand">
-        <textarea id="encoderInput" class="expand" placeholder="Place text here..." spellcheck="false" autocorrect="off" autocomplete="off"></textarea>
+        <textarea id="encoderInput" class="expand" placeholder="Place text here..." spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"></textarea>
       </div>
     </div>
     <div class="toolbar">
@@ -1376,7 +1362,7 @@
   var buttons = Array.from(document.getElementsByTagName("button"));
   buttons.forEach(function(item){
     item.addEventListener("click",function(){
-      if (touchTools.contains(item) == false){
+      if (editingTools.contains(item) == false){
         item.focus();
       }
     });
@@ -1399,6 +1385,9 @@
       setTimeout(function(){
         document.documentElement.classList.remove("fade");
       }, 50);
+      if ("ontouchstart" in document.documentElement){
+        openCard("editingTools");
+      }
       if (title == "true"){
         setTimeout(function(){
           openCard("welcome");
@@ -1469,6 +1458,10 @@
         if (view == "split"){
           forceRefresh();
         }
+      }
+      if (event.key == "E"){
+        blockShortcut(event);
+        openCard("editingTools");
       }
       if (event.key == "F"){
         blockShortcut(event);
@@ -1828,11 +1821,14 @@
     }
   }
   function closeCard(element){
-    if (activeModal == undefined){
+    if (element == undefined){
       return;
     }
     var card = document.getElementById(element);
     var cardType = card.classList[1];
+    if (cardType == "modal"){
+      return;
+    }
     document.getElementById(element).classList.remove("active");
     if (cardType == "modal"){
       cardBackground.classList.remove("active");
@@ -1849,6 +1845,14 @@
     if (cardType == "modal"){
       activeModal = undefined;
     }
+  }
+  function changeState(history){
+    userInput.focus();
+    document.execCommand(history);
+  }
+  function insertText(text){
+    userInput.focus();
+    document.execCommand("insertText",false,text);
   }
   function activateReplacer(){
     userInput.value = userInput.value.split(locate.value).join(modify.value);
