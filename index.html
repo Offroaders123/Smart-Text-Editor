@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Smart Text Editor</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Smart Text Editor">
+<link rel="icon" type="image/svg+xml" href="resources/icon.svg">
+<link rel="alternate icon" type="image/png" sizes="16x16" href="resources/icon-16.png">
+<link rel="alternate icon" type="image/png" sizes="32x32" href="resources/icon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="resources/icon-apple-touch-icon.png">
+<link rel="mask-icon" href="resources/icon-mask-icon.svg" color="#ee8800">
+<link href="https://fonts.googleapis.com/css2?family=Cousine&family=Rubik&display=swap" rel="stylesheet">
+
+<script src="initialize.js"></script>
+
+<link rel="stylesheet" href="styles.css">
+
+</head>
+
+<body>
+
+<svg id="logo">
+  <defs>
+    <linearGradient id="wood" x1="-22.662" x2="-32.039" y1="-27.117" y2="-27.117" gradientTransform="matrix(-9.3466 -9.3775 9.3775 -9.3466 0 0)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e5cfad" offset="0"/>
+      <stop stop-color="#dec196" offset="0.25"/>
+      <stop stop-color="#daba8a" offset="0.5"/>
+      <stop stop-color="#c4a77c" offset="0.75"/>
+      <stop stop-color="#988260" offset="1"/>
+    </linearGradient>
+    <linearGradient id="paint" x1="22.338" x2="31.811" y1="15.409" y2="15.409" gradientTransform="matrix(9.4412 9.4724 -9.4724 9.4412 0 0)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f3ac4d" offset="0"/>
+      <stop stop-color="#f0941a" offset="0.25"/>
+      <stop stop-color="#ee8800" offset="0.5"/>
+      <stop stop-color="#d67a00" offset="0.75"/>
+      <stop stop-color="#a65f00" offset="1"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="22.267" x2="31.751" y1="-8.6537" y2="-8.6537" gradientTransform="matrix(9.4527 9.484 -9.484 9.4527 0 0)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#d5d5d5" offset="0"/>
+      <stop stop-color="#c9c9c9" offset="0.25"/>
+      <stop stop-color="#c3c3c3" offset="0.5"/>
+      <stop stop-color="#afafaf" offset="0.75"/>
+      <stop stop-color="#888888" offset="1"/>
+    </linearGradient>
+    <linearGradient id="eraser" x1="22.164" x2="31.683" y1="-14.141" y2="-14.141" gradientTransform="matrix(9.4872 9.5187 -9.5187 9.4872 0 0)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#db7c88" offset="0"/>
+      <stop stop-color="#d15766" offset="0.25"/>
+      <stop stop-color="#cc4455" offset="0.5"/>
+      <stop stop-color="#b73d4c" offset="0.75"/>
+      <stop stop-color="#8e2f3b" offset="1"/>
+    </linearGradient>
+  </defs>
+  <symbol id="pencil" viewBox="0 0 512 512">
+    <path d="m170.77 428.71-168.7 81.953 81.054-169.89z" fill="url(#wood)"/>
+    <path d="m54.396 484.82-52.657 25.846 25.566-53.027z" fill="#2a2a2a"/>
+    <path d="m314.47 108.52c-9.7304 9.7626 2.2127 37.574 26.676 62.118 24.463 24.544 52.182 36.527 61.913 26.764l-231.03 231.8c-9.7304 9.7626-37.45-2.2201-61.913-26.764-24.463-24.544-36.406-52.355-26.676-62.118z" fill="url(#paint)"/>
+    <path d="m365.73 56.454c-9.827 9.8595 2.2347 37.947 26.94 62.734 24.706 24.788 52.7 36.889 62.527 27.03l-55.137 55.319c-9.827 9.8595-37.821-2.2421-62.527-27.03-24.706-24.788-36.767-52.875-26.94-62.734z" fill="url(#metal)"/>
+    <path d="m417.17 4.7679c-9.8787 9.9114 2.2886 38.189 27.176 63.159 24.888 24.97 53.072 37.178 62.95 27.266l-54.165 54.344c-9.8787 9.9114-38.063-2.2962-62.95-27.266-24.888-24.97-37.055-53.247-27.176-63.159z" fill="url(#eraser)"/>
+    <path d="m417.17 4.7679c9.8787-9.9114 38.063 2.2962 62.95 27.266 24.888 24.97 37.055 53.247 27.176 63.159s-38.062-2.2962-62.95-27.266c-24.888-24.97-37.055-53.247-27.176-63.159z" fill="#db7c88"/>
+  </symbol>
+</svg>
+<svg id="icons">
+  <symbol id="arrow" viewBox="0 0 512 512">
+    <path d="m112.66 0 286.68 256-286.68 256z"/>
+  </symbol>
+  <symbol id="check" viewBox="0 0 512 512">
+    <path d="m63.346 191.15 192.72 192.72-63.402 63.402-192.72-192.72z"/>
+    <path d="m129.5 383.87 319.15-319.15 63.402 63.402-319.15 319.15z"/>
+  </symbol>
+  <symbol id="close" viewBox="0 0 512 512">
+    <path d="m1.5795 65.78 64.201-64.201 190.22 190.22 190.22-190.22 64.201 64.201-190.22 190.22 190.22 190.22-64.201 64.201-190.22-190.22-190.22 190.22-64.201-64.201 190.22-190.22z"/>
+  </symbol>
+  <symbol id="refresh" viewBox="0 0 512 512">
+    <path d="m510.27 285.75c-13.893 118.73-108.1 212.04-226.96 224.79-118.86 12.751-230.71-58.451-269.47-171.53-38.761-113.08 5.8941-237.93 107.58-300.78 101.68-62.846 233.32-46.955 317.13 38.282l-37.067 36.446c-66.79-67.929-171.7-80.593-252.74-30.508-81.036 50.084-116.62 149.58-85.733 239.7 30.89 90.117 120.03 146.86 214.75 136.7 94.721-10.161 169.8-84.522 180.87-179.14z"/>
+    <path d="m512 189.01v-189.01l-188.98 189.01z"/>
+  </symbol>
+</svg>
+
+<header id="header" class="text horizontal">
+  <div class="toolbar">
+    <div class="dropdown">
+      <button>File</button>
+      <ul>
+        <li onclick="window.open(window.location.href,'_blank');">New<span>Ctrl + Shift + C</span></li>
+        <li onclick="load.click();"><input id="load" type="file">Open<span>Ctrl + Shift + L</span></li>
+        <li onclick="saveAs();"><a id="save"></a>Save<span>Ctrl + Shift + S</span></li>
+        <li>Save As...
+          <svg><use href="#arrow"/></svg>
+          <ul>
+            <li onclick="saveAs('txt');">Plain Text<span>.txt</span></li>
+            <li onclick="saveAs('html');">HTML<span>.html</span></li>
+            <li onclick="saveAs('css');">CSS<span>.css</span></li>
+            <li onclick="saveAs('js');">JavaScript<span>.js</span></li>
+            <li onclick="saveAs('json');">JSON<span>.json</span></li>
+            <li onclick="saveAs('svg');">SVG<span>.svg</span></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <div class="dropdown">
+      <button>View</button>
+      <ul>
+        <li onclick="changeView('text');">Text<span>Ctrl + Shift + 1</span></li>
+        <li onclick="changeView('code');">Code<span>Ctrl + Shift + 2</span></li>
+        <li onclick="changeView('split');">Split<span>Ctrl + Shift + 3</span></li>
+        <li onclick="changeView('preview');">Preview<span>Ctrl + Shift + 4</span></li>
+        <li onclick="changeOrientation();">Orientation<span>Ctrl + Shift + 5</span></li>
+        <li onclick="openDisplay();">Display<span>Ctrl + Shift + 6</span></li>
+      </ul>
+    </div>
+    <div class="dropdown">
+      <button>Tools</button>
+      <ul>
+        <li onclick="openCard('editingTools');">Editing Tools<span>Ctrl + Shift + E</span></li>
+        <li onclick="openCard('replacer');">Replace Text<span>Ctrl + Shift + F</span></li>
+        <li onclick="openCard('picker');">Color Picker<span>Ctrl + Shift + K</span></li>
+        <li onclick="openCard('formatter');">JSON Formatter<span>Ctrl + Shift + R</span></li>
+        <li onclick="openCard('encoder');">URI Encoder<span>Ctrl + Shift + Y</span></li>
+        <li onclick="confirmOverwrite(insertTemplate);">Import HTML Template<span>Ctrl + Shift + H</span></li>
+        <li>Online Resources...
+          <svg><use href="#arrow"/></svg>
+          <ul>
+            <li onclick="window.open('https://www.diffchecker.com/','_blank');">Difference Finder</li>
+            <li onclick="window.open('https://webformatter.com/','_blank');">Code Formatter</li>
+            <li onclick="window.open('https://caniuse.com/','_blank');">Compatibility Checker</li>
+            <li onclick="window.open('https://realfavicongenerator.net/','_blank');">Favicon Generator</li>
+            <li onclick="window.open('https://www.svgminify.com/','_blank');">SVG Simplifier</li>
+            <li onclick="window.open('https://keycode.info/','_blank');">Keycode Finder</li>
+            <li onclick="window.open('https://www.uuidgenerator.net/','_blank');">UUID Generator</li>
+            <li onclick="window.open('https://cryptii.com/','_blank');">Text Encryptor</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <div>
+      <button onclick="openCard('settings');">Settings</button>
+    </div>
+  </div>
+  <div class="title">
+    <svg><use href="#pencil"/></svg>
+    <section>Smart Text Editor</section>
+  </div>
+  <div class="attribution">
+    <span>Inspired by <a href="https://htmledit.squarefree.com/" target="_blank">Real-Time HTML Editor</a> and <a href="https://www.editpad.org/" target="_blank">Edit Pad</a>!</span>
+  </div>
+</header>
+
+<main id="main" class="text horizontal">
+  <textarea id="userInput" class="text horizontal" placeholder="Welcome to the Smart Text Editor! This site was created to allow for text editing and code development within your browser!" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"></textarea>
+  <div id="scaler" class="text horizontal">
+    <div class="handle">▲<br>▼</div>
+  </div>
+  <iframe id="preview" class="text horizontal" src="about:blank"></iframe>
+  <div id="editingTools" class="card editing">
+    <button onclick="changeState('undo');">&#8630;</button>
+    <button onclick="changeState('redo');">&#8631;</button>
+    <button onclick="if (view == 'split'){ forceRefresh(); }"><svg><use href="#refresh"></use></svg></button>
+    <button onclick="insertText('<');"><</button>
+    <button onclick="insertText('>');">></button>
+    <button onclick="insertText('{');">{</button>
+    <button onclick="insertText('}');">}</button>
+    <button onclick="insertText('[');">[</button>
+    <button onclick="insertText(']');">]</button>
+  </div>
+  <div id="cardBackground"></div>
+  <div id="welcome" class="card modal scale">
+    <div class="header">
+      <svg class="pencil"><use href="#pencil"></use></svg>
+      <section>Smart Text Editor</section>
+    </div>
+    <div class="content">
+      <div class="item">
+        <span>Welcome to the Smart Text Editor!</span>
+        <span>Created by Brandon Bennett</span>
+      </div>
+    </div>
+  </div>
+  <div id="replacer" class="card widget">
+    <div class="header">
+      <section>Replace Text</section>
+      <svg class="button closeButton" onclick="closeCard('replacer');"><use href="#close"></use></svg>
+    </div>
+    <div class="content">
+      <div class="item expand">
+        <textarea id="locate" placeholder="Text to locate..." spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"></textarea>
+        <textarea id="modify" placeholder="Replace with..." spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"></textarea>
+      </div>
+    </div>
+    <div class="toolbar">
+      <button onclick="activateReplacer();">Replace</button>
+      <button onclick="var store = locate.value; locate.value = modify.value; modify.value = store;">Flip</button>
+      <button onclick="locate.value = ''; modify.value = '';">Clear</button>
+    </div>
+  </div>
+  <div id="picker" class="card widget">
+    <div class="header">
+      <section>Color Picker</section>
+      <svg class="button closeButton" onclick="closeCard('picker');"><use href="#close"></use></svg>
+    </div>
+    <div class="content">
+      <div class="item">
+        <span id="colorPreview"></span>
+        <input id="colorInput" type="text" value="#ffa500" maxlength="7" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off">
+      </div>
+      <div class="item">
+        <label for="redChannel">Red</label>
+        <input id="redChannel" type="range" min="0" max="255" style="--range-thumb-hover: #bb2222; --range-track-hover: #660000;" oninput="channelRefresh();">
+        <label for="greenChannel">Green</label>
+        <input id="greenChannel" type="range" min="0" max="255" style="--range-thumb-hover: #22bb22; --range-track-hover: #006600;" oninput="channelRefresh();">
+        <label for="blueChannel">Blue</label>
+        <input id="blueChannel" type="range" min="0" max="255" style="--range-thumb-hover: #2222bb; --range-track-hover: #000066;" oninput="channelRefresh();">
+      </div>
+    </div>
+    <div class="toolbar">
+      <button onclick="colorInput.select(); document.execCommand('copy');">Copy</button>
+      <button onclick="textEdit('insert',storedColor,true); channelRefresh(); insertColor = true;">Insert</button>
+      <button onclick="var selectionCount = userInput.selectionEnd - userInput.selectionStart; if (selectionCount != 0){ textEdit('delete',selectionCount,true); } insertColor = false;">Delete</button>
+    </div>
+  </div>
+  <div id="formatter" class="card widget">
+    <div class="header">
+      <section>JSON Formatter</section>
+      <svg class="button closeButton" onclick="closeCard('formatter');"><use href="#close"></use></svg>
+    </div>
+    <div class="content">
+      <div class="item expand">
+        <textarea id="formatterInput" class="expand" placeholder="Place JSON here..." spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"></textarea>
+      </div>
+    </div>
+    <div class="toolbar">
+      <button onclick="activateFormatter('  ');">Format</button>
+      <button onclick="activateFormatter('');">Collapse</button>
+      <button onclick="formatterInput.value = '';">Clear</button>
+    </div>
+  </div>
+  <div id="encoder" class="card widget">
+    <div class="header">
+      <section>URI Encoder</section>
+      <svg class="button closeButton" onclick="closeCard('encoder');"><use href="#close"></use></svg>
+    </div>
+    <div class="content">
+      <div class="item expand">
+        <textarea id="encoderInput" class="expand" placeholder="Place text here..." spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"></textarea>
+      </div>
+    </div>
+    <div class="toolbar">
+      <button onclick="activateEncoder('encode');">Encode</button>
+      <button onclick="activateEncoder('decode');">Decode</button>
+      <button onclick="encoderInput.value = '';">Clear</button>
+    </div>
+    <div class="toolbar">
+      <div class="checkbox" data-tooltip="Encodes more special characters">
+        <input id="componentSetting" type="checkbox" oninput="encodeComponent = this.checked;">
+        <label for="componentSetting"><svg class="button"><use href="#check"></use></svg>Enable URI Component</label>
+      </div>
+    </div>
+  </div>
+  <div id="settings" class="card modal">
+    <div class="header">
+      <section>Settings</section>
+      <svg class="button closeButton" onclick="closeCard('settings');"><use href="#close"></use></svg>
+    </div>
+    <div class="content">
+      <div class="item list">
+        <div class="select">Default View:
+          <div class="dropdown">
+            <button id="viewSetting">Text</button>
+            <ul>
+              <li onclick="updateSelect('view','text');">Text</li>
+              <li onclick="updateSelect('view','code');">Code</li>
+              <li onclick="updateSelect('view','split');">Split</li>
+            </ul>
+          </div>
+        </div>
+        <div class="select">Default Orientation:
+          <div class="dropdown">
+            <button id="orientationSetting">Horizontal</button>
+            <ul>
+              <li onclick="updateSelect('orientation','horizontal');">Horizontal</li>
+              <li onclick="updateSelect('orientation','vertical');">Vertical</li>
+            </ul>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="checkbox" data-tooltip="Refresh manually using Ctrl + Enter when disabled">
+          <input id="refreshSetting" type="checkbox" oninput="updateCheckbox('refresh');" checked>
+          <label for="refreshSetting"><svg class="button"><use href="#check"></use></svg>Automatically Refresh Preview</label>
+        </div>
+        <div class="checkbox">
+          <input id="titleSetting" type="checkbox" oninput="updateCheckbox('title');" checked>
+          <label for="titleSetting"><svg class="button"><use href="#check"></use></svg>Show Title on Startup</label>
+        </div>
+        <div class="checkbox">
+          <input id="transitionsSetting" type="checkbox" oninput="updateCheckbox('transitions');" checked>
+          <label for="transitionsSetting"><svg class="button"><use href="#check"></use></svg>Smooth Transitions</label>
+        </div>
+      </div>
+    </div>
+    <div class="toolbar">
+      <button style="--button-hover: #bb2222;" onclick="resetSettings();">Reset All Settings</button>
+    </div>
+    <div class="toolbar">
+      <a href="https://github.com/Offroaders123/Smart-Text-Editor/" target="_blank">Smart Text Editor on GitHub</a>
+    </div>
+  </div>
+  <div id="reset" class="card notification">
+    <div class="header"><svg class="pencil"><use href="#pencil"></use></svg>
+      <section>Reset Settings</section>
+    </div>
+    <div class="content">
+      <div class="item">Your settings have been reset!</div>
+    </div>
+  </div>
+</main>
+
+<script src="scripts.js"></script>
+
+</body>
+
+</html>
