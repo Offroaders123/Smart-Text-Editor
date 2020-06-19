@@ -1,950 +1,956 @@
-  *, *::before, *::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: var(--font-family-sans-serif);
-  }
-  html {
-    --body: #111111;
-    --font-family-sans-serif: "Rubik", sans-serif;
-    --font-family-monospace: "Cousine", monospace;
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-family-sans-serif);
+}
+html {
+  --body: #111111;
+  --font-family-sans-serif: "Rubik", sans-serif;
+  --font-family-monospace: "Cousine", monospace;
 
-    --container-dark: #171717;
-    --container-medium: #1c1c1c;
-    --container-medium-hover: #2c2c2c;
-    --container-light: #ffffff;
+  --container-dark: #171717;
+  --container-medium: #1c1c1c;
+  --container-medium-hover: #2c2c2c;
+  --container-light: #ffffff;
 
-    --button: #3a3a3a;
-    --button-hover: #4a4a4a;
+  --button: #3a3a3a;
+  --button-hover: #4a4a4a;
+  --button-disabled: #2a2a2a;
 
-    --range-thumb: var(--button);
-    --range-thumb-hover: var(--button-hover);
-    --range-track: var(--container-medium);
-    --range-track-hover: var(--container-medium-hover);
+  --range-thumb: var(--button);
+  --range-thumb-hover: var(--button-hover);
+  --range-track: var(--container-medium);
+  --range-track-hover: var(--container-medium-hover);
 
-    --textarea-dark: #1d1d1d;
-    --textarea-medium: #212121;
-    --textarea-light: #eae2d1;
-    --textarea-drag-dark-color: #7f7fff;
-    --textarea-drag-dark-background: #161656;
-    --textarea-drag-light-color: #000080;
-    --textarea-drag-light-background: #aaaaea;
-    --textarea-drag-border: #0000ff;
+  --textarea-dark: #1d1d1d;
+  --textarea-medium: #212121;
+  --textarea-light: #eae2d1;
+  --textarea-drag-dark-color: #7f7fff;
+  --textarea-drag-dark-background: #161656;
+  --textarea-drag-light-color: #000080;
+  --textarea-drag-light-background: #aaaaea;
+  --textarea-drag-border: #0000ff;
 
-    --card-background: #17171760;
+  --card-background: #17171760;
 
-    --border-radius: min(1.25vw, 5px);
-    --box-shadow-color: #000000bf;
-    --outline: var(--text-medium);
+  --border-radius: min(1.25vw, 5px);
+  --box-shadow-color: #000000bf;
+  --outline: var(--text-medium);
 
-    --text-super-dark: #000000;
-    --text-dark: #aaaaaa;
-    --text-medium: #cccccc;
-    --text-info: #777777;
-    --text-light: #ffffff;
-    --text-hover: #ffffff;
-    --text-selection-color: var(--text-super-dark);
-    --text-selection-background: #b4d5ffbf;
+  --text-super-dark: #000000;
+  --text-dark: #aaaaaa;
+  --text-medium: #cccccc;
+  --text-info: #777777;
+  --text-light: #ffffff;
+  --text-hover: #ffffff;
+  --text-selection-color: var(--text-super-dark);
+  --text-selection-background: #b4d5ffbf;
 
-    --scrollbar: #7a7a7a;
-    --scrollbar-hover: #9a9a9a;
+  --scrollbar: #7a7a7a;
+  --scrollbar-hover: #9a9a9a;
 
-    --transition-slow: 0.5s;
-    --transition-medium: 0.25s;
-    --transition-fast: 0.125s;
+  --transition-slow: 0.5s;
+  --transition-medium: 0.25s;
+  --transition-fast: 0.125s;
 
-    --fade-opacity: 0;
-    --fade-pointer-events: none;
-  }
-  html.fade {
-    --fade-opacity: 1;
-    --fade-pointer-events: all;
-  }
-  body {
-    position: fixed;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background: var(--body);
-    overflow: hidden;
-    user-select: none;
-    -webkit-user-select: none;
-  }
-  body::after {
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: var(--container-medium);
-    opacity: var(--fade-opacity);
-    pointer-events: var(--fade-pointer-events);
-    z-index: 3;
-    transition: opacity 0.25s;
-  }
-  button {
-    padding: min(0.5vw, 2px) min(1vw, 8px);
-    min-width: min(8vw, 75px);
-    color: var(--text-dark);
-    font-size: min(2.5vw, 14.5px);
-    background: var(--button);
-    border: none;
-    border-radius: var(--border-radius);
-    box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow-color), 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
-    --focus-border: transparent;
-    cursor: pointer;
-    outline: none;
-    transition: var(--transition-fast);
-    transition-property: color, background;
-  }
-  button::-moz-focus-inner {
-    border: none;
-  }
-  button:hover, button:focus, .dropdown.active:focus-within > button {
-    color: var(--text-hover);
-    background: var(--button-hover);
-  }
-  button:focus {
-    --focus-border: var(--outline);
-  }
-  textarea, [type="text"] {
-    --color: var(--text-super-dark);
-    color: var(--color);
-    font-size: 13px;
-    border: none;
-    border-radius: 0;
-    outline: none;
-    -webkit-appearance: none;
-  }
-  textarea {
-    font-family: var(--font-family-sans-serif);
-    white-space: pre;
-    word-wrap: normal;
-    resize: none;
-  }
-  a {
-    color: var(--text-dark);
-    font-size: min(2vw, 14.5px);
-    border-radius: calc(var(--border-radius) * 0.5);
-    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
-    --focus-border: transparent;
-    outline: none;
-    transition: var(--transition-fast);
-    transition-property: color;
-  }
-  a:hover, a:focus {
-    color: var(--text-hover);
-  }
-  a:focus {
-    --focus-border: var(--outline);
-  }
-  ::placeholder {
-    color: var(--color);
-    opacity: 0.55;
-    white-space: pre-wrap;
-    transition: color var(--transition-slow);
-  }
-  ::selection {
-    color: var(--text-selection-color);
-    background: var(--text-selection-background);
-  }
-  [type="range"] {
-    margin-bottom: min(1vw, 4px);
-    width: min(25vw, 130px);
-    height: min(5vw, 20px);
-    background: none;
-    cursor: pointer;
-    outline: none;
-    -webkit-appearance: none;
-  }
-  [type="range"]:last-child {
-    margin-bottom: 0;
-  }
-  ::-webkit-slider-thumb {
-    margin-top: calc(min(1.75vw, 7px) * -1);
-    width: min(2.75vw, 12px);
-    height: min(5vw, 20px);
-    background: var(--range-thumb);
-    border: none;
-    border-radius: var(--border-radius);
-    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
-    transition: background var(--transition-fast);
-    -webkit-appearance: none;
-  }
-  ::-moz-range-thumb {
-    margin-top: calc(min(1.75vw, 7px) * -1);
-    width: min(2.75vw, 12px);
-    height: min(5vw, 20px);
-    background: var(--range-thumb);
-    border: none;
-    border-radius: var(--border-radius);
-    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
-    transition: background var(--transition-fast);
-  }
-  :hover::-webkit-slider-thumb, :focus::-webkit-slider-thumb {
-    background: var(--range-thumb-hover);
-  }
-  :hover::-moz-range-thumb, :focus::-moz-range-thumb {
-    background: var(--range-thumb-hover);
-  }
-  ::-webkit-slider-runnable-track {
-    height: min(1.5vw, 6px);
-    background: var(--range-track);
-    border-radius: var(--border-radius);
-    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
-    transition: background var(--transition-fast);
-  }
-  ::-moz-range-track {
-    height: min(1.5vw, 6px);
-    background: var(--range-track);
-    border-radius: var(--border-radius);
-    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
-    transition: background var(--transition-fast);
-  }
-  :hover::-webkit-slider-runnable-track, :focus::-webkit-slider-runnable-track {
-    background: var(--range-track-hover);
-  }
-  :hover::-moz-range-track, :focus::-moz-range-track {
-    background: var(--range-track-hover);
-  }
-  svg.button {
-    fill: var(--text-dark);
-    cursor: pointer;
-    transition: var(--transition-fast);
-    transition-property: fill, background, border-color;
-  }
-  svg.button:hover, svg.button:focus {
-    fill: var(--text-hover);
-  }
-  svg.button.closeButton {
-    padding: min(0.5vw, 2px);
-    position: absolute;
-    right: 0;
-    border-radius: var(--border-radius);
-    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
-    --focus-border: transparent;
-    outline: none;
-  }
-  svg.button.closeButton:focus {
-    --focus-border: var(--outline);
-  }
+  --fade-opacity: 0;
+  --fade-pointer-events: none;
+}
+html.fade {
+  --fade-opacity: 1;
+  --fade-pointer-events: all;
+}
+body {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--body);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+body::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: var(--container-medium);
+  opacity: var(--fade-opacity);
+  pointer-events: var(--fade-pointer-events);
+  z-index: 3;
+  transition: opacity 0.25s;
+}
+button {
+  padding: min(0.5vw, 2px) min(1vw, 8px);
+  min-width: min(8vw, 75px);
+  color: var(--text-dark);
+  font-size: min(2.5vw, 14.5px);
+  background: var(--button);
+  border: none;
+  border-radius: var(--border-radius);
+  box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow-color), 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
+  --focus-border: transparent;
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition-fast);
+  transition-property: color, background, opacity;
+}
+button::-moz-focus-inner {
+  border: none;
+}
+button:hover, button:focus, .dropdown.active:focus-within > button {
+  color: var(--text-hover);
+  background: var(--button-hover);
+}
+button:focus {
+  --focus-border: var(--outline);
+}
+button:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+textarea, [type="text"] {
+  --color: var(--text-super-dark);
+  color: var(--color);
+  font-size: 13px;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  -webkit-appearance: none;
+}
+textarea {
+  font-family: var(--font-family-sans-serif);
+  white-space: pre;
+  word-wrap: normal;
+  resize: none;
+}
+a {
+  color: var(--text-dark);
+  font-size: min(2vw, 14.5px);
+  border-radius: calc(var(--border-radius) * 0.5);
+  box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
+  --focus-border: transparent;
+  outline: none;
+  transition: var(--transition-fast);
+  transition-property: color;
+}
+a:hover, a:focus {
+  color: var(--text-hover);
+}
+a:focus {
+  --focus-border: var(--outline);
+}
+::placeholder {
+  color: var(--color);
+  opacity: 0.55;
+  white-space: pre-wrap;
+  transition: color var(--transition-slow);
+}
+::selection {
+  color: var(--text-selection-color);
+  background: var(--text-selection-background);
+}
+[type="range"] {
+  margin-bottom: min(1vw, 4px);
+  width: min(25vw, 130px);
+  height: min(5vw, 20px);
+  background: none;
+  cursor: pointer;
+  outline: none;
+  -webkit-appearance: none;
+}
+[type="range"]:last-child {
+  margin-bottom: 0;
+}
+::-webkit-slider-thumb {
+  margin-top: calc(min(1.75vw, 7px) * -1);
+  width: min(2.75vw, 12px);
+  height: min(5vw, 20px);
+  background: var(--range-thumb);
+  border: none;
+  border-radius: var(--border-radius);
+  box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
+  transition: background var(--transition-fast);
+  -webkit-appearance: none;
+}
+::-moz-range-thumb {
+  margin-top: calc(min(1.75vw, 7px) * -1);
+  width: min(2.75vw, 12px);
+  height: min(5vw, 20px);
+  background: var(--range-thumb);
+  border: none;
+  border-radius: var(--border-radius);
+  box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
+  transition: background var(--transition-fast);
+}
+:hover::-webkit-slider-thumb, :focus::-webkit-slider-thumb {
+  background: var(--range-thumb-hover);
+}
+:hover::-moz-range-thumb, :focus::-moz-range-thumb {
+  background: var(--range-thumb-hover);
+}
+::-webkit-slider-runnable-track {
+  height: min(1.5vw, 6px);
+  background: var(--range-track);
+  border-radius: var(--border-radius);
+  box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
+  transition: background var(--transition-fast);
+}
+::-moz-range-track {
+  height: min(1.5vw, 6px);
+  background: var(--range-track);
+  border-radius: var(--border-radius);
+  box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
+  transition: background var(--transition-fast);
+}
+:hover::-webkit-slider-runnable-track, :focus::-webkit-slider-runnable-track {
+  background: var(--range-track-hover);
+}
+:hover::-moz-range-track, :focus::-moz-range-track {
+  background: var(--range-track-hover);
+}
+svg.button {
+  fill: var(--text-dark);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  transition-property: fill, background, border-color;
+}
+svg.button:hover, svg.button:focus {
+  fill: var(--text-hover);
+}
+svg.button.closeButton {
+  padding: min(0.5vw, 2px);
+  position: absolute;
+  right: 0;
+  border-radius: var(--border-radius);
+  box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
+  --focus-border: transparent;
+  outline: none;
+}
+svg.button.closeButton:focus {
+  --focus-border: var(--outline);
+}
 
-  /* Easter egg: Typing 'tooltip' sounds like the Mario Bros theme! */
+/* Easter egg: Typing 'tooltip' sounds like the Mario Bros theme! */
 
-  [data-tooltip] {
-    position: relative;
-  }
-  [data-tooltip]::before, [data-tooltip]::after {
-    position: absolute;
-    display: flex;
-    opacity: 0;
-    pointer-events: none;
-    transform: scale(var(--scale));
-    --scale: 0;
-    transition: var(--transition-fast);
-    transition-property: opacity transform;
-  }
-  [data-tooltip]::before {
-    content: attr(data-tooltip);
-    padding: min(2vw, 8px);
-    bottom: calc(100% + min(3vw, 12px));
-    color: var(--text-hover);
-    font-size: min(2.75vw, 12px);
-    background: var(--container-medium-hover);
-    border-radius: calc(var(--border-radius) * 2);
-    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow-color);
-  }
-  [data-tooltip]::after {
-    content: "";
-    top: calc(min(3vw, 12px) * -1);
-    border: min(3vw, 12px) solid transparent;
-    border-top-color: var(--container-medium-hover);
-    filter: drop-shadow(0 min(0.5vw, 2px) min(0.25vw, 1px) var(--box-shadow-color));
-    transform-origin: top center;
-  }
-  [data-tooltip]:hover::before, [data-tooltip]:hover::after, [data-tooltip]:focus::before, [data-tooltip]:focus::after {
-    opacity: 1;
-    --scale: 1;
-    transition-delay: var(--transition-slow);
-  }
-  ::-webkit-scrollbar {
-    width: min(3vw, 12px);
-    height: min(3vw, 12px);
-  }
-  ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner {
-    background: none;
-  }
-  ::-webkit-scrollbar-thumb {
-    width: min(9vw, 36px);
-    height: min(9vw, 36px);
-    background-clip: content-box;
-    background-color: var(--scrollbar);
-    border: min(0.5vw, 2px) solid transparent;
-    border-radius: calc(var(--border-radius) * 2);
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: var(--scrollbar-hover);
-  }
-  #logo, #icons {
-    position: absolute;
-  }
-  #header {
-    padding: min(1.5vw, 10px);
-    position: relative;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--container-dark);
-    z-index: 1;
-    transition: box-shadow var(--transition-slow);
-  }
-  #header.text, #header.code, #header.split {
-    box-shadow: 0 1px 8px var(--box-shadow-color);
-  }
-  #header.split.vertical {
-    box-shadow: -50vw 1px 8px var(--box-shadow-color);
-  }
-  #header.preview.horizontal {
-    box-shadow: none;
-  }
-  #header.preview.vertical {
-    box-shadow: -100vw 1px 8px transparent;
-  }
-  #header.resize, #userInput.resize, #preview.resize {
-    pointer-events: none;
-    transition: none;
-  }
-  #header .toolbar {
-    display: flex;
-    align-items: center;
-  }
-  #header .toolbar > * {
-    margin: 0 min(0.75vw, 6px);
-  }
-  #header .toolbar > :first-child {
-    margin-left: 0;
-  }
-  #header .toolbar > :last-child {
-    margin-right: 0;
-  }
+[data-tooltip] {
+  position: relative;
+}
+[data-tooltip]::before, [data-tooltip]::after {
+  position: absolute;
+  display: flex;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(var(--scale));
+  --scale: 0;
+  transition: var(--transition-fast);
+  transition-property: opacity transform;
+}
+[data-tooltip]::before {
+  content: attr(data-tooltip);
+  padding: min(2vw, 8px);
+  bottom: calc(100% + min(3vw, 12px));
+  color: var(--text-hover);
+  font-size: min(2.75vw, 12px);
+  background: var(--container-medium-hover);
+  border-radius: calc(var(--border-radius) * 2);
+  box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow-color);
+}
+[data-tooltip]::after {
+  content: "";
+  top: calc(min(3vw, 12px) * -1);
+  border: min(3vw, 12px) solid transparent;
+  border-top-color: var(--container-medium-hover);
+  filter: drop-shadow(0 min(0.5vw, 2px) min(0.25vw, 1px) var(--box-shadow-color));
+  transform-origin: top center;
+}
+[data-tooltip]:hover::before, [data-tooltip]:hover::after, [data-tooltip]:focus::before, [data-tooltip]:focus::after {
+  opacity: 1;
+  --scale: 1;
+  transition-delay: var(--transition-slow);
+}
+::-webkit-scrollbar {
+  width: min(3vw, 12px);
+  height: min(3vw, 12px);
+}
+::-webkit-scrollbar-track, ::-webkit-scrollbar-corner {
+  background: none;
+}
+::-webkit-scrollbar-thumb {
+  width: min(9vw, 36px);
+  height: min(9vw, 36px);
+  background-clip: content-box;
+  background-color: var(--scrollbar);
+  border: min(0.5vw, 2px) solid transparent;
+  border-radius: calc(var(--border-radius) * 2);
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-hover);
+}
+#symbols {
+  position: absolute;
+  pointer-events: none;
+}
+#header {
+  padding: min(1.5vw, 10px);
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--container-dark);
+  z-index: 1;
+  transition: box-shadow var(--transition-slow);
+}
+#header.text, #header.code, #header.split {
+  box-shadow: 0 1px 8px var(--box-shadow-color);
+}
+#header.split.vertical {
+  box-shadow: -50vw 1px 8px var(--box-shadow-color);
+}
+#header.preview.horizontal {
+  box-shadow: none;
+}
+#header.preview.vertical {
+  box-shadow: -100vw 1px 8px transparent;
+}
+#header.resize, #userInput.resize, #preview.resize {
+  pointer-events: none;
+  transition: none;
+}
+#header .toolbar {
+  display: flex;
+  align-items: center;
+}
+#header .toolbar > * {
+  margin: 0 min(0.75vw, 6px);
+}
+#header .toolbar > :first-child {
+  margin-left: 0;
+}
+#header .toolbar > :last-child {
+  margin-right: 0;
+}
+#header .title {
+  position: absolute;
+  left: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translateX(-50%);
+  transition: transform var(--transition-slow);
+}
+#header .title img {
+  width: min(5vw, 24px);
+  height: min(5vw, 24px);
+  flex-shrink: 0;
+}
+#header .title section {
+  margin-left: 5px;
+  color: var(--text-dark);
+  font-size: min(4vw, 16px);
+  white-space: nowrap;
+  transform-origin: left center;
+  transition: var(--transition-slow);
+  transition-property: margin-left, visibility, opacity, transform;
+}
+@media (max-width: 900px){
   #header .title {
-    position: absolute;
-    left: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transform: translateX(-50%);
-    transition: transform var(--transition-slow);
-  }
-  #header .title svg {
-    width: min(5vw, 24px);
-    height: min(5vw, 24px);
-    flex-shrink: 0;
+    transform: translateX(calc(min(2.75vw, 12px) * -1));
   }
   #header .title section {
-    margin-left: 5px;
-    color: var(--text-dark);
-    font-size: min(4vw, 16px);
-    white-space: nowrap;
-    transform-origin: left center;
-    transition: var(--transition-slow);
-    transition-property: margin-left, visibility, opacity, transform;
-  }
-  @media (max-width: 900px){
-    #header .title {
-      transform: translateX(calc(min(2.75vw, 12px) * -1));
-    }
-    #header .title section {
-      margin-left: 0;
-      visibility: hidden;
-      opacity: 0;
-      transform: scaleX(0);
-    }
-  }
-  #header .attribution {
-    max-width: 35%;
-    display: flex;
-    text-align: right;
-  }
-  #header .attribution span {
-    color: var(--text-dark);
-    font-size: min(2vw, 14.5px);
-  }
-  #main {
-    position: relative;
-    flex: 1;
-  }
-  #main.code textarea, #main.code [type="text"], #main.split textarea, #main.split [type="text"], #main.preview textarea, #main.preview [type="text"] {
-    font-family: var(--font-family-monospace);
-  }
-  #main.horizontal.resize {
-    cursor: row-resize;
-  }
-  #main.vertical.resize {
-    cursor: col-resize;
-  }
-  #userInput {
-    position: absolute;
-    left: 0;
-    top: 0;
-    border: 4px solid;
-    transition: var(--transition-slow);
-  }
-  #userInput.text {
-    --size: 100%;
-    --color: var(--text-super-dark);
-    background: var(--textarea-light);
-    border-color: var(--textarea-light);
-    white-space: pre-wrap;
-  }
-  #userInput.code, #userInput.split, #userInput.preview {
-    --color: var(--text-light);
-    background: var(--textarea-dark);
-    border-color: var(--textarea-dark);
-  }
-  #userInput.code {
-    --size: 100%;
-  }
-  #userInput.split {
-    --size: calc(50% - 8px);
-  }
-  #userInput.preview {
-    --size: 0;
+    margin-left: 0;
     visibility: hidden;
     opacity: 0;
+    transform: scaleX(0);
   }
-  #userInput.horizontal, #preview.horizontal {
-    width: 100%;
-    height: var(--size);
+}
+#header .attribution {
+  max-width: 35%;
+  display: flex;
+  text-align: right;
+}
+#header .attribution span {
+  color: var(--text-dark);
+  font-size: min(2vw, 14.5px);
+}
+#main {
+  position: relative;
+  flex: 1;
+}
+#main.code textarea, #main.code [type="text"], #main.split textarea, #main.split [type="text"], #main.preview textarea, #main.preview [type="text"] {
+  font-family: var(--font-family-monospace);
+}
+#main.horizontal.resize {
+  cursor: row-resize;
+}
+#main.vertical.resize {
+  cursor: col-resize;
+}
+#userInput {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border: 4px solid;
+  transition: var(--transition-slow);
+}
+#userInput.text {
+  --size: 100%;
+  --color: var(--text-super-dark);
+  background: var(--textarea-light);
+  border-color: var(--textarea-light);
+  white-space: pre-wrap;
+}
+#userInput.code, #userInput.split, #userInput.preview {
+  --color: var(--text-light);
+  background: var(--textarea-dark);
+  border-color: var(--textarea-dark);
+}
+#userInput.code {
+  --size: 100%;
+}
+#userInput.split {
+  --size: calc(50% - 8px);
+}
+#userInput.preview {
+  --size: 0;
+  visibility: hidden;
+  opacity: 0;
+}
+#userInput.horizontal, #preview.horizontal {
+  width: 100%;
+  height: var(--size);
+}
+#userInput.vertical, #preview.vertical {
+  width: var(--size);
+  height: 100%;
+}
+#userInput.drag {
+  border-color: var(--textarea-drag-border);
+  transition: var(--transition-medium);
+}
+#userInput.text.drag {
+  --color: var(--textarea-drag-light-color);
+  background: var(--textarea-drag-light-background);
+}
+#userInput.code.drag, #userInput.split.drag, #userInput.preview.drag {
+  --color: var(--textarea-drag-dark-color);
+  background: var(--textarea-drag-dark-background);
+}
+#scaler {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--button);
+  box-shadow: 0 -1px 8px var(--box-shadow-color);
+  transition: var(--transition-slow), background var(--transition-fast);
+}
+#scaler.active, #scaler:hover {
+  background: var(--button-hover);
+  transition: background var(--transition-fast);
+}
+#scaler.text, #scaler.code {
+  --axis: 0;
+  --size: 0;
+  visibility: hidden;
+  opacity: 0;
+}
+#scaler.split {
+  --axis: calc(50% - 8px);
+  --size: 16px;
+}
+#scaler.preview {
+  --axis: 100%;
+  --size: 0;
+  visibility: hidden;
+  opacity: 0;
+}
+#scaler.horizontal {
+  bottom: var(--axis);
+  width: 100%;
+  height: var(--size);
+  cursor: row-resize;
+  --rotate: 0deg;
+}
+#scaler.vertical {
+  right: var(--axis);
+  width: var(--size);
+  height: 100%;
+  cursor: col-resize;
+  --rotate: 90deg;
+}
+#scaler .handle {
+  padding: min(0.5vw, 2px);
+  color: var(--text-dark);
+  font-size: min(2.75vw, 12px);
+  background: var(--button);
+  border-radius: var(--border-radius);
+  box-shadow: 0 0 min(2vw, 8px) min(0.25vw, 1px) var(--box-shadow-color);
+  visibility: hidden;
+  opacity: 0;
+  z-index: 1;
+  transform: scale(0) rotate(var(--rotate));
+  transform-origin: center center;
+  transition: var(--transition-fast);
+  transition-property: color, background, visibility, opacity, transform;
+}
+#scaler.active > .handle, #scaler:hover > .handle {
+  color: var(--text-hover);
+  background: var(--button-hover);
+  visibility: visible;
+  opacity: 1;
+  transform: scale(1) rotate(var(--rotate));
+}
+#preview {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  background: var(--container-light);
+  border: none;
+  transition: var(--transition-slow);
+}
+#preview.text, #preview.code {
+  --size: 0;
+  visibility: hidden;
+  opacity: 0;
+}
+#preview.split {
+  --size: calc(50% - 8px);
+}
+#preview.preview {
+  --size: 100%;
+}
+.card {
+  display: flex;
+  flex-direction: column;
+  color: var(--text-dark);
+  background: var(--container-dark);
+  box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow-color);
+  white-space: nowrap;
+  visibility: hidden;
+  pointer-events: none;
+  transition: var(--transition-medium);
+  transition-property: max-height, visibility, opacity, transform;
+}
+.card.widget, .card.editing, .card.modal {
+  opacity: 0;
+}
+.card.widget, .card.editing, .card.notification {
+  padding: min(2vw, 10px);
+  position: absolute;
+  right: 0;
+  max-height: calc(100% - min(3vw, 20px));
+  border-radius: var(--border-radius);
+  overflow-y: auto;
+}
+.card.widget, .card.notification {
+  min-width: min(50vw, 250px);
+}
+.card.widget, .card.editing {
+  margin: min(2vw, 10px);
+  transform: scaleY(0);
+  transform-origin: top center;
+}
+.card.editing {
+  flex-direction: row;
+  border-radius: calc(var(--border-radius) * 2);
+}
+.card.notification {
+  margin: min(4vw, 20px);
+  bottom: 0;
+  z-index: 2;
+  transform: translateX(calc(100% + min(8vw, 40px)));
+}
+.card.modal {
+  padding: min(2.6vw, 16px);
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  min-width: min(35vw, 225px);
+  z-index: 1;
+  border-radius: calc(var(--border-radius) * 2);
+  transform-origin: center center;
+  transform: translate(-50%,-50%) scale(0);
+}
+.card.modal.scale {
+  padding: min(6vh, 2vw);
+  border-radius: calc(var(--border-radius) + min(3vh, 1vw));
+  z-index: 2;
+  transform: translate(-50%,50vh) scale(1);
+}
+#cardBackground {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--card-background);
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  transition: var(--transition-medium);
+  transition-property: visibility, opacity;
+}
+.card.active, #cardBackground.active {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: all;
+}
+.card.widget.active, .card.editing.active {
+  transform: scaleY(1);
+}
+.card.notification.active {
+  animation: notification var(--transition-medium) ease var(--transition-medium);
+  transform: translateX(0);
+}
+@keyframes notification {
+  50% {
+    transform: scale(1.1);
   }
-  #userInput.vertical, #preview.vertical {
-    width: var(--size);
-    height: 100%;
-  }
-  #userInput.drag {
-    border-color: var(--textarea-drag-border);
-    transition: var(--transition-medium);
-  }
-  #userInput.text.drag {
-    --color: var(--textarea-drag-light-color);
-    background: var(--textarea-drag-light-background);
-  }
-  #userInput.code.drag, #userInput.split.drag, #userInput.preview.drag {
-    --color: var(--textarea-drag-dark-color);
-    background: var(--textarea-drag-dark-background);
-  }
-  #scaler {
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: var(--button);
-    box-shadow: 0 -1px 8px var(--box-shadow-color);
-    transition: var(--transition-slow), background var(--transition-fast);
-  }
-  #scaler.active, #scaler:hover {
-    background: var(--button-hover);
-    transition: background var(--transition-fast);
-  }
-  #scaler.text, #scaler.code {
-    --axis: 0;
-    --size: 0;
-    visibility: hidden;
-    opacity: 0;
-  }
-  #scaler.split {
-    --axis: calc(50% - 8px);
-    --size: 16px;
-  }
-  #scaler.preview {
-    --axis: 100%;
-    --size: 0;
-    visibility: hidden;
-    opacity: 0;
-  }
-  #scaler.horizontal {
-    bottom: var(--axis);
-    width: 100%;
-    height: var(--size);
-    cursor: row-resize;
-    --rotate: 0deg;
-  }
-  #scaler.vertical {
-    right: var(--axis);
-    width: var(--size);
-    height: 100%;
-    cursor: col-resize;
-    --rotate: 90deg;
-  }
-  #scaler .handle {
-    padding: min(0.5vw, 2px);
-    color: var(--text-dark);
-    font-size: min(2.75vw, 12px);
-    background: var(--button);
-    border-radius: var(--border-radius);
-    box-shadow: 0 0 min(2vw, 8px) min(0.25vw, 1px) var(--box-shadow-color);
-    visibility: hidden;
-    opacity: 0;
-    z-index: 1;
-    transform: scale(0) rotate(var(--rotate));
-    transform-origin: center center;
-    transition: var(--transition-fast);
-    transition-property: color, background, visibility, opacity, transform;
-  }
-  #scaler.active > .handle, #scaler:hover > .handle {
-    color: var(--text-hover);
-    background: var(--button-hover);
-    visibility: visible;
-    opacity: 1;
-    transform: scale(1) rotate(var(--rotate));
-  }
-  #preview {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    background: var(--container-light);
-    border: none;
-    transition: var(--transition-slow);
-  }
-  #preview.text, #preview.code {
-    --size: 0;
-    visibility: hidden;
-    opacity: 0;
-  }
-  #preview.split {
-    --size: calc(50% - 8px);
-  }
-  #preview.preview {
-    --size: 100%;
-  }
-  .card {
-    display: flex;
-    flex-direction: column;
-    color: var(--text-dark);
-    background: var(--container-dark);
-    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow-color);
-    white-space: nowrap;
-    visibility: hidden;
-    pointer-events: none;
-    transition: var(--transition-medium);
-    transition-property: max-height, visibility, opacity, transform;
-  }
-  .card.widget, .card.editing, .card.modal {
-    opacity: 0;
-  }
-  .card.widget, .card.editing, .card.notification {
-    padding: min(2vw, 10px);
-    position: absolute;
-    right: 0;
-    max-height: calc(100% - min(3vw, 20px));
-    border-radius: var(--border-radius);
-    overflow-y: auto;
-  }
-  .card.widget, .card.notification {
-    min-width: min(50vw, 250px);
-  }
-  .card.widget, .card.editing {
-    margin: min(2vw, 10px);
-    transform: scaleY(0);
-    transform-origin: top center;
-  }
-  .card.editing {
-    flex-direction: row;
-    border-radius: calc(var(--border-radius) * 2);
-  }
-  .card.notification {
-    margin: min(4vw, 20px);
-    bottom: 0;
-    z-index: 2;
-    transform: translateX(calc(100% + min(8vw, 40px)));
-  }
-  .card.modal {
-    padding: min(2.6vw, 16px);
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    min-width: min(35vw, 225px);
-    z-index: 1;
-    border-radius: calc(var(--border-radius) * 2);
-    transform-origin: center center;
-    transform: translate(-50%,-50%) scale(0);
-  }
-  .card.modal.scale {
-    padding: min(6vh, 2vw);
-    border-radius: calc(var(--border-radius) + min(3vh, 1vw));
-    z-index: 2;
-    transform: translate(-50%,50vh) scale(1);
-  }
-  #cardBackground {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--card-background);
-    visibility: hidden;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 1;
-    transition: var(--transition-medium);
-    transition-property: visibility, opacity;
-  }
-  .card.active, #cardBackground.active {
-    visibility: visible;
-    opacity: 1;
-    pointer-events: all;
-  }
-  .card.widget.active, .card.editing.active {
-    transform: scaleY(1);
-  }
-  .card.notification.active {
-    animation: notification var(--transition-medium) ease var(--transition-medium);
-    transform: translateX(0);
-  }
-  @keyframes notification {
-    50% {
-      transform: scale(1.1);
-    }
-  }
-  .card.modal.active {
-    transform: translate(-50%,-50%) scale(1);
-  }
+}
+.card.modal.active {
+  transform: translate(-50%,-50%) scale(1);
+}
 
 
 /* vvvvvvvvvv Editing Tool Stuffs vvvvvvvvvv */
 
 
-  .card.editing > * {
-    margin: 0 min(0.75vw, 6px);
-  }
-  .card.editing > :first-child {
-    margin-left: 0;
-  }
-  .card.editing > :last-child {
-    margin-right: 0;
-  }
-  .card.editing button {
-    width: min(5vw, 28px);
-    height: min(6vw, 32px);
-    min-width: unset;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .card.editing button svg {
-    width: min(2.25vw, 12px);
-    height: min(2.25vw, 12px);
-    fill: var(--text-dark);
-    transition: fill var(--transition-fast);
-  }
-  .card.editing button:hover > svg, .card.editing button:focus > svg {
-    fill: var(--text-hover);
-  }
-  .card.editing.active ~ .card.widget {
-    max-height: calc(100% - min(3vw, 20px) - min(19vw, 62px));
-    transform: translateY(min(19vw, 62px)) scaleY(0);
-  }
-  .card.editing.active ~ .card.widget.active {
-    transform: translateY(min(19vw, 62px)) scaleY(1);
-  }
+.card.editing > * {
+  margin: 0 min(0.75vw, 6px);
+}
+.card.editing > :first-child {
+  margin-left: 0;
+}
+.card.editing > :last-child {
+  margin-right: 0;
+}
+.card.editing button {
+  width: min(5vw, 28px);
+  height: min(6vw, 32px);
+  min-width: unset;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.card.editing button svg {
+  width: min(2.25vw, 12px);
+  height: min(2.25vw, 12px);
+  fill: var(--text-dark);
+  transition: fill var(--transition-fast);
+}
+.card.editing button:hover > svg, .card.editing button:focus > svg {
+  fill: var(--text-hover);
+}
+.card.editing.active ~ .card.widget {
+  max-height: calc(100% - min(3vw, 20px) - min(19vw, 62px));
+  transform: translateY(min(19vw, 62px)) scaleY(0);
+}
+.card.editing.active ~ .card.widget.active {
+  transform: translateY(min(19vw, 62px)) scaleY(1);
+}
 
 
 /* ^^^^^^^^^^^^ Editing Tool Stuffs ^^^^^^^^^^^^ */
 
 
-  .card .header {
-    position: relative;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .card.widget .header, .card.notification .header {
-    margin-bottom: min(1.5vw, 10px);
-  }
-  .card.modal .header {
-    margin-bottom: min(3vw, 16px);
-  }
-  .card.modal.scale .header {
-    margin-bottom: min(5.25vh, 1.75vw);
-  }
-  .card.widget .header section, .card.notification .header section {
-    font-size: min(3vw, 16px);
-  }
-  .card.modal .header section {
-    font-size: min(5vw, 24px);
-  }
-  .card.modal.scale .header section {
-    color: var(--text-light);
-    font-size: min(9vh, 3vw);
-  }
-  .card .header .pencil {
-    margin-right: min(3vw, 10px);
-    width: min(5vw, 24px);
-    height: min(5vw, 24px);
-  }
-  .card.modal.scale .header .pencil {
-    margin-right: min(3vh, 1vw);
-    width: min(15vh, 5vw);
-    height: min(15vh, 5vw);
-  }
-  .card.widget .closeButton, .card.notification .closeButton {
-    width: min(3.5vw, 15px);
-    height: min(3.5vw, 15px);
-  }
-  .card.modal .closeButton {
-    width: min(4.25vw, 21px);
-    height: min(4.25vw, 21px);
-  }
-  .card .content {
-    width: 100%;
-    display: flex;
-    justify-content: space-around;
-  }
-  .card.widget .content {
-    min-height: 40px;
-    overflow-y: auto;
-  }
-  .card.modal .content .section {
-    margin-bottom: min(1vw, 4px);
-    font-size: min(3.25vw, 18px);
-  }
-  .card.modal .content span {
-    font-size: min(2vw, 14.5px);
-  }
-  .card.modal.scale .content span {
-    font-size: min(4.5vh, 1.5vw);
-  }
-  .card .content .item {
-    margin: auto 0;
-    margin-right: min(1.5vw, 10px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: var(--text-dark);
-    font-size: min(3vw, 14.5px);
-  }
-  .card .content .item:last-child {
-    margin-right: 0;
-  }
-  .card .content .item.list {
-    align-items: flex-start;
-  }
-  .card .content .item.list > * {
-    margin-bottom: 10px;
-  }
-  .card .content .item.list > :last-child {
-    margin-bottom: 0;
-  }
-  .card .content .item.expand {
-    width: 100%;
-  }
-  .card textarea, .card [type="text"] {
-    padding: 4px;
-    --color: var(--text-light);
-    background: var(--textarea-medium);
-    border-radius: var(--border-radius);
-    box-shadow: 0 2px 4px var(--box-shadow-color) inset;
-  }
-  .card textarea {
-    margin-bottom: min(1.5vw, 10px);
-    width: 100%;
-    max-width: 50vw;
-    height: min(25vw, 75px);
-    max-height: min(25vw, 25vh);
-  }
-  .card textarea.expand {
-    height: 150px;
-  }
-  .card textarea:last-child {
-    margin-bottom: 0;
-  }
-  #colorPreview {
-    margin-bottom: min(1.5vw, 10px);
-    min-width: min(20vw, 86px);
-    min-height: min(20vw, 86px);
-    border-radius: var(--border-radius);
-    box-shadow: 0 2px 4px var(--box-shadow-color) inset;
-  }
-  #colorInput {
-    width: min(20vw, 86px);
-  }
-  .card .toolbar {
-    display: flex;
-    justify-content: center;
-  }
-  .card.widget .toolbar, .card.notification .toolbar {
-    margin-top: min(2vw, 10px);
-  }
-  .card.modal .toolbar {
-    margin-top: min(3vw, 16px);
-  }
-  .card .toolbar > * {
-    margin: 0 min(0.75vw, 6px);
-  }
-  .card .toolbar > :first-child {
-    margin-left: 0;
-  }
-  .card .toolbar > :last-child {
-    margin-right: 0;
-  }
-  .dropdown ul {
-    position: absolute;
-    min-width: min(35vw, 155px);
-    background: var(--container-medium);
-    border-radius: var(--border-radius);
-    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow-color);
-    z-index: 1;
-    visibility: hidden;
-    opacity: 0;
-    pointer-events: none;
-    list-style: none;
+.card .header {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.card.widget .header, .card.notification .header {
+  margin-bottom: min(1.5vw, 10px);
+}
+.card.modal .header {
+  margin-bottom: min(3vw, 16px);
+}
+.card.modal.scale .header {
+  margin-bottom: min(5.25vh, 1.75vw);
+}
+.card.widget .header section, .card.notification .header section {
+  font-size: min(3vw, 16px);
+}
+.card.modal .header section {
+  font-size: min(5vw, 24px);
+}
+.card.modal.scale .header section {
+  color: var(--text-light);
+  font-size: min(9vh, 3vw);
+}
+.card .header .pencil {
+  margin-right: min(3vw, 10px);
+  width: min(5vw, 24px);
+  height: min(5vw, 24px);
+}
+.card.modal.scale .header .pencil {
+  margin-right: min(3vh, 1vw);
+  width: min(15vh, 5vw);
+  height: min(15vh, 5vw);
+}
+.card.widget .closeButton, .card.notification .closeButton {
+  width: min(3.5vw, 15px);
+  height: min(3.5vw, 15px);
+}
+.card.modal .closeButton {
+  width: min(4.25vw, 21px);
+  height: min(4.25vw, 21px);
+}
+.card .content {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+}
+.card.widget .content {
+  min-height: 40px;
+  overflow-y: auto;
+}
+.card.modal .content .section {
+  margin-bottom: min(1vw, 4px);
+  font-size: min(3.25vw, 18px);
+}
+.card.modal .content span {
+  font-size: min(2vw, 14.5px);
+}
+.card.modal.scale .content span {
+  font-size: min(4.5vh, 1.5vw);
+}
+.card .content .item {
+  margin: auto 0;
+  margin-right: min(1.5vw, 10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--text-dark);
+  font-size: min(3vw, 14.5px);
+}
+.card .content .item:last-child {
+  margin-right: 0;
+}
+.card .content .item.list {
+  align-items: flex-start;
+}
+.card .content .item.list > * {
+  margin-bottom: 10px;
+}
+.card .content .item.list > :last-child {
+  margin-bottom: 0;
+}
+.card .content .item.expand {
+  width: 100%;
+}
+.card textarea, .card [type="text"] {
+  padding: 4px;
+  --color: var(--text-light);
+  background: var(--textarea-medium);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 4px var(--box-shadow-color) inset;
+}
+.card textarea {
+  margin-bottom: min(1.5vw, 10px);
+  width: 100%;
+  max-width: 50vw;
+  height: min(25vw, 75px);
+  max-height: min(25vw, 25vh);
+}
+.card textarea.expand {
+  height: 150px;
+}
+.card textarea:last-child {
+  margin-bottom: 0;
+}
+#colorPreview {
+  margin-bottom: min(1.5vw, 10px);
+  min-width: min(20vw, 86px);
+  min-height: min(20vw, 86px);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 4px var(--box-shadow-color) inset;
+}
+#colorInput {
+  width: min(20vw, 86px);
+}
+.card .toolbar {
+  display: flex;
+  justify-content: center;
+}
+.card.widget .toolbar, .card.notification .toolbar {
+  margin-top: min(2vw, 10px);
+}
+.card.modal .toolbar {
+  margin-top: min(3vw, 16px);
+}
+.card .toolbar > * {
+  margin: 0 min(0.75vw, 6px);
+}
+.card .toolbar > :first-child {
+  margin-left: 0;
+}
+.card .toolbar > :last-child {
+  margin-right: 0;
+}
+.dropdown ul {
+  position: absolute;
+  min-width: min(35vw, 155px);
+  background: var(--container-medium);
+  border-radius: var(--border-radius);
+  box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow-color);
+  z-index: 1;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  list-style: none;
+  transform: scaleY(0);
+  transform-origin: top center;
+  transition: var(--transition-fast);
+  transition-property: visibility, opacity, transform;
+}
+.dropdown li {
+  padding: min(1.75vw, 8px);
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-medium);
+  font-size: min(2.75vw, 12.5px);
+  border-radius: var(--border-radius);
+  box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
+  --focus-border: transparent;
+  outline: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  transition-property: color, background;
+}
+.dropdown li span {
+  margin-left: min(4vw, 16px);
+  color: var(--text-info);
+  font-size: min(2.5vw, 11px);
+}
+.dropdown li svg {
+  width: min(2.75vw, 12px);
+  height: min(2.75vw, 12px);
+  fill: var(--text-info);
+  transition: var(--transition-fast);
+  transition-property: fill transform;
+}
+.dropdown li [type="file"], .dropdown li a {
+  display: none;
+}
+.dropdown li:hover, .dropdown li:focus, .dropdown li:focus-within {
+  color: var(--text-hover);
+  background: var(--container-medium-hover);
+}
+.dropdown li:focus {
+  --focus-border: var(--outline);
+}
+.dropdown li:hover > svg, .dropdown li:focus > svg, .dropdown li:focus-within > svg {
+  fill: var(--text-hover);
+}
+.dropdown ul ul {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  transform: scale(0);
+  transform-origin: left top;
+}
+@media (max-width: 550px), (max-height: 475px){
+  .dropdown ul ul {
+    min-width: 100%;
+    max-height: min(24vh, 60px);
+    left: 0;
+    top: 100%;
     transform: scaleY(0);
     transform-origin: top center;
-    transition: var(--transition-fast);
-    transition-property: visibility, opacity, transform;
-  }
-  .dropdown li {
-    padding: min(1.75vw, 8px);
-    position: relative;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--text-medium);
-    font-size: min(2.75vw, 12.5px);
-    border-radius: var(--border-radius);
-    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
-    --focus-border: transparent;
-    outline: none;
-    white-space: nowrap;
-    cursor: pointer;
-    transition: var(--transition-fast);
-    transition-property: color, background;
-  }
-  .dropdown li span {
-    margin-left: min(4vw, 16px);
-    color: var(--text-info);
-    font-size: min(2.5vw, 11px);
+    overflow-y: auto;
   }
   .dropdown li svg {
-    width: min(2.75vw, 12px);
-    height: min(2.75vw, 12px);
-    fill: var(--text-info);
-    transition: var(--transition-fast);
-    transition-property: fill transform;
+    transform: rotate(90deg);
   }
-  .dropdown li [type="file"], .dropdown li a {
-    display: none;
-  }
-  .dropdown li:hover, .dropdown li:focus, .dropdown li:focus-within {
-    color: var(--text-hover);
-    background: var(--container-medium-hover);
-  }
-  .dropdown li:focus {
-    --focus-border: var(--outline);
-  }
-  .dropdown li:hover > svg, .dropdown li:focus > svg, .dropdown li:focus-within > svg {
-    fill: var(--text-hover);
+}
+@media (max-height: 300px){
+  .dropdown ul {
+    max-height: 55vh;
+    overflow-y: auto;
   }
   .dropdown ul ul {
-    position: absolute;
-    left: 100%;
-    top: 0;
-    transform: scale(0);
-    transform-origin: left top;
+    max-height: unset;
+    overflow-y: unset;
   }
-  @media (max-width: 550px), (max-height: 475px){
-    .dropdown ul ul {
-      min-width: 100%;
-      max-height: min(24vh, 60px);
-      left: 0;
-      top: 100%;
-      transform: scaleY(0);
-      transform-origin: top center;
-      overflow-y: auto;
-    }
-    .dropdown li svg {
-      transform: rotate(90deg);
-    }
-  }
-  @media (max-height: 300px){
-    .dropdown ul {
-      max-height: 55vh;
-      overflow-y: auto;
-    }
-    .dropdown ul ul {
-      max-height: unset;
-      overflow-y: unset;
-    }
-  }
-  .dropdown.active:focus-within > ul, .dropdown li:focus-within > ul {
-    visibility: visible;
-    opacity: 1;
-    pointer-events: all;
-    transform: scale(1);
-  }
-  .select {
-    padding: min(0.75vw, 3px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .select .dropdown {
-    margin-left: min(1vw, 4px);
-  }
-  .checkbox {
-    padding: min(0.75vw, 3px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: var(--border-radius);
-    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
-    --focus-border: transparent;
-    outline: none;
-  }
-  .checkbox:focus {
-    --focus-border: var(--outline);
-  }
-  .checkbox [type="checkbox"] {
-    display: none;
-  }
-  .checkbox label {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: var(--text-medium);
-    font-size: min(2vw, 14.5px);
-    cursor: pointer;
-    transition: color var(--transition-fast);
-  }
-  .checkbox label svg {
-    margin-right: min(4px, 4px);
-    padding: min(0.25vw, 1px);
-    width: min(2.5vw, 18px);
-    height: min(2.5vw, 18px);
-    fill: transparent;
-    background: var(--container-medium);
-    border: min(0.25vw, 2px) solid var(--text-dark);
-    border-radius: var(--border-radius);
-    box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow-color);
-  }
-  .checkbox [type="checkbox"]:hover + label, .checkbox:focus label {
-    color: var(--text-hover);
-  }
-  .checkbox [type="checkbox"]:hover + label svg, .checkbox:focus [type="checkbox"] + label svg {
-    background: var(--container-medium-hover);
-    fill: transparent;
-    border-color: var(--text-hover);
-  }
-  .checkbox [type="checkbox"]:checked + label svg {
-    fill: var(--text-medium);
-  }
-  .checkbox [type="checkbox"]:checked:hover + label svg, .checkbox:focus [type="checkbox"]:checked + label svg {
-    fill: var(--text-hover);
-  }
-  .divider {
-    width: 100%;
-    height: min(0.5vw, 2px);
-    background: var(--text-dark);
-    border-radius: var(--border-radius);
-  }
+}
+.dropdown.active:focus-within > ul, .dropdown li:focus-within > ul {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: all;
+  transform: scale(1);
+}
+.select {
+  padding: min(0.75vw, 3px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.select .dropdown {
+  margin-left: min(1vw, 4px);
+}
+.checkbox {
+  padding: min(0.75vw, 3px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: var(--border-radius);
+  box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
+  --focus-border: transparent;
+  outline: none;
+}
+.checkbox:focus {
+  --focus-border: var(--outline);
+}
+.checkbox [type="checkbox"] {
+  display: none;
+}
+.checkbox label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text-medium);
+  font-size: min(2vw, 14.5px);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+.checkbox label svg {
+  margin-right: min(4px, 4px);
+  padding: min(0.25vw, 1px);
+  width: min(2.5vw, 18px);
+  height: min(2.5vw, 18px);
+  fill: transparent;
+  background: var(--container-medium);
+  border: min(0.25vw, 2px) solid var(--text-dark);
+  border-radius: var(--border-radius);
+  box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow-color);
+}
+.checkbox [type="checkbox"]:hover + label, .checkbox:focus label {
+  color: var(--text-hover);
+}
+.checkbox [type="checkbox"]:hover + label svg, .checkbox:focus [type="checkbox"] + label svg {
+  background: var(--container-medium-hover);
+  fill: transparent;
+  border-color: var(--text-hover);
+}
+.checkbox [type="checkbox"]:checked + label svg {
+  fill: var(--text-medium);
+}
+.checkbox [type="checkbox"]:checked:hover + label svg, .checkbox:focus [type="checkbox"]:checked + label svg {
+  fill: var(--text-hover);
+}
+.divider {
+  width: 100%;
+  height: min(0.5vw, 2px);
+  background: var(--text-dark);
+  border-radius: var(--border-radius);
+}
