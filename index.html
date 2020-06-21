@@ -16,9 +16,986 @@
 <link rel="mask-icon" href="resources/icon-mask-icon.svg" color="#ee8800">
 <link href="https://fonts.googleapis.com/css2?family=Cousine&family=Rubik&display=swap" rel="stylesheet">
 
-<script src="initialize.js"></script>
+<script>
+  var windowParent, removeTransitions = "--transition-slow: 0s; --transition-medium: 0s; --transition-fast: 0s";
+  if (window == window.parent){
+    windowParent = true;
+  } else {
+    windowParent = false;
+    console.clear();
+  }
+  if (windowParent){
+    document.documentElement.style = removeTransitions;
+    document.documentElement.classList.add("fade");
+  }
+</script>
 
-<link rel="stylesheet" href="styles.css">
+<style>
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--font-family-sans-serif);
+  }
+  html {
+    --body: #111111;
+    --font-family-sans-serif: "Rubik", sans-serif;
+    --font-family-monospace: "Cousine", monospace;
+  
+    --container-dark: #171717;
+    --container-medium: #1c1c1c;
+    --container-medium-hover: #2c2c2c;
+    --container-light: #ffffff;
+  
+    --button: #3a3a3a;
+    --button-hover: #4a4a4a;
+    --button-disabled: #2a2a2a;
+  
+    --range-thumb: var(--button);
+    --range-thumb-hover: var(--button-hover);
+    --range-track: var(--container-medium);
+    --range-track-hover: var(--container-medium-hover);
+  
+    --textarea-dark: #1d1d1d;
+    --textarea-medium: #212121;
+    --textarea-light: #eae2d1;
+    --textarea-drag-dark-color: #7f7fff;
+    --textarea-drag-dark-background: #161656;
+    --textarea-drag-light-color: #000080;
+    --textarea-drag-light-background: #aaaaea;
+    --textarea-drag-border: #0000ff;
+  
+    --card-background: #17171760;
+  
+    --border-radius: min(1.25vw, 5px);
+    --box-shadow-color: #000000bf;
+    --outline: var(--text-medium);
+  
+    --text-super-dark: #000000;
+    --text-dark: #aaaaaa;
+    --text-medium: #cccccc;
+    --text-info: #777777;
+    --text-light: #ffffff;
+    --text-hover: #ffffff;
+    --text-selection-color: var(--text-super-dark);
+    --text-selection-background: #b4d5ffbf;
+  
+    --scrollbar: #7a7a7a;
+    --scrollbar-hover: #9a9a9a;
+  
+    --transition-slow: 0.5s;
+    --transition-medium: 0.25s;
+    --transition-fast: 0.125s;
+  
+    --fade-opacity: 0;
+    --fade-pointer-events: none;
+  }
+  html.fade {
+    --fade-opacity: 1;
+    --fade-pointer-events: all;
+  }
+  body {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--body);
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  body::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: var(--container-medium);
+    opacity: var(--fade-opacity);
+    pointer-events: var(--fade-pointer-events);
+    z-index: 3;
+    transition: opacity 0.25s;
+  }
+  button {
+    padding: min(0.5vw, 2px) min(1vw, 8px);
+    min-width: min(8vw, 75px);
+    color: var(--text-dark);
+    font-size: min(2.5vw, 14.5px);
+    background: var(--button);
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow-color), 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
+    --focus-border: transparent;
+    cursor: pointer;
+    outline: none;
+    transition: var(--transition-fast);
+    transition-property: color, background, opacity;
+  }
+  button::-moz-focus-inner {
+    border: none;
+  }
+  button:hover, button:focus, .dropdown.active:focus-within > button {
+    color: var(--text-hover);
+    background: var(--button-hover);
+  }
+  button:focus {
+    --focus-border: var(--outline);
+  }
+  button:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  textarea, [type="text"] {
+    --color: var(--text-super-dark);
+    color: var(--color);
+    font-size: 13px;
+    border: none;
+    border-radius: 0;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  textarea {
+    font-family: var(--font-family-sans-serif);
+    white-space: pre;
+    word-wrap: normal;
+    resize: none;
+  }
+  a {
+    color: var(--text-dark);
+    font-size: min(2vw, 14.5px);
+    border-radius: calc(var(--border-radius) * 0.5);
+    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
+    --focus-border: transparent;
+    outline: none;
+    transition: var(--transition-fast);
+    transition-property: color;
+  }
+  a:hover, a:focus {
+    color: var(--text-hover);
+  }
+  a:focus {
+    --focus-border: var(--outline);
+  }
+  ::placeholder {
+    color: var(--color);
+    opacity: 0.55;
+    white-space: pre-wrap;
+    transition: color var(--transition-slow);
+  }
+  ::selection {
+    color: var(--text-selection-color);
+    background: var(--text-selection-background);
+  }
+  [type="range"] {
+    margin-bottom: min(1vw, 4px);
+    width: min(25vw, 130px);
+    height: min(5vw, 20px);
+    background: none;
+    cursor: pointer;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  [type="range"]:last-child {
+    margin-bottom: 0;
+  }
+  ::-webkit-slider-thumb {
+    margin-top: calc(min(1.75vw, 7px) * -1);
+    width: min(2.75vw, 12px);
+    height: min(5vw, 20px);
+    background: var(--range-thumb);
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
+    transition: background var(--transition-fast);
+    -webkit-appearance: none;
+  }
+  ::-moz-range-thumb {
+    margin-top: calc(min(1.75vw, 7px) * -1);
+    width: min(2.75vw, 12px);
+    height: min(5vw, 20px);
+    background: var(--range-thumb);
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
+    transition: background var(--transition-fast);
+  }
+  :hover::-webkit-slider-thumb, :focus::-webkit-slider-thumb {
+    background: var(--range-thumb-hover);
+  }
+  :hover::-moz-range-thumb, :focus::-moz-range-thumb {
+    background: var(--range-thumb-hover);
+  }
+  ::-webkit-slider-runnable-track {
+    height: min(1.5vw, 6px);
+    background: var(--range-track);
+    border-radius: var(--border-radius);
+    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
+    transition: background var(--transition-fast);
+  }
+  ::-moz-range-track {
+    height: min(1.5vw, 6px);
+    background: var(--range-track);
+    border-radius: var(--border-radius);
+    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
+    transition: background var(--transition-fast);
+  }
+  :hover::-webkit-slider-runnable-track, :focus::-webkit-slider-runnable-track {
+    background: var(--range-track-hover);
+  }
+  :hover::-moz-range-track, :focus::-moz-range-track {
+    background: var(--range-track-hover);
+  }
+  svg.button {
+    fill: var(--text-dark);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    transition-property: fill, background, border-color;
+  }
+  svg.button:hover, svg.button:focus {
+    fill: var(--text-hover);
+  }
+  svg.button.closeButton {
+    padding: min(0.5vw, 2px);
+    position: absolute;
+    right: 0;
+    border-radius: var(--border-radius);
+    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
+    --focus-border: transparent;
+    outline: none;
+  }
+  svg.button.closeButton:focus {
+    --focus-border: var(--outline);
+  }
+  
+  /* Easter egg: Typing 'tooltip' sounds like the Mario Bros theme! */
+  
+  [data-tooltip] {
+    position: relative;
+  }
+  [data-tooltip]::before, [data-tooltip]::after {
+    position: absolute;
+    display: flex;
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(var(--scale));
+    --scale: 0;
+    transition: var(--transition-fast);
+    transition-property: opacity transform;
+  }
+  [data-tooltip]::before {
+    content: attr(data-tooltip);
+    padding: min(2vw, 8px);
+    bottom: calc(100% + min(3vw, 12px));
+    color: var(--text-hover);
+    font-size: min(2.75vw, 12px);
+    background: var(--container-medium-hover);
+    border-radius: calc(var(--border-radius) * 2);
+    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow-color);
+  }
+  [data-tooltip]::after {
+    content: "";
+    top: calc(min(3vw, 12px) * -1);
+    border: min(3vw, 12px) solid transparent;
+    border-top-color: var(--container-medium-hover);
+    filter: drop-shadow(0 min(0.5vw, 2px) min(0.25vw, 1px) var(--box-shadow-color));
+    transform-origin: top center;
+  }
+  [data-tooltip]:hover::before, [data-tooltip]:hover::after, [data-tooltip]:focus::before, [data-tooltip]:focus::after {
+    opacity: 1;
+    --scale: 1;
+    transition-delay: var(--transition-slow);
+  }
+  ::-webkit-scrollbar {
+    width: min(3vw, 12px);
+    height: min(3vw, 12px);
+  }
+  ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner {
+    background: none;
+  }
+  ::-webkit-scrollbar-thumb {
+    width: min(9vw, 36px);
+    height: min(9vw, 36px);
+    background-clip: content-box;
+    background-color: var(--scrollbar);
+    border: min(0.5vw, 2px) solid transparent;
+    border-radius: calc(var(--border-radius) * 2);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-hover);
+  }
+  #symbols {
+    position: absolute;
+    pointer-events: none;
+  }
+  #header {
+    padding: min(1.5vw, 10px);
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--container-dark);
+    z-index: 1;
+    transition: box-shadow var(--transition-slow);
+  }
+  #header.text, #header.code, #header.split {
+    box-shadow: 0 1px 8px var(--box-shadow-color);
+  }
+  #header.split.vertical {
+    box-shadow: -50vw 1px 8px var(--box-shadow-color);
+  }
+  #header.preview.horizontal {
+    box-shadow: none;
+  }
+  #header.preview.vertical {
+    box-shadow: -100vw 1px 8px transparent;
+  }
+  #header.resize, #userInput.resize, #preview.resize {
+    pointer-events: none;
+    transition: none;
+  }
+  #header .toolbar {
+    display: flex;
+    align-items: center;
+  }
+  #header .toolbar > * {
+    margin: 0 min(0.75vw, 6px);
+  }
+  #header .toolbar > :first-child {
+    margin-left: 0;
+  }
+  #header .toolbar > :last-child {
+    margin-right: 0;
+  }
+  #header .title {
+    position: absolute;
+    left: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translateX(-50%);
+    transition: transform var(--transition-slow);
+  }
+  #header .title img {
+    width: min(5vw, 24px);
+    height: min(5vw, 24px);
+    flex-shrink: 0;
+  }
+  #header .title section {
+    margin-left: 5px;
+    color: var(--text-dark);
+    font-size: min(4vw, 16px);
+    white-space: nowrap;
+    transform-origin: left center;
+    transition: var(--transition-slow);
+    transition-property: margin-left, visibility, opacity, transform;
+  }
+  @media (max-width: 900px){
+    #header .title {
+      transform: translateX(calc(min(2.75vw, 12px) * -1));
+    }
+    #header .title section {
+      margin-left: 0;
+      visibility: hidden;
+      opacity: 0;
+      transform: scaleX(0);
+    }
+  }
+  #header .attribution {
+    max-width: 35%;
+    display: flex;
+    text-align: right;
+  }
+  #header .attribution span {
+    color: var(--text-dark);
+    font-size: min(2vw, 14.5px);
+  }
+  #main {
+    position: relative;
+    flex: 1;
+  }
+  #main.code textarea, #main.code [type="text"], #main.split textarea, #main.split [type="text"], #main.preview textarea, #main.preview [type="text"] {
+    font-family: var(--font-family-monospace);
+  }
+  #main.horizontal.resize {
+    cursor: row-resize;
+  }
+  #main.vertical.resize {
+    cursor: col-resize;
+  }
+  #userInput {
+    position: absolute;
+    left: 0;
+    top: 0;
+    border: 4px solid;
+    transition: var(--transition-slow);
+  }
+  #userInput.text {
+    --size: 100%;
+    --color: var(--text-super-dark);
+    background: var(--textarea-light);
+    border-color: var(--textarea-light);
+    white-space: pre-wrap;
+  }
+  #userInput.code, #userInput.split, #userInput.preview {
+    --color: var(--text-light);
+    background: var(--textarea-dark);
+    border-color: var(--textarea-dark);
+  }
+  #userInput.code {
+    --size: 100%;
+  }
+  #userInput.split {
+    --size: calc(50% - 8px);
+  }
+  #userInput.preview {
+    --size: 0;
+    visibility: hidden;
+    opacity: 0;
+  }
+  #userInput.horizontal, #preview.horizontal {
+    width: 100%;
+    height: var(--size);
+  }
+  #userInput.vertical, #preview.vertical {
+    width: var(--size);
+    height: 100%;
+  }
+  #userInput.drag {
+    border-color: var(--textarea-drag-border);
+    transition: var(--transition-medium);
+  }
+  #userInput.text.drag {
+    --color: var(--textarea-drag-light-color);
+    background: var(--textarea-drag-light-background);
+  }
+  #userInput.code.drag, #userInput.split.drag, #userInput.preview.drag {
+    --color: var(--textarea-drag-dark-color);
+    background: var(--textarea-drag-dark-background);
+  }
+  #scaler {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--button);
+    box-shadow: 0 -1px 8px var(--box-shadow-color);
+    transition: var(--transition-slow), background var(--transition-fast);
+  }
+  #scaler.active, #scaler:hover {
+    background: var(--button-hover);
+    transition: background var(--transition-fast);
+  }
+  #scaler.text, #scaler.code {
+    --axis: 0;
+    --size: 0;
+    visibility: hidden;
+    opacity: 0;
+  }
+  #scaler.split {
+    --axis: calc(50% - 8px);
+    --size: 16px;
+  }
+  #scaler.preview {
+    --axis: 100%;
+    --size: 0;
+    visibility: hidden;
+    opacity: 0;
+  }
+  #scaler.horizontal {
+    bottom: var(--axis);
+    width: 100%;
+    height: var(--size);
+    cursor: row-resize;
+    --rotate: 0deg;
+  }
+  #scaler.vertical {
+    right: var(--axis);
+    width: var(--size);
+    height: 100%;
+    cursor: col-resize;
+    --rotate: 90deg;
+  }
+  #scaler .handle {
+    padding: min(0.5vw, 2px);
+    color: var(--text-dark);
+    font-size: min(2.75vw, 12px);
+    background: var(--button);
+    border-radius: var(--border-radius);
+    box-shadow: 0 0 min(2vw, 8px) min(0.25vw, 1px) var(--box-shadow-color);
+    visibility: hidden;
+    opacity: 0;
+    z-index: 1;
+    transform: scale(0) rotate(var(--rotate));
+    transform-origin: center center;
+    transition: var(--transition-fast);
+    transition-property: color, background, visibility, opacity, transform;
+  }
+  #scaler.active > .handle, #scaler:hover > .handle {
+    color: var(--text-hover);
+    background: var(--button-hover);
+    visibility: visible;
+    opacity: 1;
+    transform: scale(1) rotate(var(--rotate));
+  }
+  #preview {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    background: var(--container-light);
+    border: none;
+    transition: var(--transition-slow);
+  }
+  #preview.text, #preview.code {
+    --size: 0;
+    visibility: hidden;
+    opacity: 0;
+  }
+  #preview.split {
+    --size: calc(50% - 8px);
+  }
+  #preview.preview {
+    --size: 100%;
+  }
+  .card {
+    display: flex;
+    flex-direction: column;
+    color: var(--text-dark);
+    background: var(--container-dark);
+    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow-color);
+    white-space: nowrap;
+    visibility: hidden;
+    pointer-events: none;
+    transition: var(--transition-medium);
+    transition-property: max-height, visibility, opacity, transform;
+  }
+  .card.widget, .card.editing, .card.modal {
+    opacity: 0;
+  }
+  .card.widget, .card.editing, .card.notification {
+    padding: min(2vw, 10px);
+    position: absolute;
+    right: 0;
+    max-height: calc(100% - min(3vw, 20px));
+    border-radius: var(--border-radius);
+    overflow-y: auto;
+  }
+  .card.widget, .card.notification {
+    min-width: min(50vw, 250px);
+  }
+  .card.widget, .card.editing {
+    margin: min(2vw, 10px);
+    transform: scaleY(0);
+    transform-origin: top center;
+  }
+  .card.editing {
+    flex-direction: row;
+    border-radius: calc(var(--border-radius) * 2);
+  }
+  .card.notification {
+    margin: min(4vw, 20px);
+    bottom: 0;
+    z-index: 2;
+    transform: translateX(calc(100% + min(8vw, 40px)));
+  }
+  .card.modal {
+    padding: min(2.6vw, 16px);
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    min-width: min(35vw, 225px);
+    z-index: 1;
+    border-radius: calc(var(--border-radius) * 2);
+    transform-origin: center center;
+    transform: translate(-50%,-50%) scale(0);
+  }
+  .card.modal.scale {
+    padding: min(6vh, 2vw);
+    border-radius: calc(var(--border-radius) + min(3vh, 1vw));
+    z-index: 2;
+    transform: translate(-50%,50vh) scale(1);
+  }
+  #cardBackground {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--card-background);
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+    transition: var(--transition-medium);
+    transition-property: visibility, opacity;
+  }
+  .card.active, #cardBackground.active {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: all;
+  }
+  .card.widget.active, .card.editing.active {
+    transform: scaleY(1);
+  }
+  .card.notification.active {
+    animation: notification var(--transition-medium) ease var(--transition-medium);
+    transform: translateX(0);
+  }
+  @keyframes notification {
+    50% {
+      transform: scale(1.1);
+    }
+  }
+  .card.modal.active {
+    transform: translate(-50%,-50%) scale(1);
+  }
+  
+  
+  /* vvvvvvvvvv Editing Tool Stuffs vvvvvvvvvv */
+  
+  
+  .card.editing > * {
+    margin: 0 min(0.75vw, 6px);
+  }
+  .card.editing > :first-child {
+    margin-left: 0;
+  }
+  .card.editing > :last-child {
+    margin-right: 0;
+  }
+  .card.editing button {
+    width: min(5vw, 28px);
+    height: min(6vw, 32px);
+    min-width: unset;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .card.editing button svg {
+    width: min(2.25vw, 12px);
+    height: min(2.25vw, 12px);
+    fill: var(--text-dark);
+    transition: fill var(--transition-fast);
+  }
+  .card.editing button:hover > svg, .card.editing button:focus > svg {
+    fill: var(--text-hover);
+  }
+  .card.editing.active ~ .card.widget {
+    max-height: calc(100% - min(3vw, 20px) - min(19vw, 62px));
+    transform: translateY(min(19vw, 62px)) scaleY(0);
+  }
+  .card.editing.active ~ .card.widget.active {
+    transform: translateY(min(19vw, 62px)) scaleY(1);
+  }
+  
+  
+  /* ^^^^^^^^^^^^ Editing Tool Stuffs ^^^^^^^^^^^^ */
+  
+  
+  .card .header {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .card.widget .header, .card.notification .header {
+    margin-bottom: min(1.5vw, 10px);
+  }
+  .card.modal .header {
+    margin-bottom: min(3vw, 16px);
+  }
+  .card.modal.scale .header {
+    margin-bottom: min(5.25vh, 1.75vw);
+  }
+  .card.widget .header section, .card.notification .header section {
+    font-size: min(3vw, 16px);
+  }
+  .card.modal .header section {
+    font-size: min(5vw, 24px);
+  }
+  .card.modal.scale .header section {
+    color: var(--text-light);
+    font-size: min(9vh, 3vw);
+  }
+  .card .header .pencil {
+    margin-right: min(3vw, 10px);
+    width: min(5vw, 24px);
+    height: min(5vw, 24px);
+  }
+  .card.modal.scale .header .pencil {
+    margin-right: min(3vh, 1vw);
+    width: min(15vh, 5vw);
+    height: min(15vh, 5vw);
+  }
+  .card.widget .closeButton, .card.notification .closeButton {
+    width: min(3.5vw, 15px);
+    height: min(3.5vw, 15px);
+  }
+  .card.modal .closeButton {
+    width: min(4.25vw, 21px);
+    height: min(4.25vw, 21px);
+  }
+  .card .content {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+  }
+  .card.widget .content {
+    min-height: 40px;
+    overflow-y: auto;
+  }
+  .card.modal .content .section {
+    margin-bottom: min(1vw, 4px);
+    font-size: min(3.25vw, 18px);
+  }
+  .card.modal .content span {
+    font-size: min(2vw, 14.5px);
+  }
+  .card.modal.scale .content span {
+    font-size: min(4.5vh, 1.5vw);
+  }
+  .card .content .item {
+    margin: auto 0;
+    margin-right: min(1.5vw, 10px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text-dark);
+    font-size: min(3vw, 14.5px);
+  }
+  .card .content .item:last-child {
+    margin-right: 0;
+  }
+  .card .content .item.list {
+    align-items: flex-start;
+  }
+  .card .content .item.list > * {
+    margin-bottom: 10px;
+  }
+  .card .content .item.list > :last-child {
+    margin-bottom: 0;
+  }
+  .card .content .item.expand {
+    width: 100%;
+  }
+  .card textarea, .card [type="text"] {
+    padding: 4px;
+    --color: var(--text-light);
+    background: var(--textarea-medium);
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 4px var(--box-shadow-color) inset;
+  }
+  .card textarea {
+    margin-bottom: min(1.5vw, 10px);
+    width: 100%;
+    max-width: 50vw;
+    height: min(25vw, 75px);
+    max-height: min(25vw, 25vh);
+  }
+  .card textarea.expand {
+    height: 150px;
+  }
+  .card textarea:last-child {
+    margin-bottom: 0;
+  }
+  #colorPreview {
+    margin-bottom: min(1.5vw, 10px);
+    min-width: min(20vw, 86px);
+    min-height: min(20vw, 86px);
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 4px var(--box-shadow-color) inset;
+  }
+  #colorInput {
+    width: min(20vw, 86px);
+  }
+  .card .toolbar {
+    display: flex;
+    justify-content: center;
+  }
+  .card.widget .toolbar, .card.notification .toolbar {
+    margin-top: min(2vw, 10px);
+  }
+  .card.modal .toolbar {
+    margin-top: min(3vw, 16px);
+  }
+  .card .toolbar > * {
+    margin: 0 min(0.75vw, 6px);
+  }
+  .card .toolbar > :first-child {
+    margin-left: 0;
+  }
+  .card .toolbar > :last-child {
+    margin-right: 0;
+  }
+  .dropdown ul {
+    position: absolute;
+    min-width: min(35vw, 155px);
+    background: var(--container-medium);
+    border-radius: var(--border-radius);
+    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow-color);
+    z-index: 1;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    list-style: none;
+    transform: scaleY(0);
+    transform-origin: top center;
+    transition: var(--transition-fast);
+    transition-property: visibility, opacity, transform;
+  }
+  .dropdown li {
+    padding: min(1.75vw, 8px);
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-medium);
+    font-size: min(2.75vw, 12.5px);
+    border-radius: var(--border-radius);
+    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
+    --focus-border: transparent;
+    outline: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    transition-property: color, background;
+  }
+  .dropdown li span {
+    margin-left: min(4vw, 16px);
+    color: var(--text-info);
+    font-size: min(2.5vw, 11px);
+  }
+  .dropdown li svg {
+    width: min(2.75vw, 12px);
+    height: min(2.75vw, 12px);
+    fill: var(--text-info);
+    transition: var(--transition-fast);
+    transition-property: fill transform;
+  }
+  .dropdown li [type="file"], .dropdown li a {
+    display: none;
+  }
+  .dropdown li:hover, .dropdown li:focus, .dropdown li:focus-within {
+    color: var(--text-hover);
+    background: var(--container-medium-hover);
+  }
+  .dropdown li:focus {
+    --focus-border: var(--outline);
+  }
+  .dropdown li:hover > svg, .dropdown li:focus > svg, .dropdown li:focus-within > svg {
+    fill: var(--text-hover);
+  }
+  .dropdown ul ul {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    transform: scale(0);
+    transform-origin: left top;
+  }
+  @media (max-width: 550px), (max-height: 475px){
+    .dropdown ul ul {
+      min-width: 100%;
+      max-height: min(24vh, 60px);
+      left: 0;
+      top: 100%;
+      transform: scaleY(0);
+      transform-origin: top center;
+      overflow-y: auto;
+    }
+    .dropdown li svg {
+      transform: rotate(90deg);
+    }
+  }
+  @media (max-height: 300px){
+    .dropdown ul {
+      max-height: 55vh;
+      overflow-y: auto;
+    }
+    .dropdown ul ul {
+      max-height: unset;
+      overflow-y: unset;
+    }
+  }
+  .dropdown.active:focus-within > ul, .dropdown li:focus-within > ul {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: all;
+    transform: scale(1);
+  }
+  .select {
+    padding: min(0.75vw, 3px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .select .dropdown {
+    margin-left: min(1vw, 4px);
+  }
+  .checkbox {
+    padding: min(0.75vw, 3px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--border-radius);
+    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
+    --focus-border: transparent;
+    outline: none;
+  }
+  .checkbox:focus {
+    --focus-border: var(--outline);
+  }
+  .checkbox [type="checkbox"] {
+    display: none;
+  }
+  .checkbox label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-medium);
+    font-size: min(2vw, 14.5px);
+    cursor: pointer;
+    transition: color var(--transition-fast);
+  }
+  .checkbox label svg {
+    margin-right: min(4px, 4px);
+    padding: min(0.25vw, 1px);
+    width: min(2.5vw, 18px);
+    height: min(2.5vw, 18px);
+    fill: transparent;
+    background: var(--container-medium);
+    border: min(0.25vw, 2px) solid var(--text-dark);
+    border-radius: var(--border-radius);
+    box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow-color);
+  }
+  .checkbox [type="checkbox"]:hover + label, .checkbox:focus label {
+    color: var(--text-hover);
+  }
+  .checkbox [type="checkbox"]:hover + label svg, .checkbox:focus [type="checkbox"] + label svg {
+    background: var(--container-medium-hover);
+    fill: transparent;
+    border-color: var(--text-hover);
+  }
+  .checkbox [type="checkbox"]:checked + label svg {
+    fill: var(--text-medium);
+  }
+  .checkbox [type="checkbox"]:checked:hover + label svg, .checkbox:focus [type="checkbox"]:checked + label svg {
+    fill: var(--text-hover);
+  }
+  .divider {
+    width: 100%;
+    height: min(0.5vw, 2px);
+    background: var(--text-dark);
+    border-radius: var(--border-radius);
+  }
+  .loading-animation {
+    animation: loading 4s infinite linear;
+  }
+  @keyframes loading {
+    from {
+      transform: rotate(-360deg);
+    }
+  }
+</style>
 
 </head>
 
@@ -35,9 +1012,35 @@
   <symbol id="close" viewBox="0 0 512 512">
     <path d="m1.5795 65.78 64.201-64.201 190.22 190.22 190.22-190.22 64.201 64.201-190.22 190.22 190.22 190.22-64.201 64.201-190.22-190.22-190.22 190.22-64.201-64.201 190.22-190.22z"/>
   </symbol>
+  <symbol id="undo" viewBox="0 0 512 512">
+    <path d="m133.64 437.65-133.64-133.64h267.28z"/>
+    <path d="m512 249c-0.72363-111.33-91.271-201.16-202.61-200.98-111.33 0.17137-201.61 90.272-201.99 201.61l52.695 0.18028c0.28168-82.334 67.039-148.97 149.37-149.09 82.334-0.12673 149.3 66.299 149.83 148.63z"/>
+    <path d="m107.4 246.77h52.472v57.48h-52.472z"/>
+    <path d="m459.53 246.77h52.472v190.87h-52.472z"/>
+  </symbol>
+  <symbol id="redo" viewBox="0 0 512 512">
+    <path d="m378.36 437.65 133.64-133.64h-267.28z"/>
+    <path d="m0.0044544 249c0.72363-111.33 91.271-201.16 202.61-200.98 111.33 0.17137 201.61 90.272 201.99 201.61l-52.695 0.18028c-0.28168-82.334-67.039-148.97-149.37-149.09-82.334-0.12673-149.3 66.299-149.83 148.63z"/>
+    <path d="m404.6 246.77h-52.472v57.48h52.472z"/>
+    <path d="m52.473 246.77h-52.472v190.87h52.472z"/>
+  </symbol>
   <symbol id="refresh" viewBox="0 0 512 512">
     <path d="m510.27 285.75c-13.893 118.73-108.1 212.04-226.96 224.79-118.86 12.751-230.71-58.451-269.47-171.53-38.761-113.08 5.8941-237.93 107.58-300.78 101.68-62.846 233.32-46.955 317.13 38.282l-37.067 36.446c-66.79-67.929-171.7-80.593-252.74-30.508-81.036 50.084-116.62 149.58-85.733 239.7 30.89 90.117 120.03 146.86 214.75 136.7 94.721-10.161 169.8-84.522 180.87-179.14z"/>
     <path d="m512 189.01v-189.01l-188.98 189.01z"/>
+  </symbol>
+  <symbol id="loading" viewBox="0 0 512 512">
+    <path d="m229.78 8.7403c0-4.8272 3.9132-8.7403 8.7403-8.7403h34.96c2.3181 0 4.5412 0.92085 6.1804 2.56 1.6391 1.6391 2.56 3.8623 2.56 6.1803v88.126c0 4.8272-3.9132 8.7403-8.7403 8.7403h-34.96c-4.8272 0-8.7403-3.9132-8.7403-8.7403z"/>
+    <path d="m356.92 28.764c2.4126-4.1803 7.7575-5.6138 11.938-3.2016l30.278 17.47c2.0076 1.1583 3.4727 3.0667 4.0731 5.3053 0.60034 2.2386 0.28674 4.624-0.87186 6.6314l-44.051 76.326c-2.4126 4.1803-7.7575 5.6138-11.938 3.2016l-30.278-17.47c-4.1806-2.4121-5.6139-7.7564-3.2013-11.937z" opacity="0.083"/>
+    <path d="m457.03 109.66c4.1804-2.4126 9.5246-0.97937 11.937 3.2013l17.47 30.278c1.1584 2.0076 1.4718 4.3932 0.87137 6.6321-0.60043 2.2388-2.0655 4.1475-4.073 5.3061l-76.326 44.051c-4.1804 2.4126-9.5246 0.97937-11.937-3.2013l-17.47-30.278c-2.4121-4.1806-0.9787-9.5255 3.2017-11.938z" opacity="0.16"/>
+    <path d="m503.26 229.78c4.8271 0 8.7403 3.9132 8.7403 8.7403v34.96c0 2.3181-0.92087 4.5412-2.56 6.1804-1.6391 1.6391-3.8622 2.56-6.1803 2.56h-88.126c-4.8271 0-8.7403-3.9132-8.7403-8.7403v-34.96c0-4.8272 3.9132-8.7403 8.7403-8.7403z" opacity="0.25"/>
+    <path d="m483.25 356.93c4.1806 2.4151 5.6119 7.7619 3.1969 11.943l-17.491 30.278c-1.1597 2.0076-3.0695 3.4723-5.3091 4.0718-2.2396 0.59955-4.6257 0.28482-6.6333-0.87494l-76.294-44.073c-4.1806-2.4151-5.6119-7.7619-3.1969-11.943l17.491-30.278c2.415-4.1806 7.7618-5.6119 11.942-3.1969z" opacity="0.33"/>
+    <path d="m402.34 457.03c2.4126 4.1804 0.97937 9.5246-3.2013 11.937l-30.278 17.47c-2.0076 1.1584-4.3932 1.4718-6.6321 0.87137-2.2388-0.60043-4.1475-2.0655-5.3061-4.073l-44.051-76.326c-2.4126-4.1804-0.97937-9.5246 3.2013-11.937l30.278-17.47c4.1806-2.4121 9.5255-0.9787 11.938 3.2017z" opacity="0.42"/>
+    <path d="m229.78 503.26c0 4.8271 3.9132 8.7403 8.7403 8.7403h34.96c2.3181 0 4.5412-0.92087 6.1804-2.56 1.6391-1.6391 2.56-3.8622 2.56-6.1803v-88.126c0-4.8271-3.9132-8.7403-8.7403-8.7403h-34.96c-4.8272 0-8.7403 3.9132-8.7403 8.7403z" opacity="0.5"/>
+    <path d="m109.66 457.03c-2.4126 4.1804-0.97936 9.5246 3.2013 11.937l30.278 17.47c2.0076 1.1584 4.3932 1.4718 6.6321 0.87137 2.2388-0.60043 4.1475-2.0655 5.3061-4.073l44.051-76.326c2.4126-4.1804 0.97937-9.5246-3.2013-11.937l-30.278-17.47c-4.1806-2.4121-9.5255-0.9787-11.938 3.2017z" opacity="0.58"/>
+    <path d="m28.765 356.92c-4.1803 2.4126-5.6138 7.7575-3.2016 11.938l17.47 30.278c1.1583 2.0076 3.0667 3.4727 5.3053 4.0731 2.2386 0.60034 4.624 0.28674 6.6314-0.87186l76.326-44.051c4.1803-2.4126 5.6138-7.7575 3.2016-11.938l-17.47-30.278c-2.4121-4.1806-7.7564-5.6139-11.937-3.2013z" opacity="0.66"/>
+    <path d="m8.7403 282.22c-4.8272 0-8.7403-3.9132-8.7403-8.7403v-34.96c0-2.3181 0.92085-4.5412 2.56-6.1804 1.6391-1.6391 3.8623-2.56 6.1803-2.56h88.126c4.8272 0 8.7403 3.9132 8.7403 8.7403v34.96c0 4.8271-3.9132 8.7403-8.7403 8.7403z" opacity="0.75"/>
+    <path d="m54.982 109.67c-4.1806-2.4151-9.5274-0.98376-11.942 3.1969l-17.491 30.278c-1.1597 2.0076-1.4745 4.3937-0.87492 6.6334 0.59953 2.2397 2.0642 4.1494 4.0718 5.3092l76.294 44.073c4.1806 2.415 9.5274 0.98376 11.942-3.1969l17.491-30.278c2.415-4.1806 0.98373-9.5275-3.1969-11.943z" opacity="0.83"/>
+    <path d="m155.08 28.764c-2.4126-4.1803-7.7575-5.6138-11.938-3.2016l-30.278 17.47c-2.0076 1.1583-3.4727 3.0667-4.0731 5.3053-0.60036 2.2386-0.28674 4.624 0.87183 6.6314l44.051 76.326c2.4126 4.1803 7.7575 5.6138 11.938 3.2016l30.278-17.47c4.1806-2.4121 5.6139-7.7564 3.2013-11.937z" opacity="0.91"/>
   </symbol>
 </svg>
 
@@ -109,7 +1112,6 @@
     <span>Inspired by <a href="https://htmledit.squarefree.com/" target="_blank">Real-Time HTML Editor</a> and <a href="https://www.editpad.org/" target="_blank">Edit Pad</a>!</span>
   </div>
 </header>
-
 <main id="main" class="text horizontal">
   <textarea id="userInput" class="text horizontal" placeholder="Welcome to the Smart Text Editor! This site was created to allow for text editing and code development within your browser!" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"></textarea>
   <div id="scaler" class="text horizontal">
@@ -117,8 +1119,8 @@
   </div>
   <iframe id="preview" class="text horizontal" src="about:blank"></iframe>
   <div id="editingTools" class="card editing">
-    <button id="undoTool" onclick="changeState('undo');">&#8630;</button>
-    <button id="redoTool" onclick="changeState('redo');">&#8631;</button>
+    <button id="undoTool" onclick="changeState('undo');"><svg><use href="#undo"></use></svg></button>
+    <button id="redoTool" onclick="changeState('redo');"><svg><use href="#redo"></use></svg></button>
     <button id="refreshTool" onclick="forceRefresh();" disabled><svg><use href="#refresh"></use></svg></button>
   </div>
   <div id="cardBackground"></div>
@@ -273,7 +1275,740 @@
   </div>
 </main>
 
-<script src="scripts.js"></script>
+<script>
+  var storage = window.localStorage, view = "text", orientation = "horizontal", refresh = "true", title = "true", transitions = "true", loadedFile = undefined, sourceChange = false, mustSave = false, activeWidget = undefined, activeModal = undefined, storedColor, insertColor = false, encodeComponent = false;
+  
+  // --- Dropdown section
+  var dropdowns = Array.from(document.getElementsByClassName("dropdown"));
+  dropdowns.forEach(function(dropdown){
+    var button = dropdown.getElementsByTagName("button")[0];
+    var list = dropdown.getElementsByTagName("ul")[0];
+    var listItems = Array.from(dropdown.getElementsByTagName("li"));
+    listItems.forEach(function(listItem){
+      var subListPresent = listItem.getElementsByTagName("ul")[0];
+      if (subListPresent == undefined){
+        listItem.addEventListener("click",function(){
+          setTimeout(function(){
+            dropdowns.forEach(function(dropdown){
+              dropdown.classList.remove("active");
+            });
+          }, 50);
+        });
+      }
+      listItem.addEventListener("keydown",function(event){
+        if (event.key == "Enter"){
+          listItem.click();
+        }
+      });
+      listItem.setAttribute("tabindex","0");
+      if (subListPresent != undefined){
+        listItem.setAttribute("data-list","");
+        listItem.addEventListener("mouseenter",function(){
+          if (dropdown.classList.contains("active")){
+            listItem.focus();
+          }
+        });
+      }
+    });
+    button.addEventListener("click",function(){
+      dropdowns.forEach(function(dropdown){
+        dropdown.classList.toggle("active");
+        if (dropdown.classList.contains("active")){
+          document.body.addEventListener("click",disableDropdown);
+        }
+        function disableDropdown(event){
+          if (dropdown.contains(event.target)) return;
+          dropdowns.forEach(function(dropdown){
+            if (dropdown.classList.contains("active")) return;
+            dropdown.classList.remove("active");
+            document.body.removeEventListener("click",disableDropdown);
+          });
+        }
+        function hoverDropdown(){
+          button.focus();
+        }
+      });
+    });
+    button.addEventListener("mouseenter",function(){
+      if (dropdown.classList.contains("active")){
+        button.focus();
+      }
+    });
+    button.addEventListener("touchstart",function(event){
+      if (dropdown.contains(event.targetTouches[0].target)) return;
+      dropdowns.forEach(function(dropdown){
+        dropdown.classList.remove("active");
+      });
+    });
+  });
+  // --- Dropdown section
+  
+  var checkboxes = Array.from(document.getElementsByClassName("checkbox"));
+  checkboxes.forEach(function(item){
+    item.addEventListener("keydown",function(event){
+      if (event.key == "Enter"){
+        blockShortcut(event);
+        item.getElementsByTagName("label")[0].click();
+      }
+    });
+    item.setAttribute("tabindex","0");
+  });
+  
+  var buttons = Array.from(document.getElementsByTagName("button"));
+  buttons.forEach(function(item){
+    item.addEventListener("click",function(){
+      if (editingTools.contains(item) == false){
+        item.focus();
+      }
+    });
+  });
+  
+  var closeButtons = Array.from(document.getElementsByClassName("closeButton"));
+  closeButtons.forEach(function(closeButton){
+    closeButton.addEventListener("keydown",function(){
+      if (event.key == "Enter"){
+        blockShortcut(event);
+        closeButton.onclick();
+      }
+    });
+    closeButton.setAttribute("tabindex","0");
+  });
+  
+  window.addEventListener("load",function(){
+    if (windowParent){
+      loadSettings("initial");
+      setTimeout(function(){
+        document.documentElement.classList.remove("fade");
+      }, 50);
+      if ("ontouchstart" in document.documentElement){
+        openCard("editingTools");
+      }
+      if (title == "true"){
+        setTimeout(function(){
+          openCard("welcome");
+        }, 100);
+        setTimeout(function(){
+          if (activeModal == "welcome"){
+            closeCard("welcome");
+          }
+        }, 2100);
+      }
+      userInput.focus();
+    }
+    colorInputRefresh();
+    forceRefresh();
+    if ("serviceWorker" in navigator && windowParent && window.location.protocol == "https:"){
+      navigator.serviceWorker.register("service-worker.js");
+    }
+  });
+  window.addEventListener("beforeunload",function(){
+    if (windowParent && mustSave){
+      event.returnValue = "Changes you made may not be saved.";
+    }
+  });
+  window.addEventListener("keydown",function(event){
+    if (event.key == "Escape" && activeModal){
+      blockShortcut(event);
+      closeCard(activeModal);
+    }
+    if (event.ctrlKey){
+      if (event.key == "C"){
+        blockShortcut(event);
+        window.open(window.location.href,"_blank");
+      }
+      if (event.key == "L"){
+        blockShortcut(event);
+        load.click();
+      }
+      if (event.key == "S"){
+        blockShortcut(event);
+        saveAs();
+      }
+      if (event.key == "!"){
+        blockShortcut(event);
+        changeView("text");
+      }
+      if (event.key == "@"){
+        blockShortcut(event);
+        changeView("code");
+      }
+      if (event.key == "#"){
+        blockShortcut(event);
+        changeView("split");
+      }
+      if (event.key == "$"){
+        blockShortcut(event);
+        changeView("preview");
+      }
+      if (event.key == "%"){
+        blockShortcut(event);
+        changeOrientation();
+      }
+      if (event.key == "^"){
+        blockShortcut(event);
+        openDisplay();
+      }
+      if (event.key == "Enter"){
+        blockShortcut(event);
+        if (view == "split" || view == "preview"){
+          forceRefresh();
+        }
+      }
+      if (event.key == "E"){
+        blockShortcut(event);
+        openCard("editingTools");
+      }
+      if (event.key == "F"){
+        blockShortcut(event);
+        openCard("replacer");
+      }
+      if (event.key == "K"){
+        blockShortcut(event);
+        openCard("picker");
+      }
+      if (event.key == "G"){
+        blockShortcut(event);
+        importColor();
+      }
+      if (event.key == "R"){
+        blockShortcut(event);
+        openCard("formatter");
+      }
+      if (event.key == "Y"){
+        blockShortcut(event);
+        openCard("encoder");
+      }
+      if (event.key == "H"){
+        blockShortcut(event);
+        confirmOverwrite(insertTemplate);
+      }
+      if (event.key == ">"){
+        blockShortcut(event);
+        openCard("settings");
+      }
+    }
+  });
+  window.addEventListener("resize",function(){
+    if (view == "split"){
+      if (orientation == "vertical"){
+        if (!header.getAttribute("style")){
+          header.classList.add("resize");
+          setTimeout(function(){
+            header.classList.remove("resize");
+          }, 50);
+        }
+      }
+      changeView("split");
+    }
+  });
+  document.documentElement.addEventListener("dragover",function(event){
+    event.preventDefault();
+    userInput.classList.add("drag");
+    event.dataTransfer.dropEffect = "copy";
+  });
+  document.documentElement.addEventListener("dragleave",function(){
+    userInput.classList.remove("drag");
+  });
+  document.documentElement.addEventListener("drop",function(event){
+    event.preventDefault();
+    userInput.classList.remove("drag");
+    if (event.dataTransfer.types.includes("Files")){
+      load.files = event.dataTransfer.files;
+      confirmOverwrite(importFile,event);
+    } else {
+      textEdit("insert",event.dataTransfer.getData("text"),true);
+    }
+  });
+  userInput.addEventListener("input",function(){
+    sourceChange = true;
+    mustSave = true;
+    if (view == "split" || view == "preview"){
+      previewRefresh();
+    }
+  });
+  userInput.addEventListener("mousedown",function(){
+    if (insertColor){
+      insertColor = false;
+    }
+  });
+  scaler.addEventListener("mousedown",function(){
+    toggleScaling();
+    document.body.addEventListener("mousemove",setScaling);
+    document.body.addEventListener("mouseup",removeScaling);
+    document.body.addEventListener("mouseleave",removeScaling);
+  });
+  load.addEventListener("change",function(event){
+    confirmOverwrite(importFile,event);
+  });
+  colorInput.addEventListener("input",function(){
+    colorInputRefresh();
+    textEdit("insert",storedColor,true);
+    colorInput.focus();
+  });
+  cardBackground.addEventListener("click",function(){
+    if (activeModal == "welcome"){
+      userInput.focus();
+    }
+    closeCard(activeModal);
+  });
+  welcome.addEventListener("click",function(){
+    closeCard("welcome");
+  });
+  function loadSettings(input){
+    var storedView = storage.getItem("view");
+    if (storedView != undefined){
+      if (input == "initial"){
+        changeView(storedView);
+      }
+      updateSelect("view",storedView);
+    }
+    var storedOrientation = storage.getItem("orientation");
+    if (storedOrientation != undefined){
+      if (input == "initial"){
+        changeOrientation(storedOrientation);
+      }
+      updateSelect("orientation",storedOrientation);
+    }
+    var storedRefresh = storage.getItem("refresh");
+    if (storedRefresh != undefined){
+      refresh = storedRefresh;
+      updateCheckbox("refresh",storedRefresh);
+    }
+    var storedTitle = storage.getItem("title");
+    if (storedTitle != undefined){
+      title = storedTitle;
+      updateCheckbox("title",storedTitle);
+    }
+    setTimeout(function(){
+      var storedTransitions = storage.getItem("transitions");
+      if (storedTransitions != undefined){
+        changeTransitions(storedTransitions);
+        updateCheckbox("transitions",storedTransitions);
+      } else {
+        changeTransitions(transitions);
+      }
+    }, 50);
+  }
+  function resetSettings(){
+    var ask = confirm("Are you sure you want to reset all settings?\nThis cannot be undone.");
+    if (ask){
+      updateSelect("view","text");
+      updateSelect("orientation","horizontal");
+      refresh = "true";
+      updateCheckbox("refresh","true");
+      title = "true";
+      updateCheckbox("title","true");
+      changeTransitions("true");
+      updateCheckbox("transitions","true");
+      storage.clear();
+      openCard("reset");
+    }
+  }
+  function updateSetting(item,value){
+    storage.setItem(item,value);
+  }
+  function updateSelect(item,value){
+    updateSetting(item,value);
+    document.getElementById(`${item}Setting`).innerHTML = updateCapitalization(value);
+  }
+  function updateCheckbox(item,value){
+    if (value == undefined){
+      value = document.getElementById(`${item}Setting`).checked;
+    }
+    if (value != undefined){
+      if (value == "true"){
+        document.getElementById(`${item}Setting`).checked = "true";
+      }
+      if (value == "false"){
+        document.getElementById(`${item}Setting`).removeAttribute("checked");
+      }
+    }
+    updateSetting(item,value);
+  }
+  function updateCapitalization(value){
+    return value.charAt(0).toUpperCase() + value.slice(1);
+  }
+  function changeView(input){
+    var elements = ["header","main","userInput","scaler","preview"], newView = input;
+    elements.forEach(function(item){
+      changeClass(item,view,newView);
+    });
+    if (newView == "text" || newView == "code"){
+      undoTool.disabled = false;
+      redoTool.disabled = false;
+      refreshTool.disabled = true;
+    }
+    if (newView == "split"){
+      undoTool.disabled = false;
+      redoTool.disabled = false;
+      refreshTool.disabled = false;
+    }
+    if (newView == "preview"){
+      undoTool.disabled = true;
+      redoTool.disabled = true;
+      refreshTool.disabled = false;
+    }
+    view = newView;
+    previewRefresh();
+  }
+  function changeOrientation(input){
+    var elements = ["header","main","userInput","scaler","preview"], newOrientation;
+    if (input == undefined){
+      if (orientation == "horizontal"){
+        newOrientation = "vertical";
+      }
+      if (orientation == "vertical"){
+        newOrientation = "horizontal";
+      }
+      changeView("code");
+      setTimeout(function(){
+        elements.forEach(function(item){
+          changeClass(item,orientation,newOrientation);
+        });
+        scaler.style.transition = "none";
+        preview.style.transition = "none";
+        orientation = newOrientation;
+      }, 500);
+      setTimeout(function(){
+        changeView("split");
+      }, 550);
+    } else {
+      newOrientation = input;
+      elements.forEach(function(item){
+        changeClass(item,orientation,newOrientation);
+      });
+      orientation = newOrientation;
+    }
+  }
+  function changeClass(element,variable,newVariable){
+    document.getElementById(element).classList.remove(variable);
+    document.getElementById(element).removeAttribute("style");
+    document.getElementById(element).classList.add(newVariable);
+  }
+  function changeTransitions(input){
+    var newTransition = input;
+    if (newTransition == "true"){
+      document.documentElement.removeAttribute("style");
+    }
+    if (newTransition == "false"){
+      document.documentElement.style = removeTransitions;
+    }
+    transitions = newTransition;
+  }
+  function confirmOverwrite(action,event){
+    if (mustSave){
+      var ask = confirm("Changes you made may not be saved.");
+      if (ask){
+        action(event);
+        closeCard(activeModal);
+      }
+    } else {
+      action(event);
+      closeCard(activeModal);
+    }
+  }
+  function blockShortcut(event){
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  function importFile(event){
+    closeCard(activeModal);
+    var reader = new FileReader(),
+        mimeType = load.files[0].type;
+        type = mimeType.split("/")[0],
+        subType = mimeType.split("/")[1],
+        validTypes = ["text","image","audio"],
+        validSubtypes = ["javascript","json","manifest+json","markdown"];
+  
+    if (mimeType == ""){
+      alert("File mime type is undefined, please choose a different file extension to import.");
+      return;
+    }
+    if (validTypes.includes(type) || validSubtypes.includes(subType)){
+      if (type == "text" || type == "application" || subType == "svg+xml"){
+        reader.readAsText(load.files[0],"UTF-8");
+        reader.addEventListener("loadend",function(){
+          userInput.value = reader.result;
+          sourceChange = true;
+          mustSave = false;
+          previewRefresh();
+        });
+        loadedFile = load.files[0].name;
+        if (subType == "plain"){
+          changeView("text");
+        }
+        if (subType != "plain" && subType != "html" && subType != "svg+xml"){
+          changeView("code");
+        }
+        if (subType == "html" || subType == "svg+xml"){
+          changeView("split");
+        }
+      }
+      if (type == "image" && subType != "svg+xml" || type == "audio"){
+        reader.readAsDataURL(load.files[0]);
+        reader.addEventListener("loadend",function(){
+          textEdit("insert",reader.result,true);
+        });
+      }
+    } else {
+      alert("Sorry, that file type isn't supported.");
+    }
+  }
+  function saveAs(extension){
+    var blob = new Blob([userInput.value],{type: "text/plain"});
+    save.href = URL.createObjectURL(blob);
+    if (extension == undefined){
+      if (loadedFile != undefined){
+        save.download = loadedFile;
+      } else {
+        save.download = "Untitled.txt";
+      }
+    } else {
+      save.download = `Untitled.${extension}`;
+    }
+    save.addEventListener("click",function(event){
+      event.stopPropagation();
+    });
+    save.click();
+    loadedFile = save.download;
+    mustSave = false;
+  }
+  function openDisplay(){
+    var screenDimensions = [window.screen.width, window.screen.height], display = window.open("","_blank",`left=${screenDimensions[0] / 6},top=${screenDimensions[1] / 6 - 40},width=${screenDimensions[0] * 2/3},height=${screenDimensions[1] * 2/3}`);
+    display.document.open();
+    display.document.write(userInput.value);
+    display.document.close();
+  }
+  function textEdit(type,text,focus){
+    var cursor = userInput.selectionStart;
+    if (focus == true){
+      userInput.focus();
+    }
+    if (type == "insert"){
+      userInput.setRangeText(text);
+      userInput.setSelectionRange(cursor,cursor + text.length);
+    }
+    if (type == "delete"){
+      userInput.setSelectionRange(cursor,cursor + text);
+      userInput.setRangeText("");
+    }
+    sourceChange = true;
+    mustSave = true;
+    previewRefresh();
+  }
+  function openCard(element){
+    var card = document.getElementById(element);
+    var cardType = card.classList[1];
+    if (card.classList.contains("active")){
+      card.classList.toggle("active");
+      if (cardType == "modal"){
+        cardBackground.classList.toggle("active");
+      }
+    } else {
+      var cards = Array.from(document.getElementsByClassName("card"));
+      if (cardType != "notification"){
+        cards.forEach(function(item){
+          var itemType = item.classList[1];
+          if (itemType == cardType || itemType == "modal"){
+            item.classList.remove("active");
+          }
+        });
+      }
+      if (cardType != "notification" && cardType != "modal"){
+        cardBackground.classList.remove("active");
+      }
+      card.classList.add("active");
+      if (cardType == "notification"){
+        setTimeout(function(){
+          closeCard(element);
+        }, 3000);
+      }
+      if (cardType == "modal"){
+        cardBackground.classList.add("active");
+      }
+    }
+    if (cardType == "widget"){
+      activeWidget = element;
+    }
+    if (cardType == "modal"){
+      activeModal = element;
+    }
+  }
+  function closeCard(element){
+    if (element == undefined) return;
+    var card = document.getElementById(element);
+    var cardType = card.classList[1];
+    document.getElementById(element).classList.remove("active");
+    if (cardType == "modal"){
+      cardBackground.classList.remove("active");
+    }
+    if (activeModal == "welcome" && windowParent){
+      userInput.focus();
+    }
+    if (activeModal == "settings" && windowParent){
+      loadSettings();
+    }
+    if (cardType == "widget"){
+      activeWidget = undefined;
+    }
+    if (cardType == "modal"){
+      activeModal = undefined;
+    }
+  }
+  function changeState(history){
+    userInput.focus();
+    document.execCommand(history);
+  }
+  function activateReplacer(){
+    userInput.value = userInput.value.split(locate.value).join(modify.value);
+    sourceChange = true;
+    mustSave = true;
+    previewRefresh();
+  }
+  function colorInputRefresh(){
+    var get = colorInput.value.replace("#","");
+    if (get.length == 3 || get.length == 6){
+      storedColor = get;
+      if (storedColor.length == 3){
+        storedColor = storedColor.match(/.{1}/g);
+        storedColor.forEach(function(item,index){
+          storedColor[index] = item + item;
+        });
+      }
+      if (storedColor.length == 6){
+        storedColor = storedColor.match(/.{1,2}/g);
+      }
+      storedColor.forEach(function(item,index){
+        storedColor[index] = parseInt(item,16);
+      });
+      redChannel.value = storedColor[0];
+      greenChannel.value = storedColor[1];
+      blueChannel.value = storedColor[2];
+      storedColor = `#${convertHex(redChannel.value)}${convertHex(greenChannel.value)}${convertHex(blueChannel.value)}`;
+      colorPreview.style.background = storedColor;
+    }
+  }
+  function channelRefresh(){
+    storedColor = `#${convertHex(redChannel.value)}${convertHex(greenChannel.value)}${convertHex(blueChannel.value)}`;
+    colorPreview.style.background = storedColor;
+    colorInput.value = storedColor;
+    if (insertColor){
+      textEdit("insert",storedColor,true);
+    }
+  }
+  function convertHex(channel){
+    var hex = parseInt(channel).toString(16);
+    if (hex.length == 1){
+      hex = 0 + hex;
+    }
+    return hex;
+  }
+  function importColor(){
+    insertColor = true;
+    if (!picker.classList.contains("active")){
+      openCard("picker");
+    }
+    if (window.getSelection().toString().length > 0){
+      colorInput.value = window.getSelection();
+    }
+    colorInput.focus();
+    colorInputRefresh();
+  }
+  function activateFormatter(format){
+    try {
+      formatterInput.value = JSON.stringify(JSON.parse(formatterInput.value),false,format);
+    } catch (error){
+      alert("Invalid JSON data.");
+    }
+  }
+  function activateEncoder(format){
+    if (encodeComponent == false){
+      if (format == "encode"){
+        encoderInput.value = encodeURI(encoderInput.value);
+      }
+      if (format == "decode"){
+        encoderInput.value = decodeURI(encoderInput.value);
+      }
+    }
+    if (encodeComponent == true){
+      if (format == "encode"){
+        encoderInput.value = encodeURIComponent(encoderInput.value);
+      }
+      if (format == "decode"){
+        encoderInput.value = decodeURIComponent(encoderInput.value);
+      }
+    }
+  }
+  function insertTemplate(){
+    userInput.value = decodeURI("%3C!DOCTYPE%20html%3E%0A%3Chtml%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20margin:%200;%0A%20%20%20%20padding:%200;%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20width:%20100vw;%0A%20%20%20%20height:%20100vh;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E");
+    sourceChange = true;
+    changeView("split");
+  }
+  function forceRefresh(){
+    var store = refresh;
+    refresh = "true";
+    sourceChange = true;
+    previewRefresh();
+    refresh = store;
+  }
+  function previewRefresh(){
+    if (refresh == "true" && sourceChange){
+      preview.src = "about:blank";
+      preview.contentWindow.document.open();
+      preview.contentWindow.document.write(userInput.value);
+      preview.contentWindow.document.close();
+      sourceChange = false;
+    }
+  }
+  function toggleScaling(){
+    header.classList.toggle("resize");
+    main.classList.toggle("resize");
+    userInput.classList.toggle("resize");
+    scaler.classList.toggle("active");
+    preview.classList.toggle("resize");
+  }
+  function setScaling(event){
+    var cursorOffset, windowAxis;
+    if (orientation == "horizontal"){
+      cursorOffset = event.clientY - header.offsetHeight;
+      windowAxis = window.innerHeight;
+    }
+    if (orientation == "vertical"){
+      cursorOffset = event.clientX;
+      windowAxis = window.innerWidth;
+    }
+    if (cursorOffset <= 80){
+      cursorOffset = 80;
+    }
+    if (orientation == "horizontal"){
+      if (cursorOffset >= windowAxis - 80 - header.offsetHeight){
+        cursorOffset = windowAxis - 80 - header.offsetHeight;
+      }
+    }
+    if (orientation == "vertical"){
+      if (cursorOffset >= windowAxis - 80){
+        cursorOffset = windowAxis - 80;
+      }
+    }
+    if (orientation == "horizontal"){
+      userInput.style.height = `calc(${cursorOffset}px - 8px)`;
+      scaler.style.bottom = `calc(100% - ${cursorOffset}px - 8px)`;
+      preview.style.height = `calc(100% - ${cursorOffset}px - 8px)`;
+    }
+    if (orientation == "vertical"){
+      header.style.boxShadow = `calc(-100vw + ${cursorOffset}px) 1px 8px var(--box-shadow-color)`;
+      userInput.style.width = `calc(${cursorOffset}px - 8px)`;
+      scaler.style.right = `calc(100% - ${cursorOffset}px - 8px)`;
+      preview.style.width = `calc(100% - ${cursorOffset}px - 8px)`;
+    }
+  }
+  function removeScaling(type){
+    document.body.removeEventListener("mousemove",setScaling);
+    document.body.removeEventListener("mouseup",removeScaling);
+    document.body.removeEventListener("mouseleave",removeScaling);
+    toggleScaling();
+  }
+</script>
 
 </body>
 
