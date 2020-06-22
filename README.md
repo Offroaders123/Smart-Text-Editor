@@ -1,7 +1,16 @@
-![Smart Text Editor](resources/icon-32.png)
-# Smart Text Editor
-The text editor that requires only a browser and a keyboard (virtual keyboards as well)!
+<table>
+  <tr>
+    <td>
+      <img width="64" src="resources/icon.svg">
+    </td>
+    <td>
+      <h1>Smart Text Editor</h1>
+    </td>
+  </tr>
+</table>
 
+The text editor that requires only a browser and a keyboard!
+  
 This is a project that I am working on in my free time, and it has turned into something really useful!
 I have started to implement features similar to that of a Progressive Web App, so it can be opened/used through the browser like most websites, or as close to a normal desktop/smartphone/tablet app as possible! I personally find the idea super interesting, so I will continue to learn more about it.
 
@@ -34,5 +43,4 @@ A list of instructions to add a shortcut for Smart Text Editor to your device ca
 
 
 ## Thanks for checking out Smart Text Editor!
-This is a very fun project to work on, and I can't wait to see what it grows into as the development moves along! 
-- Brandon Bennett
+This is a very fun project to work on, and I can't wait to see what it grows into as the development moves along!
