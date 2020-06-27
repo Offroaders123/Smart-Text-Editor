@@ -67,7 +67,9 @@
   
     --card-background: #17171760;
   
-    --border-radius: min(1.25vw, 5px);
+    --border-radius-small: min(0.625vw, 2.5px);
+    --border-radius-medium: min(1.25vw, 5px);
+    --border-radius-large: min(2.5vw, 10px);
     --box-shadow-color: #000000bf;
     --outline: var(--text-medium);
   
@@ -123,7 +125,7 @@
     font-size: min(2.5vw, 14.5px);
     background: var(--button);
     border: none;
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-medium);
     box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow-color), 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
     --focus-border: transparent;
     cursor: pointer;
@@ -163,12 +165,11 @@
   a {
     color: var(--text-dark);
     font-size: min(2vw, 14.5px);
-    border-radius: calc(var(--border-radius) * 0.5);
+    border-radius: var(--border-radius-small);
     box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
     --focus-border: transparent;
     outline: none;
-    transition: var(--transition-fast);
-    transition-property: color;
+    transition: var(--transition-fast) color;
   }
   a:hover, a:focus {
     color: var(--text-hover);
@@ -204,7 +205,7 @@
     height: min(5vw, 20px);
     background: var(--range-thumb);
     border: none;
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-medium);
     box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
     transition: background var(--transition-fast);
     -webkit-appearance: none;
@@ -215,7 +216,7 @@
     height: min(5vw, 20px);
     background: var(--range-thumb);
     border: none;
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-medium);
     box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
     transition: background var(--transition-fast);
   }
@@ -228,14 +229,14 @@
   ::-webkit-slider-runnable-track {
     height: min(1.5vw, 6px);
     background: var(--range-track);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-medium);
     box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
     transition: background var(--transition-fast);
   }
   ::-moz-range-track {
     height: min(1.5vw, 6px);
     background: var(--range-track);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-medium);
     box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow-color);
     transition: background var(--transition-fast);
   }
@@ -258,7 +259,7 @@
     padding: min(0.5vw, 2px);
     position: absolute;
     right: 0;
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-medium);
     box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
     --focus-border: transparent;
     outline: none;
@@ -289,7 +290,7 @@
     color: var(--text-hover);
     font-size: min(2.75vw, 12px);
     background: var(--container-medium-hover);
-    border-radius: calc(var(--border-radius) * 2);
+    border-radius: var(--border-radius-large);
     box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow-color);
   }
   [data-tooltip]::after {
@@ -318,7 +319,7 @@
     background-clip: content-box;
     background-color: var(--scrollbar);
     border: min(0.5vw, 2px) solid transparent;
-    border-radius: calc(var(--border-radius) * 2);
+    border-radius: var(--border-radius-large);
   }
   ::-webkit-scrollbar-thumb:hover {
     background-color: var(--scrollbar-hover);
@@ -397,7 +398,7 @@
       margin-left: 0;
       visibility: hidden;
       opacity: 0;
-      transform: scaleX(0);
+      transform: scale(0);
     }
   }
   #header .attribution {
@@ -520,7 +521,7 @@
     color: var(--text-dark);
     font-size: min(2.75vw, 12px);
     background: var(--button);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-medium);
     box-shadow: 0 0 min(2vw, 8px) min(0.25vw, 1px) var(--box-shadow-color);
     visibility: hidden;
     opacity: 0;
@@ -576,7 +577,7 @@
     position: absolute;
     right: 0;
     max-height: calc(100% - min(3vw, 20px));
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-medium);
     overflow-y: auto;
   }
   .card.widget, .card.notification {
@@ -589,7 +590,7 @@
   }
   .card.editing {
     flex-direction: row;
-    border-radius: calc(var(--border-radius) * 2);
+    border-radius: var(--border-radius-large);
   }
   .card.notification {
     margin: min(4vw, 20px);
@@ -604,13 +605,13 @@
     top: 50%;
     min-width: min(35vw, 225px);
     z-index: 1;
-    border-radius: calc(var(--border-radius) * 2);
+    border-radius: var(--border-radius-large);
     transform-origin: center center;
     transform: translate(-50%,-50%) scale(0);
   }
   .card.modal.scale {
     padding: min(6vh, 2vw);
-    border-radius: calc(var(--border-radius) + min(3vh, 1vw));
+    border-radius: calc(var(--border-radius-medium) + min(3vh, 1vw));
     z-index: 2;
     transform: translate(-50%,50vh) scale(1);
   }
@@ -782,7 +783,7 @@
     padding: 4px;
     --color: var(--text-light);
     background: var(--textarea-medium);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-medium);
     box-shadow: 0 2px 4px var(--box-shadow-color) inset;
   }
   .card textarea {
@@ -802,7 +803,7 @@
     margin-bottom: min(1.5vw, 10px);
     min-width: min(20vw, 86px);
     min-height: min(20vw, 86px);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-medium);
     box-shadow: 0 2px 4px var(--box-shadow-color) inset;
   }
   #colorInput {
@@ -831,7 +832,7 @@
     position: absolute;
     min-width: min(35vw, 155px);
     background: var(--container-medium);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-medium);
     box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow-color);
     z-index: 1;
     visibility: hidden;
@@ -851,7 +852,7 @@
     align-items: center;
     color: var(--text-medium);
     font-size: min(2.75vw, 12.5px);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-medium);
     box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
     --focus-border: transparent;
     outline: none;
@@ -936,7 +937,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-medium);
     box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
     --focus-border: transparent;
     outline: none;
@@ -952,19 +953,19 @@
     justify-content: center;
     align-items: center;
     color: var(--text-medium);
-    font-size: min(2vw, 14.5px);
+    font-size: min(2.5vw, 14.5px);
     cursor: pointer;
     transition: color var(--transition-fast);
   }
   .checkbox label svg {
     margin-right: min(4px, 4px);
     padding: min(0.25vw, 1px);
-    width: min(2.5vw, 18px);
-    height: min(2.5vw, 18px);
+    width: min(3.35vw, 18px);
+    height: min(3.35vw, 18px);
     fill: transparent;
     background: var(--container-medium);
-    border: min(0.25vw, 2px) solid var(--text-dark);
-    border-radius: var(--border-radius);
+    border: min(0.35vw, 2px) solid var(--text-dark);
+    border-radius: var(--border-radius-medium);
     box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow-color);
   }
   .checkbox [type="checkbox"]:hover + label, .checkbox:focus label {
@@ -985,7 +986,7 @@
     width: 100%;
     height: min(0.5vw, 2px);
     background: var(--text-dark);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-medium);
   }
   .loading-animation {
     animation: loading 4s infinite linear;
@@ -1243,6 +1244,16 @@
             </ul>
           </div>
         </div>
+        <div class="select">Open Editing Tools:
+          <div class="dropdown">
+            <button id="editingToolsSetting">Automatic</button>
+            <ul>
+              <li onclick="updateSelect('editingTools','automatic');">Automatic</li>
+              <li onclick="updateSelect('editingTools','yes');">Yes</li>
+              <li onclick="updateSelect('editingTools','no');">No</li>
+            </ul>
+          </div>
+        </div>
         <div class="divider"></div>
         <div class="checkbox" data-tooltip="Refresh manually using Ctrl + Enter when disabled">
           <input id="refreshSetting" type="checkbox" oninput="updateCheckbox('refresh');" checked>
@@ -1377,13 +1388,13 @@
   
   window.addEventListener("load",function(){
     if (windowParent){
+      if ("ontouchstart" in document.documentElement){
+        openCard("editingTools");
+      }
       loadSettings("initial");
       setTimeout(function(){
         document.documentElement.classList.remove("fade");
       }, 50);
-      if ("ontouchstart" in document.documentElement){
-        openCard("editingTools");
-      }
       if (title == "true"){
         setTimeout(function(){
           openCard("welcome");
@@ -1570,6 +1581,19 @@
       }
       updateSelect("orientation",storedOrientation);
     }
+    var storedEditingTools = storage.getItem("editingTools");
+    if (storedEditingTools != undefined){
+      var editingOpen = editingTools.classList.contains("active");
+      if (input == "initial"){
+        if (storedEditingTools == "yes" && !editingOpen){
+          openCard("editingTools");
+        }
+        if (storedEditingTools == "no" && editingOpen){
+          closeCard("editingTools");
+        }
+      }
+      updateSelect("editingTools",storedEditingTools);
+    }
     var storedRefresh = storage.getItem("refresh");
     if (storedRefresh != undefined){
       refresh = storedRefresh;
@@ -1595,6 +1619,7 @@
     if (ask){
       updateSelect("view","text");
       updateSelect("orientation","horizontal");
+      updateSelect("editingTools","automatic");
       refresh = "true";
       updateCheckbox("refresh","true");
       title = "true";
