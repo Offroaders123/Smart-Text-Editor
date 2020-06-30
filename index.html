@@ -1742,7 +1742,7 @@
   function openEditorWindow(){
     var windowFeatures;
     if (window.matchMedia("(display-mode: standalone)").matches){
-      windowFeatures = "standalone";
+      windowFeatures = `left= ${window.screenX}, top= ${window.screenY}, width=${window.outerWidth}, height=${window.outerHeight}`;
     } else {
       windowFeatures = "";
     }
@@ -1811,7 +1811,7 @@
     mustSave = false;
   }
   function openDisplay(){
-    var screenDimensions = [window.screen.width, window.screen.height], display = window.open("","_blank",`left=${screenDimensions[0] / 6},top=${screenDimensions[1] / 6 - 40},width=${screenDimensions[0] * 2/3},height=${screenDimensions[1] * 2/3}`);
+    var display = window.open("","_blank",`left= ${window.screenX}, top= ${window.screenY}, width=${window.outerWidth}, height=${window.outerHeight}`);
     display.document.open();
     display.document.write(userInput.value);
     display.document.close();
