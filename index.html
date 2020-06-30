@@ -996,12 +996,6 @@
       transform: rotate(-360deg);
     }
   }
-  #install {
-    margin: min(2vw, 10px);
-    position: absolute;
-    right: 0;
-    bottom: 0;
-  }
 </style>
 
 </head>
@@ -1291,7 +1285,6 @@
       <div class="item">Your settings have been reset!</div>
     </div>
   </div>
-  <button id="install" style="display: none;">Install Smart Text Editor ⬇</button>
 </main>
 
 <script>
@@ -1391,21 +1384,6 @@
       }
     });
     closeButton.setAttribute("tabindex","0");
-  });
-
-  var installEvent;
-  window.addEventListener("beforeinstallprompt",function(event){
-    install.removeAttribute("style");
-    install.addEventListener("click",function(){
-      installEvent = event;
-      window.installEvent.prompt();
-      window.installEvent.userChoice.then(function(choice){
-        if (choice.outcome == "accepted"){
-          install.style.display = "none";console.log("Installed!");
-        } else {"User dismissed the prompt"}
-        installEvent = null;
-      });
-    });
   });
   
   window.addEventListener("load",function(){
