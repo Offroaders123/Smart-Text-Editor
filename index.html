@@ -148,6 +148,9 @@
     opacity: 0.5;
     pointer-events: none;
   }
+  button.warning {
+    --button-hover: #bb2222;
+  }
   textarea, [type="text"] {
     --color: var(--text-super-dark);
     color: var(--color);
@@ -1272,7 +1275,7 @@
       </div>
     </div>
     <div class="toolbar">
-      <button style="--button-hover: #bb2222;" onclick="resetSettings();">Reset All Settings</button>
+      <button class="warning" onclick="resetSettings();">Reset All Settings</button>
     </div>
     <div class="toolbar">
       <a href="https://github.com/Offroaders123/Smart-Text-Editor/" target="_blank">Smart Text Editor on GitHub</a>
@@ -1742,7 +1745,7 @@
   function openEditorWindow(){
     var windowFeatures;
     if (window.matchMedia("(display-mode: standalone)").matches){
-      windowFeatures = `left= ${window.screenX}, top= ${window.screenY}, width=${window.outerWidth}, height=${window.outerHeight}`;
+      windowFeatures = `left= ${window.screenX}, top= ${window.screenY}, width=${window.innerWidth}, height=${window.innerHeight}`;
     } else {
       windowFeatures = "";
     }
@@ -1811,7 +1814,7 @@
     mustSave = false;
   }
   function openDisplay(){
-    var display = window.open("","_blank",`left= ${window.screenX}, top= ${window.screenY}, width=${window.outerWidth}, height=${window.outerHeight}`);
+    var display = window.open("","_blank",`left= ${window.screenX}, top= ${window.screenY}, width=${window.innerWidth}, height=${window.innerHeight}`);
     display.document.open();
     display.document.write(userInput.value);
     display.document.close();
