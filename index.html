@@ -1740,8 +1740,13 @@
     event.stopPropagation();
   }
   function openEditorWindow(){
-    var newEditor = window.open("","_blank");
-    newEditor.window.open(window.location.href,"_self");
+    var windowFeatures;
+    if (window.matchMedia("(display-mode: standalone)").matches){
+      windowFeatures = "standalone";
+    } else {
+      windowFeatures = "";
+    }
+    window.open(window.location.href,"_blank",windowFeatures);
   }
   function importFile(event){
     closeCard(activeModal);
