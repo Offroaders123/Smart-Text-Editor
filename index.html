@@ -1156,7 +1156,7 @@
         <textarea id="modify" placeholder="Replace with..." spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"></textarea>
       </div>
     </div>
-    <div id="replacerToolbar" class="toolbar">
+    <div class="toolbar">
       <button onclick="activateReplacer();">Replace</button>
       <button onclick="var store = locate.value; locate.value = modify.value; modify.value = store;">Flip</button>
       <button onclick="locate.value = ''; modify.value = '';">Clear</button>
@@ -1907,25 +1907,10 @@
     document.execCommand(history);
   }
   function activateReplacer(){
-    var replacerButtons = Array.from(replacerToolbar.getElementsByTagName("button"));
-    replacerButtons.forEach(function(button){
-      button.disabled = true;
-    });
-    var worker = new Worker("replacer-worker.js");
-    worker.postMessage({
-      "userInput": userInput.value,
-      "locate": locate.value,
-      "modify": modify.value
-    });
-    worker.addEventListener("message",function(event){
-      userInput.value = event.data;
-      replacerButtons.forEach(function(button){
-        button.disabled = false;
-      });
-      sourceChange = true;
-      mustSave = true;
-      previewRefresh();
-    });
+    userInput.value = userInput.value.split(locate.value).join(modify.value);
+    sourceChange = true;
+    mustSave = true;
+    previewRefresh();
   }
   function colorInputRefresh(){
     var get = colorInput.value.replace("#","");
