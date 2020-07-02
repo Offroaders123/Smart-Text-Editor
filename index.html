@@ -1096,12 +1096,12 @@
         <li>Online Resources...
           <svg><use href="#arrow"/></svg>
           <ul>
-            <li onclick="window.open('https://www.diffchecker.com/','_blank');">Difference Finder</li>
             <li onclick="window.open('https://webformatter.com/','_blank');">Code Formatter</li>
+            <li onclick="window.open('https://www.sharedrop.io/');">File Transferer</li>
+            <li onclick="window.open('https://www.diffchecker.com/','_blank');">Difference Finder</li>
             <li onclick="window.open('https://caniuse.com/','_blank');">Compatibility Checker</li>
             <li onclick="window.open('https://realfavicongenerator.net/','_blank');">Favicon Generator</li>
             <li onclick="window.open('https://www.svgminify.com/','_blank');">SVG Simplifier</li>
-            <li onclick="window.open('https://keycode.info/','_blank');">Keycode Finder</li>
             <li onclick="window.open('https://www.uuidgenerator.net/','_blank');">UUID Generator</li>
             <li onclick="window.open('https://cryptii.com/','_blank');">Text Encryptor</li>
           </ul>
@@ -1156,7 +1156,7 @@
         <textarea id="modify" placeholder="Replace with..." spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"></textarea>
       </div>
     </div>
-    <div class="toolbar">
+    <div id="replacerToolbar" class="toolbar">
       <button onclick="activateReplacer();">Replace</button>
       <button onclick="var store = locate.value; locate.value = modify.value; modify.value = store;">Flip</button>
       <button onclick="locate.value = ''; modify.value = '';">Clear</button>
@@ -1550,6 +1550,11 @@
       insertColor = false;
     }
   });
+  scaler.addEventListener("touchstart",function(){
+    toggleScaling();
+    document.body.addEventListener("touchmove",setScaling);
+    document.body.addEventListener("touchend",removeScaling);
+  });
   scaler.addEventListener("mousedown",function(){
     toggleScaling();
     document.body.addEventListener("mousemove",setScaling);
@@ -1902,10 +1907,25 @@
     document.execCommand(history);
   }
   function activateReplacer(){
-    userInput.value = userInput.value.split(locate.value).join(modify.value);
-    sourceChange = true;
-    mustSave = true;
-    previewRefresh();
+    var replacerButtons = Array.from(replacerToolbar.getElementsByTagName("button"));
+    replacerButtons.forEach(function(button){
+      button.disabled = true;
+    });
+    var worker = new Worker("replacer-worker.js");
+    worker.postMessage({
+      "userInput": userInput.value,
+      "locate": locate.value,
+      "modify": modify.value
+    });
+    worker.addEventListener("message",function(event){
+      userInput.value = event.data;
+      replacerButtons.forEach(function(button){
+        button.disabled = false;
+      });
+      sourceChange = true;
+      mustSave = true;
+      previewRefresh();
+    });
   }
   function colorInputRefresh(){
     var get = colorInput.value.replace("#","");
@@ -2012,11 +2032,19 @@
   function setScaling(event){
     var cursorOffset, windowAxis;
     if (orientation == "horizontal"){
-      cursorOffset = event.clientY - header.offsetHeight;
+      if (event instanceof TouchEvent){
+        cursorOffset = event.touches[0].clientY - header.offsetHeight;
+      } else {
+        cursorOffset = event.clientY - header.offsetHeight;
+      }
       windowAxis = window.innerHeight;
     }
     if (orientation == "vertical"){
-      cursorOffset = event.clientX;
+      if (event instanceof TouchEvent){
+        cursorOffset = event.touches[0].clientX;
+      } else {
+        cursorOffset = event.clientX;
+      }
       windowAxis = window.innerWidth;
     }
     if (cursorOffset <= 80){
@@ -2044,11 +2072,17 @@
       preview.style.width = `calc(100% - ${cursorOffset}px - 8px)`;
     }
   }
-  function removeScaling(type){
-    document.body.removeEventListener("mousemove",setScaling);
-    document.body.removeEventListener("mouseup",removeScaling);
-    document.body.removeEventListener("mouseleave",removeScaling);
-    toggleScaling();
+  function removeScaling(event){
+    if (event instanceof TouchEvent){
+      document.body.removeEventListener("touchmove",setScaling);
+      document.body.removeEventListener("touchend",removeScaling);
+      toggleScaling();
+    } else {
+      document.body.removeEventListener("mousemove",setScaling);
+      document.body.removeEventListener("mouseup",removeScaling);
+      document.body.removeEventListener("mouseleave",removeScaling);
+      toggleScaling();
+    }
   }
 </script>
 
