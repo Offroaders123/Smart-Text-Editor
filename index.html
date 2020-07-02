@@ -14,7 +14,7 @@
 <link rel="alternate icon" type="image/png" sizes="32x32" href="resources/icon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="resources/icon-apple-touch-icon.png">
 <link rel="mask-icon" href="resources/icon-mask-icon.svg" color="#ee8800">
-<link href="https://fonts.googleapis.com/css2?family=Cousine&family=Rubik&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cousine&family=Rubik&display=swap">
 
 <script>
   var windowParent, removeTransitions = "--transition-slow: 0s; --transition-medium: 0s; --transition-fast: 0s";
@@ -489,6 +489,8 @@
   }
   #scaler.active, #scaler:hover {
     background: var(--button-hover);
+  }
+  #scaler.active {
     transition: background var(--transition-fast);
   }
   #scaler.text, #scaler.code {
