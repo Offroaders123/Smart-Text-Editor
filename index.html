@@ -134,15 +134,15 @@
     transition: var(--transition-fast);
     transition-property: color, background, opacity;
   }
-  button::-moz-focus-inner {
-    border: none;
-  }
-  button:hover, button:focus, .dropdown.active:focus-within > button {
+  button:hover, button:focus, .dropdown.active:focus-within > button, .select:hover .dropdown button {
     color: var(--text-hover);
     background: var(--button-hover);
   }
   button:focus {
     --focus-border: var(--outline);
+  }
+  button::-moz-focus-inner {
+    border: none;
   }
   button:disabled {
     opacity: 0.5;
@@ -931,13 +931,19 @@
     transform: scale(1);
   }
   .select {
-    padding: min(0.75vw, 3px);
+    margin: min(0.75vw, 3px);
     display: flex;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
+    transition: color var(--transition-fast);
   }
-  .select .dropdown {
-    margin-left: min(1vw, 4px);
+  .select label {
+    padding-right: min(1vw, 4px);
+    cursor: pointer;
+  }
+  .select:hover, .select:focus-within {
+    color: var(--text-hover);
   }
   .checkbox {
     padding: min(0.75vw, 3px);
@@ -1122,7 +1128,7 @@
 </header>
 
 <main id="main" class="text horizontal">
-  <textarea id="userInput" class="text horizontal" placeholder="Welcome to the Smart Text Editor! This site was created to allow for text editing and code development within your browser!" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"></textarea>
+  <textarea id="userInput" class="text horizontal" placeholder="Welcome to the Smart Text Editor! This site was created to allow for text editing and code development within your browser!"></textarea>
   <div id="scaler" class="text horizontal">
     <div class="handle">▲<br>▼</div>
   </div>
@@ -1152,8 +1158,8 @@
     </div>
     <div class="content">
       <div class="item expand">
-        <textarea id="locate" placeholder="Text to locate..." spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"></textarea>
-        <textarea id="modify" placeholder="Replace with..." spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"></textarea>
+        <textarea id="locate" placeholder="Text to locate..."></textarea>
+        <textarea id="modify" placeholder="Replace with..."></textarea>
       </div>
     </div>
     <div class="toolbar">
@@ -1170,7 +1176,7 @@
     <div class="content">
       <div class="item">
         <span id="colorPreview"></span>
-        <input id="colorInput" type="text" value="#ffa500" maxlength="7" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off">
+        <input id="colorInput" type="text" value="#ffa500" maxlength="7">
       </div>
       <div class="item">
         <label for="redChannel">Red</label>
@@ -1194,7 +1200,7 @@
     </div>
     <div class="content">
       <div class="item expand">
-        <textarea id="formatterInput" class="expand" placeholder="Place JSON here..." spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"></textarea>
+        <textarea id="formatterInput" class="expand" placeholder="Place JSON here..."></textarea>
       </div>
     </div>
     <div class="toolbar">
@@ -1210,7 +1216,7 @@
     </div>
     <div class="content">
       <div class="item expand">
-        <textarea id="encoderInput" class="expand" placeholder="Place text here..." spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"></textarea>
+        <textarea id="encoderInput" class="expand" placeholder="Place text here..."></textarea>
       </div>
     </div>
     <div class="toolbar">
@@ -1232,7 +1238,8 @@
     </div>
     <div class="content">
       <div class="item list">
-        <div class="select">Default View:
+        <div class="select">
+          <label for="viewSetting">Default View:</label>
           <div class="dropdown">
             <button id="viewSetting">Text</button>
             <ul>
@@ -1242,7 +1249,8 @@
             </ul>
           </div>
         </div>
-        <div class="select">Default Orientation:
+        <div class="select">
+          <label for="orientationSetting">Default Orientation:</label>
           <div class="dropdown">
             <button id="orientationSetting">Horizontal</button>
             <ul>
@@ -1251,7 +1259,8 @@
             </ul>
           </div>
         </div>
-        <div class="select" data-tooltip="Opens for only touch devices when Automatic is selected">Open Editing Tools:
+        <div class="select" data-tooltip="Opens for only touch devices when Automatic is selected">
+          <label for="editingToolsSetting">Open Editing Tools:</label>
           <div class="dropdown">
             <button id="editingToolsSetting">Automatic</button>
             <ul>
@@ -1361,26 +1370,51 @@
     });
   });
   // --- Dropdown section
-  
-  var checkboxes = Array.from(document.getElementsByClassName("checkbox"));
-  checkboxes.forEach(function(item){
-    item.addEventListener("keydown",function(event){
-      if (event.key == "Enter"){
-        blockShortcut(event);
-        item.getElementsByTagName("label")[0].click();
+
+  var selects = Array.from(document.getElementsByClassName("select"));
+  selects.forEach(function(select){
+    select.getElementsByTagName("label")[0].addEventListener("mouseover",function(){
+      var activeDropdown = Array.from(select.getElementsByClassName("dropdown"))[0].classList.contains("active");
+      if (activeDropdown == true){
+        document.getElementById(select.getElementsByTagName("label")[0].getAttribute("for")).focus();
       }
     });
-    item.setAttribute("tabindex","0");
+  });
+  
+  var checkboxes = Array.from(document.getElementsByClassName("checkbox"));
+  checkboxes.forEach(function(checkbox){
+    checkbox.addEventListener("keydown",function(event){
+      if (event.key == "Enter"){
+        blockShortcut(event);
+        checkbox.getElementsByTagName("label")[0].click();
+      }
+    });
+    checkbox.setAttribute("tabindex","0");
   });
   
   var buttons = Array.from(document.getElementsByTagName("button"));
-  buttons.forEach(function(item){
-    item.addEventListener("click",function(){
-      if (editingTools.contains(item) == false){
-        item.focus();
+  buttons.forEach(function(button){
+    button.addEventListener("click",function(){
+      if (editingTools.contains(button) == false){
+        button.focus();
       }
     });
   });
+
+  var textareas = Array.from(document.getElementsByTagName("textarea"));
+  textareas.forEach(function(textarea){
+    addInputCharacteristics(textarea);
+  });
+  var inputTexts = document.querySelectorAll("input[type='text']");
+  inputTexts.forEach(function(inputText){
+    addInputCharacteristics(inputText);
+  });
+  function addInputCharacteristics(item){
+    item.spellcheck = false;
+    item.autocomplete = "off";
+    item.autocapitalize = "off";
+    item.setAttribute("autocorrect","off");
+  }
   
   var closeButtons = Array.from(document.getElementsByClassName("closeButton"));
   closeButtons.forEach(function(closeButton){
