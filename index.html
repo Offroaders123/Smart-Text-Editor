@@ -297,6 +297,7 @@
     background: var(--container-medium-hover);
     border-radius: var(--border-radius-large);
     box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow-color);
+    transform-origin: bottom center;
   }
   [data-tooltip]::after {
     content: "";
@@ -873,12 +874,20 @@
     color: var(--text-info);
     font-size: min(2.5vw, 11px);
   }
-  .dropdown li svg {
+  .dropdown svg {
     width: min(2.75vw, 12px);
     height: min(2.75vw, 12px);
-    fill: var(--text-info);
     transition: var(--transition-fast);
-    transition-property: fill transform;
+  }
+  .dropdown button svg {
+    margin-left: min(2vw, 8px);
+    fill: var(--text-dark);
+    transform: rotate(90deg);
+    transition-property: fill;
+  }
+  .dropdown li svg {
+    fill: var(--text-info);
+    transition-property: fill, transform;
   }
   .dropdown li [type="file"], .dropdown li a {
     display: none;
@@ -890,7 +899,7 @@
   .dropdown li:focus {
     --focus-border: var(--outline);
   }
-  .dropdown li:hover > svg, .dropdown li:focus > svg, .dropdown li:focus-within > svg {
+  .dropdown:hover > button svg, .dropdown li:hover > svg, .dropdown li:focus > svg, .dropdown:focus-within > button svg, .dropdown li:focus-within > svg {
     fill: var(--text-hover);
   }
   .dropdown ul ul {
@@ -944,6 +953,15 @@
   }
   .select:hover, .select:focus-within {
     color: var(--text-hover);
+  }
+  .select:hover > .dropdown button svg {
+    fill: var(--text-hover);
+  }
+  .select button {
+    min-width: unset;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
   .checkbox {
     padding: min(0.75vw, 3px);
@@ -1241,7 +1259,7 @@
         <div class="select">
           <label for="viewSetting">Default View:</label>
           <div class="dropdown">
-            <button id="viewSetting">Text</button>
+            <button id="viewSetting">Text<svg><use href="#arrow"></use></svg></button>
             <ul>
               <li onclick="updateSelect('view','text');">Text</li>
               <li onclick="updateSelect('view','code');">Code</li>
@@ -1252,7 +1270,7 @@
         <div class="select">
           <label for="orientationSetting">Default Orientation:</label>
           <div class="dropdown">
-            <button id="orientationSetting">Horizontal</button>
+            <button id="orientationSetting">Horizontal<svg><use href="#arrow"></use></svg></button>
             <ul>
               <li onclick="updateSelect('orientation','horizontal');">Horizontal</li>
               <li onclick="updateSelect('orientation','vertical');">Vertical</li>
@@ -1262,7 +1280,7 @@
         <div class="select" data-tooltip="Opens for only touch devices when Automatic is selected">
           <label for="editingToolsSetting">Open Editing Tools:</label>
           <div class="dropdown">
-            <button id="editingToolsSetting">Automatic</button>
+            <button id="editingToolsSetting">Automatic<svg><use href="#arrow"></use></svg></button>
             <ul>
               <li onclick="updateSelect('editingTools','automatic');">Automatic</li>
               <li onclick="updateSelect('editingTools','yes');">Yes</li>
@@ -1370,16 +1388,6 @@
     });
   });
   // --- Dropdown section
-
-  var selects = Array.from(document.getElementsByClassName("select"));
-  selects.forEach(function(select){
-    select.getElementsByTagName("label")[0].addEventListener("mouseover",function(){
-      var activeDropdown = Array.from(select.getElementsByClassName("dropdown"))[0].classList.contains("active");
-      if (activeDropdown == true){
-        document.getElementById(select.getElementsByTagName("label")[0].getAttribute("for")).focus();
-      }
-    });
-  });
   
   var checkboxes = Array.from(document.getElementsByClassName("checkbox"));
   checkboxes.forEach(function(checkbox){
@@ -1681,7 +1689,8 @@
   }
   function updateSelect(item,value){
     updateSetting(item,value);
-    document.getElementById(`${item}Setting`).innerHTML = updateCapitalization(value);
+    var settingButton = document.getElementById(`${item}Setting`);
+    settingButton.innerHTML = settingButton.innerHTML.replace(settingButton.textContent,updateCapitalization(value));
   }
   function updateCheckbox(item,value){
     if (value == undefined){
