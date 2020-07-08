@@ -836,8 +836,13 @@
   .card .toolbar > :last-child {
     margin-right: 0;
   }
+  .dropdown {
+    position: relative;
+  }
   .dropdown ul {
     position: absolute;
+    left: 0;
+    top: 100%;
     min-width: min(35vw, 155px);
     background: var(--container-medium);
     border-radius: var(--border-radius-medium);
@@ -958,10 +963,12 @@
     fill: var(--text-hover);
   }
   .select button {
-    min-width: unset;
     display: flex;
     justify-content: space-between;
     align-items: center;
+  }
+  .select ul {
+    min-width: 100%;
   }
   .checkbox {
     padding: min(0.75vw, 3px);
@@ -1388,7 +1395,7 @@
     });
   });
   // --- Dropdown section
-  
+
   var checkboxes = Array.from(document.getElementsByClassName("checkbox"));
   checkboxes.forEach(function(checkbox){
     checkbox.addEventListener("keydown",function(event){
