@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="resources/icon-apple-touch-icon.png">
 <link rel="mask-icon" href="resources/icon-mask-icon.svg" color="#ee8800">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cousine&family=Rubik&display=swap">
-<script src="https://offroaders123.github.io/Numbered-Textarea-Plugin/install.js"></script>
+<link rel="stylesheet" href="https://offroaders123.github.io/Numbered-Textarea-Plugin/styles.css">
 
 <script>
   var windowParent, removeTransitions = "--transition-slow: 0s; --transition-medium: 0s; --transition-fast: 0s";
@@ -50,7 +50,6 @@
   
     --button: #3a3a3a;
     --button-hover: #4a4a4a;
-    --button-disabled: #2a2a2a;
   
     --range-thumb: var(--button);
     --range-thumb-hover: var(--button-hover);
@@ -60,10 +59,7 @@
     --textarea-dark: #1d1d1d;
     --textarea-medium: #212121;
     --textarea-light: #eae2d1;
-    --textarea-drag-dark-color: #7f7fff;
-    --textarea-drag-dark-background: #161656;
-    --textarea-drag-light-color: #000080;
-    --textarea-drag-light-background: #aaaaea;
+    --textarea-drag-background: #0000ff40;
     --textarea-drag-border: #0000ff;
   
     --card-background: #17171760;
@@ -166,8 +162,10 @@
   [data-lined-container]:focus-within, [type="text"] {
     outline: none;
   }
+  [data-lined-container] ol, [data-lined-container] textarea, [type="text"] {
+    padding: 6px;
+  }
   [data-lined-container] ol {
-    padding: 4px;
     color: var(--color);
     background: transparent;
     opacity: 0.55;
@@ -454,7 +452,7 @@
     left: 0;
     top: 0;
   }
-  #workspace, #workspace ol, #workspace textarea {
+  #workspace, #workspace ol {
     transition: var(--transition-slow);
   }
   #workspace ol {
@@ -462,10 +460,17 @@
     padding-right: 16px;
     transition-property: color;
   }
-  #workspace textarea {
-    padding: 0;
-    border: 4px solid;
-    transition-property: border-color;
+  #workspace::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    border: 0 solid var(--textarea-drag-border);
+    pointer-events: none;
+    transition: var(--transition-medium);
+    transition-property: background, border-width;
   }
   #workspace.text {
     --size: 100%;
@@ -480,9 +485,6 @@
     --color: var(--text-light);
     background: var(--textarea-dark);
   }
-  #workspace.code textarea, #workspace.split textarea, #workspace.preview textarea {
-    border-color: var(--textarea-dark);
-  }
   #workspace.code {
     --size: 100%;
   }
@@ -494,6 +496,10 @@
     visibility: hidden;
     opacity: 0;
   }
+  #workspace.drag::after {
+    background: var(--textarea-drag-background);
+    border-width: 4px;
+  }
   #workspace.horizontal, #preview.horizontal {
     width: 100%;
     height: var(--size);
@@ -501,18 +507,6 @@
   #workspace.vertical, #preview.vertical {
     width: var(--size);
     height: 100%;
-  }
-  #workspace.drag textarea {
-    border-color: var(--textarea-drag-border);
-    transition: var(--transition-medium);
-  }
-  #workspace.text.drag {
-    --color: var(--textarea-drag-light-color);
-    background: var(--textarea-drag-light-background);
-  }
-  #workspace.code.drag, #workspace.split.drag, #workspace.preview.drag {
-    --color: var(--textarea-drag-dark-color);
-    background: var(--textarea-drag-dark-background);
   }
   #scaler {
     position: absolute;
@@ -818,9 +812,6 @@
     border-radius: var(--border-radius-medium);
     box-shadow: 0 2px 4px var(--box-shadow-color) inset;
   }
-  .card [data-lined-container] textarea, .card [type="text"] {
-    padding: 4px;
-  }
   .card [data-lined-container] {
     margin-bottom: min(1.5vw, 10px);
     width: 100%;
@@ -834,14 +825,14 @@
   .card [data-lined-container]:last-child {
     margin-bottom: 0;
   }
-  #colorPreview {
+  #pickerPreview {
     margin-bottom: min(1.5vw, 10px);
     min-width: min(20vw, 86px);
     min-height: min(20vw, 86px);
     border-radius: var(--border-radius-medium);
     box-shadow: 0 2px 4px var(--box-shadow-color) inset;
   }
-  #colorInput {
+  #pickerInput {
     width: min(20vw, 86px);
   }
   .card .toolbar {
@@ -1233,8 +1224,8 @@
     </div>
     <div class="content">
       <div class="item">
-        <span id="colorPreview"></span>
-        <input id="colorInput" type="text" value="#ffa500" maxlength="7">
+        <span id="pickerPreview"></span>
+        <input id="pickerInput" type="text" value="#ffa500" maxlength="7">
       </div>
       <div class="item">
         <label for="redChannel">Red</label>
@@ -1246,7 +1237,7 @@
       </div>
     </div>
     <div class="toolbar">
-      <button onclick="colorInput.select(); document.execCommand('copy');">Copy</button>
+      <button onclick="pickerInput.select(); document.execCommand('copy');">Copy</button>
       <button onclick="textEdit('insert',storedColor,true); channelRefresh(); insertColor = true;">Insert</button>
       <button onclick="var selectionCount = workspaceInput.selectionEnd - workspaceInput.selectionStart; if (selectionCount != 0){ textEdit('delete',selectionCount,true); } insertColor = false;">Delete</button>
     </div>
@@ -1368,10 +1359,11 @@
   </div>
 </main>
 
+<script src="https://offroaders123.github.io/Numbered-Textarea-Plugin/script.js"></script>
+
 <script>
   var storage = window.localStorage, view = "text", orientation = "horizontal", refresh = "true", title = "true", transitions = "true", loadedFile = undefined, sourceChange = false, mustSave = false, activeWidget = undefined, activeModal = undefined, storedColor, insertColor = false, encodeComponent = false;
-  
-  // --- Dropdown section
+
   var dropdowns = Array.from(document.getElementsByClassName("dropdown"));
   dropdowns.forEach(function(dropdown){
     var button = dropdown.getElementsByTagName("button")[0];
@@ -1434,7 +1426,6 @@
       });
     });
   });
-  // --- Dropdown section
 
   var checkboxes = Array.from(document.getElementsByClassName("checkbox"));
   checkboxes.forEach(function(checkbox){
@@ -1503,8 +1494,8 @@
       }
       workspaceInput.focus();
     }
-    colorInputRefresh();
-    previewRefresh();
+    pickerInputRefresh();
+    forceRefresh();
     if ("serviceWorker" in navigator && windowParent && window.location.protocol == "https:"){
       navigator.serviceWorker.register("service-worker.js");
     }
@@ -1634,7 +1625,7 @@
       previewRefresh();
     }
   });
-  workspaceInput.addEventListener("mousedown",function(){
+  workspaceInput.addEventListener("click",function(){
     if (insertColor){
       insertColor = false;
     }
@@ -1653,10 +1644,12 @@
   load.addEventListener("change",function(event){
     confirmOverwrite(importFile,event);
   });
-  colorInput.addEventListener("input",function(){
-    colorInputRefresh();
-    textEdit("insert",storedColor,true);
-    colorInput.focus();
+  pickerInput.addEventListener("input",function(){
+    pickerInputRefresh();
+    if (insertColor){
+      textEdit("insert",storedColor,true);
+      pickerInput.focus();
+    }
   });
   cardBackground.addEventListener("click",function(){
     if (activeModal == "welcome"){
@@ -2008,8 +2001,8 @@
     mustSave = true;
     previewRefresh();
   }
-  function colorInputRefresh(){
-    var get = colorInput.value.replace("#","");
+  function pickerInputRefresh(){
+    var get = pickerInput.value.replace("#","");
     if (get.length == 3 || get.length == 6){
       storedColor = get;
       if (storedColor.length == 3){
@@ -2028,13 +2021,13 @@
       greenChannel.value = storedColor[1];
       blueChannel.value = storedColor[2];
       storedColor = `#${convertHex(redChannel.value)}${convertHex(greenChannel.value)}${convertHex(blueChannel.value)}`;
-      colorPreview.style.background = storedColor;
+      pickerPreview.style.background = storedColor;
     }
   }
   function channelRefresh(){
     storedColor = `#${convertHex(redChannel.value)}${convertHex(greenChannel.value)}${convertHex(blueChannel.value)}`;
-    colorPreview.style.background = storedColor;
-    colorInput.value = storedColor;
+    pickerPreview.style.background = storedColor;
+    pickerInput.value = storedColor;
     if (insertColor){
       textEdit("insert",storedColor,true);
     }
@@ -2052,10 +2045,10 @@
       openCard("picker");
     }
     if (window.getSelection().toString().length > 0){
-      colorInput.value = window.getSelection();
+      pickerInput.value = window.getSelection();
     }
-    colorInput.focus();
-    colorInputRefresh();
+    pickerInput.focus();
+    pickerInputRefresh();
   }
   function activateFormatter(format){
     try {
