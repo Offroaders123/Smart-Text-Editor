@@ -15,6 +15,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="resources/icon-apple-touch-icon.png">
 <link rel="mask-icon" href="resources/icon-mask-icon.svg" color="#ee8800">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cousine&family=Rubik&display=swap">
+<script src="https://offroaders123.github.io/Numbered-Textarea-Plugin/install.js"></script>
 
 <script>
   var windowParent, removeTransitions = "--transition-slow: 0s; --transition-medium: 0s; --transition-fast: 0s";
@@ -151,20 +152,33 @@
   button.warning {
     --button-hover: #bb2222;
   }
-  textarea, [type="text"] {
+  [data-lined-container] {
+    resize: none;
+  }
+  [data-lined-container], [type="text"] {
     --color: var(--text-super-dark);
     color: var(--color);
+    font-family: unset;
     font-size: 13px;
     border: none;
     border-radius: 0;
-    outline: none;
-    -webkit-appearance: none;
   }
-  textarea {
-    font-family: var(--font-family-sans-serif);
-    white-space: pre;
+  [data-lined-container]:focus-within, [type="text"] {
+    outline: none;
+  }
+  [data-lined-container] ol {
+    padding: 4px;
+    padding-right: 12px;
+    color: var(--color);
+    background: transparent;
+    opacity: 0.55;
+  }
+  [data-lined-container] li::before {
+    font-family: inherit;
+  }
+  [data-lined-container] textarea, [type="text"] {
     word-wrap: normal;
-    resize: none;
+    -webkit-appearance: none;
   }
   a {
     color: var(--text-dark);
@@ -356,8 +370,10 @@
   #header.preview.vertical {
     box-shadow: -100vw 1px 8px transparent;
   }
-  #header.resize, #userInput.resize, #preview.resize {
+  #header.resize, #workspace.resize, #preview.resize {
     pointer-events: none;
+  }
+  #header.resize, #workspace.resize, #workspace.resize textarea, #preview.resize {
     transition: none;
   }
   #header .toolbar {
@@ -420,7 +436,12 @@
     position: relative;
     flex: 1;
   }
-  #main.code textarea, #main.code [type="text"], #main.split textarea, #main.split [type="text"], #main.preview textarea, #main.preview [type="text"] {
+  #main.text [data-lined-container] ol {
+    padding: 0;
+    width: 0;
+    opacity: 0;
+  }
+  #main.code [data-lined-container], #main.code [type="text"], #main.split [data-lined-container], #main.split [type="text"], #main.preview [data-lined-container], #main.preview [type="text"] {
     font-family: var(--font-family-monospace);
   }
   #main.horizontal.resize {
@@ -429,53 +450,66 @@
   #main.vertical.resize {
     cursor: col-resize;
   }
-  #userInput {
+  #workspace {
     position: absolute;
     left: 0;
     top: 0;
-    border: 4px solid;
+  }
+  #workspace, #workspace ol, #workspace textarea {
     transition: var(--transition-slow);
   }
-  #userInput.text {
+  #workspace ol {
+    transition-property: color;
+  }
+  #workspace textarea {
+    padding: 0;
+    border: 4px solid;
+    transition-property: border-color;
+  }
+  #workspace.text {
     --size: 100%;
     --color: var(--text-super-dark);
     background: var(--textarea-light);
+  }
+  #workspace.text textarea {
     border-color: var(--textarea-light);
     white-space: pre-wrap;
   }
-  #userInput.code, #userInput.split, #userInput.preview {
+  #workspace.code, #workspace.split, #workspace.preview {
     --color: var(--text-light);
     background: var(--textarea-dark);
+  }
+  #workspace.code textarea, #workspace.split textarea, #workspace.preview textarea {
     border-color: var(--textarea-dark);
   }
-  #userInput.code {
+  #workspace.code {
     --size: 100%;
   }
-  #userInput.split {
+  #workspace.split {
     --size: calc(50% - 8px);
   }
-  #userInput.preview {
+  #workspace.preview {
     --size: 0;
     visibility: hidden;
     opacity: 0;
   }
-  #userInput.horizontal, #preview.horizontal {
+  #workspace.horizontal, #preview.horizontal {
     width: 100%;
     height: var(--size);
   }
-  #userInput.vertical, #preview.vertical {
+  #workspace.vertical, #preview.vertical {
     width: var(--size);
     height: 100%;
   }
-  #userInput.drag {
+  #workspace.drag textarea {
     border-color: var(--textarea-drag-border);
     transition: var(--transition-medium);
   }
-  #userInput.text.drag {
+  #workspace.text.drag {
     --color: var(--textarea-drag-light-color);
     background: var(--textarea-drag-light-background);
   }
-  #userInput.code.drag, #userInput.split.drag, #userInput.preview.drag {
+  #workspace.code.drag, #workspace.split.drag, #workspace.preview.drag {
     --color: var(--textarea-drag-dark-color);
     background: var(--textarea-drag-dark-background);
   }
@@ -657,11 +691,6 @@
   .card.modal.active {
     transform: translate(-50%,-50%) scale(1);
   }
-  
-  
-  /* vvvvvvvvvv Editing Tool Stuffs vvvvvvvvvv */
-  
-  
   .card.editing > * {
     margin: 0 min(0.75vw, 6px);
   }
@@ -695,11 +724,6 @@
   .card.editing.active ~ .card.widget.active {
     transform: translateY(min(19vw, 62px)) scaleY(1);
   }
-  
-  
-  /* ^^^^^^^^^^^^ Editing Tool Stuffs ^^^^^^^^^^^^ */
-  
-  
   .card .header {
     position: relative;
     width: 100%;
@@ -787,24 +811,26 @@
   .card .content .item.expand {
     width: 100%;
   }
-  .card textarea, .card [type="text"] {
-    padding: 4px;
+  .card [data-lined-container], .card [type="text"] {
     --color: var(--text-light);
     background: var(--textarea-medium);
     border-radius: var(--border-radius-medium);
     box-shadow: 0 2px 4px var(--box-shadow-color) inset;
   }
-  .card textarea {
+  .card [data-lined-container] textarea, .card [type="text"] {
+    padding: 4px;
+  }
+  .card [data-lined-container] {
     margin-bottom: min(1.5vw, 10px);
     width: 100%;
     max-width: 50vw;
     height: min(25vw, 75px);
     max-height: min(25vw, 25vh);
   }
-  .card textarea.expand {
+  .card [data-lined-container].expand {
     height: 150px;
   }
-  .card textarea:last-child {
+  .card [data-lined-container]:last-child {
     margin-bottom: 0;
   }
   #colorPreview {
@@ -1153,7 +1179,9 @@
 </header>
 
 <main id="main" class="text horizontal">
-  <textarea id="userInput" class="text horizontal" placeholder="Welcome to the Smart Text Editor! This site was created to allow for text editing and code development within your browser!"></textarea>
+  <div id="workspace" class="text horizontal" data-lined-container>
+    <textarea id="workspaceInput" placeholder="Welcome to the Smart Text Editor! This site was created to allow for text editing and code development within your browser!"></textarea>
+  </div>
   <div id="scaler" class="text horizontal">
     <div class="handle">▲<br>▼</div>
   </div>
@@ -1183,14 +1211,18 @@
     </div>
     <div class="content">
       <div class="item expand">
-        <textarea id="locate" placeholder="Text to locate..."></textarea>
-        <textarea id="modify" placeholder="Replace with..."></textarea>
+        <div data-lined-container>
+          <textarea id="locate" placeholder="Text to locate..."></textarea>
+        </div>
+        <div data-lined-container>
+          <textarea id="modify" placeholder="Replace with..."></textarea>
+        </div>
       </div>
     </div>
     <div class="toolbar">
       <button onclick="activateReplacer();">Replace</button>
-      <button onclick="var store = locate.value; locate.value = modify.value; modify.value = store;">Flip</button>
-      <button onclick="locate.value = ''; modify.value = '';">Clear</button>
+      <button onclick="var store = locate.value; changeTextarea(locate,modify.value); changeTextarea(modify,store);">Flip</button>
+      <button onclick="changeTextarea(locate,''); changeTextarea(modify,'');">Clear</button>
     </div>
   </div>
   <div id="picker" class="card widget">
@@ -1215,7 +1247,7 @@
     <div class="toolbar">
       <button onclick="colorInput.select(); document.execCommand('copy');">Copy</button>
       <button onclick="textEdit('insert',storedColor,true); channelRefresh(); insertColor = true;">Insert</button>
-      <button onclick="var selectionCount = userInput.selectionEnd - userInput.selectionStart; if (selectionCount != 0){ textEdit('delete',selectionCount,true); } insertColor = false;">Delete</button>
+      <button onclick="var selectionCount = workspaceInput.selectionEnd - workspaceInput.selectionStart; if (selectionCount != 0){ textEdit('delete',selectionCount,true); } insertColor = false;">Delete</button>
     </div>
   </div>
   <div id="formatter" class="card widget">
@@ -1225,13 +1257,15 @@
     </div>
     <div class="content">
       <div class="item expand">
-        <textarea id="formatterInput" class="expand" placeholder="Place JSON here..."></textarea>
+        <div class="expand" data-lined-container>
+          <textarea id="formatterInput" placeholder="Place JSON here..."></textarea>
+        </div>
       </div>
     </div>
     <div class="toolbar">
       <button onclick="activateFormatter('  ');">Format</button>
       <button onclick="activateFormatter('');">Collapse</button>
-      <button onclick="formatterInput.value = '';">Clear</button>
+      <button onclick="changeTextarea(formatterInput,'');">Clear</button>
     </div>
   </div>
   <div id="encoder" class="card widget">
@@ -1241,13 +1275,15 @@
     </div>
     <div class="content">
       <div class="item expand">
-        <textarea id="encoderInput" class="expand" placeholder="Place text here..."></textarea>
+        <div class="expand" data-lined-container>
+          <textarea id="encoderInput" placeholder="Place text here..."></textarea>
+        </div>
       </div>
     </div>
     <div class="toolbar">
       <button onclick="activateEncoder('encode');">Encode</button>
       <button onclick="activateEncoder('decode');">Decode</button>
-      <button onclick="encoderInput.value = '';">Clear</button>
+      <button onclick="changeTextarea(encoderInput,'');">Clear</button>
     </div>
     <div class="toolbar">
       <div class="checkbox" data-tooltip="Encodes more special characters">
@@ -1315,6 +1351,9 @@
     </div>
     <div class="toolbar">
       <a href="https://github.com/Offroaders123/Smart-Text-Editor/" target="_blank">Smart Text Editor on GitHub</a>
+    </div>
+    <div class="toolbar">
+      <a href="https://github.com/Offroaders123/Numbered-Textarea-Plugin/" target="_blank">Numbered Textarea Plugin on GitHub</a>
     </div>
   </div>
   <div id="reset" class="card notification">
@@ -1461,7 +1500,7 @@
           }
         }, 2100);
       }
-      userInput.focus();
+      workspaceInput.focus();
     }
     colorInputRefresh();
     forceRefresh();
@@ -1571,15 +1610,15 @@
   });
   document.documentElement.addEventListener("dragover",function(event){
     event.preventDefault();
-    userInput.classList.add("drag");
+    workspace.classList.add("drag");
     event.dataTransfer.dropEffect = "copy";
   });
   document.documentElement.addEventListener("dragleave",function(){
-    userInput.classList.remove("drag");
+    workspace.classList.remove("drag");
   });
   document.documentElement.addEventListener("drop",function(event){
     event.preventDefault();
-    userInput.classList.remove("drag");
+    workspace.classList.remove("drag");
     if (event.dataTransfer.types.includes("Files")){
       load.files = event.dataTransfer.files;
       confirmOverwrite(importFile,event);
@@ -1587,14 +1626,14 @@
       textEdit("insert",event.dataTransfer.getData("text"),true);
     }
   });
-  userInput.addEventListener("input",function(){
+  workspaceInput.addEventListener("input",function(){
     sourceChange = true;
     mustSave = true;
     if (view == "split" || view == "preview"){
       previewRefresh();
     }
   });
-  userInput.addEventListener("mousedown",function(){
+  workspaceInput.addEventListener("mousedown",function(){
     if (insertColor){
       insertColor = false;
     }
@@ -1620,7 +1659,7 @@
   });
   cardBackground.addEventListener("click",function(){
     if (activeModal == "welcome"){
-      userInput.focus();
+      workspaceInput.focus();
     }
     closeCard(activeModal);
   });
@@ -1717,9 +1756,9 @@
     return value.charAt(0).toUpperCase() + value.slice(1);
   }
   function changeView(input){
-    var elements = ["header","main","userInput","scaler","preview"], newView = input;
-    elements.forEach(function(item){
-      changeClass(item,view,newView);
+    var elements = [header,main,workspace,scaler,preview], newView = input;
+    elements.forEach(function(element){
+      changeClass(element,view,newView);
     });
     if (newView == "text" || newView == "code"){
       undoTool.disabled = false;
@@ -1740,7 +1779,7 @@
     previewRefresh();
   }
   function changeOrientation(input){
-    var elements = ["header","main","userInput","scaler","preview"], newOrientation;
+    var elements = [header,main,workspace,scaler,preview], newOrientation;
     if (input == undefined){
       if (orientation == "horizontal"){
         newOrientation = "vertical";
@@ -1750,8 +1789,8 @@
       }
       changeView("code");
       setTimeout(function(){
-        elements.forEach(function(item){
-          changeClass(item,orientation,newOrientation);
+        elements.forEach(function(element){
+          changeClass(element,orientation,newOrientation);
         });
         scaler.style.transition = "none";
         preview.style.transition = "none";
@@ -1762,16 +1801,16 @@
       }, 550);
     } else {
       newOrientation = input;
-      elements.forEach(function(item){
-        changeClass(item,orientation,newOrientation);
+      elements.forEach(function(element){
+        changeClass(element,orientation,newOrientation);
       });
       orientation = newOrientation;
     }
   }
   function changeClass(element,variable,newVariable){
-    document.getElementById(element).classList.remove(variable);
-    document.getElementById(element).removeAttribute("style");
-    document.getElementById(element).classList.add(newVariable);
+    element.classList.remove(variable);
+    element.removeAttribute("style");
+    element.classList.add(newVariable);
   }
   function changeTransitions(input){
     var newTransition = input;
@@ -1793,6 +1832,12 @@
     } else {
       action(event);
       closeCard(activeModal);
+    }
+  }
+  function changeTextarea(textarea,newValue){
+    textarea.value = newValue;
+    if (textarea.parentElement.hasAttribute("data-lined-container")){
+      updateLineCount(textarea);
     }
   }
   function blockShortcut(event){
@@ -1825,10 +1870,9 @@
       if (type == "text" || type == "application" || subType == "svg+xml"){
         reader.readAsText(load.files[0],"UTF-8");
         reader.addEventListener("loadend",function(){
-          userInput.value = reader.result;
-          sourceChange = true;
+          changeTextarea(workspaceInput,reader.result);
           mustSave = false;
-          previewRefresh();
+          forceRefresh();
         });
         loadedFile = load.files[0].name;
         if (subType == "plain"){
@@ -1853,7 +1897,7 @@
     load.value = null;
   }
   function saveAs(extension){
-    var blob = new Blob([userInput.value],{type: "text/plain"});
+    var blob = new Blob([workspaceInput.value],{type: "text/plain"});
     save.href = URL.createObjectURL(blob);
     if (extension == undefined){
       if (loadedFile != undefined){
@@ -1874,21 +1918,21 @@
   function openDisplay(){
     var display = window.open("","_blank",`left= ${window.screenX}, top= ${window.screenY}, width=${window.innerWidth}, height=${window.innerHeight}`);
     display.document.open();
-    display.document.write(userInput.value);
+    display.document.write(workspaceInput.value);
     display.document.close();
   }
   function textEdit(type,text,focus){
-    var cursor = userInput.selectionStart;
+    var cursor = workspaceInput.selectionStart;
     if (focus == true){
-      userInput.focus();
+      workspaceInput.focus();
     }
     if (type == "insert"){
-      userInput.setRangeText(text);
-      userInput.setSelectionRange(cursor,cursor + text.length);
+      workspaceInput.setRangeText(text);
+      workspaceInput.setSelectionRange(cursor,cursor + text.length);
     }
     if (type == "delete"){
-      userInput.setSelectionRange(cursor,cursor + text);
-      userInput.setRangeText("");
+      workspaceInput.setSelectionRange(cursor,cursor + text);
+      workspaceInput.setRangeText("");
     }
     sourceChange = true;
     mustSave = true;
@@ -1941,7 +1985,7 @@
       cardBackground.classList.remove("active");
     }
     if (activeModal == "welcome" && windowParent){
-      userInput.focus();
+      workspaceInput.focus();
     }
     if (activeModal == "settings" && windowParent){
       loadSettings();
@@ -1954,11 +1998,11 @@
     }
   }
   function changeState(history){
-    userInput.focus();
+    workspaceInput.focus();
     document.execCommand(history);
   }
   function activateReplacer(){
-    userInput.value = userInput.value.split(locate.value).join(modify.value);
+    changeTextarea(workspaceInput,workspaceInput.value.split(locate.value).join(modify.value));
     sourceChange = true;
     mustSave = true;
     previewRefresh();
@@ -2014,7 +2058,7 @@
   }
   function activateFormatter(format){
     try {
-      formatterInput.value = JSON.stringify(JSON.parse(formatterInput.value),false,format);
+      changeTextarea(formatterInput,JSON.stringify(JSON.parse(formatterInput.value),false,format));
     } catch (error){
       alert("Invalid JSON data.");
     }
@@ -2022,23 +2066,23 @@
   function activateEncoder(format){
     if (encodeComponent == false){
       if (format == "encode"){
-        encoderInput.value = encodeURI(encoderInput.value);
+        changeTextarea(encoderInput,encodeURI(encoderInput.value));
       }
       if (format == "decode"){
-        encoderInput.value = decodeURI(encoderInput.value);
+        changeTextarea(encoderInput,decodeURI(encoderInput.value));
       }
     }
     if (encodeComponent == true){
       if (format == "encode"){
-        encoderInput.value = encodeURIComponent(encoderInput.value);
+        changeTextarea(encoderInput,encodeURIComponent(encoderInput.value));
       }
       if (format == "decode"){
-        encoderInput.value = decodeURIComponent(encoderInput.value);
+        changeTextarea(encoderInput,decodeURIComponent(encoderInput.value));
       }
     }
   }
   function insertTemplate(){
-    userInput.value = decodeURI("%3C!DOCTYPE%20html%3E%0A%3Chtml%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20margin:%200;%0A%20%20%20%20padding:%200;%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20width:%20100vw;%0A%20%20%20%20height:%20100vh;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E");
+    changeTextarea(workspaceInput,decodeURI("%3C!DOCTYPE%20html%3E%0A%3Chtml%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20margin:%200;%0A%20%20%20%20padding:%200;%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20width:%20100vw;%0A%20%20%20%20height:%20100vh;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E"));
     sourceChange = true;
     changeView("split");
   }
@@ -2050,10 +2094,11 @@
     refresh = store;
   }
   function previewRefresh(){
+    updateLineCount(workspaceInput);
     if (refresh == "true" && sourceChange){
       preview.src = "about:blank";
       preview.contentWindow.document.open();
-      preview.contentWindow.document.write(userInput.value);
+      preview.contentWindow.document.write(workspaceInput.value);
       preview.contentWindow.document.close();
       sourceChange = false;
     }
@@ -2061,7 +2106,7 @@
   function toggleScaling(){
     header.classList.toggle("resize");
     main.classList.toggle("resize");
-    userInput.classList.toggle("resize");
+    workspace.classList.toggle("resize");
     scaler.classList.toggle("active");
     preview.classList.toggle("resize");
   }
@@ -2097,13 +2142,13 @@
       }
     }
     if (orientation == "horizontal"){
-      userInput.style.height = `calc(${cursorOffset}px - 8px)`;
+      workspace.style.height = `calc(${cursorOffset}px - 8px)`;
       scaler.style.bottom = `calc(100% - ${cursorOffset}px - 8px)`;
       preview.style.height = `calc(100% - ${cursorOffset}px - 8px)`;
     }
     if (orientation == "vertical"){
       header.style.boxShadow = `calc(-100vw + ${cursorOffset}px) 1px 8px var(--box-shadow-color)`;
-      userInput.style.width = `calc(${cursorOffset}px - 8px)`;
+      workspace.style.width = `calc(${cursorOffset}px - 8px)`;
       scaler.style.right = `calc(100% - ${cursorOffset}px - 8px)`;
       preview.style.width = `calc(100% - ${cursorOffset}px - 8px)`;
     }
