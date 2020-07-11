@@ -168,7 +168,6 @@
   }
   [data-lined-container] ol {
     padding: 4px;
-    padding-right: 12px;
     color: var(--color);
     background: transparent;
     opacity: 0.55;
@@ -459,6 +458,8 @@
     transition: var(--transition-slow);
   }
   #workspace ol {
+    padding-left: 16px;
+    padding-right: 16px;
     transition-property: color;
   }
   #workspace textarea {
@@ -1503,7 +1504,7 @@
       workspaceInput.focus();
     }
     colorInputRefresh();
-    forceRefresh();
+    previewRefresh();
     if ("serviceWorker" in navigator && windowParent && window.location.protocol == "https:"){
       navigator.serviceWorker.register("service-worker.js");
     }
