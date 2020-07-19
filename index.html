@@ -1496,7 +1496,7 @@
     }
     pickerInputRefresh();
     forceRefresh();
-    if ("serviceWorker" in navigator && windowParent && window.location.protocol == ""){
+    if ("serviceWorker" in navigator && windowParent && window.location.protocol == "https:"){
       navigator.serviceWorker.register("service-worker.js");
     }
   });
