@@ -148,10 +148,10 @@
   button.warning {
     --button-hover: #bb2222;
   }
-  [data-lined-container] {
+  [data-numbered-container] {
     resize: none;
   }
-  [data-lined-container], [type="text"] {
+  [data-numbered-container], [type="text"] {
     --color: var(--text-super-dark);
     color: var(--color);
     font-family: unset;
@@ -159,21 +159,21 @@
     border: none;
     border-radius: 0;
   }
-  [data-lined-container]:focus-within, [type="text"] {
+  [data-numbered-container]:focus-within, [type="text"] {
     outline: none;
   }
-  [data-lined-container] ol, [data-lined-container] textarea, [type="text"] {
+  [data-numbered-container] ol, [data-numbered-container] textarea, [type="text"] {
     padding: 6px;
   }
-  [data-lined-container] ol {
+  [data-numbered-container] ol {
     color: var(--color);
     background: transparent;
     opacity: 0.55;
   }
-  [data-lined-container] li::before {
+  [data-numbered-container] li::before {
     font-family: inherit;
   }
-  [data-lined-container] textarea, [type="text"] {
+  [data-numbered-container] textarea, [type="text"] {
     word-wrap: normal;
     -webkit-appearance: none;
   }
@@ -433,12 +433,12 @@
     position: relative;
     flex: 1;
   }
-  #main.text [data-lined-container] ol {
+  #main.text [data-numbered-container] ol {
     padding: 0;
     width: 0;
     opacity: 0;
   }
-  #main.code [data-lined-container], #main.code [type="text"], #main.split [data-lined-container], #main.split [type="text"], #main.preview [data-lined-container], #main.preview [type="text"] {
+  #main.code [data-numbered-container], #main.code [type="text"], #main.split [data-numbered-container], #main.split [type="text"], #main.preview [data-numbered-container], #main.preview [type="text"] {
     font-family: var(--font-family-monospace);
   }
   #main.horizontal.resize {
@@ -806,23 +806,23 @@
   .card .content .item.expand {
     width: 100%;
   }
-  .card [data-lined-container], .card [type="text"] {
+  .card [data-numbered-container], .card [type="text"] {
     --color: var(--text-light);
     background: var(--textarea-medium);
     border-radius: var(--border-radius-medium);
     box-shadow: 0 2px 4px var(--box-shadow-color) inset;
   }
-  .card [data-lined-container] {
+  .card [data-numbered-container] {
     margin-bottom: min(1.5vw, 10px);
     width: 100%;
     max-width: 50vw;
     height: min(25vw, 75px);
     max-height: min(25vw, 25vh);
   }
-  .card [data-lined-container].expand {
+  .card [data-numbered-container].expand {
     height: 150px;
   }
-  .card [data-lined-container]:last-child {
+  .card [data-numbered-container]:last-child {
     margin-bottom: 0;
   }
   #pickerPreview {
@@ -1171,7 +1171,7 @@
 </header>
 
 <main id="main" class="text horizontal">
-  <div id="workspace" class="text horizontal" data-lined-container>
+  <div id="workspace" class="text horizontal" data-numbered-container>
     <textarea id="workspaceInput" placeholder="Welcome to the Smart Text Editor! This site was created to allow for text editing and code development within your browser!"></textarea>
   </div>
   <div id="scaler" class="text horizontal">
@@ -1203,10 +1203,10 @@
     </div>
     <div class="content">
       <div class="item expand">
-        <div data-lined-container>
+        <div data-numbered-container>
           <textarea id="locate" placeholder="Text to locate..."></textarea>
         </div>
-        <div data-lined-container>
+        <div data-numbered-container>
           <textarea id="modify" placeholder="Replace with..."></textarea>
         </div>
       </div>
@@ -1249,7 +1249,7 @@
     </div>
     <div class="content">
       <div class="item expand">
-        <div class="expand" data-lined-container>
+        <div class="expand" data-numbered-container>
           <textarea id="formatterInput" placeholder="Place JSON here..."></textarea>
         </div>
       </div>
@@ -1267,7 +1267,7 @@
     </div>
     <div class="content">
       <div class="item expand">
-        <div class="expand" data-lined-container>
+        <div class="expand" data-numbered-container>
           <textarea id="encoderInput" placeholder="Place text here..."></textarea>
         </div>
       </div>
@@ -1832,7 +1832,7 @@
   }
   function changeTextarea(textarea,newValue){
     textarea.value = newValue;
-    if (textarea.parentElement.hasAttribute("data-lined-container")){
+    if (textarea.parentElement.hasAttribute("data-numbered-container")){
       updateLineCount(textarea);
     }
   }
