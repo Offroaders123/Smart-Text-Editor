@@ -174,8 +174,10 @@
     font-family: inherit;
   }
   [data-numbered-container] textarea, [type="text"] {
-    word-wrap: normal;
     -webkit-appearance: none;
+  }
+  [data-numbered-container] textarea {
+    word-wrap: normal;
   }
   a {
     color: var(--text-dark);
@@ -432,11 +434,6 @@
   #main {
     position: relative;
     flex: 1;
-  }
-  #main.text [data-numbered-container] ol {
-    padding: 0;
-    width: 0;
-    opacity: 0;
   }
   #main.code [data-numbered-container], #main.code [type="text"], #main.split [data-numbered-container], #main.split [type="text"], #main.preview [data-numbered-container], #main.preview [type="text"] {
     font-family: var(--font-family-monospace);
@@ -1450,6 +1447,7 @@
   var textareas = Array.from(document.getElementsByTagName("textarea"));
   textareas.forEach(function(textarea){
     addInputCharacteristics(textarea);
+    disableLineCount(textarea);
   });
   var inputTexts = document.querySelectorAll("input[type='text']");
   inputTexts.forEach(function(inputText){
@@ -1760,6 +1758,16 @@
       undoTool.disabled = false;
       redoTool.disabled = false;
       refreshTool.disabled = true;
+    }
+    if (newView == "text"){
+      textareas.forEach(function(textarea){
+        disableLineCount(textarea);
+      });
+    }
+    if (newView != "text"){
+      textareas.forEach(function(textarea){
+        enableLineCount(textarea);
+      });
     }
     if (newView == "split"){
       undoTool.disabled = false;
