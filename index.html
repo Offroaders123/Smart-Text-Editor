@@ -37,14 +37,14 @@
     font-family: var(--font-family-interface);
   }
   :root {
-    --body: #111111;
+    --body: #121212;
 
     --font-family-interface: "Rubik", sans-serif;
     --font-family-code: "Cousine", monospace;
 
-    --container-dark: #171717;
-    --container-medium: #1c1c1c;
-    --container-medium-hover: #2c2c2c;
+    --container-dark: #191919;
+    --container-medium: #1d1d1d;
+    --container-medium-hover: #2d2d2d;
 
     --text-dark: #000000;
     --text-medium: #aaaaaa;
@@ -52,6 +52,7 @@
     --text-medium-additional: #777777;
     --text-light: #ffffff;
     --text-hover: #ffffff;
+    --text-warning-hover: #ffe5e5;
 
     --border-radius-small: min(0.625vw, 2.5px);
     --border-radius-medium: min(1.25vw, 5px);
@@ -72,10 +73,10 @@
 
     --button: #3a3a3a;
     --button-hover: #4a4a4a;
-    --button-warning: #bb2222;
+    --button-warning-hover: #bb2222;
 
-    --textarea-dark: #1d1d1d;
-    --textarea-medium: #212121;
+    --textarea-dark: #1f1f1f;
+    --textarea-medium: #252525;
     --textarea-light: #eae2d1;
     --textarea-drag-background: #0000ff40;
     --textarea-drag-border: #0000ff;
@@ -85,7 +86,7 @@
     --range-track: var(--container-medium);
     --range-track-hover: var(--container-medium-hover);
 
-    --card-background: #17171760;
+    --card-background: #19191960;
 
     --fade-opacity: 0;
     --fade-pointer-events: none;
@@ -146,8 +147,9 @@
   button::-moz-focus-inner {
     border: none;
   }
-  button.warning {
-    --button-hover: var(--button-warning);
+  button.warning:hover, button.warning:focus {
+    color: var(--text-warning-hover);
+    background: var(--button-warning-hover);
   }
   [data-numbered-container], [type="text"] {
     --color: var(--text-dark);
@@ -277,6 +279,13 @@
   }
   svg.button.closeButton:focus {
     --focus-border: var(--outline);
+  }
+  hr {
+    width: 100%;
+    height: min(0.5vw, 2px);
+    background: var(--text-medium);
+    border: none;
+    border-radius: var(--border-radius-medium);
   }
 
   /* Easter egg: Typing 'tooltip' sounds like the Mario Bros theme! */
@@ -505,7 +514,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    color: var(--text-medium-contrast);
     font-size: min(2.5vw, 14.5px);
     cursor: pointer;
     transition: color var(--transition-fast);
@@ -530,7 +538,7 @@
     border-color: var(--text-hover);
   }
   .checkbox [type="checkbox"]:checked + label svg {
-    fill: var(--text-medium-contrast);
+    fill: var(--text-medium);
   }
   .checkbox [type="checkbox"]:checked:hover + label svg, .checkbox:focus [type="checkbox"]:checked + label svg {
     fill: var(--text-hover);
@@ -542,12 +550,6 @@
     from {
       transform: rotate(-360deg);
     }
-  }
-  .divider {
-    width: 100%;
-    height: min(0.5vw, 2px);
-    background: var(--text-medium);
-    border-radius: var(--border-radius-medium);
   }
   .card {
     display: flex;
@@ -756,7 +758,7 @@
     align-items: flex-start;
   }
   .card .content .item.list > * + * {
-    margin-top: 10px;
+    margin-top: min(2.5vw, 12px);
   }
   .card .content .item.expand {
     width: 100%;
@@ -766,7 +768,7 @@
     justify-content: center;
   }
   .card.modal .toolbar {
-    margin-top: min(3vw, 16px);
+    margin-top: min(2.6vw, 16px);
   }
   .card.notification .toolbar, .card.widget .toolbar {
     margin-top: min(2.5vw, 12px);
@@ -1229,7 +1231,7 @@
             </ul>
           </div>
         </div>
-        <div class="divider"></div>
+        <hr>
         <div class="checkbox" data-tooltip="Refresh manually using Ctrl + Enter when disabled">
           <input id="refreshSetting" type="checkbox" oninput="updateCheckbox('refresh');" checked>
           <label for="refreshSetting"><svg class="button"><use href="#check"></use></svg>Automatically Refresh Preview</label>
