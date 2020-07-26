@@ -18,15 +18,13 @@
 <link rel="stylesheet" href="https://offroaders123.github.io/Numbered-Textarea-Plugin/styles.css">
 
 <script>
-  var windowParent, removeTransitions = "--transition-slow: 0s; --transition-medium: 0s; --transition-fast: 0s";
+  var windowParent;
   if (window == window.parent){
     windowParent = true;
   } else {
     windowParent = false;
-    console.clear();
   }
   if (windowParent){
-    document.documentElement.style = removeTransitions;
     document.documentElement.classList.add("fade");
   }
 </script>
@@ -92,6 +90,11 @@
     --fade-opacity: 0;
     --fade-pointer-events: none;
   }
+  :root.reduced-motion, :root.fade {
+    --transition-slow: 0s;
+    --transition-medium: 0s;
+    --transition-fast: 0s
+  }
   :root.fade {
     --fade-opacity: 1;
     --fade-pointer-events: all;
@@ -128,8 +131,8 @@
     border-radius: var(--border-radius-medium);
     box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow), 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
     --focus-border: transparent;
-    cursor: pointer;
     outline: none;
+    cursor: pointer;
     transition: var(--transition-fast);
     transition-property: color, background, opacity;
   }
@@ -142,10 +145,6 @@
   }
   button::-moz-focus-inner {
     border: none;
-  }
-  button:disabled {
-    opacity: 0.5;
-    pointer-events: none;
   }
   button.warning {
     --button-hover: var(--button-warning);
@@ -197,16 +196,19 @@
     --focus-border: var(--outline);
   }
   [type="range"] {
-    margin-bottom: min(1vw, 4px);
+    padding: min(3vw, 12px) min(0.75vw, 3px);
     width: min(25vw, 130px);
     height: min(5vw, 20px);
     background: none;
-    cursor: pointer;
+    border-radius: var(--border-radius-medium);
+    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
+    --focus-border: transparent;
     outline: none;
+    cursor: pointer;
     -webkit-appearance: none;
   }
-  [type="range"]:last-child {
-    margin-bottom: 0;
+  [type="range"]:focus {
+    --focus-border: var(--outline);
   }
   ::-webkit-slider-thumb {
     margin-top: calc(min(1.75vw, 7px) * -1);
@@ -317,6 +319,10 @@
     --scale: 1;
     transition-delay: var(--transition-delay);
   }
+  :disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
   ::placeholder {
     color: var(--color);
     opacity: 0.55;
@@ -389,8 +395,8 @@
     box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
     --focus-border: transparent;
     outline: none;
-    white-space: nowrap;
     cursor: pointer;
+    white-space: nowrap;
     transition: var(--transition-fast);
     transition-property: color, background;
   }
@@ -529,10 +535,10 @@
   .checkbox [type="checkbox"]:checked:hover + label svg, .checkbox:focus [type="checkbox"]:checked + label svg {
     fill: var(--text-hover);
   }
-  .loading-animation {
-    animation: loading 4s infinite linear;
+  .buffering {
+    animation: rotate 4s infinite linear;
   }
-  @keyframes loading {
+  @keyframes rotate {
     from {
       transform: rotate(-360deg);
     }
@@ -571,7 +577,8 @@
   }
   .card.modal.scale {
     padding: min(6vh, 2vw);
-    border-radius: calc(var(--border-radius-medium) + min(3vh, 1vw));
+    min-width: unset;
+    border-radius: calc(var(--border-radius-large) + min(1.5vh, 0.5vw));
     z-index: 2;
     transform: translate(-50%,50vh) scale(1);
   }
@@ -600,14 +607,8 @@
   .card.action {
     flex-direction: row;
   }
-  .card.action > * {
-    margin: 0 min(0.75vw, 6px);
-  }
-  .card.action > :first-child {
-    margin-left: 0;
-  }
-  .card.action > :last-child {
-    margin-right: 0;
+  .card.action > * + * {
+    margin-left: min(2.5vw, 12px);
   }
   .card.action button {
     width: min(5vw, 28px);
@@ -618,8 +619,8 @@
     align-items: center;
   }
   .card.action button svg {
-    width: min(2.25vw, 12px);
-    height: min(2.25vw, 12px);
+    width: min(2.5vw, 12px);
+    height: min(2.5vw, 12px);
     fill: var(--text-medium);
     transition: fill var(--transition-fast);
   }
@@ -641,11 +642,19 @@
   .card.modal.active {
     transform: translate(-50%,-50%) scale(1);
   }
+  .card.modal.scale.active {
+    animation: grow var(--transition-medium);
+  }
+  @keyframes grow {
+    0% {
+      transform: translate(-50%,-50%) scale(0);
+    }
+  }
   .card.notification.active {
-    animation: pulse var(--transition-medium) var(--transition-delay);
+    animation: pop var(--transition-medium) var(--transition-delay);
     transform: translateX(0);
   }
-  @keyframes pulse {
+  @keyframes pop {
     50% {
       transform: scale(1.1);
     }
@@ -704,14 +713,13 @@
     box-shadow: 0 2px 4px var(--box-shadow) inset;
   }
   .card [data-numbered-container] {
-    margin-bottom: min(2.5vw, 12px);
     width: 100%;
     max-width: 50vw;
     height: min(25vw, 75px);
     max-height: min(25vw, 25vh);
   }
-  .card [data-numbered-container]:last-child {
-    margin-bottom: 0;
+  .card [data-numbered-container] + * {
+    margin-top: min(2.5vw, 12px);
   }
   .card [data-numbered-container].expand {
     height: 150px;
@@ -736,24 +744,19 @@
   }
   .card .content .item {
     margin: auto 0;
-    margin-right: min(1.5vw, 10px);
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: var(--text-medium);
     font-size: min(3vw, 14.5px);
   }
-  .card .content .item:last-child {
-    margin-right: 0;
+  .card .content .item + * {
+    margin-left: min(2.5vw, 12px);
   }
   .card .content .item.list {
     align-items: flex-start;
   }
-  .card .content .item.list > * {
-    margin-bottom: 10px;
-  }
-  .card .content .item.list > :last-child {
-    margin-bottom: 0;
+  .card .content .item.list > * + * {
+    margin-top: 10px;
   }
   .card .content .item.expand {
     width: 100%;
@@ -768,14 +771,8 @@
   .card.notification .toolbar, .card.widget .toolbar {
     margin-top: min(2.5vw, 12px);
   }
-  .card .toolbar > * {
-    margin: 0 min(0.75vw, 6px);
-  }
-  .card .toolbar > :first-child {
-    margin-left: 0;
-  }
-  .card .toolbar > :last-child {
-    margin-right: 0;
+  .card .toolbar > * + * {
+    margin-left: min(2.5vw, 12px);
   }
   .card .toolbar button {
     min-width: min(12vw, 75px);
@@ -785,11 +782,12 @@
     pointer-events: none;
   }
   #header {
-    padding: min(1.5vw, 10px);
+    padding: min(1.5vw, 12px);
     position: relative;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    color: var(--text-medium);
     background: var(--container-dark);
     z-index: 1;
     transition: box-shadow var(--transition-slow);
@@ -814,14 +812,8 @@
     display: flex;
     align-items: center;
   }
-  #header .toolbar > * {
-    margin: 0 min(0.75vw, 6px);
-  }
-  #header .toolbar > :first-child {
-    margin-left: 0;
-  }
-  #header .toolbar > :last-child {
-    margin-right: 0;
+  #header .toolbar > * + * {
+    margin-left: min(1.5vw, 12px);
   }
   #header .title {
     position: absolute;
@@ -839,7 +831,6 @@
   }
   #header .title span {
     margin-left: 5px;
-    color: var(--text-medium);
     font-size: min(4vw, 16px);
     white-space: nowrap;
     transform-origin: left center;
@@ -863,7 +854,6 @@
     text-align: right;
   }
   #header .attribution span {
-    color: var(--text-medium);
     font-size: min(2vw, 14.5px);
   }
   #main {
@@ -904,6 +894,10 @@
     --color: var(--text-dark);
     background: var(--textarea-light);
   }
+  #workspace.code, #workspace.split, #workspace.preview {
+    --color: var(--text-light);
+    background: var(--textarea-dark);
+  }
   #workspace.code {
     --size: 100%;
   }
@@ -933,12 +927,7 @@
     transition-property: color;
   }
   #workspace.text textarea {
-    border-color: var(--textarea-light);
     white-space: pre-wrap;
-  }
-  #workspace.code, #workspace.split, #workspace.preview {
-    --color: var(--text-light);
-    background: var(--textarea-dark);
   }
   #scaler {
     position: absolute;
@@ -1095,7 +1084,7 @@
     <path d="m510.27 285.75c-13.893 118.73-108.1 212.04-226.96 224.79-118.86 12.751-230.71-58.451-269.47-171.53-38.761-113.08 5.8941-237.93 107.58-300.78 101.68-62.846 233.32-46.955 317.13 38.282l-37.067 36.446c-66.79-67.929-171.7-80.593-252.74-30.508-81.036 50.084-116.62 149.58-85.733 239.7 30.89 90.117 120.03 146.86 214.75 136.7 94.721-10.161 169.8-84.522 180.87-179.14z"/>
     <path d="m512 189.01v-189.01l-188.98 189.01z"/>
   </symbol>
-  <symbol id="loading" viewBox="0 0 512 512">
+  <symbol id="buffering" viewBox="0 0 512 512">
     <path d="m229.78 8.7403c0-4.8272 3.9132-8.7403 8.7403-8.7403h34.96c2.3181 0 4.5412 0.92085 6.1804 2.56 1.6391 1.6391 2.56 3.8623 2.56 6.1803v88.126c0 4.8272-3.9132 8.7403-8.7403 8.7403h-34.96c-4.8272 0-8.7403-3.9132-8.7403-8.7403z"/>
     <path d="m356.92 28.764c2.4126-4.1803 7.7575-5.6138 11.938-3.2016l30.278 17.47c2.0076 1.1583 3.4727 3.0667 4.0731 5.3053 0.60034 2.2386 0.28674 4.624-0.87186 6.6314l-44.051 76.326c-2.4126 4.1803-7.7575 5.6138-11.938 3.2016l-30.278-17.47c-4.1806-2.4121-5.6139-7.7564-3.2013-11.937z" opacity="0.083"/>
     <path d="m457.03 109.66c4.1804-2.4126 9.5246-0.97937 11.937 3.2013l17.47 30.278c1.1584 2.0076 1.4718 4.3932 0.87137 6.6321-0.60043 2.2388-2.0655 4.1475-4.073 5.3061l-76.326 44.051c-4.1804 2.4126-9.5246 0.97937-11.937-3.2013l-17.47-30.278c-2.4121-4.1806-0.9787-9.5255 3.2017-11.938z" opacity="0.16"/>
@@ -1312,11 +1301,11 @@
       </div>
       <div class="item">
         <label for="redChannel">Red</label>
-        <input id="redChannel" type="range" min="0" max="255">
+        <input id="redChannel" type="range">
         <label for="greenChannel">Green</label>
-        <input id="greenChannel" type="range" min="0" max="255">
+        <input id="greenChannel" type="range">
         <label for="blueChannel">Blue</label>
-        <input id="blueChannel" type="range" min="0" max="255">
+        <input id="blueChannel" type="range">
       </div>
     </div>
     <div class="toolbar">
@@ -1372,21 +1361,21 @@
 <script src="https://offroaders123.github.io/Numbered-Textarea-Plugin/script.js"></script>
 
 <script>
-  var storage = window.localStorage, view = "text", orientation = "horizontal", refresh = "true", title = "true", transitions = "true", loadedFile = undefined, sourceChange = false, mustSave = false, activeWidget = undefined, activeModal = undefined, storedColor, insertColor = false, encodeComponent = false;
+  var storage = window.localStorage, view = "text", orientation = "horizontal", refresh = "true", title = "true", transitions = "true", loadedFile, sourceChange = false, mustSave = false, activeWidget, activeModal, storedColor, insertColor = false, encodeComponent = false;
   window.addEventListener("load",function(){
     if (windowParent){
       if ("ontouchstart" in document.documentElement){
         openCard("editingTools");
       }
       loadSettings("initial");
-      setTimeout(function(){
+      window.setTimeout(function(){
         document.documentElement.classList.remove("fade");
       }, 50);
       if (title == "true"){
-        setTimeout(function(){
+        window.setTimeout(function(){
           openCard("welcome");
         }, 100);
-        setTimeout(function(){
+        window.setTimeout(function(){
           if (activeModal == "welcome"){
             closeCard("welcome");
           }
@@ -1402,7 +1391,8 @@
   });
   window.addEventListener("beforeunload",function(){
     if (windowParent && mustSave){
-      event.returnValue = "Changes you made may not be saved.";
+      event.preventDefault();
+      event.returnValue = "";
     }
   });
   window.addEventListener("keydown",function(event){
@@ -1492,7 +1482,7 @@
       if (orientation == "vertical"){
         if (!header.getAttribute("style")){
           header.classList.add("resize");
-          setTimeout(function(){
+          window.setTimeout(function(){
             header.classList.remove("resize");
           }, 50);
         }
@@ -1542,7 +1532,7 @@
       var subListPresent = listItem.getElementsByTagName("ul")[0];
       if (subListPresent == undefined){
         listItem.addEventListener("click",function(){
-          setTimeout(function(){
+          window.setTimeout(function(){
             dropdowns.forEach(function(dropdown){
               dropdown.classList.remove("active");
             });
@@ -1618,6 +1608,8 @@
   var pickerChannels = picker.querySelectorAll("[type='range']");
   pickerChannels.forEach(function(pickerChannel){
     pickerChannel.addEventListener("input",channelRefresh);
+    pickerChannel.min = "0";
+    pickerChannel.max = "255";
   });
   workspaceInput.addEventListener("input",function(){
     sourceChange = true;
@@ -1700,7 +1692,7 @@
         title = storedTitle;
         updateCheckbox("title",storedTitle);
       }
-      setTimeout(function(){
+      window.setTimeout(function(){
         var storedTransitions = storage.getItem("transitions");
         if (storedTransitions != undefined){
           changeTransitions(storedTransitions);
@@ -1738,8 +1730,7 @@
   function updateCheckbox(item,value){
     if (value == undefined){
       value = document.getElementById(`${item}Setting`).checked;
-    }
-    if (value != undefined){
+    } else {
       if (value == "true"){
         document.getElementById(`${item}Setting`).checked = "true";
       }
@@ -1801,7 +1792,7 @@
         newOrientation = "horizontal";
       }
       changeView("code");
-      setTimeout(function(){
+      window.setTimeout(function(){
         elements.forEach(function(element){
           changeClass(element,orientation,newOrientation);
         });
@@ -1809,7 +1800,7 @@
         preview.style.transition = "none";
         orientation = newOrientation;
       }, 500);
-      setTimeout(function(){
+      window.setTimeout(function(){
         changeView("split");
       }, 550);
     } else {
@@ -1828,10 +1819,10 @@
   function changeTransitions(input){
     var newTransition = input;
     if (newTransition == "true"){
-      document.documentElement.removeAttribute("style");
+      document.documentElement.classList.remove("reduced-motion");
     }
     if (newTransition == "false"){
-      document.documentElement.style = removeTransitions;
+      document.documentElement.classList.add("reduced-motion");
     }
     transitions = newTransition;
   }
@@ -1866,9 +1857,16 @@
     }
     window.open(window.location.href,"_blank",windowFeatures);
   }
-  function importFile(event){
+  function importFile(){
     closeCard(activeModal);
-    var reader = new FileReader(), mimeType = load.files[0].type, type = mimeType.split("/")[0], subType = mimeType.split("/")[1], validTypes = ["text","image","audio"], validSubtypes = ["javascript","json","manifest+json","markdown"];
+    var reader = new FileReader(), fileName = load.files[0].name, fileExtension = fileName.split(".").pop(), mimeType = load.files[0].type;
+    if (fileExtension == "webmanifest"){
+      mimeType = "application/manifest+json";
+    }
+    if (fileExtension == "markdown" || fileExtension == "md"){
+      mimeType = "text/markdown";
+    }
+    var type = mimeType.split("/")[0], subType = mimeType.split("/")[1], validTypes = ["text","image","audio"], validSubtypes = ["javascript","json","manifest+json","markdown"];
     if (mimeType == ""){
       alert("File mime type is undefined, please choose a different file extension to import.");
       return;
@@ -1881,7 +1879,7 @@
           mustSave = false;
           forceRefresh();
         });
-        loadedFile = load.files[0].name;
+        loadedFile = fileName;
         if (subType == "plain"){
           changeView("text");
         }
@@ -1968,7 +1966,7 @@
       }
       card.classList.add("active");
       if (cardType == "notification"){
-        setTimeout(function(){
+        window.setTimeout(function(){
           closeCard(element);
         }, 3000);
       }
@@ -2004,9 +2002,9 @@
       activeModal = undefined;
     }
   }
-  function changeState(history){
+  function changeState(action){
     workspaceInput.focus();
-    document.execCommand(history);
+    document.execCommand(action);
   }
   function activateReplacer(){
     changeTextarea(workspaceInput,workspaceInput.value.split(locate.value).join(modify.value));
