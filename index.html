@@ -18,13 +18,8 @@
 <link rel="stylesheet" href="https://offroaders123.github.io/Numbered-Textarea-Plugin/styles.css">
 
 <script>
-  var windowParent;
-  if (window == window.parent){
-    windowParent = true;
-  } else {
-    windowParent = false;
-  }
-  if (windowParent){
+  var parentWindow = (window.self == window.top);
+  if (parentWindow){
     document.documentElement.classList.add("fade");
   }
 </script>
@@ -123,19 +118,21 @@
     transition: opacity 0.25s;
   }
   button {
-    padding: min(0.5vw, 2px) min(1vw, 8px);
-    min-width: min(8vw, 75px);
     color: var(--text-medium);
     font-size: min(2.5vw, 14.5px);
-    background: var(--button);
     border: none;
     border-radius: var(--border-radius-medium);
-    box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow), 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
-    --focus-border: transparent;
     outline: none;
     cursor: pointer;
     transition: var(--transition-fast);
     transition-property: color, background, opacity;
+  }
+  button:not(.close) {
+    padding: min(0.5vw, 2px) min(1vw, 8px);
+    min-width: min(8vw, 75px);
+    background: var(--button);
+    box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow), 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
+    --focus-border: transparent;
   }
   button:hover, button:focus, .dropdown.active:focus-within > button, .select:hover .dropdown button {
     color: var(--text-hover);
@@ -150,6 +147,27 @@
   button.warning:hover, button.warning:focus {
     color: var(--text-warning-hover);
     background: var(--button-warning-hover);
+  }
+  button.close {
+    padding: min(0.5vw, 2px);
+    position: absolute;
+    right: 0;
+    background: none;
+    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
+  }
+  button.close.left {
+    left: 0;
+  }
+  button svg {
+    fill: var(--text-medium);
+    transition: var(--transition-fast) fill;
+  }
+  button:hover svg, button:focus svg, .dropdown:hover button svg, .dropdown:focus-within button svg, .dropdown li:hover svg, .dropdown li:focus svg, .dropdown li:focus-within svg {
+    fill: var(--text-hover);
+  }
+  button.close svg {
+    width: 100%;
+    height: 100%;
   }
   [data-numbered-container], [type="text"] {
     --color: var(--text-dark);
@@ -259,33 +277,223 @@
   :hover::-moz-range-track, :focus::-moz-range-track {
     background: var(--range-track-hover);
   }
-  svg.button {
-    fill: var(--text-medium);
-    cursor: pointer;
-    transition: var(--transition-fast);
-    transition-property: fill, background, border-color;
-  }
-  svg.button:hover, svg.button:focus {
-    fill: var(--text-hover);
-  }
-  svg.button.closeButton {
-    padding: min(0.5vw, 2px);
-    position: absolute;
-    right: 0;
-    border-radius: var(--border-radius-medium);
-    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
-    --focus-border: transparent;
-    outline: none;
-  }
-  svg.button.closeButton:focus {
-    --focus-border: var(--outline);
-  }
   hr {
     width: 100%;
     height: min(0.5vw, 2px);
     background: var(--text-medium);
     border: none;
     border-radius: var(--border-radius-medium);
+  }
+  :disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  ::placeholder {
+    color: var(--color);
+    opacity: 0.55;
+    white-space: pre-wrap;
+    transition: color var(--transition-slow);
+  }
+  ::selection {
+    color: var(--selection-color);
+    background: var(--selection-background);
+  }
+  ::-webkit-scrollbar {
+    width: min(3vw, 12px);
+    height: min(3vw, 12px);
+  }
+  ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner {
+    background: none;
+  }
+  ::-webkit-scrollbar-thumb {
+    width: min(9vw, 36px);
+    height: min(9vw, 36px);
+    background-clip: content-box;
+    background-color: var(--scrollbar);
+    border: min(0.5vw, 2px) solid transparent;
+    border-radius: var(--border-radius-large);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-hover);
+  }
+  .dropdown {
+    position: relative;
+  }
+  .dropdown svg {
+    width: min(2.75vw, 12px);
+    height: min(2.75vw, 12px);
+  }
+  .dropdown button svg {
+    margin-left: min(2vw, 8px);
+    transform: rotate(90deg);
+  }
+  .dropdown ul {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    min-width: min(35vw, 155px);
+    background: var(--container-medium);
+    border-radius: var(--border-radius-medium);
+    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow);
+    z-index: 1;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    list-style: none;
+    transform: scaleY(0);
+    transform-origin: top center;
+    transition: var(--transition-fast);
+    transition-property: visibility, opacity, transform;
+  }
+  .dropdown li, .dropdown a {
+    padding: min(1.75vw, 8px);
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-medium-contrast);
+    font-size: min(2.75vw, 12.5px);
+    border-radius: var(--border-radius-medium);
+    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
+    --focus-border: transparent;
+    outline: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: var(--transition-fast);
+    transition-property: color, background;
+  }
+  .dropdown li span {
+    margin-left: min(4vw, 16px);
+    color: var(--text-medium-additional);
+    font-size: min(2.5vw, 11px);
+  }
+  .dropdown li svg {
+    fill: var(--text-medium-additional);
+    transition-property: fill, transform;
+  }
+  .dropdown a {
+    text-decoration: none;
+  }
+  .dropdown li:hover, .dropdown li:focus, .dropdown li:focus-within, .dropdown a:hover, .dropdown a:focus {
+    color: var(--text-hover);
+    background: var(--container-medium-hover);
+  }
+  .dropdown li:focus, .dropdown a:focus {
+    --focus-border: var(--outline);
+  }
+  .dropdown ul ul {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    transform: scale(0);
+    transform-origin: left top;
+  }
+  @media (max-width: 550px), (max-height: 475px) {
+    .dropdown ul ul {
+      min-width: 100%;
+      max-height: min(24vh, 60px);
+      left: 0;
+      top: 100%;
+      transform: scaleY(0);
+      transform-origin: top center;
+      overflow-y: auto;
+    }
+    .dropdown li svg {
+      transform: rotate(90deg);
+    }
+  }
+  @media (max-height: 300px) {
+    .dropdown ul {
+      max-height: 55vh;
+      overflow-y: auto;
+    }
+    .dropdown ul ul {
+      max-height: unset;
+      overflow-y: unset;
+    }
+  }
+  .dropdown.active:focus-within > ul, .dropdown li:focus-within > ul {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: all;
+    transform: scale(1);
+  }
+  .select {
+    margin: min(0.75vw, 3px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: color var(--transition-fast);
+  }
+  .select:hover, .select:focus-within {
+    color: var(--text-hover);
+  }
+  .select label {
+    padding-right: min(1vw, 4px);
+    cursor: pointer;
+  }
+  .select button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .select ul {
+    min-width: 100%;
+  }
+  .checkbox {
+    padding: min(0.75vw, 3px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--border-radius-medium);
+    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
+    --focus-border: transparent;
+    outline: none;
+    cursor: pointer;
+  }
+  .checkbox:focus {
+    --focus-border: var(--outline);
+  }
+  .checkbox [type="checkbox"] {
+    display: none;
+  }
+  .checkbox label, .checkbox label svg {
+    cursor: pointer;
+  }
+  .checkbox label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: min(2.5vw, 14.5px);
+    transition: color var(--transition-fast);
+  }
+  .checkbox label svg {
+    margin-right: min(4px, 4px);
+    padding: min(0.25vw, 1px);
+    width: min(3.35vw, 18px);
+    height: min(3.35vw, 18px);
+    fill: transparent;
+    background: var(--container-medium);
+    border: min(0.35vw, 2px) solid var(--text-medium);
+    border-radius: var(--border-radius-medium);
+    box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow);
+    transition: var(--transition-fast);
+    transition-property: fill, background, border-color;
+  }
+  .checkbox:hover label, .checkbox:focus label {
+    color: var(--text-hover);
+  }
+  .checkbox:hover label svg, .checkbox:focus label svg {
+    fill: transparent;
+    background: var(--container-medium-hover);
+    border-color: var(--text-hover);
+  }
+  .checkbox [type="checkbox"]:checked + label svg {
+    fill: var(--text-medium);
+  }
+  .checkbox:hover [type="checkbox"]:checked + label svg, .checkbox:focus [type="checkbox"]:checked + label svg {
+    fill: var(--text-hover);
   }
 
   /* Easter egg: Typing 'tooltip' sounds like the Mario Bros theme! */
@@ -328,221 +536,6 @@
     --scale: 1;
     transition-delay: var(--transition-delay);
   }
-  :disabled {
-    opacity: 0.5;
-    pointer-events: none;
-  }
-  ::placeholder {
-    color: var(--color);
-    opacity: 0.55;
-    white-space: pre-wrap;
-    transition: color var(--transition-slow);
-  }
-  ::selection {
-    color: var(--selection-color);
-    background: var(--selection-background);
-  }
-  ::-webkit-scrollbar {
-    width: min(3vw, 12px);
-    height: min(3vw, 12px);
-  }
-  ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner {
-    background: none;
-  }
-  ::-webkit-scrollbar-thumb {
-    width: min(9vw, 36px);
-    height: min(9vw, 36px);
-    background-clip: content-box;
-    background-color: var(--scrollbar);
-    border: min(0.5vw, 2px) solid transparent;
-    border-radius: var(--border-radius-large);
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: var(--scrollbar-hover);
-  }
-  .dropdown {
-    position: relative;
-  }
-  .dropdown svg {
-    width: min(2.75vw, 12px);
-    height: min(2.75vw, 12px);
-    transition: var(--transition-fast);
-  }
-  .dropdown button svg {
-    margin-left: min(2vw, 8px);
-    fill: var(--text-medium);
-    transform: rotate(90deg);
-    transition-property: fill;
-  }
-  .dropdown ul {
-    position: absolute;
-    left: 0;
-    top: 100%;
-    min-width: min(35vw, 155px);
-    background: var(--container-medium);
-    border-radius: var(--border-radius-medium);
-    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow);
-    z-index: 1;
-    visibility: hidden;
-    opacity: 0;
-    pointer-events: none;
-    list-style: none;
-    transform: scaleY(0);
-    transform-origin: top center;
-    transition: var(--transition-fast);
-    transition-property: visibility, opacity, transform;
-  }
-  .dropdown li {
-    padding: min(1.75vw, 8px);
-    position: relative;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--text-medium-contrast);
-    font-size: min(2.75vw, 12.5px);
-    border-radius: var(--border-radius-medium);
-    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
-    --focus-border: transparent;
-    outline: none;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: var(--transition-fast);
-    transition-property: color, background;
-  }
-  .dropdown li span {
-    margin-left: min(4vw, 16px);
-    color: var(--text-medium-additional);
-    font-size: min(2.5vw, 11px);
-  }
-  .dropdown li svg {
-    fill: var(--text-medium-additional);
-    transition-property: fill, transform;
-  }
-  .dropdown li [type="file"], .dropdown li a {
-    display: none;
-  }
-  .dropdown li:hover, .dropdown li:focus, .dropdown li:focus-within {
-    color: var(--text-hover);
-    background: var(--container-medium-hover);
-  }
-  .dropdown li:focus {
-    --focus-border: var(--outline);
-  }
-  .dropdown:hover > button svg, .dropdown li:hover > svg, .dropdown li:focus > svg, .dropdown:focus-within > button svg, .dropdown li:focus-within > svg {
-    fill: var(--text-hover);
-  }
-  .dropdown ul ul {
-    position: absolute;
-    left: 100%;
-    top: 0;
-    transform: scale(0);
-    transform-origin: left top;
-  }
-  @media (max-width: 550px), (max-height: 475px){
-    .dropdown ul ul {
-      min-width: 100%;
-      max-height: min(24vh, 60px);
-      left: 0;
-      top: 100%;
-      transform: scaleY(0);
-      transform-origin: top center;
-      overflow-y: auto;
-    }
-    .dropdown li svg {
-      transform: rotate(90deg);
-    }
-  }
-  @media (max-height: 300px){
-    .dropdown ul {
-      max-height: 55vh;
-      overflow-y: auto;
-    }
-    .dropdown ul ul {
-      max-height: unset;
-      overflow-y: unset;
-    }
-  }
-  .dropdown.active:focus-within > ul, .dropdown li:focus-within > ul {
-    visibility: visible;
-    opacity: 1;
-    pointer-events: all;
-    transform: scale(1);
-  }
-  .select {
-    margin: min(0.75vw, 3px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: color var(--transition-fast);
-  }
-  .select:hover, .select:focus-within {
-    color: var(--text-hover);
-  }
-  .select:hover > .dropdown button svg {
-    fill: var(--text-hover);
-  }
-  .select label {
-    padding-right: min(1vw, 4px);
-    cursor: pointer;
-  }
-  .select button {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .select ul {
-    min-width: 100%;
-  }
-  .checkbox {
-    padding: min(0.75vw, 3px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: var(--border-radius-medium);
-    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
-    --focus-border: transparent;
-    outline: none;
-  }
-  .checkbox:focus {
-    --focus-border: var(--outline);
-  }
-  .checkbox [type="checkbox"] {
-    display: none;
-  }
-  .checkbox label {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: min(2.5vw, 14.5px);
-    cursor: pointer;
-    transition: color var(--transition-fast);
-  }
-  .checkbox label svg {
-    margin-right: min(4px, 4px);
-    padding: min(0.25vw, 1px);
-    width: min(3.35vw, 18px);
-    height: min(3.35vw, 18px);
-    fill: transparent;
-    background: var(--container-medium);
-    border: min(0.35vw, 2px) solid var(--text-medium);
-    border-radius: var(--border-radius-medium);
-    box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow);
-  }
-  .checkbox [type="checkbox"]:hover + label, .checkbox:focus label {
-    color: var(--text-hover);
-  }
-  .checkbox [type="checkbox"]:hover + label svg, .checkbox:focus [type="checkbox"] + label svg {
-    background: var(--container-medium-hover);
-    fill: transparent;
-    border-color: var(--text-hover);
-  }
-  .checkbox [type="checkbox"]:checked + label svg {
-    fill: var(--text-medium);
-  }
-  .checkbox [type="checkbox"]:checked:hover + label svg, .checkbox:focus [type="checkbox"]:checked + label svg {
-    fill: var(--text-hover);
-  }
   .buffering {
     animation: rotate 4s infinite linear;
   }
@@ -571,15 +564,16 @@
     position: fixed;
     left: 50%;
     top: 50%;
-    min-width: min(35vw, 225px);
     z-index: 1;
     border-radius: var(--border-radius-large);
     transform-origin: center center;
     transform: translate(-50%,-50%) scale(0);
   }
+  .card.modal:not(.scale) {
+    min-width: min(35vw, 225px);
+  }
   .card.modal.scale {
     padding: min(6vh, 2vw);
-    min-width: unset;
     border-radius: calc(var(--border-radius-large) + min(1.5vh, 0.5vw));
     z-index: 2;
     transform: translate(-50%,50vh) scale(1);
@@ -613,8 +607,7 @@
     margin-left: min(2.5vw, 12px);
   }
   .card.action button {
-    width: min(5vw, 28px);
-    height: min(6vw, 32px);
+    padding: min(2.25vw, 10px) min(2vw, 8px);
     min-width: unset;
     display: flex;
     justify-content: center;
@@ -623,11 +616,6 @@
   .card.action button svg {
     width: min(2.5vw, 12px);
     height: min(2.5vw, 12px);
-    fill: var(--text-medium);
-    transition: fill var(--transition-fast);
-  }
-  .card.action button:hover > svg, .card.action button:focus > svg {
-    fill: var(--text-hover);
   }
   .card.action.active ~ .card.widget {
     max-height: calc(100% - min(4.5vw, 24px) - min(13.5vw, 68px));
@@ -636,7 +624,7 @@
   .card.action.active ~ .card.widget.active {
     transform: translateY(min(13.5vw, 68px)) scaleY(1);
   }
-  .card.active, #cardBackground.active {
+  .card.active, #backdrop.active {
     visibility: visible;
     opacity: 1;
     pointer-events: all;
@@ -700,11 +688,11 @@
     width: min(15vh, 5vw);
     height: min(15vh, 5vw);
   }
-  .card.modal .closeButton {
+  .card.modal button.close {
     width: min(4.25vw, 21px);
     height: min(4.25vw, 21px);
   }
-  .card.notification .closeButton, .card.widget .closeButton {
+  .card.notification button.close, .card.widget button.close {
     width: min(3.5vw, 18px);
     height: min(3.5vw, 18px);
   }
@@ -817,6 +805,9 @@
   #header .toolbar > * + * {
     margin-left: min(1.5vw, 12px);
   }
+  #load, #save {
+    display: none;
+  }
   #header .title {
     position: absolute;
     left: 50%;
@@ -839,7 +830,7 @@
     transition: var(--transition-slow);
     transition-property: margin-left, visibility, opacity, transform;
   }
-  @media (max-width: 900px){
+  @media (max-width: 900px) {
     #header .title {
       transform: translateX(calc(min(2.75vw, 12px) * -1));
     }
@@ -862,7 +853,7 @@
     position: relative;
     flex: 1;
   }
-  #main.code [data-numbered-container], #main.code [type="text"], #main.split [data-numbered-container], #main.split [type="text"], #main.preview [data-numbered-container], #main.preview [type="text"] {
+  #main:not(.text) [data-numbered-container], #main:not(.text) [type="text"] {
     font-family: var(--font-family-code);
   }
   #main.horizontal.resize {
@@ -1017,7 +1008,7 @@
   #preview.preview {
     --size: 100%;
   }
-  #cardBackground {
+  #backdrop {
     position: fixed;
     left: 0;
     top: 0;
@@ -1108,7 +1099,7 @@
       <button>File</button>
       <ul>
         <li onclick="openEditorWindow();">New<span>Ctrl + Shift + C</span></li>
-        <li onclick="load.click();"><input id="load" type="file" accept="text/*,image/*,audio/*,.js,.json,.webmanifest,.md">Open<span>Ctrl + Shift + L</span></li>
+        <li onclick="load.click();"><input id="load" type="file" accept="text/*,image/*,audio/*,.html,.css,.js,.json,.svg,.webmanifest,.md">Open<span>Ctrl + Shift + L</span></li>
         <li onclick="saveAs();"><a id="save"></a>Save<span>Ctrl + Shift + S</span></li>
         <li>Save As...
           <svg><use href="#arrow"/></svg>
@@ -1126,10 +1117,10 @@
     <div class="dropdown">
       <button>View</button>
       <ul>
-        <li onclick="changeView('text');">Text<span>Ctrl + Shift + 1</span></li>
-        <li onclick="changeView('code');">Code<span>Ctrl + Shift + 2</span></li>
-        <li onclick="changeView('split');">Split<span>Ctrl + Shift + 3</span></li>
-        <li onclick="changeView('preview');">Preview<span>Ctrl + Shift + 4</span></li>
+        <li onclick="changeView('text',true);">Text<span>Ctrl + Shift + 1</span></li>
+        <li onclick="changeView('code',true);">Code<span>Ctrl + Shift + 2</span></li>
+        <li onclick="changeView('split',true);">Split<span>Ctrl + Shift + 3</span></li>
+        <li onclick="changeView('preview',true);">Preview<span>Ctrl + Shift + 4</span></li>
         <li onclick="changeOrientation();">Orientation<span>Ctrl + Shift + 5</span></li>
         <li onclick="openDisplay();">Display<span>Ctrl + Shift + 6</span></li>
       </ul>
@@ -1146,14 +1137,14 @@
         <li>Online Resources...
           <svg><use href="#arrow"/></svg>
           <ul>
-            <li onclick="window.open('https://webformatter.com/','_blank');">Code Formatter</li>
-            <li onclick="window.open('https://www.sharedrop.io/');">File Transferer</li>
-            <li onclick="window.open('https://www.diffchecker.com/','_blank');">Difference Finder</li>
-            <li onclick="window.open('https://caniuse.com/','_blank');">Compatibility Checker</li>
-            <li onclick="window.open('https://realfavicongenerator.net/','_blank');">Favicon Generator</li>
-            <li onclick="window.open('https://www.svgminify.com/','_blank');">SVG Simplifier</li>
-            <li onclick="window.open('https://www.uuidgenerator.net/','_blank');">UUID Generator</li>
-            <li onclick="window.open('https://cryptii.com/','_blank');">Text Encryptor</li>
+            <a href="https://webformatter.com">Code Formatter</a>
+            <a href="https://www.sharedrop.io">File Transferer</a>
+            <a href="https://www.diffchecker.com/">Difference Finder</a>
+            <a href="https://caniuse.com/">Compatibility Checker</a>
+            <a href="https://realfavicongenerator.net/">Favicon Generator</a>
+            <a href="https://www.svgminify.com/">SVG Simplifier</a>
+            <a href="https://www.uuidgenerator.net/">UUID Generator</a>
+            <a href="https://cryptii.com/">Text Encryptor</a>
           </ul>
         </li>
       </ul>
@@ -1167,7 +1158,7 @@
     <span>Smart Text Editor</span>
   </div>
   <div class="attribution">
-    <span>Inspired by <a href="https://htmledit.squarefree.com/" target="_blank">Real-Time HTML Editor</a> and <a href="https://www.editpad.org/" target="_blank">Edit Pad</a>!</span>
+    <span>Inspired by <a href="https://htmledit.squarefree.com/">Real-Time HTML Editor</a> and <a href="https://www.editpad.org/">Edit Pad</a>!</span>
   </div>
 </header>
 
@@ -1179,7 +1170,7 @@
     <div class="handle">▲<br>▼</div>
   </div>
   <iframe id="preview" class="text horizontal" src="about:blank"></iframe>
-  <div id="cardBackground"></div>
+  <div id="backdrop"></div>
   <div id="welcome" class="card modal scale">
     <div class="header">
       <img class="pencil" src="resources/icon.svg">
@@ -1195,7 +1186,7 @@
   <div id="settings" class="card modal">
     <div class="header">
       <span>Settings</span>
-      <svg class="button closeButton" onclick="closeCard('settings');"><use href="#close"></use></svg>
+      <button class="close"><svg><use href="#close"></use></svg></button>
     </div>
     <div class="content">
       <div class="item list">
@@ -1234,15 +1225,15 @@
         <hr>
         <div class="checkbox" data-tooltip="Refresh manually using Ctrl + Enter when disabled">
           <input id="refreshSetting" type="checkbox" oninput="updateCheckbox('refresh');" checked>
-          <label for="refreshSetting"><svg class="button"><use href="#check"></use></svg>Automatically Refresh Preview</label>
+          <label for="refreshSetting"><svg><use href="#check"></use></svg>Automatically Refresh Preview</label>
         </div>
         <div class="checkbox">
           <input id="titleSetting" type="checkbox" oninput="updateCheckbox('title');" checked>
-          <label for="titleSetting"><svg class="button"><use href="#check"></use></svg>Show Title on Startup</label>
+          <label for="titleSetting"><svg><use href="#check"></use></svg>Show Title on Startup</label>
         </div>
         <div class="checkbox">
           <input id="transitionsSetting" type="checkbox" oninput="updateCheckbox('transitions');" checked>
-          <label for="transitionsSetting"><svg class="button"><use href="#check"></use></svg>Smooth Transitions</label>
+          <label for="transitionsSetting"><svg><use href="#check"></use></svg>Smooth Transitions</label>
         </div>
       </div>
     </div>
@@ -1250,10 +1241,10 @@
       <button class="warning" onclick="resetSettings();">Reset All Settings</button>
     </div>
     <div class="toolbar">
-      <a href="https://github.com/Offroaders123/Smart-Text-Editor/" target="_blank">Smart Text Editor on GitHub</a>
+      <a href="https://github.com/Offroaders123/Smart-Text-Editor/">Smart Text Editor on GitHub</a>
     </div>
     <div class="toolbar">
-      <a href="https://github.com/Offroaders123/Numbered-Textarea-Plugin/" target="_blank">Numbered Textarea Plugin on GitHub</a>
+      <a href="https://github.com/Offroaders123/Numbered-Textarea-Plugin/">Numbered Textarea Plugin on GitHub</a>
     </div>
   </div>
   <div id="reset" class="card notification">
@@ -1273,7 +1264,7 @@
   <div id="replacer" class="card widget">
     <div class="header">
       <span>Replace Text</span>
-      <svg class="button closeButton" onclick="closeCard('replacer');"><use href="#close"></use></svg>
+      <button class="close"><svg><use href="#close"></use></svg></button>
     </div>
     <div class="content">
       <div class="item expand">
@@ -1294,7 +1285,7 @@
   <div id="picker" class="card widget">
     <div class="header">
       <span>Color Picker</span>
-      <svg class="button closeButton" onclick="closeCard('picker');"><use href="#close"></use></svg>
+      <button class="close"><svg><use href="#close"></use></svg></button>
     </div>
     <div class="content">
       <div class="item">
@@ -1319,7 +1310,7 @@
   <div id="formatter" class="card widget">
     <div class="header">
       <span>JSON Formatter</span>
-      <svg class="button closeButton" onclick="closeCard('formatter');"><use href="#close"></use></svg>
+      <button class="close"><svg><use href="#close"></use></svg></button>
     </div>
     <div class="content">
       <div class="item expand">
@@ -1337,7 +1328,7 @@
   <div id="encoder" class="card widget">
     <div class="header">
       <span>URI Encoder</span>
-      <svg class="button closeButton" onclick="closeCard('encoder');"><use href="#close"></use></svg>
+      <button class="close"><svg><use href="#close"></use></svg></button>
     </div>
     <div class="content">
       <div class="item expand">
@@ -1354,7 +1345,7 @@
     <div class="toolbar">
       <div class="checkbox" data-tooltip="Encodes more special characters">
         <input id="componentSetting" type="checkbox" oninput="encodeComponent = this.checked;">
-        <label for="componentSetting"><svg class="button"><use href="#check"></use></svg>Enable URI Component</label>
+        <label for="componentSetting"><svg><use href="#check"></use></svg>Enable URI Component</label>
       </div>
     </div>
   </div>
@@ -1365,7 +1356,7 @@
 <script>
   var storage = window.localStorage, view = "text", orientation = "horizontal", refresh = "true", title = "true", transitions = "true", loadedFile, sourceChange = false, mustSave = false, activeWidget, activeModal, storedColor, insertColor = false, encodeComponent = false;
   window.addEventListener("load",function(){
-    if (windowParent){
+    if (parentWindow){
       if ("ontouchstart" in document.documentElement){
         openCard("editingTools");
       }
@@ -1387,18 +1378,18 @@
     }
     pickerInputRefresh();
     forceRefresh();
-    if ("serviceWorker" in navigator && windowParent && window.location.protocol == "https:"){
+    if ("serviceWorker" in navigator && parentWindow && window.location.protocol == "https:"){
       navigator.serviceWorker.register("service-worker.js");
     }
   });
   window.addEventListener("beforeunload",function(){
-    if (windowParent && mustSave){
+    if (parentWindow && mustSave){
       event.preventDefault();
       event.returnValue = "";
     }
   });
   window.addEventListener("keydown",function(event){
-    if (event.key == "Escape" && activeModal){
+    if (event.key == "Escape" && activeModal != undefined){
       blockShortcut(event);
       closeCard(activeModal);
     }
@@ -1417,19 +1408,19 @@
       }
       if (event.key == "!"){
         blockShortcut(event);
-        changeView("text");
+        changeView("text",true);
       }
       if (event.key == "@"){
         blockShortcut(event);
-        changeView("code");
+        changeView("code",true);
       }
       if (event.key == "#"){
         blockShortcut(event);
-        changeView("split");
+        changeView("split",true);
       }
       if (event.key == "$"){
         blockShortcut(event);
-        changeView("preview");
+        changeView("preview",true);
       }
       if (event.key == "%"){
         blockShortcut(event);
@@ -1525,37 +1516,13 @@
   inputTexts.forEach(function(inputText){
     addInputCharacteristics(inputText);
   });
+  var anchors = document.querySelectorAll("a[href]");
+  anchors.forEach(function(anchor){
+    anchor.target = "_blank";
+  });
   var dropdowns = Array.from(document.getElementsByClassName("dropdown"));
   dropdowns.forEach(function(dropdown){
     var button = dropdown.getElementsByTagName("button")[0];
-    var list = dropdown.getElementsByTagName("ul")[0];
-    var listItems = Array.from(dropdown.getElementsByTagName("li"));
-    listItems.forEach(function(listItem){
-      var subListPresent = listItem.getElementsByTagName("ul")[0];
-      if (subListPresent == undefined){
-        listItem.addEventListener("click",function(){
-          window.setTimeout(function(){
-            dropdowns.forEach(function(dropdown){
-              dropdown.classList.remove("active");
-            });
-          }, 50);
-        });
-      }
-      listItem.addEventListener("keydown",function(event){
-        if (event.key == "Enter"){
-          listItem.click();
-        }
-      });
-      listItem.setAttribute("tabindex","0");
-      if (subListPresent != undefined){
-        listItem.setAttribute("data-list","");
-        listItem.addEventListener("mouseenter",function(){
-          if (dropdown.classList.contains("active")){
-            listItem.focus();
-          }
-        });
-      }
-    });
     button.addEventListener("click",function(){
       dropdowns.forEach(function(dropdown){
         dropdown.classList.toggle("active");
@@ -1570,9 +1537,6 @@
             document.body.removeEventListener("click",disableDropdown);
           });
         }
-        function hoverDropdown(){
-          button.focus();
-        }
       });
     });
     button.addEventListener("mouseenter",function(){
@@ -1586,6 +1550,31 @@
         dropdown.classList.remove("active");
       });
     });
+    var list = dropdown.getElementsByTagName("ul")[0];
+    var listItems = Array.from(dropdown.getElementsByTagName("li"));
+    listItems.forEach(function(listItem){
+      var subListPresent = listItem.getElementsByTagName("ul")[0];
+      if (subListPresent == undefined){
+        listItem.addEventListener("click",function(){
+          dropdowns.forEach(function(dropdown){
+            dropdown.classList.remove("active");
+          });
+        });
+      }
+      listItem.addEventListener("keydown",function(event){
+        if (event.key == "Enter"){
+          listItem.click();
+        }
+      });
+      listItem.setAttribute("tabindex","0");
+      if (subListPresent != undefined){
+        listItem.addEventListener("mouseenter",function(){
+          if (dropdown.classList.contains("active")){
+            listItem.focus();
+          }
+        });
+      }
+    });
   });
   var checkboxes = Array.from(document.getElementsByClassName("checkbox"));
   checkboxes.forEach(function(checkbox){
@@ -1597,15 +1586,14 @@
     });
     checkbox.setAttribute("tabindex","0");
   });
-  var closeButtons = Array.from(document.getElementsByClassName("closeButton"));
+  var closeButtons = document.querySelectorAll("button.close");
   closeButtons.forEach(function(closeButton){
-    closeButton.addEventListener("keydown",function(){
-      if (event.key == "Enter"){
-        blockShortcut(event);
-        closeButton.onclick();
-      }
+    closeButton.addEventListener("click",function(){
+      closeCard(closeButton.parentElement.parentElement.id);
     });
-    closeButton.setAttribute("tabindex","0");
+    if (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform)){
+      closeButton.classList.add("left");
+    }
   });
   var pickerChannels = picker.querySelectorAll("[type='range']");
   pickerChannels.forEach(function(pickerChannel){
@@ -1639,7 +1627,7 @@
   load.addEventListener("change",function(event){
     confirmOverwrite(importFile,event);
   });
-  cardBackground.addEventListener("click",function(){
+  backdrop.addEventListener("click",function(){
     if (activeModal == "welcome"){
       workspaceInput.focus();
     }
@@ -1656,7 +1644,7 @@
     }
   });
   function loadSettings(input){
-    if (windowParent){
+    if (parentWindow){
       var storedView = storage.getItem("view");
       if (storedView != undefined){
         if (input == "initial"){
@@ -1751,7 +1739,7 @@
     item.autocapitalize = "off";
     item.setAttribute("autocorrect","off");
   }
-  function changeView(input){
+  function changeView(input,userInteraction){
     var elements = [header,main,workspace,scaler,preview], newView = input;
     elements.forEach(function(element){
       changeClass(element,view,newView);
@@ -1783,6 +1771,9 @@
     }
     view = newView;
     previewRefresh();
+    if (userInteraction == true){
+      closeCard(activeModal);
+    }
   }
   function changeOrientation(input){
     var elements = [header,main,workspace,scaler,preview], newOrientation;
@@ -1793,7 +1784,7 @@
       if (orientation == "vertical"){
         newOrientation = "horizontal";
       }
-      changeView("code");
+      changeView("code",true);
       window.setTimeout(function(){
         elements.forEach(function(element){
           changeClass(element,orientation,newOrientation);
@@ -1930,7 +1921,7 @@
   }
   function textEdit(type,text,focus){
     var cursor = workspaceInput.selectionStart;
-    if (focus == true){
+    if (focus){
       workspaceInput.focus();
     }
     if (type == "insert"){
@@ -1951,7 +1942,7 @@
     if (card.classList.contains("active")){
       card.classList.toggle("active");
       if (cardType == "modal"){
-        cardBackground.classList.toggle("active");
+        backdrop.classList.toggle("active");
       }
     } else {
       var cards = Array.from(document.getElementsByClassName("card"));
@@ -1964,7 +1955,7 @@
         });
       }
       if (cardType != "notification" && cardType != "modal"){
-        cardBackground.classList.remove("active");
+        backdrop.classList.remove("active");
       }
       card.classList.add("active");
       if (cardType == "notification"){
@@ -1973,7 +1964,7 @@
         }, 3000);
       }
       if (cardType == "modal"){
-        cardBackground.classList.add("active");
+        backdrop.classList.add("active");
       }
     }
     if (cardType == "widget"){
@@ -1989,9 +1980,9 @@
     var cardType = card.classList[1];
     document.getElementById(element).classList.remove("active");
     if (cardType == "modal"){
-      cardBackground.classList.remove("active");
+      backdrop.classList.remove("active");
     }
-    if (activeModal == "welcome" && windowParent){
+    if (activeModal == "welcome" && parentWindow){
       workspaceInput.focus();
     }
     if (activeModal == "settings"){
@@ -2071,7 +2062,14 @@
     }
   }
   function activateEncoder(format){
-    if (encodeComponent == false){
+    if (encodeComponent){
+      if (format == "encode"){
+        changeTextarea(encoderInput,encodeURIComponent(encoderInput.value));
+      }
+      if (format == "decode"){
+        changeTextarea(encoderInput,decodeURIComponent(encoderInput.value));
+      }
+    } else {
       if (format == "encode"){
         changeTextarea(encoderInput,encodeURI(encoderInput.value));
       }
@@ -2079,19 +2077,11 @@
         changeTextarea(encoderInput,decodeURI(encoderInput.value));
       }
     }
-    if (encodeComponent == true){
-      if (format == "encode"){
-        changeTextarea(encoderInput,encodeURIComponent(encoderInput.value));
-      }
-      if (format == "decode"){
-        changeTextarea(encoderInput,decodeURIComponent(encoderInput.value));
-      }
-    }
   }
   function insertTemplate(){
     changeTextarea(workspaceInput,decodeURI("%3C!DOCTYPE%20html%3E%0A%3Chtml%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20margin:%200;%0A%20%20%20%20padding:%200;%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20width:%20100vw;%0A%20%20%20%20height:%20100vh;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E"));
     sourceChange = true;
-    changeView("split");
+    changeView("split",true);
   }
   function forceRefresh(){
     var store = refresh;
