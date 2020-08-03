@@ -206,11 +206,14 @@
     border-radius: var(--border-radius-small);
     box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
     --focus-border: transparent;
+    text-decoration-color: transparent;
     outline: none;
-    transition: var(--transition-fast) color;
+    transition: var(--transition-fast);
+    transition-property: color, text-decoration-color;
   }
   a:hover, a:focus {
     color: var(--text-hover);
+    text-decoration-color: var(--text-hover);
   }
   a:focus {
     --focus-border: var(--outline);
@@ -370,9 +373,6 @@
   .dropdown li svg {
     fill: var(--text-medium-additional);
     transition-property: fill, transform;
-  }
-  .dropdown a {
-    text-decoration: none;
   }
   .dropdown li:hover, .dropdown li:focus, .dropdown li:focus-within, .dropdown a:hover, .dropdown a:focus {
     color: var(--text-hover);
@@ -1117,10 +1117,10 @@
     <div class="dropdown">
       <button>View</button>
       <ul>
-        <li onclick="changeView('text',true);">Text<span>Ctrl + Shift + 1</span></li>
-        <li onclick="changeView('code',true);">Code<span>Ctrl + Shift + 2</span></li>
-        <li onclick="changeView('split',true);">Split<span>Ctrl + Shift + 3</span></li>
-        <li onclick="changeView('preview',true);">Preview<span>Ctrl + Shift + 4</span></li>
+        <li onclick="changeView('text');">Text<span>Ctrl + Shift + 1</span></li>
+        <li onclick="changeView('code');">Code<span>Ctrl + Shift + 2</span></li>
+        <li onclick="changeView('split');">Split<span>Ctrl + Shift + 3</span></li>
+        <li onclick="changeView('preview');">Preview<span>Ctrl + Shift + 4</span></li>
         <li onclick="changeOrientation();">Orientation<span>Ctrl + Shift + 5</span></li>
         <li onclick="openDisplay();">Display<span>Ctrl + Shift + 6</span></li>
       </ul>
@@ -1290,7 +1290,7 @@
     <div class="content">
       <div class="item">
         <span id="pickerPreview"></span>
-        <input id="pickerInput" type="text" value="#ffa500" maxlength="7">
+        <input id="pickerInput" type="text" value="#ee8800" maxlength="7">
       </div>
       <div class="item">
         <label for="redChannel">Red</label>
@@ -1408,19 +1408,19 @@
       }
       if (event.key == "!"){
         blockShortcut(event);
-        changeView("text",true);
+        changeView("text");
       }
       if (event.key == "@"){
         blockShortcut(event);
-        changeView("code",true);
+        changeView("code");
       }
       if (event.key == "#"){
         blockShortcut(event);
-        changeView("split",true);
+        changeView("split");
       }
       if (event.key == "$"){
         blockShortcut(event);
-        changeView("preview",true);
+        changeView("preview");
       }
       if (event.key == "%"){
         blockShortcut(event);
@@ -1601,6 +1601,12 @@
     pickerChannel.min = "0";
     pickerChannel.max = "255";
   });
+  load.addEventListener("change",function(event){
+    confirmOverwrite(importFile,event);
+  });
+  save.addEventListener("click",function(event){
+    event.stopPropagation();
+  });
   workspaceInput.addEventListener("input",function(){
     sourceChange = true;
     mustSave = true;
@@ -1623,9 +1629,6 @@
     document.body.addEventListener("mousemove",setScaling);
     document.body.addEventListener("mouseup",removeScaling);
     document.body.addEventListener("mouseleave",removeScaling);
-  });
-  load.addEventListener("change",function(event){
-    confirmOverwrite(importFile,event);
   });
   backdrop.addEventListener("click",function(){
     if (activeModal == "welcome"){
@@ -1739,7 +1742,7 @@
     item.autocapitalize = "off";
     item.setAttribute("autocorrect","off");
   }
-  function changeView(input,userInteraction){
+  function changeView(input){
     var elements = [header,main,workspace,scaler,preview], newView = input;
     elements.forEach(function(element){
       changeClass(element,view,newView);
@@ -1771,9 +1774,6 @@
     }
     view = newView;
     previewRefresh();
-    if (userInteraction == true){
-      closeCard(activeModal);
-    }
   }
   function changeOrientation(input){
     var elements = [header,main,workspace,scaler,preview], newOrientation;
@@ -1784,7 +1784,7 @@
       if (orientation == "vertical"){
         newOrientation = "horizontal";
       }
-      changeView("code",true);
+      changeView("code");
       window.setTimeout(function(){
         elements.forEach(function(element){
           changeClass(element,orientation,newOrientation);
@@ -1906,9 +1906,6 @@
     } else {
       save.download = `Untitled.${extension}`;
     }
-    save.addEventListener("click",function(event){
-      event.stopPropagation();
-    });
     save.click();
     loadedFile = save.download;
     mustSave = false;
@@ -1932,6 +1929,7 @@
       workspaceInput.setSelectionRange(cursor,cursor + text);
       workspaceInput.setRangeText("");
     }
+    updateLineCount(workspaceInput);
     sourceChange = true;
     mustSave = true;
     previewRefresh();
@@ -2081,7 +2079,7 @@
   function insertTemplate(){
     changeTextarea(workspaceInput,decodeURI("%3C!DOCTYPE%20html%3E%0A%3Chtml%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20margin:%200;%0A%20%20%20%20padding:%200;%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20width:%20100vw;%0A%20%20%20%20height:%20100vh;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E"));
     sourceChange = true;
-    changeView("split",true);
+    changeView("split");
   }
   function forceRefresh(){
     var store = refresh;
