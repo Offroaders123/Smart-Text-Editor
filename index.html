@@ -1586,10 +1586,11 @@
     });
     checkbox.setAttribute("tabindex","0");
   });
-  var modals = Array.from(document.querySelectorAll(".card.modal"));
-  modals.forEach(function(modal){
-    var navigable = getNavigableElements(modal);
-    modal.addEventListener("keydown",function(event){
+  var cards = Array.from(document.getElementsByClassName("card"));
+  cards.forEach(function(card){
+    var navigable = getNavigableElements(card);
+    card.addEventListener("keydown",function(event){
+      if (card.classList.contains("modal") != true) return;
       if (event.key == "Tab"){
         if (event.shiftKey){
           if (document.activeElement == navigable[0]){
@@ -1971,7 +1972,6 @@
         backdrop.classList.remove("active");
       }
     } else {
-      var cards = Array.from(document.getElementsByClassName("card"));
       if (cardType != "notification"){
         cards.forEach(function(item){
           var itemType = item.classList[1];
