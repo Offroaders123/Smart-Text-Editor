@@ -1354,7 +1354,7 @@
 <script src="https://offroaders123.github.io/Numbered-Textarea-Plugin/script.js"></script>
 
 <script>
-  var storage = window.localStorage, view = "text", orientation = "horizontal", refresh = "true", title = "true", transitions = "true", loadedFile, sourceChange = false, mustSave = false, activeWidget, activeModal, storedColor, insertColor = false, encodeComponent = false;
+  var storage = window.localStorage, view = "text", orientation = "horizontal", refresh = "true", title = "true", transitions = "true", loadedFile, sourceChange = false, mustSave = false, activeModal, activeWidget, storedColor, insertColor = false, encodeComponent = false;
   window.addEventListener("load",function(){
     if (parentWindow){
       if ("ontouchstart" in document.documentElement){
@@ -1512,11 +1512,11 @@
     addInputCharacteristics(textarea);
     disableLineCount(textarea);
   });
-  var inputTexts = document.querySelectorAll("input[type='text']");
+  var inputTexts = Array.from(document.querySelectorAll("input[type='text']"));
   inputTexts.forEach(function(inputText){
     addInputCharacteristics(inputText);
   });
-  var anchors = document.querySelectorAll("a[href]");
+  var anchors = Array.from(document.querySelectorAll("a[href]"));
   anchors.forEach(function(anchor){
     anchor.target = "_blank";
   });
@@ -1586,7 +1586,26 @@
     });
     checkbox.setAttribute("tabindex","0");
   });
-  var closeButtons = document.querySelectorAll("button.close");
+  var modals = Array.from(document.querySelectorAll(".card.modal"));
+  modals.forEach(function(modal){
+    var navigable = getNavigableElements(modal);
+    modal.addEventListener("keydown",function(event){
+      if (event.key == "Tab"){
+        if (event.shiftKey){
+          if (document.activeElement == navigable[0]){
+            navigable[navigable.length - 1].focus();
+            event.preventDefault();
+          }
+        } else {
+          if (document.activeElement == navigable[navigable.length - 1]){
+            navigable[0].focus();
+            event.preventDefault();
+          }
+        }
+      }
+    });
+  });
+  var closeButtons = Array.from(document.querySelectorAll("button.close"));
   closeButtons.forEach(function(closeButton){
     closeButton.addEventListener("click",function(){
       closeCard(closeButton.parentElement.parentElement.id);
@@ -1595,7 +1614,7 @@
       closeButton.classList.add("left");
     }
   });
-  var pickerChannels = picker.querySelectorAll("[type='range']");
+  var pickerChannels = Array.from(picker.querySelectorAll("[type='range']"));
   pickerChannels.forEach(function(pickerChannel){
     pickerChannel.addEventListener("input",channelRefresh);
     pickerChannel.min = "0";
@@ -1819,6 +1838,15 @@
     }
     transitions = newTransition;
   }
+  function getNavigableElements(container){
+    var navigable = Array.from(container.querySelectorAll("button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), a[href]:not([disabled]), [tabindex]:not([tabindex='-1'])"));
+    navigable.forEach(function(element){
+      if (window.getComputedStyle(element).getPropertyValue("display") == "none"){
+        navigable.splice(navigable.indexOf(element),1);
+      }
+    });
+    return navigable;
+  }
   function confirmOverwrite(action,event){
     if (mustSave){
       var ask = confirm("Changes you made may not be saved.");
@@ -1938,9 +1966,9 @@
     var card = document.getElementById(element);
     var cardType = card.classList[1];
     if (card.classList.contains("active")){
-      card.classList.toggle("active");
+      card.classList.remove("active");
       if (cardType == "modal"){
-        backdrop.classList.toggle("active");
+        backdrop.classList.remove("active");
       }
     } else {
       var cards = Array.from(document.getElementsByClassName("card"));
@@ -1952,24 +1980,27 @@
           }
         });
       }
+      card.classList.add("active");
       if (cardType != "notification" && cardType != "modal"){
         backdrop.classList.remove("active");
       }
-      card.classList.add("active");
       if (cardType == "notification"){
         window.setTimeout(function(){
           closeCard(element);
         }, 3000);
       }
       if (cardType == "modal"){
+        window.setTimeout(function(){
+          getNavigableElements(card)[0].focus();
+        }, 125);
         backdrop.classList.add("active");
       }
     }
-    if (cardType == "widget"){
-      activeWidget = element;
-    }
     if (cardType == "modal"){
       activeModal = element;
+    }
+    if (cardType == "widget"){
+      activeWidget = element;
     }
   }
   function closeCard(element){
@@ -1986,11 +2017,11 @@
     if (activeModal == "settings"){
       loadSettings();
     }
-    if (cardType == "widget"){
-      activeWidget = undefined;
-    }
     if (cardType == "modal"){
       activeModal = undefined;
+    }
+    if (cardType == "widget"){
+      activeWidget = undefined;
     }
   }
   function changeState(action){
