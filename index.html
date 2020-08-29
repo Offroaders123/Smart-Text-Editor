@@ -9,9 +9,10 @@
 <meta name="author" content="Brandon Bennett">
 <meta name="description" content="The text editor that requires only a browser and a keyboard!">
 <meta name="google-site-verification" content="_LrfHy7pIualH1TolkQ5b3Po0dtjYrx-QQsiXelwx20"/>
-<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#191919">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Smart Text Editor">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/svg+xml" href="resources/icon.svg">
 <link rel="alternate icon" type="image/png" sizes="16x16" href="resources/icon-16.png">
 <link rel="alternate icon" type="image/png" sizes="32x32" href="resources/icon-32.png">
@@ -1561,6 +1562,7 @@
   });
   var anchors = Array.from(document.querySelectorAll("a[href]"));
   anchors.forEach(function(anchor){
+    anchor.rel = "noopener";
     anchor.target = "_blank";
   });
   var dropdowns = Array.from(document.getElementsByClassName("dropdown"));
@@ -1698,9 +1700,9 @@
   });
   scaler.addEventListener("touchstart",function(){
     toggleScaling();
-    document.body.addEventListener("touchmove",setScaling);
-    document.body.addEventListener("touchend",removeScaling);
-  });
+    document.body.addEventListener("touchmove",setScaling,{ passive: true });
+    document.body.addEventListener("touchend",removeScaling,{ passive: true });
+  },{ passive: true });
   scaler.addEventListener("mousedown",function(){
     toggleScaling();
     document.body.addEventListener("mousemove",setScaling);
@@ -2256,8 +2258,8 @@
   }
   function removeScaling(event){
     if (event instanceof TouchEvent){
-      document.body.removeEventListener("touchmove",setScaling);
-      document.body.removeEventListener("touchend",removeScaling);
+      document.body.removeEventListener("touchmove",setScaling,{ passive: true });
+      document.body.removeEventListener("touchend",removeScaling,{ passive: true });
       toggleScaling();
     } else {
       document.body.removeEventListener("mousemove",setScaling);
