@@ -2069,7 +2069,10 @@
       }
       if (cardType == "modal"){
         window.setTimeout(function(){
-          getNavigableElements(card)[0].focus();
+          var navigable = getNavigableElements(card);
+          if (navigable.length != 0){
+            navigable[0].focus();
+          }
         }, 125);
         backdrop.classList.add("active");
       }
