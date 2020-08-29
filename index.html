@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-US">
 
 <head>
 
 <title>Smart Text Editor</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta name="author" content="Brandon Bennett">
+<meta name="description" content="The text editor that requires only a browser and a keyboard!">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Smart Text Editor">
@@ -32,19 +34,27 @@
     font-family: var(--font-family-interface);
   }
   :root {
-    --body: #121212;
+    --primary-hue: 0;
+    --primary-sat: 0%;
+    --secondary-sat: calc(var(--primary-sat) * 0.5);
+    --tertiary-sat: calc(var(--primary-sat) * 0.25);
+
+    --textarea-code-color: var(--text-light);
+    --textarea-drag-hue: 240;
+
+    --body: hsl(var(--primary-hue),var(--primary-sat),7.1%);
 
     --font-family-interface: "Rubik", sans-serif;
     --font-family-code: "Cousine", monospace;
 
-    --container-dark: #191919;
-    --container-medium: #1d1d1d;
-    --container-medium-hover: #2d2d2d;
+    --container-dark: hsl(var(--primary-hue),var(--primary-sat),9.8%);
+    --container-medium: hsl(var(--primary-hue),var(--primary-sat),11.4%);
+    --container-medium-hover: hsl(var(--primary-hue),var(--primary-sat),17.6%);
 
     --text-dark: #000000;
-    --text-medium: #aaaaaa;
-    --text-medium-contrast: #cccccc;
-    --text-medium-additional: #777777;
+    --text-medium: hsl(var(--primary-hue),var(--tertiary-sat),66.7%);
+    --text-medium-contrast: hsl(var(--primary-hue),var(--tertiary-sat),80%);
+    --text-medium-additional: hsl(var(--primary-hue),var(--secondary-sat),46.7%);
     --text-light: #ffffff;
     --text-hover: #ffffff;
     --text-warning-hover: #ffe5e5;
@@ -63,18 +73,18 @@
     --selection-color: var(--text-dark);
     --selection-background: #b4d5ffbf;
 
-    --scrollbar: #7a7a7a;
-    --scrollbar-hover: #9a9a9a;
+    --scrollbar: hsl(var(--primary-hue),var(--secondary-sat),47.8%);
+    --scrollbar-hover: hsl(var(--primary-hue),var(--secondary-sat),60.4%);
 
-    --button: #3a3a3a;
-    --button-hover: #4a4a4a;
+    --button: hsl(var(--primary-hue),var(--secondary-sat),22.7%);
+    --button-hover: hsl(var(--primary-hue),var(--secondary-sat),29%);
     --button-warning-hover: #bb2222;
 
-    --textarea-dark: #1f1f1f;
-    --textarea-medium: #252525;
+    --textarea-dark: hsl(var(--primary-hue),var(--secondary-sat),12.2%);
+    --textarea-medium: hsl(var(--primary-hue),var(--secondary-sat),14.5%);
     --textarea-light: #eae2d1;
-    --textarea-drag-background: #0000ff40;
-    --textarea-drag-border: #0000ff;
+    --textarea-drag-background: hsla(var(--textarea-drag-hue),100%,50%,25%);
+    --textarea-drag-border: hsl(var(--textarea-drag-hue),100%,50%);
 
     --range-thumb: var(--button);
     --range-thumb-hover: var(--button-hover);
@@ -101,6 +111,7 @@
     height: 100vh;
     display: flex;
     flex-direction: column;
+    color: var(--text-medium);
     background: var(--body);
     overflow: hidden;
     user-select: none;
@@ -127,7 +138,7 @@
     transition: var(--transition-fast);
     transition-property: color, background, opacity;
   }
-  button:not(.close) {
+  button:not(.nav) {
     padding: min(0.5vw, 2px) min(1vw, 8px);
     min-width: min(8vw, 75px);
     background: var(--button);
@@ -148,15 +159,17 @@
     color: var(--text-warning-hover);
     background: var(--button-warning-hover);
   }
-  button.close {
+  button.nav {
     padding: min(0.5vw, 2px);
     position: absolute;
-    right: 0;
     background: none;
     box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
   }
-  button.close.left {
+  button.nav.back {
     left: 0;
+  }
+  button.nav.close {
+    right: 0;
   }
   button svg {
     fill: var(--text-medium);
@@ -165,13 +178,11 @@
   button:hover svg, button:focus svg, .dropdown:hover button svg, .dropdown:focus-within button svg, .dropdown li:hover svg, .dropdown li:focus svg, .dropdown li:focus-within svg {
     fill: var(--text-hover);
   }
-  button.close svg {
+  button.nav svg {
     width: 100%;
     height: 100%;
   }
-  [data-numbered-container], [type="text"] {
-    --color: var(--text-dark);
-    color: var(--color);
+  [data-numbered-container], input[type="text"] {
     font-family: unset;
     font-size: 13px;
     border: none;
@@ -180,25 +191,35 @@
   [data-numbered-container] {
     resize: none;
   }
-  [data-numbered-container]:focus-within, [type="text"] {
+  [data-numbered-container]:focus-within, input[type="text"] {
     outline: none;
   }
-  [data-numbered-container] ol, [data-numbered-container] textarea, [type="text"] {
+  [data-numbered-container] ol, [data-numbered-container] textarea, input[type="text"] {
     padding: 6px;
   }
   [data-numbered-container] ol {
-    color: var(--color);
+    color: inherit;
     background: transparent;
     opacity: 0.55;
   }
   [data-numbered-container] li::before {
     font-family: inherit;
   }
-  [data-numbered-container] textarea, [type="text"] {
+  [data-numbered-container] textarea, input[type="text"] {
     -webkit-appearance: none;
   }
   [data-numbered-container] textarea {
     word-wrap: normal;
+  }
+  span.info {
+    display: flex;
+    align-items: center;
+    color: #ffcd00;
+  }
+  span.info::before {
+    content: "\26A0";
+    margin-right: min(1.25vw, 5px);
+    font-size: 150%;
   }
   a {
     color: inherit;
@@ -218,7 +239,7 @@
   a:focus {
     --focus-border: var(--outline);
   }
-  [type="range"] {
+  input[type="range"] {
     padding: min(3vw, 12px) min(0.75vw, 3px);
     width: min(25vw, 130px);
     height: min(5vw, 20px);
@@ -230,10 +251,10 @@
     cursor: pointer;
     -webkit-appearance: none;
   }
-  [type="range"]:focus {
+  input[type="range"]:focus {
     --focus-border: var(--outline);
   }
-  ::-webkit-slider-thumb {
+  input[type="range"]::-webkit-slider-thumb {
     margin-top: calc(min(1.75vw, 7px) * -1);
     width: min(2.75vw, 12px);
     height: min(5vw, 20px);
@@ -244,20 +265,20 @@
     transition: background var(--transition-fast);
     -webkit-appearance: none;
   }
-  :hover::-webkit-slider-thumb, :focus::-webkit-slider-thumb {
+  input[type="range"]:hover::-webkit-slider-thumb, input[type="range"]:focus::-webkit-slider-thumb {
     background: var(--range-thumb-hover);
   }
-  ::-webkit-slider-runnable-track {
+  input[type="range"]::-webkit-slider-runnable-track {
     height: min(1.5vw, 6px);
     background: var(--range-track);
     border-radius: var(--border-radius-medium);
     box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow);
     transition: background var(--transition-fast);
   }
-  :hover::-webkit-slider-runnable-track, :focus::-webkit-slider-runnable-track {
+  input[type="range"]:hover::-webkit-slider-runnable-track, input[type="range"]:focus::-webkit-slider-runnable-track {
     background: var(--range-track-hover);
   }
-  ::-moz-range-thumb {
+  input[type="range"]::-moz-range-thumb {
     margin-top: calc(min(1.75vw, 7px) * -1);
     width: min(2.75vw, 12px);
     height: min(5vw, 20px);
@@ -267,17 +288,17 @@
     box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow);
     transition: background var(--transition-fast);
   }
-  :hover::-moz-range-thumb, :focus::-moz-range-thumb {
+  input[type="range"]:hover::-moz-range-thumb, input[type="range"]:focus::-moz-range-thumb {
     background: var(--range-thumb-hover);
   }
-  ::-moz-range-track {
+  input[type="range"]::-moz-range-track {
     height: min(1.5vw, 6px);
     background: var(--range-track);
     border-radius: var(--border-radius-medium);
     box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow);
     transition: background var(--transition-fast);
   }
-  :hover::-moz-range-track, :focus::-moz-range-track {
+  input[type="range"]:hover::-moz-range-track, input[type="range"]:focus::-moz-range-track {
     background: var(--range-track-hover);
   }
   hr {
@@ -292,10 +313,9 @@
     pointer-events: none;
   }
   ::placeholder {
-    color: var(--color);
+    color: inherit;
     opacity: 0.55;
     white-space: pre-wrap;
-    transition: color var(--transition-slow);
   }
   ::selection {
     color: var(--selection-color);
@@ -372,6 +392,7 @@
   }
   .dropdown li svg {
     fill: var(--text-medium-additional);
+    transition: var(--transition-fast);
     transition-property: fill, transform;
   }
   .dropdown li:hover, .dropdown li:focus, .dropdown li:focus-within, .dropdown a:hover, .dropdown a:focus {
@@ -388,7 +409,7 @@
     transform: scale(0);
     transform-origin: left top;
   }
-  @media (max-width: 550px), (max-height: 475px) {
+  @media (max-width: 550px), (max-height: 515px) {
     .dropdown ul ul {
       min-width: 100%;
       max-height: min(24vh, 60px);
@@ -422,7 +443,6 @@
     margin: min(0.75vw, 3px);
     display: flex;
     justify-content: center;
-    align-items: center;
     cursor: pointer;
     transition: color var(--transition-fast);
   }
@@ -431,7 +451,9 @@
   }
   .select label {
     padding-right: min(1vw, 4px);
-    cursor: pointer;
+    display: flex;
+    align-items: center;
+    cursor: inherit;
   }
   .select button {
     display: flex;
@@ -455,21 +477,19 @@
   .checkbox:focus {
     --focus-border: var(--outline);
   }
-  .checkbox [type="checkbox"] {
+  .checkbox input[type="checkbox"] {
     display: none;
-  }
-  .checkbox label, .checkbox label svg {
-    cursor: pointer;
   }
   .checkbox label {
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: min(2.5vw, 14.5px);
+    pointer-events: none;
     transition: color var(--transition-fast);
   }
   .checkbox label svg {
-    margin-right: min(4px, 4px);
+    margin-right: min(1vw, 4px);
     padding: min(0.25vw, 1px);
     width: min(3.35vw, 18px);
     height: min(3.35vw, 18px);
@@ -489,10 +509,10 @@
     background: var(--container-medium-hover);
     border-color: var(--text-hover);
   }
-  .checkbox [type="checkbox"]:checked + label svg {
+  .checkbox input[type="checkbox"]:checked + label svg {
     fill: var(--text-medium);
   }
-  .checkbox:hover [type="checkbox"]:checked + label svg, .checkbox:focus [type="checkbox"]:checked + label svg {
+  .checkbox:hover input[type="checkbox"]:checked + label svg, .checkbox:focus input[type="checkbox"]:checked + label svg {
     fill: var(--text-hover);
   }
 
@@ -521,7 +541,7 @@
     background: var(--container-medium-hover);
     border-radius: var(--border-radius-large);
     box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow);
-    transform-origin: bottom center;
+    transform-origin: center bottom;
   }
   [data-tooltip]::after {
     content: "";
@@ -529,7 +549,7 @@
     border: min(3vw, 12px) solid transparent;
     border-top-color: var(--container-medium-hover);
     filter: drop-shadow(0 min(0.5vw, 2px) min(0.25vw, 1px) var(--box-shadow));
-    transform-origin: top center;
+    transform-origin: center top;
   }
   [data-tooltip]:hover::before, [data-tooltip]:hover::after, [data-tooltip]:focus::before, [data-tooltip]:focus::after, [data-tooltip]:focus-within::before, [data-tooltip]:focus-within::after {
     opacity: 1;
@@ -547,7 +567,6 @@
   .card {
     display: flex;
     flex-direction: column;
-    color: var(--text-medium);
     background: var(--container-dark);
     box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow);
     white-space: nowrap;
@@ -688,28 +707,24 @@
     width: min(15vh, 5vw);
     height: min(15vh, 5vw);
   }
-  .card.modal button.close {
+  .card.modal button.nav {
     width: min(4.25vw, 21px);
     height: min(4.25vw, 21px);
   }
-  .card.notification button.close, .card.widget button.close {
+  .card.notification button.nav, .card.widget button.nav {
     width: min(3.5vw, 18px);
     height: min(3.5vw, 18px);
   }
-  .card [data-numbered-container], .card [type="text"] {
-    --color: var(--text-light);
+  .card [data-numbered-container], .card input[type="text"] {
+    color: var(--text-light);
     background: var(--textarea-medium);
     border-radius: var(--border-radius-medium);
     box-shadow: 0 2px 4px var(--box-shadow) inset;
   }
   .card [data-numbered-container] {
-    width: 100%;
     max-width: 50vw;
     height: min(25vw, 75px);
     max-height: min(25vw, 25vh);
-  }
-  .card [data-numbered-container] + * {
-    margin-top: min(2.5vw, 12px);
   }
   .card [data-numbered-container].expand {
     height: 150px;
@@ -719,12 +734,8 @@
     display: flex;
     justify-content: space-around;
   }
-  .card.modal .content .section {
-    margin-bottom: min(1vw, 4px);
-    font-size: min(3.25vw, 18px);
-  }
   .card.modal .content span {
-    font-size: min(2vw, 14.5px);
+    font-size: min(2.5vw, 14.5px);
   }
   .card.modal.scale .content span {
     font-size: min(4.5vh, 1.5vw);
@@ -742,29 +753,36 @@
   .card .content .item + * {
     margin-left: min(2.5vw, 12px);
   }
-  .card .content .item.list {
-    align-items: flex-start;
+  .card .content .item.list > * {
+    display: flex;
+    justify-content: center;
   }
-  .card .content .item.list > * + * {
+  .card .content .item.list > * + *:not(label):not([type="range"]), .card .content .item.list > *:not(label):not([type="range"]) + label {
     margin-top: min(2.5vw, 12px);
+  }
+  .card .content .item.list.start {
+    align-items: flex-start;
   }
   .card .content .item.expand {
     width: 100%;
   }
-  .card .toolbar {
+  .card .content .item.expand > *:not(label) {
+    width: 100%;
+  }
+  .card .options {
     display: flex;
     justify-content: center;
   }
-  .card.modal .toolbar {
+  .card.modal .options {
     margin-top: min(2.6vw, 16px);
   }
-  .card.notification .toolbar, .card.widget .toolbar {
+  .card.notification .options, .card.widget .options {
     margin-top: min(2.5vw, 12px);
   }
-  .card .toolbar > * + * {
+  .card .options > * + * {
     margin-left: min(2.5vw, 12px);
   }
-  .card .toolbar button {
+  .card .options button {
     min-width: min(12vw, 75px);
   }
   #symbols {
@@ -777,7 +795,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: var(--text-medium);
     background: var(--container-dark);
     z-index: 1;
     transition: box-shadow var(--transition-slow);
@@ -798,11 +815,11 @@
     pointer-events: none;
     transition: none;
   }
-  #header .toolbar {
+  #header .options {
     display: flex;
     align-items: center;
   }
-  #header .toolbar > * + * {
+  #header .options > * + * {
     margin-left: min(1.5vw, 12px);
   }
   #load, #save {
@@ -853,8 +870,9 @@
     position: relative;
     flex: 1;
   }
-  #main:not(.text) [data-numbered-container], #main:not(.text) [type="text"] {
+  #main:not(.text) [data-numbered-container], #main:not(.text) input[type="text"] {
     font-family: var(--font-family-code);
+    color: var(--textarea-code-color);
   }
   #main.horizontal.resize {
     cursor: row-resize;
@@ -862,13 +880,11 @@
   #main.vertical.resize {
     cursor: col-resize;
   }
-  #workspace, #workspace ol {
-    transition: var(--transition-slow);
-  }
   #workspace {
     position: absolute;
     left: 0;
     top: 0;
+    transition: var(--transition-slow);
   }
   #workspace::after {
     content: "";
@@ -884,11 +900,11 @@
   }
   #workspace.text {
     --size: 100%;
-    --color: var(--text-dark);
+    color: var(--text-dark);
     background: var(--textarea-light);
   }
   #workspace.code, #workspace.split, #workspace.preview {
-    --color: var(--text-light);
+    color: var(--text-light);
     background: var(--textarea-dark);
   }
   #workspace.code {
@@ -969,7 +985,6 @@
   }
   #scaler .handle {
     padding: min(0.5vw, 2px);
-    color: var(--text-medium);
     font-size: min(2.75vw, 12px);
     background: var(--button);
     border-radius: var(--border-radius-medium);
@@ -1023,7 +1038,6 @@
     transition-property: visibility, opacity;
   }
   #pickerPreview {
-    margin-bottom: min(2.5vw, 12px);
     min-width: min(20vw, 86px);
     min-height: min(20vw, 86px);
     border-radius: var(--border-radius-medium);
@@ -1057,6 +1071,10 @@
   <symbol id="check" viewBox="0 0 512 512">
     <path d="m63.346 191.15 192.72 192.72-63.402 63.402-192.72-192.72z"/>
     <path d="m129.5 383.87 319.15-319.15 63.402 63.402-319.15 319.15z"/>
+  </symbol>
+  <symbol id="back" viewBox="0 0 512 512">
+    <path d="m160.8 191.81 254.36 254.36-64 64-254.36-254.36z"/>
+    <path d="m96.833 255.86 254.36-254.36 64 64-254.36 254.36z"/>
   </symbol>
   <symbol id="close" viewBox="0 0 512 512">
     <path d="m1.5795 65.78 64.201-64.201 190.22 190.22 190.22-190.22 64.201 64.201-190.22 190.22 190.22 190.22-64.201 64.201-190.22-190.22-190.22 190.22-64.201-64.201 190.22-190.22z"/>
@@ -1094,7 +1112,7 @@
 </svg>
 
 <header id="header" class="text horizontal">
-  <div class="toolbar">
+  <div class="options">
     <div class="dropdown">
       <button>File</button>
       <ul>
@@ -1141,6 +1159,7 @@
             <a href="https://www.sharedrop.io">File Transferer</a>
             <a href="https://www.diffchecker.com/">Difference Finder</a>
             <a href="https://caniuse.com/">Compatibility Checker</a>
+            <a href="https://web.dev/measure/">Performance Tester</a>
             <a href="https://realfavicongenerator.net/">Favicon Generator</a>
             <a href="https://www.svgminify.com/">SVG Simplifier</a>
             <a href="https://www.uuidgenerator.net/">UUID Generator</a>
@@ -1154,7 +1173,7 @@
     </div>
   </div>
   <div class="title">
-    <img src="resources/icon.svg">
+    <img src="resources/icon.svg" alt="">
     <span>Smart Text Editor</span>
   </div>
   <div class="attribution">
@@ -1173,7 +1192,7 @@
   <div id="backdrop"></div>
   <div id="welcome" class="card modal scale">
     <div class="header">
-      <img class="pencil" src="resources/icon.svg">
+      <img class="pencil" src="resources/icon.svg" alt="">
       <span>Smart Text Editor</span>
     </div>
     <div class="content">
@@ -1186,10 +1205,10 @@
   <div id="settings" class="card modal">
     <div class="header">
       <span>Settings</span>
-      <button class="close"><svg><use href="#close"></use></svg></button>
+      <button class="nav close"><svg><use href="#close"></use></svg></button>
     </div>
     <div class="content">
-      <div class="item list">
+      <div class="item list start">
         <div class="select">
           <label for="viewSetting">Default View:</label>
           <div class="dropdown">
@@ -1237,19 +1256,42 @@
         </div>
       </div>
     </div>
-    <div class="toolbar">
+    <div class="options">
+      <button onclick="openCard('theme');">Theme...</button>
       <button class="warning" onclick="resetSettings();">Reset All Settings</button>
     </div>
-    <div class="toolbar">
+    <div class="options">
       <a href="https://github.com/Offroaders123/Smart-Text-Editor/">Smart Text Editor on GitHub</a>
     </div>
-    <div class="toolbar">
+    <div class="options">
       <a href="https://github.com/Offroaders123/Numbered-Textarea-Plugin/">Numbered Textarea Plugin on GitHub</a>
+    </div>
+  </div>
+  <div id="theme" class="card modal">
+    <div class="header">
+      <span>Theme</span>
+      <button class="nav back" data-parent="settings"><svg><use href="#back"></use></svg></button>
+      <button class="nav close"><svg><use href="#close"></use></svg></button>
+    </div>
+    <div class="content">
+      <div class="item list expand">
+        <span class="info">These settings currently don't<br>save between sessions</span>
+        <label for="hueSetting">Hue</label>
+        <input id="hueSetting" type="range" value="0" min="0" max="360">
+        <label for="satSetting">Saturation</label>
+        <input id="satSetting" type="range" value="0" min="0" max="100">
+        <label for="codeColorSetting">Code Text Color</label>
+        <input id="codeColorSetting" type="text" placeholder="Insert color...">
+      </div>
+    </div>
+    <div class="options">
+      <button onclick="changeView('code');">Activate Code View</button>
+      <button onclick="resetTheme();">Reset</button>
     </div>
   </div>
   <div id="reset" class="card notification">
     <div class="header">
-      <img class="pencil" src="resources/icon.svg">
+      <img class="pencil" src="resources/icon.svg" alt="">
       <span>Reset Settings</span>
     </div>
     <div class="content">
@@ -1264,10 +1306,10 @@
   <div id="replacer" class="card widget">
     <div class="header">
       <span>Replace Text</span>
-      <button class="close"><svg><use href="#close"></use></svg></button>
+      <button class="nav close"><svg><use href="#close"></use></svg></button>
     </div>
     <div class="content">
-      <div class="item expand">
+      <div class="item list expand">
         <div data-numbered-container>
           <textarea id="locate" placeholder="Text to locate..."></textarea>
         </div>
@@ -1276,7 +1318,7 @@
         </div>
       </div>
     </div>
-    <div class="toolbar">
+    <div class="options">
       <button onclick="activateReplacer();">Replace</button>
       <button onclick="var store = locate.value; changeTextarea(locate,modify.value); changeTextarea(modify,store);">Flip</button>
       <button onclick="changeTextarea(locate,''); changeTextarea(modify,'');">Clear</button>
@@ -1285,14 +1327,14 @@
   <div id="picker" class="card widget">
     <div class="header">
       <span>Color Picker</span>
-      <button class="close"><svg><use href="#close"></use></svg></button>
+      <button class="nav close"><svg><use href="#close"></use></svg></button>
     </div>
     <div class="content">
-      <div class="item">
-        <span id="pickerPreview"></span>
-        <input id="pickerInput" type="text" value="#ee8800" maxlength="7">
+      <div class="item list">
+        <div id="pickerPreview"></div>
+        <input id="pickerInput" type="text" value="#ee8800" maxlength="7" placeholder="#rrggbb">
       </div>
-      <div class="item">
+      <div class="item list">
         <label for="redChannel">Red</label>
         <input id="redChannel" type="range">
         <label for="greenChannel">Green</label>
@@ -1301,7 +1343,7 @@
         <input id="blueChannel" type="range">
       </div>
     </div>
-    <div class="toolbar">
+    <div class="options">
       <button onclick="pickerInput.select(); document.execCommand('copy');">Copy</button>
       <button onclick="textEdit('insert',storedColor,true); channelRefresh(); insertColor = true;">Insert</button>
       <button onclick="var selectionCount = workspaceInput.selectionEnd - workspaceInput.selectionStart; if (selectionCount != 0){ textEdit('delete',selectionCount,true); } insertColor = false;">Delete</button>
@@ -1310,16 +1352,16 @@
   <div id="formatter" class="card widget">
     <div class="header">
       <span>JSON Formatter</span>
-      <button class="close"><svg><use href="#close"></use></svg></button>
+      <button class="nav close"><svg><use href="#close"></use></svg></button>
     </div>
     <div class="content">
       <div class="item expand">
         <div class="expand" data-numbered-container>
-          <textarea id="formatterInput" placeholder="Place JSON here..."></textarea>
+          <textarea id="formatterInput" placeholder="Insert JSON data..."></textarea>
         </div>
       </div>
     </div>
-    <div class="toolbar">
+    <div class="options">
       <button onclick="activateFormatter('  ');">Format</button>
       <button onclick="activateFormatter('');">Collapse</button>
       <button onclick="changeTextarea(formatterInput,'');">Clear</button>
@@ -1328,21 +1370,21 @@
   <div id="encoder" class="card widget">
     <div class="header">
       <span>URI Encoder</span>
-      <button class="close"><svg><use href="#close"></use></svg></button>
+      <button class="nav close"><svg><use href="#close"></use></svg></button>
     </div>
     <div class="content">
       <div class="item expand">
         <div class="expand" data-numbered-container>
-          <textarea id="encoderInput" placeholder="Place text here..."></textarea>
+          <textarea id="encoderInput" placeholder="Insert text..."></textarea>
         </div>
       </div>
     </div>
-    <div class="toolbar">
+    <div class="options">
       <button onclick="activateEncoder('encode');">Encode</button>
       <button onclick="activateEncoder('decode');">Decode</button>
       <button onclick="changeTextarea(encoderInput,'');">Clear</button>
     </div>
-    <div class="toolbar">
+    <div class="options">
       <div class="checkbox" data-tooltip="Encodes more special characters">
         <input id="componentSetting" type="checkbox" oninput="encodeComponent = this.checked;">
         <label for="componentSetting"><svg><use href="#check"></use></svg>Enable URI Component</label>
@@ -1562,7 +1604,7 @@
         });
       }
       listItem.addEventListener("keydown",function(event){
-        if (event.key == "Enter"){
+        if (event.key == "Enter" || event.key == " "){
           listItem.click();
         }
       });
@@ -1578,13 +1620,20 @@
   });
   var checkboxes = Array.from(document.getElementsByClassName("checkbox"));
   checkboxes.forEach(function(checkbox){
+    checkbox.addEventListener("click",function(){
+      input.click();
+    });
     checkbox.addEventListener("keydown",function(event){
-      if (event.key == "Enter"){
-        blockShortcut(event);
-        checkbox.getElementsByTagName("label")[0].click();
+      if (event.key == "Enter" || event.key == " "){
+        event.preventDefault();
+        input.click();
       }
     });
     checkbox.setAttribute("tabindex","0");
+    var input = checkbox.querySelector("input[type='checkbox']");
+    input.addEventListener("click",function(event){
+      event.stopPropagation();
+    });
   });
   var cards = Array.from(document.getElementsByClassName("card"));
   cards.forEach(function(card){
@@ -1594,28 +1643,35 @@
       if (event.key == "Tab"){
         if (event.shiftKey){
           if (document.activeElement == navigable[0]){
-            navigable[navigable.length - 1].focus();
             event.preventDefault();
+            navigable[navigable.length - 1].focus();
           }
         } else {
           if (document.activeElement == navigable[navigable.length - 1]){
-            navigable[0].focus();
             event.preventDefault();
+            navigable[0].focus();
           }
         }
       }
     });
   });
-  var closeButtons = Array.from(document.querySelectorAll("button.close"));
+  var backButtons = Array.from(document.querySelectorAll("button.nav.back"));
+  backButtons.forEach(function(backButton){
+    backButton.addEventListener("click",function(){
+      openCard(backButton.getAttribute("data-parent"));
+    });
+  });
+  var closeButtons = Array.from(document.querySelectorAll("button.nav.close"));
   closeButtons.forEach(function(closeButton){
     closeButton.addEventListener("click",function(){
       closeCard(closeButton.parentElement.parentElement.id);
     });
-    if (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform)){
-      closeButton.classList.add("left");
-    }
   });
-  var pickerChannels = Array.from(picker.querySelectorAll("[type='range']"));
+  var themeSettings = Array.from(theme.getElementsByTagName("input"));
+  themeSettings.forEach(function(themeSetting){
+    themeSetting.addEventListener("input",updateTheme);
+  });
+  var pickerChannels = Array.from(picker.querySelectorAll("input[type='range']"));
   pickerChannels.forEach(function(pickerChannel){
     pickerChannel.addEventListener("input",channelRefresh);
     pickerChannel.min = "0";
@@ -1755,6 +1811,24 @@
   }
   function updateCapitalization(value){
     return value.charAt(0).toUpperCase() + value.slice(1);
+  }
+  function updateTheme(){
+    document.documentElement.classList.add("reduced-motion");
+    document.documentElement.style.setProperty("--primary-hue",hueSetting.value);
+    document.documentElement.style.setProperty("--primary-sat",`${satSetting.value}%`);
+    document.documentElement.style.setProperty("--textarea-code-color",codeColorSetting.value);
+    window.setTimeout(function(){
+      document.documentElement.classList.remove("reduced-motion");
+    }, 500);
+  }
+  function resetTheme(){
+    document.documentElement.classList.add("reduced-motion");
+    document.documentElement.style.removeProperty("--primary-hue");
+    document.documentElement.style.removeProperty("--primary-sat");
+    document.documentElement.style.removeProperty("--textarea-code-color");
+    window.setTimeout(function(){
+      document.documentElement.classList.remove("reduced-motion");
+    }, 500);
   }
   function addInputCharacteristics(item){
     item.spellcheck = false;
@@ -1918,6 +1992,7 @@
           textEdit("insert",reader.result,true);
         });
       }
+      document.title = `${fileName} - Smart Text Editor`;
     } else {
       alert("Sorry, that file type isn't supported.");
     }
@@ -2108,7 +2183,7 @@
     }
   }
   function insertTemplate(){
-    changeTextarea(workspaceInput,decodeURI("%3C!DOCTYPE%20html%3E%0A%3Chtml%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20margin:%200;%0A%20%20%20%20padding:%200;%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20width:%20100vw;%0A%20%20%20%20height:%20100vh;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E"));
+    changeTextarea(workspaceInput,decodeURI("%3C!DOCTYPE%20html%3E%0A%3Chtml%20lang=%22en-US%22%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20margin:%200;%0A%20%20%20%20padding:%200;%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20width:%20100vw;%0A%20%20%20%20height:%20100vh;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E"));
     sourceChange = true;
     changeView("split");
   }
