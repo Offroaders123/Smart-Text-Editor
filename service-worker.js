@@ -1,4 +1,4 @@
-var cacheName = 1.71;
+var cacheName = 1.72;
 self.addEventListener("activate",function(event){
   event.waitUntil(caches.keys().then(function(cacheNames){
     return Promise.all(cacheNames.map(function(cache){
