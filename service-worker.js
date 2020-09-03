@@ -1,8 +1,8 @@
-var cacheName = 1.73;
+var cacheVersion = 1.75;
 self.addEventListener("activate",function(event){
-  event.waitUntil(caches.keys().then(function(cacheNames){
-    return Promise.all(cacheNames.map(function(cache){
-      if (cache != cacheName){
+  event.waitUntil(caches.keys().then(function(cacheVersions){
+    return Promise.all(cacheVersions.map(function(cache){
+      if (cache != cacheVersion){
         return caches.delete(cache);
       }
     }));
@@ -11,7 +11,7 @@ self.addEventListener("activate",function(event){
 self.addEventListener("fetch",function(event){
   event.respondWith(fetch(event.request).then(function(resolve){
     var resolveClone = resolve.clone();
-    caches.open(cacheName).then(function(cache){
+    caches.open(cacheVersion).then(function(cache){
       cache.put(event.request,resolveClone);
     });
     return resolve;

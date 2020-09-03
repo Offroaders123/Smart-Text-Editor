@@ -3,6 +3,7 @@
   "short_name": "Smart Text Editor",
   "start_url": "https://offroaders123.github.io/Smart-Text-Editor/",
   "display": "standalone",
+  "theme_color": "#191919",
   "background_color": "#1d1d1d",
   "icons": [
     {

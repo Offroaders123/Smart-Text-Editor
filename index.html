@@ -343,6 +343,7 @@
   }
   .dropdown {
     position: relative;
+    display: flex;
   }
   .dropdown svg {
     width: min(2.75vw, 12px);
@@ -496,7 +497,7 @@
     width: min(3.35vw, 18px);
     height: min(3.35vw, 18px);
     fill: transparent;
-    background: var(--container-medium);
+    background: var(--range-track);
     border: min(0.35vw, 2px) solid var(--text-medium);
     border-radius: var(--border-radius-medium);
     box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow);
@@ -508,7 +509,7 @@
   }
   .checkbox:hover label svg, .checkbox:focus label svg {
     fill: transparent;
-    background: var(--container-medium-hover);
+    background: var(--range-track-hover);
     border-color: var(--text-hover);
   }
   .checkbox input[type="checkbox"]:checked + label svg {
@@ -1173,9 +1174,7 @@
         </li>
       </ul>
     </div>
-    <div>
-      <button onclick="openCard('settings');">Settings</button>
-    </div>
+    <button onclick="openCard('settings');">Settings</button>
   </div>
   <div class="title">
     <img src="resources/icon.svg" alt="">
@@ -1288,7 +1287,7 @@
         <label for="dragHueSetting">Drag and Drop Hue</label>
         <input id="dragHueSetting" type="range" value="240" min="0" max="360" data-display="#value°">
         <label for="codeColorSetting">Code Text Color</label>
-        <input id="codeColorSetting" type="text" placeholder="Insert color...">
+        <input id="codeColorSetting" type="text" placeholder="Any color format...">
       </div>
     </div>
     <div class="options">
@@ -1318,10 +1317,10 @@
     <div class="content">
       <div class="item list expand">
         <div data-numbered-container>
-          <textarea id="locate" placeholder="Insert text to locate..."></textarea>
+          <textarea id="replacerFind" placeholder="Text to find..."></textarea>
         </div>
         <div data-numbered-container>
-          <textarea id="modify" placeholder="Insert text to replace with..."></textarea>
+          <textarea id="replacerReplace" placeholder="Replace with..."></textarea>
         </div>
       </div>
     </div>
@@ -1364,7 +1363,7 @@
     <div class="content">
       <div class="item expand">
         <div class="expand" data-numbered-container>
-          <textarea id="formatterInput" placeholder="Insert JSON data..."></textarea>
+          <textarea id="formatterInput" placeholder="JSON data to format..."></textarea>
         </div>
       </div>
     </div>
@@ -1382,7 +1381,7 @@
     <div class="content">
       <div class="item expand">
         <div class="expand" data-numbered-container>
-          <textarea id="encoderInput" placeholder="Insert text..."></textarea>
+          <textarea id="encoderInput" placeholder="Text to encode..."></textarea>
         </div>
       </div>
     </div>
@@ -2159,19 +2158,19 @@
     document.execCommand(action);
   }
   function activateReplacer(){
-    changeTextarea(workspaceInput,workspaceInput.value.split(locate.value).join(modify.value));
+    changeTextarea(workspaceInput,workspaceInput.value.split(replacerFind.value).join(replacerReplace.value));
     sourceChange = true;
     mustSave = true;
     previewRefresh();
   }
   function flipReplacer(){
-    var cachedData = locate.value;
-    changeTextarea(locate,modify.value);
-    changeTextarea(modify,cachedData);
+    var cachedData = replacerFind.value;
+    changeTextarea(replacerFind,replacerReplace.value);
+    changeTextarea(replacerReplace,cachedData);
   }
   function clearReplacer(){
-    changeTextarea(locate,"");
-    changeTextarea(modify,"");
+    changeTextarea(replacerFind,"");
+    changeTextarea(replacerReplace,"");
   }
   function pickerInputRefresh(){
     var get = pickerInput.value.replace("#","");
