@@ -39,7 +39,7 @@
     --primary-hue: 0;
     --primary-sat: 0%;
     --secondary-sat: calc(var(--primary-sat) * 0.5);
-    --tertiary-sat: calc(var(--primary-sat) * 0.25);
+    --tertiary-sat: calc(var(--primary-sat) * 0.125);
 
     --textarea-code-color: var(--text-light);
     --textarea-drag-hue: 240;
@@ -90,8 +90,8 @@
 
     --range-thumb: var(--button);
     --range-thumb-hover: var(--button-hover);
-    --range-track: var(--container-medium);
-    --range-track-hover: var(--container-medium-hover);
+    --range-track: hsl(var(--primary-hue),var(--secondary-sat),12.5%);
+    --range-track-hover: hsl(var(--primary-hue),var(--secondary-sat),18.8%);
 
     --card-background: #19191960;
 
@@ -124,7 +124,7 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    background: var(--container-medium);
+    background: var(--container-dark);
     opacity: var(--fade-opacity);
     pointer-events: var(--fade-pointer-events);
     z-index: 3;
@@ -537,7 +537,9 @@
     content: attr(data-tooltip);
     padding: min(2vw, 8px);
     bottom: calc(100% + min(3vw, 12px));
-    min-width: min(9vw, 36px);
+    min-width: min(12vw, 48px);
+    justify-content: center;
+    align-items: center;
     color: var(--text-hover);
     font-size: min(2.75vw, 12px);
     background: var(--container-medium-hover);
@@ -553,9 +555,11 @@
     filter: drop-shadow(0 min(0.5vw, 2px) min(0.25vw, 1px) var(--box-shadow));
     transform-origin: center top;
   }
-  [data-tooltip]:hover::before, [data-tooltip]:hover::after, [data-tooltip]:focus::before, [data-tooltip]:focus::after, [data-tooltip]:focus-within::before, [data-tooltip]:focus-within::after {
+  [data-tooltip]:hover::before, [data-tooltip]:hover::after, [data-tooltip]:focus::before, [data-tooltip]:focus::after, [data-tooltip]:focus-within::before, [data-tooltip]:focus-within::after, [data-tooltip].focused::before, [data-tooltip].focused::after {
     opacity: 1;
     --scale: 1;
+  }
+  :not(label)[data-tooltip]:hover::before, :not(label)[data-tooltip]:hover::after, [data-tooltip]:focus::before, [data-tooltip]:focus::after, [data-tooltip]:focus-within::before, [data-tooltip]:focus-within::after {
     transition-delay: var(--transition-delay);
   }
   .buffering {
@@ -895,10 +899,9 @@
     top: 0;
     width: 100%;
     height: 100%;
-    border: 0 solid var(--textarea-drag-border);
     pointer-events: none;
     transition: var(--transition-medium);
-    transition-property: background, border-width;
+    transition-property: background, box-shadow;
   }
   #workspace.text {
     --size: 100%;
@@ -922,7 +925,7 @@
   }
   #workspace.drag::after {
     background: var(--textarea-drag-background);
-    border-width: 4px;
+    box-shadow: 0 0 4px 4px var(--textarea-drag-border) inset;
   }
   #workspace.horizontal, #preview.horizontal {
     width: 100%;
@@ -1278,10 +1281,12 @@
     <div class="content">
       <div class="item list expand">
         <span class="info">These settings currently don't<br>save between sessions</span>
-        <label for="hueSetting">Hue</label>
-        <input id="hueSetting" type="range" value="0" min="0" max="360">
-        <label for="satSetting">Saturation</label>
-        <input id="satSetting" type="range" value="0" min="0" max="100">
+        <label for="primaryHueSetting">Primary Hue</label>
+        <input id="primaryHueSetting" type="range" value="0" min="0" max="360" data-display="#value°">
+        <label for="primarySatSetting">Primary Saturation</label>
+        <input id="primarySatSetting" type="range" value="0" min="0" max="100" data-display="#value%">
+        <label for="dragHueSetting">Drag and Drop Hue</label>
+        <input id="dragHueSetting" type="range" value="240" min="0" max="360" data-display="#value°">
         <label for="codeColorSetting">Code Text Color</label>
         <input id="codeColorSetting" type="text" placeholder="Insert color...">
       </div>
@@ -1313,17 +1318,17 @@
     <div class="content">
       <div class="item list expand">
         <div data-numbered-container>
-          <textarea id="locate" placeholder="Text to locate..."></textarea>
+          <textarea id="locate" placeholder="Insert text to locate..."></textarea>
         </div>
         <div data-numbered-container>
-          <textarea id="modify" placeholder="Replace with..."></textarea>
+          <textarea id="modify" placeholder="Insert text to replace with..."></textarea>
         </div>
       </div>
     </div>
     <div class="options">
       <button onclick="activateReplacer();">Replace</button>
-      <button onclick="var store = locate.value; changeTextarea(locate,modify.value); changeTextarea(modify,store);">Flip</button>
-      <button onclick="changeTextarea(locate,''); changeTextarea(modify,'');">Clear</button>
+      <button onclick="flipReplacer();">Flip</button>
+      <button onclick="clearReplacer();">Clear</button>
     </div>
   </div>
   <div id="picker" class="card widget">
@@ -1346,9 +1351,9 @@
       </div>
     </div>
     <div class="options">
-      <button onclick="pickerInput.select(); document.execCommand('copy');">Copy</button>
-      <button onclick="textEdit('insert',storedColor,true); channelRefresh(); insertColor = true;">Insert</button>
-      <button onclick="var selectionCount = workspaceInput.selectionEnd - workspaceInput.selectionStart; if (selectionCount != 0){ textEdit('delete',selectionCount,true); } insertColor = false;">Delete</button>
+      <button onclick="copyPicker();">Copy</button>
+      <button onclick="insertPicker();">Insert</button>
+      <button onclick="deletePicker();">Delete</button>
     </div>
   </div>
   <div id="formatter" class="card widget">
@@ -1398,7 +1403,7 @@
 <script src="https://offroaders123.github.io/Numbered-Textarea-Plugin/script.js"></script>
 
 <script>
-  var storage = window.localStorage, view = "text", orientation = "horizontal", refresh = "true", title = "true", transitions = "true", loadedFile, sourceChange = false, mustSave = false, activeModal, activeWidget, storedColor, insertColor = false, encodeComponent = false;
+  var storage = window.localStorage, view = "text", orientation = "horizontal", refresh = "true", title = "true", transitions = "true", loadedFile, sourceChange = false, mustSave = false, activeModal, activeWidget, cachedColor, insertColor = false, encodeComponent = false;
   window.addEventListener("load",function(){
     if (parentWindow){
       if ("ontouchstart" in document.documentElement){
@@ -1670,9 +1675,27 @@
       closeCard(closeButton.parentElement.parentElement.id);
     });
   });
-  var themeSettings = Array.from(theme.getElementsByTagName("input"));
-  themeSettings.forEach(function(themeSetting){
-    themeSetting.addEventListener("input",updateTheme);
+  var themeChannels = Array.from(theme.querySelectorAll("input[type='range']"));
+  themeChannels.forEach(function(themeChannel){
+    var label = themeChannel.parentElement.querySelector(`label[for="${themeChannel.id}"]`);
+    themeChannel.addEventListener("input",function(){
+      label.setAttribute("data-tooltip",themeChannel.getAttribute("data-display").split("#value").join(themeChannel.value));
+    });
+    themeChannel.addEventListener("mouseenter",function(){
+      label.classList.add("focused");
+    });
+    themeChannel.addEventListener("mouseout",function(){
+      if (document.activeElement != themeChannel){
+        label.classList.remove("focused");
+      }
+    });
+    themeChannel.addEventListener("focus",function(){
+      label.classList.add("focused");
+    });
+    themeChannel.addEventListener("blur",function(){
+      label.classList.remove("focused");
+    });
+    label.setAttribute("data-tooltip",themeChannel.getAttribute("data-display").split("#value").join(themeChannel.value));
   });
   var pickerChannels = Array.from(picker.querySelectorAll("input[type='range']"));
   pickerChannels.forEach(function(pickerChannel){
@@ -1718,57 +1741,81 @@
   welcome.addEventListener("click",function(){
     closeCard("welcome");
   });
+  primaryHueSetting.addEventListener("input",function(){
+    tempReducedMotion();
+    document.documentElement.style.setProperty("--primary-hue",primaryHueSetting.value);
+    document.querySelector("[name='theme-color']").content = window.getComputedStyle(document.documentElement).getPropertyValue("--container-dark");
+  });
+  primarySatSetting.addEventListener("input",function(){
+    tempReducedMotion();
+    document.documentElement.style.setProperty("--primary-sat",`${primarySatSetting.value}%`);
+    document.querySelector("[name='theme-color']").content = window.getComputedStyle(document.documentElement).getPropertyValue("--container-dark");
+  });
+  dragHueSetting.addEventListener("input",function(){
+    tempReducedMotion();
+    document.documentElement.style.setProperty("--textarea-drag-hue",dragHueSetting.value);
+  });
+  dragHueSetting.addEventListener("focus",function(){
+    workspace.classList.add("drag");
+  });
+  dragHueSetting.addEventListener("blur",function(){
+    workspace.classList.remove("drag");
+  });
+  codeColorSetting.addEventListener("input",function(){
+    tempReducedMotion();
+    document.documentElement.style.setProperty("--textarea-code-color",codeColorSetting.value);
+  });
   pickerInput.addEventListener("input",function(){
     pickerInputRefresh();
     if (insertColor){
-      textEdit("insert",storedColor,true);
+      textEdit("insert",cachedColor,true);
       pickerInput.focus();
     }
   });
   function loadSettings(input){
     if (parentWindow){
-      var storedView = storage.getItem("view");
-      if (storedView != undefined){
+      var savedView = storage.getItem("view");
+      if (savedView != undefined){
         if (input == "initial"){
-          changeView(storedView);
+          changeView(savedView);
         }
-        updateSelect("view",storedView);
+        updateSelect("view",savedView);
       }
-      var storedOrientation = storage.getItem("orientation");
-      if (storedOrientation != undefined){
+      var savedOrientation = storage.getItem("orientation");
+      if (savedOrientation != undefined){
         if (input == "initial"){
-          changeOrientation(storedOrientation);
+          changeOrientation(savedOrientation);
         }
-        updateSelect("orientation",storedOrientation);
+        updateSelect("orientation",savedOrientation);
       }
-      var storedEditingTools = storage.getItem("editingTools");
-      if (storedEditingTools != undefined){
+      var savedEditingTools = storage.getItem("editingTools");
+      if (savedEditingTools != undefined){
         var editingOpen = editingTools.classList.contains("active");
         if (input == "initial"){
-          if (storedEditingTools == "yes" && !editingOpen){
+          if (savedEditingTools == "yes" && !editingOpen){
             openCard("editingTools");
           }
-          if (storedEditingTools == "no" && editingOpen){
+          if (savedEditingTools == "no" && editingOpen){
             closeCard("editingTools");
           }
         }
-        updateSelect("editingTools",storedEditingTools);
+        updateSelect("editingTools",savedEditingTools);
       }
-      var storedRefresh = storage.getItem("refresh");
-      if (storedRefresh != undefined){
-        refresh = storedRefresh;
-        updateCheckbox("refresh",storedRefresh);
+      var savedRefresh = storage.getItem("refresh");
+      if (savedRefresh != undefined){
+        refresh = savedRefresh;
+        updateCheckbox("refresh",savedRefresh);
       }
-      var storedTitle = storage.getItem("title");
-      if (storedTitle != undefined){
-        title = storedTitle;
-        updateCheckbox("title",storedTitle);
+      var savedTitle = storage.getItem("title");
+      if (savedTitle != undefined){
+        title = savedTitle;
+        updateCheckbox("title",savedTitle);
       }
       window.setTimeout(function(){
-        var storedTransitions = storage.getItem("transitions");
-        if (storedTransitions != undefined){
-          changeTransitions(storedTransitions);
-          updateCheckbox("transitions",storedTransitions);
+        var savedTransitions = storage.getItem("transitions");
+        if (savedTransitions != undefined){
+          changeTransitions(savedTransitions);
+          updateCheckbox("transitions",savedTransitions);
         } else {
           changeTransitions(transitions);
         }
@@ -1815,20 +1862,24 @@
   function updateCapitalization(value){
     return value.charAt(0).toUpperCase() + value.slice(1);
   }
-  function updateTheme(){
-    document.documentElement.classList.add("reduced-motion");
-    document.documentElement.style.setProperty("--primary-hue",hueSetting.value);
-    document.documentElement.style.setProperty("--primary-sat",`${satSetting.value}%`);
-    document.documentElement.style.setProperty("--textarea-code-color",codeColorSetting.value);
-    window.setTimeout(function(){
-      document.documentElement.classList.remove("reduced-motion");
-    }, 500);
-  }
   function resetTheme(){
-    document.documentElement.classList.add("reduced-motion");
+    tempReducedMotion();
     document.documentElement.style.removeProperty("--primary-hue");
     document.documentElement.style.removeProperty("--primary-sat");
     document.documentElement.style.removeProperty("--textarea-code-color");
+    document.documentElement.style.removeProperty("--textarea-drag-hue");
+    document.querySelector("[name='theme-color']").content = window.getComputedStyle(document.documentElement).getPropertyValue("--container-dark");
+    primaryHueSetting.value = 0;
+    primarySatSetting.value = 0;
+    dragHueSetting.value = 240;
+    codeColorSetting.value = "";
+    themeChannels.forEach(function(themeChannel){
+      var label = themeChannel.parentElement.querySelector(`label[for="${themeChannel.id}"]`);
+      label.setAttribute("data-tooltip",themeChannel.getAttribute("data-display").split("#value").join(themeChannel.value));
+    });
+  }
+  function tempReducedMotion(){
+    document.documentElement.classList.add("reduced-motion");
     window.setTimeout(function(){
       document.documentElement.classList.remove("reduced-motion");
     }, 500);
@@ -1839,8 +1890,8 @@
     item.autocapitalize = "off";
     item.setAttribute("autocorrect","off");
   }
-  function changeView(input){
-    var elements = [header,main,workspace,scaler,preview], newView = input;
+  function changeView(newView){
+    var elements = [header,main,workspace,scaler,preview];
     elements.forEach(function(element){
       changeClass(element,view,newView);
     });
@@ -1877,8 +1928,7 @@
     if (input == undefined){
       if (orientation == "horizontal"){
         newOrientation = "vertical";
-      }
-      if (orientation == "vertical"){
+      } else {
         newOrientation = "horizontal";
       }
       changeView("code");
@@ -1901,17 +1951,15 @@
       orientation = newOrientation;
     }
   }
-  function changeClass(element,variable,newVariable){
-    element.classList.remove(variable);
+  function changeClass(element,style,newStyle){
+    element.classList.remove(style);
     element.removeAttribute("style");
-    element.classList.add(newVariable);
+    element.classList.add(newStyle);
   }
-  function changeTransitions(input){
-    var newTransition = input;
+  function changeTransitions(newTransition){
     if (newTransition == "true"){
       document.documentElement.classList.remove("reduced-motion");
-    }
-    if (newTransition == "false"){
+    } else {
       document.documentElement.classList.add("reduced-motion");
     }
     transitions = newTransition;
@@ -1975,6 +2023,7 @@
         reader.readAsText(load.files[0],"UTF-8");
         reader.addEventListener("loadend",function(){
           changeTextarea(workspaceInput,reader.result);
+          workspaceInput.scrollTop = 0;
           mustSave = false;
           forceRefresh();
         });
@@ -2115,35 +2164,44 @@
     mustSave = true;
     previewRefresh();
   }
+  function flipReplacer(){
+    var cachedData = locate.value;
+    changeTextarea(locate,modify.value);
+    changeTextarea(modify,cachedData);
+  }
+  function clearReplacer(){
+    changeTextarea(locate,"");
+    changeTextarea(modify,"");
+  }
   function pickerInputRefresh(){
     var get = pickerInput.value.replace("#","");
     if (get.length == 3 || get.length == 6){
-      storedColor = get;
-      if (storedColor.length == 3){
-        storedColor = storedColor.match(/.{1}/g);
-        storedColor.forEach(function(item,index){
-          storedColor[index] = item + item;
+      cachedColor = get;
+      if (cachedColor.length == 3){
+        cachedColor = cachedColor.match(/.{1}/g);
+        cachedColor.forEach(function(item,index){
+          cachedColor[index] = item + item;
         });
       }
-      if (storedColor.length == 6){
-        storedColor = storedColor.match(/.{1,2}/g);
+      if (cachedColor.length == 6){
+        cachedColor = cachedColor.match(/.{1,2}/g);
       }
-      storedColor.forEach(function(item,index){
-        storedColor[index] = parseInt(item,16);
+      cachedColor.forEach(function(item,index){
+        cachedColor[index] = parseInt(item,16);
       });
-      redChannel.value = storedColor[0];
-      greenChannel.value = storedColor[1];
-      blueChannel.value = storedColor[2];
-      storedColor = `#${convertHex(redChannel.value)}${convertHex(greenChannel.value)}${convertHex(blueChannel.value)}`;
-      pickerPreview.style.background = storedColor;
+      redChannel.value = cachedColor[0];
+      greenChannel.value = cachedColor[1];
+      blueChannel.value = cachedColor[2];
+      cachedColor = `#${convertHex(redChannel.value)}${convertHex(greenChannel.value)}${convertHex(blueChannel.value)}`;
+      pickerPreview.style.background = cachedColor;
     }
   }
   function channelRefresh(){
-    storedColor = `#${convertHex(redChannel.value)}${convertHex(greenChannel.value)}${convertHex(blueChannel.value)}`;
-    pickerPreview.style.background = storedColor;
-    pickerInput.value = storedColor;
+    cachedColor = `#${convertHex(redChannel.value)}${convertHex(greenChannel.value)}${convertHex(blueChannel.value)}`;
+    pickerPreview.style.background = cachedColor;
+    pickerInput.value = cachedColor;
     if (insertColor){
-      textEdit("insert",storedColor,true);
+      textEdit("insert",cachedColor,true);
     }
   }
   function convertHex(channel){
@@ -2163,6 +2221,22 @@
     }
     pickerInput.focus();
     pickerInputRefresh();
+  }
+  function copyPicker(){
+    pickerInput.select();
+    document.execCommand("copy");
+  }
+  function insertPicker(){
+    textEdit("insert",cachedColor,true);
+    channelRefresh();
+    insertColor = true;
+  }
+  function deletePicker(){
+    var selectionCount = workspaceInput.selectionEnd - workspaceInput.selectionStart;
+    if (selectionCount != 0){
+      textEdit("delete",selectionCount,true);
+    }
+    insertColor = false;
   }
   function activateFormatter(format){
     try {
@@ -2194,11 +2268,11 @@
     changeView("split");
   }
   function forceRefresh(){
-    var store = refresh;
+    var cachedData = refresh;
     refresh = "true";
     sourceChange = true;
     previewRefresh();
-    refresh = store;
+    refresh = cachedData;
   }
   function previewRefresh(){
     if (refresh == "true" && sourceChange){

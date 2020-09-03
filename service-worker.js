@@ -1,4 +1,4 @@
-var cacheName = 1.72;
+var cacheName = 1.73;
 self.addEventListener("activate",function(event){
   event.waitUntil(caches.keys().then(function(cacheNames){
     return Promise.all(cacheNames.map(function(cache){
@@ -10,8 +10,8 @@ self.addEventListener("activate",function(event){
 });
 self.addEventListener("fetch",function(event){
   event.respondWith(fetch(event.request).then(function(resolve){
+    var resolveClone = resolve.clone();
     caches.open(cacheName).then(function(cache){
-      var resolveClone = resolve.clone();
       cache.put(event.request,resolveClone);
     });
     return resolve;
