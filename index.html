@@ -41,9 +41,6 @@
     --secondary-sat: calc(var(--primary-sat) * 0.5);
     --tertiary-sat: calc(var(--primary-sat) * 0.125);
 
-    --textarea-code-color: var(--text-light);
-    --textarea-drag-hue: 240;
-
     --body: hsl(var(--primary-hue),var(--primary-sat),7.1%);
 
     --font-family-interface: "Rubik", sans-serif;
@@ -82,9 +79,11 @@
     --button-hover: hsl(var(--primary-hue),var(--secondary-sat),29%);
     --button-warning-hover: #bb2222;
 
+    --textarea-code-color: var(--text-light);
     --textarea-dark: hsl(var(--primary-hue),var(--secondary-sat),12.2%);
     --textarea-medium: hsl(var(--primary-hue),var(--secondary-sat),14.5%);
     --textarea-light: #eae2d1;
+    --textarea-drag-hue: 240;
     --textarea-drag-background: hsla(var(--textarea-drag-hue),100%,50%,25%);
     --textarea-drag-border: hsl(var(--textarea-drag-hue),100%,50%);
 
@@ -704,15 +703,19 @@
   .card.notification .header span, .card.widget .header span {
     font-size: min(3vw, 16px);
   }
-  .card .header .pencil {
-    margin-right: min(3vw, 10px);
+  .card .pencil {
     width: min(5vw, 24px);
     height: min(5vw, 24px);
   }
-  .card.modal.scale .header .pencil {
-    margin-right: min(3vh, 1vw);
+  .card .header .pencil {
+    margin-right: min(3vw, 10px);
+  }
+  .card.modal.scale .pencil {
     width: min(15vh, 5vw);
     height: min(15vh, 5vw);
+  }
+  .card.modal.scale .header .pencil {
+    margin-right: min(3vh, 1vw);
   }
   .card.modal button.nav {
     width: min(4.25vw, 21px);
@@ -1043,6 +1046,19 @@
     transition: var(--transition-medium);
     transition-property: visibility, opacity;
   }
+  #installButton {
+    margin-top: min(2.6vw, 16px);
+    display: none;
+    align-items: center;
+    font-size: inherit;
+  }
+  #installButton.active {
+    display: flex;
+  }
+  #installButton img {
+    margin: min(0.75vw, 3px);
+    margin-right: min(3vw, 10px);
+  }
   #pickerPreview {
     min-width: min(20vw, 86px);
     min-height: min(20vw, 86px);
@@ -1260,6 +1276,7 @@
         </div>
       </div>
     </div>
+    <button id="installButton"><img class="pencil" src="resources/icon.svg" alt="">Install Smart Text Editor</button>
     <div class="options">
       <button onclick="openCard('theme');">Theme...</button>
       <button class="warning" onclick="resetSettings();">Reset All Settings</button>
@@ -1402,7 +1419,7 @@
 <script src="https://offroaders123.github.io/Numbered-Textarea-Plugin/script.js"></script>
 
 <script>
-  var storage = window.localStorage, view = "text", orientation = "horizontal", refresh = "true", title = "true", transitions = "true", loadedFile, sourceChange = false, mustSave = false, activeModal, activeWidget, cachedColor, insertColor = false, encodeComponent = false;
+  var storage = window.localStorage, view = "text", orientation = "horizontal", refresh = "true", title = "true", transitions = "true", installPrompt, loadedFile, sourceChange = false, mustSave = false, activeModal, activeWidget, cachedColor, insertColor = false, encodeComponent = false;
   window.addEventListener("load",function(){
     if (parentWindow){
       if ("ontouchstart" in document.documentElement){
@@ -1426,9 +1443,23 @@
     }
     pickerInputRefresh();
     forceRefresh();
+    var queryParameters = new URLSearchParams(window.location.search);
+    if (queryParameters.get("template")){
+      confirmOverwrite(insertTemplate);
+      removeQueryParameters(["template"]);
+    }
+    if (queryParameters.get("settings")){
+      openCard("settings");
+      removeQueryParameters(["settings"]);
+    }
     if ("serviceWorker" in navigator && parentWindow && window.location.protocol == "https:"){
       navigator.serviceWorker.register("service-worker.js");
     }
+  });
+  window.addEventListener("beforeinstallprompt",function(event){
+    event.preventDefault();
+    installPrompt = event;
+    installButton.classList.add("active");
   });
   window.addEventListener("beforeunload",function(){
     if (parentWindow && mustSave){
@@ -1740,6 +1771,14 @@
   welcome.addEventListener("click",function(){
     closeCard("welcome");
   });
+  installButton.addEventListener("click",function(){
+    installPrompt.prompt();
+    installPrompt.userChoice.then(function(result){
+      if (result.outcome == "accepted"){
+        installButton.classList.remove("active");
+      }
+    });
+  });
   primaryHueSetting.addEventListener("input",function(){
     tempReducedMotion();
     document.documentElement.style.setProperty("--primary-hue",primaryHueSetting.value);
@@ -1888,6 +1927,26 @@
     item.autocomplete = "off";
     item.autocapitalize = "off";
     item.setAttribute("autocorrect","off");
+  }
+  function addQueryParameters(queryEntries){
+    var queryParameters = new URLSearchParams(window.location.search);
+    queryEntries.forEach(function(queryEntry){
+      queryParameters.set(queryEntry,true);
+    });
+    changeQueryParameters(queryParameters);
+  }
+  function removeQueryParameters(queryEntries){
+    var queryParameters = new URLSearchParams(window.location.search);
+    queryEntries.forEach(function(queryEntry){
+      queryParameters.delete(queryEntry);
+    });
+    changeQueryParameters(queryParameters);
+  }
+  function changeQueryParameters(queryParameters){
+    var queryString = queryParameters.toString();
+    if (queryString != "") queryString = "?" + queryString;
+    var completeAddress = window.location.pathname + queryString;
+    history.pushState(null,"",completeAddress);
   }
   function changeView(newView){
     var elements = [header,main,workspace,scaler,preview];

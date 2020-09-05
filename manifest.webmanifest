@@ -22,5 +22,31 @@
       "sizes": "512x512",
       "purpose": "maskable"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "Start with HTML Template",
+      "short_name": "HTML Template",
+      "description": "Create a new project, starting with an HTML template",
+      "url": "https://offroaders123.github.io/Smart-Text-Editor/?template=true",
+      "icons": [
+        {
+          "src": "resources/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Open Settings",
+      "short_name": "Settings",
+      "description": "Open settings for Smart Text Editor",
+      "url": "https://offroaders123.github.io/Smart-Text-Editor/?settings=true",
+      "icons": [
+        {
+          "src": "resources/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
   ]
 }
