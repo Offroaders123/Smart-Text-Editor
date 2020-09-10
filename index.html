@@ -146,7 +146,7 @@
     box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow), 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
     --focus-border: transparent;
   }
-  button:hover, button:focus, .dropdown.active:focus-within > button, .select:hover .dropdown button {
+  button:hover, button:focus, .dropdown.active > button, .select:hover .dropdown button {
     color: var(--text-hover);
     background: var(--button-hover);
   }
@@ -176,7 +176,7 @@
     fill: var(--text-medium);
     transition: var(--transition-fast) fill;
   }
-  button:hover svg, button:focus svg, .dropdown:hover button svg, .dropdown:focus-within button svg, .dropdown li:hover svg, .dropdown li:focus svg, .dropdown li:focus-within svg {
+  button:hover svg, button:focus svg, .dropdown:hover button svg, .dropdown:focus-within button svg, .dropdown.active button svg, .dropdown li:hover > svg, .dropdown li:focus > svg, .dropdown li:focus-within > svg, .dropdown li.active > svg {
     fill: var(--text-hover);
   }
   button.nav svg {
@@ -397,7 +397,7 @@
     transition: var(--transition-fast);
     transition-property: fill, transform;
   }
-  .dropdown li:hover, .dropdown li:focus, .dropdown li:focus-within, .dropdown a:hover, .dropdown a:focus {
+  .dropdown li:hover, .dropdown li:focus, .dropdown li:focus-within, .dropdown li.active, .dropdown a:hover, .dropdown a:focus {
     color: var(--text-hover);
     background: var(--container-medium-hover);
   }
@@ -435,7 +435,7 @@
       overflow-y: unset;
     }
   }
-  .dropdown.active:focus-within > ul, .dropdown li:focus-within > ul {
+  .dropdown.active > ul, .dropdown.active li.active > ul {
     visibility: visible;
     opacity: 1;
     pointer-events: all;
@@ -1225,14 +1225,14 @@
   <div id="settings" class="card modal">
     <div class="header">
       <span>Settings</span>
-      <button class="nav close"><svg><use href="#close"></use></svg></button>
+      <button class="nav close"><svg><use href="#close"/></svg></button>
     </div>
     <div class="content">
       <div class="item list start">
         <div class="select">
           <label for="viewSetting">Default View:</label>
           <div class="dropdown">
-            <button id="viewSetting">Text<svg><use href="#arrow"></use></svg></button>
+            <button id="viewSetting">Text<svg><use href="#arrow"/></svg></button>
             <ul>
               <li onclick="updateSelect('view','text');">Text</li>
               <li onclick="updateSelect('view','code');">Code</li>
@@ -1243,7 +1243,7 @@
         <div class="select">
           <label for="orientationSetting">Default Orientation:</label>
           <div class="dropdown">
-            <button id="orientationSetting">Horizontal<svg><use href="#arrow"></use></svg></button>
+            <button id="orientationSetting">Horizontal<svg><use href="#arrow"/></svg></button>
             <ul>
               <li onclick="updateSelect('orientation','horizontal');">Horizontal</li>
               <li onclick="updateSelect('orientation','vertical');">Vertical</li>
@@ -1253,7 +1253,7 @@
         <div class="select" data-tooltip="Opens for only touch devices when Automatic is selected">
           <label for="editingToolsSetting">Open Editing Tools:</label>
           <div class="dropdown">
-            <button id="editingToolsSetting">Automatic<svg><use href="#arrow"></use></svg></button>
+            <button id="editingToolsSetting">Automatic<svg><use href="#arrow"/></svg></button>
             <ul>
               <li onclick="updateSelect('editingTools','automatic');">Automatic</li>
               <li onclick="updateSelect('editingTools','yes');">Yes</li>
@@ -1264,15 +1264,15 @@
         <hr>
         <div class="checkbox" data-tooltip="Refresh manually using Ctrl + Enter when disabled">
           <input id="refreshSetting" type="checkbox" oninput="updateCheckbox('refresh');" checked>
-          <label for="refreshSetting"><svg><use href="#check"></use></svg>Automatically Refresh Preview</label>
+          <label for="refreshSetting"><svg><use href="#check"/></svg>Automatically Refresh Preview</label>
         </div>
         <div class="checkbox">
           <input id="titleSetting" type="checkbox" oninput="updateCheckbox('title');" checked>
-          <label for="titleSetting"><svg><use href="#check"></use></svg>Show Title on Startup</label>
+          <label for="titleSetting"><svg><use href="#check"/></svg>Show Title on Startup</label>
         </div>
         <div class="checkbox">
           <input id="transitionsSetting" type="checkbox" oninput="updateCheckbox('transitions');" checked>
-          <label for="transitionsSetting"><svg><use href="#check"></use></svg>Smooth Transitions</label>
+          <label for="transitionsSetting"><svg><use href="#check"/></svg>Smooth Transitions</label>
         </div>
       </div>
     </div>
@@ -1291,8 +1291,8 @@
   <div id="theme" class="card modal">
     <div class="header">
       <span>Theme</span>
-      <button class="nav back" data-parent="settings"><svg><use href="#back"></use></svg></button>
-      <button class="nav close"><svg><use href="#close"></use></svg></button>
+      <button class="nav back" data-parent="settings"><svg><use href="#back"/></svg></button>
+      <button class="nav close"><svg><use href="#close"/></svg></button>
     </div>
     <div class="content">
       <div class="item list expand">
@@ -1322,14 +1322,14 @@
     </div>
   </div>
   <div id="editingTools" class="card action">
-    <button id="undoTool" onclick="changeState('undo');"><svg><use href="#undo"></use></svg></button>
-    <button id="redoTool" onclick="changeState('redo');"><svg><use href="#redo"></use></svg></button>
-    <button id="refreshTool" onclick="forceRefresh();" disabled><svg><use href="#refresh"></use></svg></button>
+    <button id="undoTool" onclick="changeState('undo');"><svg><use href="#undo"/></svg></button>
+    <button id="redoTool" onclick="changeState('redo');"><svg><use href="#redo"/></svg></button>
+    <button id="refreshTool" onclick="forceRefresh();" disabled><svg><use href="#refresh"/></svg></button>
   </div>
   <div id="replacer" class="card widget">
     <div class="header">
       <span>Replace Text</span>
-      <button class="nav close"><svg><use href="#close"></use></svg></button>
+      <button class="nav close"><svg><use href="#close"/></svg></button>
     </div>
     <div class="content">
       <div class="item list expand">
@@ -1350,7 +1350,7 @@
   <div id="picker" class="card widget">
     <div class="header">
       <span>Color Picker</span>
-      <button class="nav close"><svg><use href="#close"></use></svg></button>
+      <button class="nav close"><svg><use href="#close"/></svg></button>
     </div>
     <div class="content">
       <div class="item list">
@@ -1375,7 +1375,7 @@
   <div id="formatter" class="card widget">
     <div class="header">
       <span>JSON Formatter</span>
-      <button class="nav close"><svg><use href="#close"></use></svg></button>
+      <button class="nav close"><svg><use href="#close"/></svg></button>
     </div>
     <div class="content">
       <div class="item expand">
@@ -1393,7 +1393,7 @@
   <div id="encoder" class="card widget">
     <div class="header">
       <span>URI Encoder</span>
-      <button class="nav close"><svg><use href="#close"></use></svg></button>
+      <button class="nav close"><svg><use href="#close"/></svg></button>
     </div>
     <div class="content">
       <div class="item expand">
@@ -1410,7 +1410,7 @@
     <div class="options">
       <div class="checkbox" data-tooltip="Encodes more special characters">
         <input id="componentSetting" type="checkbox" oninput="encodeComponent = this.checked;">
-        <label for="componentSetting"><svg><use href="#check"></use></svg>Enable URI Component</label>
+        <label for="componentSetting"><svg><use href="#check"/></svg>Enable URI Component</label>
       </div>
     </div>
   </div>
@@ -1549,17 +1549,21 @@
       }
     }
   });
-  window.addEventListener("resize",function(){
+  window.addEventListener("resize",function(event){
     if (view == "split"){
-      if (orientation == "vertical"){
-        if (!header.getAttribute("style")){
-          header.classList.add("resize");
-          window.setTimeout(function(){
-            header.classList.remove("resize");
-          }, 50);
-        }
-      }
-      changeView("split");
+      var currentWidth = window.innerWidth, currentHeight = window.innerHeight;
+      window.setTimeout(function(){
+        if (orientation == "vertical"){
+          if (window.innerWidth == currentWidth) return;
+          if (!header.getAttribute("style")){
+            header.classList.add("resize");
+            window.setTimeout(function(){
+              header.classList.remove("resize");
+            }, 50);
+          }
+        } else if (window.innerHeight == currentHeight) return;
+        changeView("split");
+      }, 50);
     }
   });
   document.documentElement.addEventListener("dragover",function(event){
@@ -1602,59 +1606,128 @@
   });
   var dropdowns = Array.from(document.getElementsByClassName("dropdown"));
   dropdowns.forEach(function(dropdown){
-    var button = dropdown.getElementsByTagName("button")[0];
-    button.addEventListener("click",function(){
-      dropdowns.forEach(function(dropdown){
-        dropdown.classList.toggle("active");
-        if (dropdown.classList.contains("active")){
-          document.body.addEventListener("click",disableDropdown);
-        }
-        function disableDropdown(event){
-          if (dropdown.contains(event.target)) return;
-          dropdowns.forEach(function(dropdown){
-            if (dropdown.classList.contains("active")) return;
-            dropdown.classList.remove("active");
-            document.body.removeEventListener("click",disableDropdown);
-          });
-        }
-      });
+    dropdown.addEventListener("click",function(event){
+      event.stopPropagation();
     });
-    button.addEventListener("mouseenter",function(){
-      if (dropdown.classList.contains("active")){
+    dropdown.addEventListener("keydown",function(event){
+      if (dropdown.classList.contains("active") != true) return;
+      if (event.key == "Escape" || event.key == "Tab" || event.key == "ArrowLeft"){
+        blockShortcut(event);
+        disableDropdown(dropdown);
         button.focus();
       }
     });
-    button.addEventListener("touchstart",function(event){
-      if (dropdown.contains(event.targetTouches[0].target)) return;
+    var button = dropdown.getElementsByTagName("button")[0], menus = Array.from(dropdown.getElementsByTagName("ul")), submenus = Array.from(dropdown.querySelectorAll("li > ul")), options = Array.from(dropdown.getElementsByTagName("li"));
+    button.addEventListener("click",function(){
+      var currentDropdown = dropdown;
       dropdowns.forEach(function(dropdown){
-        dropdown.classList.remove("active");
+        if (dropdown == currentDropdown) return;
+        disableDropdown(dropdown);
       });
-    });
-    var list = dropdown.getElementsByTagName("ul")[0];
-    var listItems = Array.from(dropdown.getElementsByTagName("li"));
-    listItems.forEach(function(listItem){
-      var subListPresent = listItem.getElementsByTagName("ul")[0];
-      if (subListPresent == undefined){
-        listItem.addEventListener("click",function(){
-          dropdowns.forEach(function(dropdown){
-            dropdown.classList.remove("active");
-          });
-        });
+      dropdown.classList.toggle("active");
+      if (dropdown.classList.contains("active")){
+        document.body.addEventListener("click",checkDropdown);
+      } else {
+        document.body.removeEventListener("click",checkDropdown);
       }
-      listItem.addEventListener("keydown",function(event){
-        if (event.key == "Enter" || event.key == " "){
-          listItem.click();
+    });
+    button.addEventListener("keydown",function(event){
+      if (dropdown.classList.contains("active") != true) return;
+      var navigable = getNavigableElements(menus[0],true);
+      if (event.key == "ArrowDown"){
+        event.preventDefault();
+        navigable[0].focus();
+      }
+      if (event.key == "ArrowUp"){
+        event.preventDefault();
+        navigable[navigable.length - 1].focus();
+      }
+    });
+    menus.forEach(function(menu){
+      menu.addEventListener("keydown",function(event){
+        var navigable = getNavigableElements(menu,true);
+        if (event.key == "ArrowDown"){
+          if (document.activeElement == navigable[navigable.length - 1]){
+            blockShortcut(event);
+            navigable[0].focus();
+          } else {
+            blockShortcut(event);
+            navigable[navigable.indexOf(document.activeElement) + 1].focus();
+          }
+        }
+        if (event.key == "ArrowUp"){
+          if (document.activeElement == navigable[0]){
+            blockShortcut(event);
+            navigable[navigable.length - 1].focus();
+          } else {
+            blockShortcut(event);
+            navigable[navigable.indexOf(document.activeElement) - 1].focus();
+          }
+        }
+        if (event.key == "Tab"){
+          event.preventDefault();
         }
       });
-      listItem.setAttribute("tabindex","0");
-      if (subListPresent != undefined){
-        listItem.addEventListener("mouseenter",function(){
-          if (dropdown.classList.contains("active")){
-            listItem.focus();
-          }
-        });
-      }
     });
+    submenus.forEach(function(submenu){
+      submenu.parentElement.addEventListener("keydown",function(event){
+        if (event.key == "ArrowRight"){
+          event.stopPropagation();
+          if (submenu.contains(document.activeElement) == true) return;
+          submenu.parentElement.classList.add("active");
+          var navigable = getNavigableElements(submenu,true);
+          window.setTimeout(function(){
+            navigable[0].focus();
+          }, 50);
+        }
+        if (event.key == "ArrowLeft"){
+          if (submenu.parentElement.classList.contains("active")){
+            event.stopPropagation();
+          }
+          submenu.parentElement.focus();
+          submenu.parentElement.classList.remove("active");
+        }
+      });
+      submenu.parentElement.addEventListener("mouseenter",function(){
+        submenu.parentElement.classList.add("active");
+      });
+    });
+    options.forEach(function(option){
+      option.addEventListener("click",function(){
+        disableDropdown(dropdown);
+      });
+      option.addEventListener("keydown",function(event){
+        if (event.key == "Enter" || event.key == " "){
+          blockShortcut(event);
+          option.click();
+          button.focus();
+        }
+        if (dropdown.parentElement.classList.contains("select") != true) return;
+        if (event.key == "Escape" || event.key == "Tab"){
+          blockShortcut(event);
+          disableDropdown(dropdown);
+          button.focus();
+        }
+      });
+      option.addEventListener("mouseenter",function(){
+        submenus.forEach(function(submenu){
+          if (option == submenu.parentElement || submenu.contains(option) || submenu.contains(document.activeElement)) return;
+          submenu.parentElement.classList.remove("active");
+        });
+      });
+      option.setAttribute("tabindex","0");
+    });
+    function checkDropdown(){
+      if (dropdown.contains(document.activeElement) == true) return;
+      disableDropdown(dropdown);
+      document.body.removeEventListener("click",checkDropdown);
+    }
+    function disableDropdown(dropdown){
+      submenus.forEach(function(submenu){
+        submenu.parentElement.classList.remove("active");
+      });
+      dropdown.classList.remove("active");
+    }
   });
   var checkboxes = Array.from(document.getElementsByClassName("checkbox"));
   checkboxes.forEach(function(checkbox){
@@ -1684,11 +1757,9 @@
             event.preventDefault();
             navigable[navigable.length - 1].focus();
           }
-        } else {
-          if (document.activeElement == navigable[navigable.length - 1]){
-            event.preventDefault();
-            navigable[0].focus();
-          }
+        } else if (document.activeElement == navigable[navigable.length - 1]){
+          event.preventDefault();
+          navigable[0].focus();
         }
       }
     });
@@ -1782,12 +1853,12 @@
   primaryHueSetting.addEventListener("input",function(){
     tempReducedMotion();
     document.documentElement.style.setProperty("--primary-hue",primaryHueSetting.value);
-    document.querySelector("[name='theme-color']").content = window.getComputedStyle(document.documentElement).getPropertyValue("--container-dark");
+    document.querySelector("[name='theme-color']").content = getElementStyle(document.documentElement,"--container-dark");
   });
   primarySatSetting.addEventListener("input",function(){
     tempReducedMotion();
     document.documentElement.style.setProperty("--primary-sat",`${primarySatSetting.value}%`);
-    document.querySelector("[name='theme-color']").content = window.getComputedStyle(document.documentElement).getPropertyValue("--container-dark");
+    document.querySelector("[name='theme-color']").content = getElementStyle(document.documentElement,"--container-dark");
   });
   dragHueSetting.addEventListener("input",function(){
     tempReducedMotion();
@@ -1906,7 +1977,7 @@
     document.documentElement.style.removeProperty("--primary-sat");
     document.documentElement.style.removeProperty("--textarea-code-color");
     document.documentElement.style.removeProperty("--textarea-drag-hue");
-    document.querySelector("[name='theme-color']").content = window.getComputedStyle(document.documentElement).getPropertyValue("--container-dark");
+    document.querySelector("[name='theme-color']").content = getElementStyle(document.documentElement,"--container-dark");
     primaryHueSetting.value = 0;
     primarySatSetting.value = 0;
     dragHueSetting.value = 240;
@@ -2022,14 +2093,22 @@
     }
     transitions = newTransition;
   }
-  function getNavigableElements(container){
-    var navigable = Array.from(container.querySelectorAll("button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), a[href]:not([disabled]), [tabindex]:not([tabindex='-1'])"));
+  function getNavigableElements(container,scope){
+    var navigable;
+    if (scope == true){
+      navigable = Array.from(container.querySelectorAll(":scope > button:not([disabled]), :scope > textarea:not([disabled]), :scope > input:not([disabled]), :scope > select:not([disabled]), :scope > a[href]:not([disabled]), :scope > [tabindex]:not([tabindex='-1'])"));
+    } else {
+      navigable = Array.from(container.querySelectorAll("button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), a[href]:not([disabled]), [tabindex]:not([tabindex='-1'])"));
+    }
     navigable.forEach(function(element){
-      if (window.getComputedStyle(element).getPropertyValue("display") == "none"){
+      if (getElementStyle(element,"display") == "none"){
         navigable.splice(navigable.indexOf(element),1);
       }
     });
     return navigable;
+  }
+  function getElementStyle(element,property){
+    return window.getComputedStyle(element).getPropertyValue(property);
   }
   function confirmOverwrite(action,event){
     if (mustSave){
@@ -2056,7 +2135,7 @@
   function openEditorWindow(){
     var windowFeatures;
     if (window.matchMedia("(display-mode: standalone)").matches){
-      windowFeatures = `left= ${window.screenX}, top= ${window.screenY}, width=${window.innerWidth}, height=${window.innerHeight}`;
+      windowFeatures = `left=${window.screenX},top= ${window.screenY},width=${window.innerWidth},height=${window.innerHeight}`;
     } else {
       windowFeatures = "";
     }
@@ -2125,7 +2204,13 @@
     mustSave = false;
   }
   function openDisplay(){
-    var display = window.open("","_blank",`left= ${window.screenX}, top= ${window.screenY}, width=${window.innerWidth}, height=${window.innerHeight}`);
+    var windowFeatures;
+    if (window.matchMedia("(display-mode: standalone)").matches){
+      windowFeatures = `left=${window.screen.width / 6},top=${window.screen.height / 6},width=${window.screen.width * 2/3},height=${window.screen.height * 2/3}`;
+    } else {
+      windowFeatures = "";
+    }
+    var display = window.open("","_blank",windowFeatures);
     display.document.open();
     display.document.write(workspaceInput.value);
     display.document.close();
@@ -2149,8 +2234,7 @@
     previewRefresh();
   }
   function openCard(element){
-    var card = document.getElementById(element);
-    var cardType = card.classList[1];
+    var card = document.getElementById(element), cardType = card.classList[1];
     if (card.classList.contains("active")){
       card.classList.remove("active");
       if (cardType == "modal"){
@@ -2193,8 +2277,7 @@
   }
   function closeCard(element){
     if (element == undefined) return;
-    var card = document.getElementById(element);
-    var cardType = card.classList[1];
+    var card = document.getElementById(element), cardType = card.classList[1];
     document.getElementById(element).classList.remove("active");
     if (cardType == "modal"){
       backdrop.classList.remove("active");
