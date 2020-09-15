@@ -18,7 +18,7 @@
 <link rel="alternate icon" type="image/png" sizes="32x32" href="resources/icon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="resources/icon-apple-touch-icon.png">
 <link rel="mask-icon" href="resources/icon-mask-icon.svg" color="#ee8800">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cousine&family=Rubik&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cousine&family=Noto+Sans&family=Rubik&display=swap">
 <link rel="stylesheet" href="https://offroaders123.github.io/Numbered-Textarea-Plugin/styles.css">
 
 <script>
@@ -44,7 +44,8 @@
     --body: hsl(var(--primary-hue),var(--primary-sat),7.1%);
 
     --font-family-interface: "Rubik", sans-serif;
-    --font-family-code: "Cousine", monospace;
+    --font-family-sans-serif: "Noto Sans", sans-serif;
+    --font-family-monospace: "Cousine", monospace;
 
     --container-dark: hsl(var(--primary-hue),var(--primary-sat),9.8%);
     --container-medium: hsl(var(--primary-hue),var(--primary-sat),11.4%);
@@ -195,7 +196,7 @@
     outline: none;
   }
   [data-numbered-container] ol, [data-numbered-container] textarea, input[type="text"] {
-    padding: 6px;
+    padding: 8px;
   }
   [data-numbered-container] ol {
     color: inherit;
@@ -367,7 +368,7 @@
     transform: scaleY(var(--scale));
     --scale: 0.15;
     transform-origin: top center;
-    transition: var(--transition-fast);
+    transition: var(--transition-fast) ease-out;
     transition-property: visibility, opacity, transform;
   }
   .dropdown li, .dropdown a {
@@ -440,6 +441,7 @@
     opacity: 1;
     pointer-events: all;
     transform: scale(1);
+    transition-style: ease-in;
   }
   .select {
     margin: min(0.75vw, 3px);
@@ -483,6 +485,7 @@
     display: none;
   }
   .checkbox label {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -490,29 +493,43 @@
     pointer-events: none;
     transition: color var(--transition-fast);
   }
-  .checkbox label svg {
+  .checkbox label::before {
+    content: "";
     margin-right: min(1vw, 4px);
     padding: min(0.25vw, 1px);
     width: min(3.35vw, 18px);
     height: min(3.35vw, 18px);
-    fill: transparent;
     background: var(--range-track);
     border: min(0.35vw, 2px) solid var(--text-medium);
     border-radius: var(--border-radius-medium);
     box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow);
     transition: var(--transition-fast);
-    transition-property: fill, background, border-color;
+    transition-property: background, border-color;
   }
   .checkbox:hover label, .checkbox:focus label {
     color: var(--text-hover);
   }
-  .checkbox:hover label svg, .checkbox:focus label svg {
-    fill: transparent;
+  .checkbox:hover label::before, .checkbox:focus label::before {
     background: var(--range-track-hover);
     border-color: var(--text-hover);
   }
+  .checkbox label svg {
+    padding: min(0.55vw, 3px);
+    position: absolute;
+    left: 0;
+    width: min(3.35vw, 18px);
+    height: min(3.35vw, 18px);
+    fill: transparent;
+    border-radius: var(--border-radius-medium);
+    transform: rotate(-45deg) scale(0);
+    transform-origin: 45% 65%;
+    transition: var(--transition-fast) ease-out;
+    transition-property: fill, transform;
+  }
   .checkbox input[type="checkbox"]:checked + label svg {
     fill: var(--text-medium);
+    transform: rotate(0deg) scale(1);
+    transition-style: ease-in;
   }
   .checkbox:hover input[type="checkbox"]:checked + label svg, .checkbox:focus input[type="checkbox"]:checked + label svg {
     fill: var(--text-hover);
@@ -530,7 +547,7 @@
     pointer-events: none;
     transform: scale(var(--scale));
     --scale: 0.85;
-    transition: var(--transition-fast);
+    transition: var(--transition-fast) ease-out;
     transition-property: opacity, transform;
   }
   [data-tooltip]::before {
@@ -558,6 +575,7 @@
   [data-tooltip]:hover::before, [data-tooltip]:hover::after, [data-tooltip]:focus::before, [data-tooltip]:focus::after, [data-tooltip]:focus-within::before, [data-tooltip]:focus-within::after, [data-tooltip].focused::before, [data-tooltip].focused::after {
     opacity: 1;
     --scale: 1;
+    transition-style: ease-in;
   }
   .buffering {
     animation: rotate 4s infinite linear;
@@ -724,16 +742,29 @@
     width: min(3.5vw, 18px);
     height: min(3.5vw, 18px);
   }
+  .card [data-numbered-container], .card [data-numbered-container]::after, .card input[type="text"] {
+    border-radius: var(--border-radius-medium);
+  }
   .card [data-numbered-container], .card input[type="text"] {
     color: var(--text-light);
     background: var(--textarea-medium);
-    border-radius: var(--border-radius-medium);
-    box-shadow: 0 2px 4px var(--box-shadow) inset;
   }
   .card [data-numbered-container] {
+    position: relative;
     max-width: 50vw;
     height: min(25vw, 75px);
     max-height: min(25vw, 25vh);
+  }
+  .card [data-numbered-container]::after, .card input[type="text"] {
+    box-shadow: 0 2px 4px var(--box-shadow) inset;
+  }
+  .card [data-numbered-container]::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    box-shadow: 0 2px 4px var(--box-shadow) inset;
+    pointer-events: none;
   }
   .card [data-numbered-container].expand {
     height: 150px;
@@ -879,8 +910,11 @@
     position: relative;
     flex: 1;
   }
+  #main.text [data-numbered-container], #main.text input[type="text"] {
+    font-family: var(--font-family-sans-serif);
+  }
   #main:not(.text) [data-numbered-container], #main:not(.text) input[type="text"] {
-    font-family: var(--font-family-code);
+    font-family: var(--font-family-monospace);
     color: var(--textarea-code-color);
   }
   #main.horizontal.resize {
@@ -1002,7 +1036,7 @@
     z-index: 1;
     transform: scale(0.25) rotate(var(--rotate));
     transform-origin: center center;
-    transition: var(--transition-fast);
+    transition: var(--transition-fast) ease-out;
     transition-property: color, background, visibility, opacity, transform;
   }
   #scaler.active > .handle, #scaler:hover > .handle {
@@ -1011,6 +1045,7 @@
     visibility: visible;
     opacity: 1;
     transform: scale(1) rotate(var(--rotate));
+    transition-style: ease-in;
   }
   #preview {
     position: absolute;
