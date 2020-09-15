@@ -93,6 +93,7 @@
     --range-track-hover: hsl(var(--primary-hue),var(--secondary-sat),18.8%);
 
     --card-background: #19191960;
+    --loading-background: #00000080;
 
     --fade-opacity: 0;
     --fade-pointer-events: none;
@@ -1080,6 +1081,51 @@
     --range-thumb-hover: #2222bb;
     --range-track-hover: #000066;
   }
+  #loading {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-light);
+    background: var(--loading-background);
+    visibility: hidden;
+    opacity: 0;
+    z-index: 2;
+    transition: var(--transition-slow);
+    transition-property: visibility, opacity;
+  }
+  #loading::after {
+    content: "Loading...";
+    margin-top: min(8vw, 32px);
+    width: 7ch;
+    font-size: min(5vw, 29px);
+    animation: loading 2s infinite linear;
+  }
+  @keyframes loading {
+    0%, 100% {
+      content: "Loading.";
+    }
+    33% {
+      content: "Loading..";
+    }
+    66% {
+      content: "Loading...";
+    }
+  }
+  #loading.active {
+    visibility: visible;
+    opacity: 1;
+  }
+  #loading svg {
+    width: 25vmin;
+    height: 25vmin;
+    fill: var(--text-light);
+  }
 </style>
 
 </head>
@@ -1414,6 +1460,9 @@
       </div>
     </div>
   </div>
+  <div id="loading">
+    <svg class="buffering"><use href="#buffering"/></svg>
+  </div>
 </main>
 
 <script src="https://offroaders123.github.io/Numbered-Textarea-Plugin/script.js"></script>
@@ -1611,7 +1660,7 @@
     });
     dropdown.addEventListener("keydown",function(event){
       if (dropdown.classList.contains("active") != true) return;
-      if (event.key == "Escape" || event.key == "Tab" || event.key == "ArrowLeft"){
+      if (event.key == "Escape" || event.key == "Tab"){
         blockShortcut(event);
         disableDropdown(dropdown);
         button.focus();
@@ -2204,9 +2253,9 @@
     mustSave = false;
   }
   function openDisplay(){
-    var windowFeatures;
-    if (window.matchMedia("(display-mode: standalone)").matches){
-      windowFeatures = `left=${window.screen.width / 6},top=${window.screen.height / 6},width=${window.screen.width * 2/3},height=${window.screen.height * 2/3}`;
+    var windowFeatures, fullscreen = (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight);
+    if (window.matchMedia("(display-mode: standalone)").matches || "standalone" in navigator || window.matchMedia("(display-mode: fullscreen)").matches || fullscreen == true){
+      windowFeatures = `left=${window.screen.width / 6},top=${window.screen.height / 6},width=${window.screen.width * 2/3},height=${(window.screen.height * 2/3) - (window.outerHeight - window.innerHeight)}`;
     } else {
       windowFeatures = "";
     }
