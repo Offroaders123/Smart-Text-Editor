@@ -1,4 +1,4 @@
-var cacheVersion = 1.80;
+var cacheVersion = 1.81;
 self.addEventListener("activate",function(event){
   event.waitUntil(caches.keys().then(function(cacheVersions){
     return Promise.all(cacheVersions.map(function(cache){

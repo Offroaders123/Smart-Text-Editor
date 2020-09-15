@@ -56,7 +56,6 @@
     --text-medium-additional: hsl(var(--primary-hue),var(--secondary-sat),46.7%);
     --text-light: #ffffff;
     --text-hover: #ffffff;
-    --text-warning-hover: #ffe5e5;
 
     --border-radius-small: min(0.625vw, 2.5px);
     --border-radius-medium: min(1.25vw, 5px);
@@ -93,7 +92,7 @@
     --range-track-hover: hsl(var(--primary-hue),var(--secondary-sat),18.8%);
 
     --card-background: #19191960;
-    --loading-background: #00000080;
+    --loading-background: #000000bf;
 
     --fade-opacity: 0;
     --fade-pointer-events: none;
@@ -158,7 +157,6 @@
     border: none;
   }
   button.warning:hover, button.warning:focus {
-    color: var(--text-warning-hover);
     background: var(--button-warning-hover);
   }
   button.nav {
@@ -366,7 +364,8 @@
     opacity: 0;
     pointer-events: none;
     list-style: none;
-    transform: scaleY(0);
+    transform: scaleY(var(--scale));
+    --scale: 0.15;
     transform-origin: top center;
     transition: var(--transition-fast);
     transition-property: visibility, opacity, transform;
@@ -409,7 +408,7 @@
     position: absolute;
     left: 100%;
     top: 0;
-    transform: scale(0);
+    transform: scale(var(--scale));
     transform-origin: left top;
   }
   @media (max-width: 550px), (max-height: 515px) {
@@ -418,7 +417,7 @@
       max-height: min(24vh, 60px);
       left: 0;
       top: 100%;
-      transform: scaleY(0);
+      transform: scaleY(var(--scale));
       transform-origin: top center;
       overflow-y: auto;
     }
@@ -530,7 +529,7 @@
     opacity: 0;
     pointer-events: none;
     transform: scale(var(--scale));
-    --scale: 0;
+    --scale: 0.85;
     transition: var(--transition-fast);
     transition-property: opacity, transform;
   }
@@ -559,9 +558,6 @@
   [data-tooltip]:hover::before, [data-tooltip]:hover::after, [data-tooltip]:focus::before, [data-tooltip]:focus::after, [data-tooltip]:focus-within::before, [data-tooltip]:focus-within::after, [data-tooltip].focused::before, [data-tooltip].focused::after {
     opacity: 1;
     --scale: 1;
-  }
-  :not(label)[data-tooltip]:hover::before, :not(label)[data-tooltip]:hover::after, [data-tooltip]:focus::before, [data-tooltip]:focus::after, [data-tooltip]:focus-within::before, [data-tooltip]:focus-within::after {
-    transition-delay: var(--transition-delay);
   }
   .buffering {
     animation: rotate 4s infinite linear;
@@ -592,8 +588,9 @@
     top: 50%;
     z-index: 1;
     border-radius: var(--border-radius-large);
+    transform: translate(-50%,-50%) scale(var(--scale));
+    --scale: 0.15;
     transform-origin: center center;
-    transform: translate(-50%,-50%) scale(0);
   }
   .card.modal:not(.scale) {
     min-width: min(35vw, 225px);
@@ -623,7 +620,8 @@
   }
   .card.action, .card.widget {
     margin: min(2.5vw, 12px);
-    transform: scaleY(0);
+    transform: scaleY(var(--scale));
+    --scale: 0.15;
     transform-origin: top center;
   }
   .card.action {
@@ -645,7 +643,7 @@
   }
   .card.action.active ~ .card.widget {
     max-height: calc(100% - min(4.5vw, 24px) - min(13.5vw, 68px));
-    transform: translateY(min(13.5vw, 68px)) scaleY(0);
+    transform: translateY(min(13.5vw, 68px)) scaleY(var(--scale));
   }
   .card.action.active ~ .card.widget.active {
     transform: translateY(min(13.5vw, 68px)) scaleY(1);
@@ -663,7 +661,7 @@
   }
   @keyframes grow {
     0% {
-      transform: translate(-50%,-50%) scale(0);
+      transform: translate(-50%,-50%) scale(var(--scale));
     }
   }
   .card.notification.active {
@@ -1002,7 +1000,7 @@
     visibility: hidden;
     opacity: 0;
     z-index: 1;
-    transform: scale(0) rotate(var(--rotate));
+    transform: scale(0.25) rotate(var(--rotate));
     transform-origin: center center;
     transition: var(--transition-fast);
     transition-property: color, background, visibility, opacity, transform;
@@ -1104,6 +1102,12 @@
     margin-top: min(8vw, 32px);
     width: 7ch;
     font-size: min(5vw, 29px);
+  }
+  #loading.active {
+    visibility: visible;
+    opacity: 1;
+  }
+  #loading.active::after {
     animation: loading 2s infinite linear;
   }
   @keyframes loading {
@@ -1116,10 +1120,6 @@
     66% {
       content: "Loading...";
     }
-  }
-  #loading.active {
-    visibility: visible;
-    opacity: 1;
   }
   #loading svg {
     width: 25vmin;
@@ -1633,10 +1633,10 @@
       textEdit("insert",event.dataTransfer.getData("text"),true);
     }
   });
-  var buttons = Array.from(document.getElementsByTagName("button"));
-  buttons.forEach(function(button){
-    button.addEventListener("click",function(){
-      button.focus();
+  var inputElements = Array.from(document.querySelectorAll("button, textarea, input"));
+  inputElements.forEach(function(inputElement){
+    inputElement.addEventListener("click",function(){
+      inputElement.focus();
     });
   });
   var textareas = Array.from(document.getElementsByTagName("textarea"));
@@ -1719,15 +1719,12 @@
       });
     });
     submenus.forEach(function(submenu){
+      submenu.parentElement.addEventListener("click",function(event){
+        openSubmenu(event);
+      });
       submenu.parentElement.addEventListener("keydown",function(event){
-        if (event.key == "ArrowRight"){
-          event.stopPropagation();
-          if (submenu.contains(document.activeElement) == true) return;
-          submenu.parentElement.classList.add("active");
-          var navigable = getNavigableElements(submenu,true);
-          window.setTimeout(function(){
-            navigable[0].focus();
-          }, 50);
+        if (event.key == "Enter" || event.key == " " || event.key == "ArrowRight"){
+          openSubmenu(event);
         }
         if (event.key == "ArrowLeft"){
           if (submenu.parentElement.classList.contains("active")){
@@ -1740,12 +1737,23 @@
       submenu.parentElement.addEventListener("mouseenter",function(){
         submenu.parentElement.classList.add("active");
       });
+      function openSubmenu(event){
+        event.stopPropagation();
+        if (submenu.contains(document.activeElement) == true) return;
+        submenu.parentElement.classList.add("active");
+        var navigable = getNavigableElements(submenu,true);
+        window.setTimeout(function(){
+          navigable[0].focus();
+        }, 50);
+      }
     });
     options.forEach(function(option){
       option.addEventListener("click",function(){
+        if (option.querySelector(":scope > ul") != null) return;
         disableDropdown(dropdown);
       });
       option.addEventListener("keydown",function(event){
+        if (option.querySelector(":scope > ul") != null) return;
         if (event.key == "Enter" || event.key == " "){
           blockShortcut(event);
           option.click();
@@ -1983,17 +1991,25 @@
   function resetSettings(){
     var ask = confirm("Are you sure you want to reset all settings?\nThis cannot be undone.");
     if (ask){
-      updateSelect("view","text");
-      updateSelect("orientation","horizontal");
-      updateSelect("editingTools","automatic");
-      refresh = "true";
-      updateCheckbox("refresh","true");
-      title = "true";
-      updateCheckbox("title","true");
-      changeTransitions("true");
-      updateCheckbox("transitions","true");
-      storage.clear();
-      openCard("reset");
+      loading.classList.add("active");
+      closeCard("reset");
+      window.setTimeout(function(){
+        updateSelect("view","text");
+        updateSelect("orientation","horizontal");
+        updateSelect("editingTools","automatic");
+        refresh = "true";
+        updateCheckbox("refresh","true");
+        title = "true";
+        updateCheckbox("title","true");
+        changeTransitions("true");
+        updateCheckbox("transitions","true");
+        resetTheme();
+        storage.clear();
+      }, 50);
+      window.setTimeout(function(){
+        loading.classList.remove("active");
+        openCard("reset");
+      }, 1050);
     }
   }
   function updateSetting(item,value){
@@ -2305,7 +2321,7 @@
       if (cardType == "notification"){
         window.setTimeout(function(){
           closeCard(element);
-        }, 3000);
+        }, 4000);
       }
       if (cardType == "modal"){
         window.setTimeout(function(){
