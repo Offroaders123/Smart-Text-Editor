@@ -1215,7 +1215,7 @@
 </svg>
 
 <header id="header" class="text horizontal">
-  <div class="options">
+  <section class="options">
     <div class="dropdown">
       <button>File</button>
       <ul>
@@ -1272,26 +1272,26 @@
       </ul>
     </div>
     <button onclick="openCard('settings');">Settings</button>
-  </div>
-  <div class="title">
+  </section>
+  <section class="title">
     <img src="resources/icon.svg" alt="">
     <span>Smart Text Editor</span>
-  </div>
-  <div class="attribution">
+  </section>
+  <section class="attribution">
     <span>Inspired by <a href="https://htmledit.squarefree.com/">Real-Time HTML Editor</a> and <a href="https://www.editpad.org/">Edit Pad</a>!</span>
-  </div>
+  </section>
 </header>
 
 <main id="main" class="text horizontal">
   <div id="workspace" class="text horizontal" data-numbered-container>
     <textarea id="workspaceInput" placeholder="Welcome to the Smart Text Editor! This site was created to allow for text editing and code development within your browser!"></textarea>
   </div>
-  <div id="scaler" class="text horizontal">
+  <section id="scaler" class="text horizontal">
     <div class="handle">▲<br>▼</div>
-  </div>
+  </section>
   <iframe id="preview" class="text horizontal" src="about:blank"></iframe>
-  <div id="backdrop"></div>
-  <div id="welcome" class="card modal scale">
+  <section id="backdrop"></section>
+  <section id="welcome" class="card modal scale">
     <div class="header">
       <img class="pencil" src="resources/icon.svg" alt="">
       <span>Smart Text Editor</span>
@@ -1302,8 +1302,8 @@
         <span>Created by Brandon Bennett</span>
       </div>
     </div>
-  </div>
-  <div id="settings" class="card modal">
+  </section>
+  <section id="settings" class="card modal">
     <div class="header">
       <span>Settings</span>
       <button class="nav close"><svg><use href="#close"/></svg></button>
@@ -1368,8 +1368,8 @@
     <div class="options">
       <a href="https://github.com/Offroaders123/Numbered-Textarea-Plugin/">Numbered Textarea Plugin on GitHub</a>
     </div>
-  </div>
-  <div id="theme" class="card modal">
+  </section>
+  <section id="theme" class="card modal">
     <div class="header">
       <span>Theme</span>
       <button class="nav back" data-parent="settings"><svg><use href="#back"/></svg></button>
@@ -1392,8 +1392,8 @@
       <button onclick="changeView('code');">Activate Code View</button>
       <button onclick="resetTheme();">Reset</button>
     </div>
-  </div>
-  <div id="reset" class="card notification">
+  </section>
+  <section id="reset" class="card notification">
     <div class="header">
       <img class="pencil" src="resources/icon.svg" alt="">
       <span>Reset Settings</span>
@@ -1401,13 +1401,13 @@
     <div class="content">
       <div class="item">Your settings have been reset!</div>
     </div>
-  </div>
-  <div id="editingTools" class="card action">
+  </section>
+  <section id="editingTools" class="card action">
     <button id="undoTool" onclick="changeState('undo');"><svg><use href="#undo"/></svg></button>
     <button id="redoTool" onclick="changeState('redo');"><svg><use href="#redo"/></svg></button>
     <button id="refreshTool" onclick="forceRefresh();" disabled><svg><use href="#refresh"/></svg></button>
-  </div>
-  <div id="replacer" class="card widget">
+  </section>
+  <section id="replacer" class="card widget">
     <div class="header">
       <span>Replace Text</span>
       <button class="nav close"><svg><use href="#close"/></svg></button>
@@ -1427,8 +1427,8 @@
       <button onclick="flipReplacer();">Flip</button>
       <button onclick="clearReplacer();">Clear</button>
     </div>
-  </div>
-  <div id="picker" class="card widget">
+  </section>
+  <section id="picker" class="card widget">
     <div class="header">
       <span>Color Picker</span>
       <button class="nav close"><svg><use href="#close"/></svg></button>
@@ -1452,8 +1452,8 @@
       <button onclick="insertPicker();">Insert</button>
       <button onclick="deletePicker();">Delete</button>
     </div>
-  </div>
-  <div id="formatter" class="card widget">
+  </section>
+  <section id="formatter" class="card widget">
     <div class="header">
       <span>JSON Formatter</span>
       <button class="nav close"><svg><use href="#close"/></svg></button>
@@ -1470,8 +1470,8 @@
       <button onclick="activateFormatter('');">Collapse</button>
       <button onclick="changeTextarea(formatterInput,'');">Clear</button>
     </div>
-  </div>
-  <div id="encoder" class="card widget">
+  </section>
+  <section id="encoder" class="card widget">
     <div class="header">
       <span>URI Encoder</span>
       <button class="nav close"><svg><use href="#close"/></svg></button>
@@ -1494,10 +1494,10 @@
         <label for="componentSetting"><svg><use href="#check"/></svg>Enable URI Component</label>
       </div>
     </div>
-  </div>
-  <div id="loading">
+  </section>
+  <section id="loading">
     <svg class="buffering"><use href="#buffering"/></svg>
-  </div>
+  </section>
 </main>
 
 <script src="https://offroaders123.github.io/Numbered-Textarea-Plugin/script.js"></script>
@@ -2088,6 +2088,7 @@
     });
   }
   function tempReducedMotion(){
+    if (transitions != "true") return;
     document.documentElement.classList.add("reduced-motion");
     window.setTimeout(function(){
       document.documentElement.classList.remove("reduced-motion");
@@ -2233,13 +2234,16 @@
     event.stopPropagation();
   }
   function openEditorWindow(){
-    var windowFeatures;
-    if (window.matchMedia("(display-mode: standalone)").matches){
-      windowFeatures = `left=${window.screenX},top= ${window.screenY},width=${window.innerWidth},height=${window.innerHeight}`;
-    } else {
-      windowFeatures = "";
+    var windowFeatures = "", standalone = (window.matchMedia("(display-mode: standalone)").matches || "standalone" in navigator), fullscreen = window.matchMedia("(display-mode: fullscreen)").matches || (window.outerWidth == window.screen.width && window.outerHeight == window.screen.height) || (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight);
+    if (standalone || standalone && fullscreen || fullscreen && window.opener != null) windowFeatures = "popup";
+    var editor = window.open(window.location.href,"_blank",windowFeatures);
+    if (fullscreen){
+      editor.resizeTo(window.screen.width * 2/3,window.screen.height * 2/3);
+      editor.moveTo(window.screen.width / 6,window.screen.height / 6);
+    } else if (standalone){
+      editor.resizeTo(window.outerWidth,window.outerHeight);
+      editor.moveTo(window.screenX,window.screenY);
     }
-    window.open(window.location.href,"_blank",windowFeatures);
   }
   function importFile(){
     closeCard(activeModal);
@@ -2304,13 +2308,13 @@
     mustSave = false;
   }
   function openDisplay(){
-    var windowFeatures, fullscreen = (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight);
-    if (window.matchMedia("(display-mode: standalone)").matches || "standalone" in navigator || window.matchMedia("(display-mode: fullscreen)").matches || fullscreen == true){
-      windowFeatures = `left=${window.screen.width / 6},top=${window.screen.height / 6},width=${window.screen.width * 2/3},height=${(window.screen.height * 2/3) - (window.outerHeight - window.innerHeight)}`;
-    } else {
-      windowFeatures = "";
-    }
+    var windowFeatures = "", createStandalone = (window.matchMedia("(display-mode: standalone)").matches || "standalone" in navigator || window.matchMedia("(display-mode: fullscreen)").matches || (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight));
+    if (createStandalone) windowFeatures = "popup";
     var display = window.open("","_blank",windowFeatures);
+    if (createStandalone){
+      display.resizeTo(window.screen.width * 2/3,window.screen.height * 2/3);
+      display.moveTo(window.screen.width / 6,window.screen.height / 6);
+    }
     display.document.open();
     display.document.write(workspaceInput.value);
     display.document.close();
