@@ -2234,8 +2234,8 @@
     event.stopPropagation();
   }
   function openEditorWindow(){
-    var windowFeatures = "", standalone = (window.matchMedia("(display-mode: standalone)").matches || "standalone" in navigator), fullscreen = window.matchMedia("(display-mode: fullscreen)").matches || (window.outerWidth == window.screen.width && window.outerHeight == window.screen.height) || (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight);
-    if (standalone || standalone && fullscreen || fullscreen && window.opener != null) windowFeatures = "popup";
+    var windowFeatures = "", standalone = (window.matchMedia("(display-mode: standalone)").matches || "standalone" in navigator || !window.menubar.visible), hiddenChrome = (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight), fullscreen = (window.matchMedia("(display-mode: fullscreen)").matches || (!window.screenY && !window.screenTop && hiddenChrome) || (!window.screenY && !window.screenTop && standalone));
+    if (standalone || fullscreen) windowFeatures = "popup";
     var editor = window.open(window.location.href,"_blank",windowFeatures);
     if (fullscreen){
       editor.resizeTo(window.screen.width * 2/3,window.screen.height * 2/3);
@@ -2308,10 +2308,10 @@
     mustSave = false;
   }
   function openDisplay(){
-    var windowFeatures = "", createStandalone = (window.matchMedia("(display-mode: standalone)").matches || "standalone" in navigator || window.matchMedia("(display-mode: fullscreen)").matches || (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight));
-    if (createStandalone) windowFeatures = "popup";
+    var windowFeatures = "", standalone = (window.matchMedia("(display-mode: standalone)").matches || "standalone" in navigator || !window.menubar.visible), hiddenChrome = (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight), fullscreen = (window.matchMedia("(display-mode: fullscreen)").matches || (!window.screenY && !window.screenTop && hiddenChrome) || (!window.screenY && !window.screenTop && standalone));
+    if (standalone || fullscreen) windowFeatures = "popup";
     var display = window.open("","_blank",windowFeatures);
-    if (createStandalone){
+    if (standalone || fullscreen){
       display.resizeTo(window.screen.width * 2/3,window.screen.height * 2/3);
       display.moveTo(window.screen.width / 6,window.screen.height / 6);
     }
