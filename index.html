@@ -927,6 +927,8 @@
     position: absolute;
     left: 0;
     top: 0;
+    display: flex;
+    flex-direction: column;
     transition: var(--transition-slow);
   }
   #workspace::after {
@@ -972,12 +974,16 @@
     width: var(--size);
     height: 100%;
   }
-  #workspace ol {
+  #workspace [data-numbered-container] {
+    flex-grow: 1;
+    background: none;
+  }
+  #workspace [data-numbered-container] ol {
     padding-left: 16px;
     padding-right: 16px;
     transition-property: color;
   }
-  #workspace.text textarea {
+  #workspace.text [data-numbered-container] textarea {
     white-space: pre-wrap;
   }
   #scaler {
@@ -1283,9 +1289,11 @@
 </header>
 
 <main id="main" class="text horizontal">
-  <div id="workspace" class="text horizontal" data-numbered-container>
-    <textarea id="workspaceInput" placeholder="Welcome to the Smart Text Editor! This site was created to allow for text editing and code development within your browser!"></textarea>
-  </div>
+  <section id="workspace" class="text horizontal">
+    <div data-numbered-container>
+      <textarea id="workspaceInput" placeholder="Welcome to the Smart Text Editor! This site was created to allow for text editing and code development within your browser!"></textarea>
+    </div>
+  </section>
   <section id="scaler" class="text horizontal">
     <div class="handle">▲<br>▼</div>
   </section>
@@ -1552,7 +1560,7 @@
     }
   });
   window.addEventListener("keydown",function(event){
-    if (event.key == "Escape" && activeModal != undefined){
+    if (event.key == "Escape" && activeModal){
       blockShortcut(event);
       closeCard(activeModal);
     }
@@ -1694,7 +1702,7 @@
       event.stopPropagation();
     });
     dropdown.addEventListener("keydown",function(event){
-      if (dropdown.classList.contains("active") != true) return;
+      if (!dropdown.classList.contains("active")) return;
       if (event.key == "Escape" || event.key == "Tab"){
         blockShortcut(event);
         disableDropdown(dropdown);
@@ -1716,7 +1724,7 @@
       }
     });
     button.addEventListener("keydown",function(event){
-      if (dropdown.classList.contains("active") != true) return;
+      if (!dropdown.classList.contains("active")) return;
       var navigable = getNavigableElements(menus[0],true);
       if (event.key == "ArrowDown"){
         event.preventDefault();
@@ -1774,7 +1782,7 @@
       });
       function openSubmenu(event){
         event.stopPropagation();
-        if (submenu.contains(document.activeElement) == true) return;
+        if (submenu.contains(document.activeElement)) return;
         submenu.parentElement.classList.add("active");
         var navigable = getNavigableElements(submenu,true);
         window.setTimeout(function(){
@@ -1794,7 +1802,7 @@
           option.click();
           button.focus();
         }
-        if (dropdown.parentElement.classList.contains("select") != true) return;
+        if (!dropdown.parentElement.classList.contains("select")) return;
         if (event.key == "Escape" || event.key == "Tab"){
           blockShortcut(event);
           disableDropdown(dropdown);
@@ -1810,7 +1818,7 @@
       option.setAttribute("tabindex","0");
     });
     function checkDropdown(){
-      if (dropdown.contains(document.activeElement) == true) return;
+      if (dropdown.contains(document.activeElement)) return;
       disableDropdown(dropdown);
       document.body.removeEventListener("click",checkDropdown);
     }
@@ -1854,7 +1862,7 @@
     }
     var navigable = getNavigableElements(card);
     card.addEventListener("keydown",function(event){
-      if (card.classList.contains("modal") != true) return;
+      if (!card.classList.contains("modal")) return;
       if (event.key == "Tab"){
         if (event.shiftKey){
           if (document.activeElement == navigable[0]){
@@ -1973,21 +1981,21 @@
   function loadSettings(input){
     if (parentWindow){
       var savedView = storage.getItem("view");
-      if (savedView != undefined){
+      if (savedView){
         if (input == "initial"){
           changeView(savedView);
         }
         updateSelect("view",savedView);
       }
       var savedOrientation = storage.getItem("orientation");
-      if (savedOrientation != undefined){
+      if (savedOrientation){
         if (input == "initial"){
           changeOrientation(savedOrientation);
         }
         updateSelect("orientation",savedOrientation);
       }
       var savedEditingTools = storage.getItem("editingTools");
-      if (savedEditingTools != undefined){
+      if (savedEditingTools){
         var editingOpen = editingTools.classList.contains("active");
         if (input == "initial"){
           if (savedEditingTools == "yes" && !editingOpen){
@@ -2000,18 +2008,18 @@
         updateSelect("editingTools",savedEditingTools);
       }
       var savedRefresh = storage.getItem("refresh");
-      if (savedRefresh != undefined){
+      if (savedRefresh){
         refresh = savedRefresh;
         updateCheckbox("refresh",savedRefresh);
       }
       var savedTitle = storage.getItem("title");
-      if (savedTitle != undefined){
+      if (savedTitle){
         title = savedTitle;
         updateCheckbox("title",savedTitle);
       }
       window.setTimeout(function(){
         var savedTransitions = storage.getItem("transitions");
-        if (savedTransitions != undefined){
+        if (savedTransitions){
           changeTransitions(savedTransitions);
           updateCheckbox("transitions",savedTransitions);
         } else {
@@ -2109,7 +2117,7 @@
   }
   function changeQueryParameters(queryParameters){
     var queryString = queryParameters.toString();
-    if (queryString != "") queryString = "?" + queryString;
+    if (queryString) queryString = "?" + queryString;
     var completeAddress = window.location.pathname + queryString;
     history.pushState(null,"",completeAddress);
   }
@@ -2148,7 +2156,7 @@
   }
   function changeOrientation(input){
     var elements = [header,main,workspace,scaler,preview], newOrientation;
-    if (input == undefined){
+    if (!input){
       if (orientation == "horizontal"){
         newOrientation = "vertical";
       } else {
@@ -2189,7 +2197,7 @@
   }
   function getNavigableElements(container,scope){
     var navigable;
-    if (scope == true){
+    if (scope){
       navigable = Array.from(container.querySelectorAll(":scope > button:not([disabled]), :scope > textarea:not([disabled]), :scope > input:not([disabled]), :scope > select:not([disabled]), :scope > a[href]:not([disabled]), :scope > [tabindex]:not([tabindex='-1'])"));
     } else {
       navigable = Array.from(container.querySelectorAll("button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), a[href]:not([disabled]), [tabindex]:not([tabindex='-1'])"));
@@ -2272,7 +2280,7 @@
           changeView("split");
         }
       }
-      if (type == "image" && subType != "svg+xml" || type == "audio"){
+      if ((type == "image" && subType != "svg+xml") || type == "audio"){
         reader.readAsDataURL(load.files[0]);
         reader.addEventListener("loadend",function(){
           textEdit("insert",reader.result,true);
@@ -2287,8 +2295,8 @@
   function saveAs(extension){
     var blob = new Blob([workspaceInput.value],{type: "text/plain"});
     save.href = URL.createObjectURL(blob);
-    if (extension == undefined){
-      if (loadedFile != undefined){
+    if (!extension){
+      if (loadedFile){
         save.download = loadedFile;
       } else {
         save.download = "Untitled.txt";
@@ -2358,17 +2366,11 @@
     if (cardType == "modal"){
       document.body.addEventListener("keydown",catchCardNavigation);
       backdrop.classList.add("active");
-      var transitionDuration = parseInt(getElementStyle(card,"--transition-slow").split("m").join("").split("s").join("") * 100);
+      var transitionDuration = parseInt(getElementStyle(card,"--transition-medium").split("m").join("").split("s").join("") * 150);
       window.setTimeout(function(){
+        document.activeElement.blur();
         var previousElement = card.querySelector(`[data-previous="${previous}"]`);
-        if (previousElement){
-          previousElement.focus();
-        } else {
-          var navigable = getNavigableElements(card);
-          if (navigable.length != 0){
-            navigable[0].focus();
-          }
-        }
+        if (previousElement) previousElement.focus();
       }, transitionDuration);
       activeModal = card;
     }
@@ -2485,7 +2487,7 @@
   }
   function deletePicker(){
     var selectionCount = workspaceInput.selectionEnd - workspaceInput.selectionStart;
-    if (selectionCount != 0){
+    if (selectionCount){
       textEdit("delete",selectionCount,true);
     }
     insertColor = false;
