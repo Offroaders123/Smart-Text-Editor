@@ -69,7 +69,7 @@
     --transition-fast: 0.125s;
     --transition-delay: 0.5s;
 
-    --selection-color: var(--text-dark);
+    --selection-color: #000000;
     --selection-background: #b4d5ffbf;
 
     --scrollbar: hsl(var(--primary-hue),var(--secondary-sat),47.8%);
@@ -1249,11 +1249,11 @@
     <div class="dropdown">
       <button>Tools</button>
       <ul>
-        <li onclick="openCard('editingTools');">Editing Tools<span>Ctrl + Shift + E</span></li>
-        <li onclick="openCard('replacer');">Replace Text<span>Ctrl + Shift + F</span></li>
-        <li onclick="openCard('picker');">Color Picker<span>Ctrl + Shift + K</span></li>
-        <li onclick="openCard('formatter');">JSON Formatter<span>Ctrl + Shift + R</span></li>
-        <li onclick="openCard('encoder');">URI Encoder<span>Ctrl + Shift + Y</span></li>
+        <li onclick="openCard(editingTools);">Editing Tools<span>Ctrl + Shift + E</span></li>
+        <li onclick="openCard(replacer);">Replace Text<span>Ctrl + Shift + F</span></li>
+        <li onclick="openCard(picker);">Color Picker<span>Ctrl + Shift + K</span></li>
+        <li onclick="openCard(formatter);">JSON Formatter<span>Ctrl + Shift + R</span></li>
+        <li onclick="openCard(encoder);">URI Encoder<span>Ctrl + Shift + Y</span></li>
         <li onclick="confirmOverwrite(insertTemplate);">Import HTML Template<span>Ctrl + Shift + H</span></li>
         <li>Online Resources...
           <svg><use href="#arrow"/></svg>
@@ -1271,7 +1271,7 @@
         </li>
       </ul>
     </div>
-    <button onclick="openCard('settings');">Settings</button>
+    <button onclick="openCard(settings);">Settings</button>
   </section>
   <section class="title">
     <img src="resources/icon.svg" alt="">
@@ -1359,7 +1359,7 @@
     </div>
     <button id="installButton"><img class="pencil" src="resources/icon.svg" alt="">Install Smart Text Editor</button>
     <div class="options">
-      <button onclick="openCard('theme');">Theme...</button>
+      <button onclick="openCard(theme);" data-previous="theme">Theme...</button>
       <button class="warning" onclick="resetSettings();">Reset All Settings</button>
     </div>
     <div class="options">
@@ -1507,7 +1507,7 @@
   window.addEventListener("load",function(){
     if (parentWindow){
       if ("ontouchstart" in document.documentElement){
-        openCard("editingTools");
+        openCard(editingTools);
       }
       loadSettings("initial");
       window.setTimeout(function(){
@@ -1515,11 +1515,11 @@
       }, 50);
       if (title == "true"){
         window.setTimeout(function(){
-          openCard("welcome");
+          openCard(welcome);
         }, 100);
         window.setTimeout(function(){
-          if (activeModal == "welcome"){
-            closeCard("welcome");
+          if (activeModal == welcome){
+            closeCard(welcome);
           }
         }, 2100);
       }
@@ -1533,7 +1533,7 @@
       removeQueryParameters(["template"]);
     }
     if (queryParameters.get("settings")){
-      openCard("settings");
+      openCard(settings);
       removeQueryParameters(["settings"]);
     }
     if ("serviceWorker" in navigator && parentWindow && window.location.protocol == "https:"){
@@ -1601,15 +1601,15 @@
       }
       if (event.key == "E"){
         blockShortcut(event);
-        openCard("editingTools");
+        openCard(editingTools);
       }
       if (event.key == "F"){
         blockShortcut(event);
-        openCard("replacer");
+        openCard(replacer);
       }
       if (event.key == "K"){
         blockShortcut(event);
-        openCard("picker");
+        openCard(picker);
       }
       if (event.key == "G"){
         blockShortcut(event);
@@ -1617,11 +1617,11 @@
       }
       if (event.key == "R"){
         blockShortcut(event);
-        openCard("formatter");
+        openCard(formatter);
       }
       if (event.key == "Y"){
         blockShortcut(event);
-        openCard("encoder");
+        openCard(encoder);
       }
       if (event.key == "H"){
         blockShortcut(event);
@@ -1629,7 +1629,7 @@
       }
       if (event.key == ">"){
         blockShortcut(event);
-        openCard("settings");
+        openCard(settings);
       }
     }
   });
@@ -1840,6 +1840,18 @@
   });
   var cards = Array.from(document.getElementsByClassName("card"));
   cards.forEach(function(card){
+    var backButton = card.querySelector("button.nav.back");
+    if (backButton != null){
+      backButton.addEventListener("click",function(){
+        openCard(document.getElementById(backButton.getAttribute("data-parent")),card.id);
+      });
+    }
+    var closeButton = card.querySelector("button.nav.close");
+    if (closeButton != null){
+      closeButton.addEventListener("click",function(){
+        closeCard(closeButton.parentElement.parentElement);
+      });
+    }
     var navigable = getNavigableElements(card);
     card.addEventListener("keydown",function(event){
       if (card.classList.contains("modal") != true) return;
@@ -1854,18 +1866,6 @@
           navigable[0].focus();
         }
       }
-    });
-  });
-  var backButtons = Array.from(document.querySelectorAll("button.nav.back"));
-  backButtons.forEach(function(backButton){
-    backButton.addEventListener("click",function(){
-      openCard(backButton.getAttribute("data-parent"));
-    });
-  });
-  var closeButtons = Array.from(document.querySelectorAll("button.nav.close"));
-  closeButtons.forEach(function(closeButton){
-    closeButton.addEventListener("click",function(){
-      closeCard(closeButton.parentElement.parentElement.id);
     });
   });
   var themeChannels = Array.from(theme.querySelectorAll("input[type='range']"));
@@ -1926,13 +1926,10 @@
     document.body.addEventListener("mouseleave",removeScaling);
   });
   backdrop.addEventListener("click",function(){
-    if (activeModal == "welcome"){
-      workspaceInput.focus();
-    }
     closeCard(activeModal);
   });
   welcome.addEventListener("click",function(){
-    closeCard("welcome");
+    closeCard(welcome);
   });
   installButton.addEventListener("click",function(){
     installPrompt.prompt();
@@ -1994,10 +1991,10 @@
         var editingOpen = editingTools.classList.contains("active");
         if (input == "initial"){
           if (savedEditingTools == "yes" && !editingOpen){
-            openCard("editingTools");
+            openCard(editingTools);
           }
           if (savedEditingTools == "no" && editingOpen){
-            closeCard("editingTools");
+            closeCard(editingTools);
           }
         }
         updateSelect("editingTools",savedEditingTools);
@@ -2026,8 +2023,7 @@
   function resetSettings(){
     var ask = confirm("Are you sure you want to reset all settings?\nThis cannot be undone.");
     if (ask){
-      loading.classList.add("active");
-      closeCard("reset");
+      closeCard(reset);
       window.setTimeout(function(){
         updateSelect("view","text");
         updateSelect("orientation","horizontal");
@@ -2041,10 +2037,7 @@
         resetTheme();
         storage.clear();
       }, 50);
-      window.setTimeout(function(){
-        loading.classList.remove("active");
-        openCard("reset");
-      }, 1050);
+      openCard(reset);
     }
   }
   function updateSetting(item,value){
@@ -2337,66 +2330,80 @@
     mustSave = true;
     previewRefresh();
   }
-  function openCard(element){
-    var card = document.getElementById(element), cardType = card.classList[1];
+  function openCard(card,previous){
+    if (!card) return;
+    var cardType = card.classList[1];
     if (card.classList.contains("active")){
-      card.classList.remove("active");
-      if (cardType == "modal"){
-        backdrop.classList.remove("active");
-      }
-    } else {
-      if (cardType != "notification"){
-        cards.forEach(function(item){
-          var itemType = item.classList[1];
-          if (itemType == cardType || itemType == "modal"){
-            item.classList.remove("active");
-          }
-        });
-      }
-      card.classList.add("active");
-      if (cardType != "notification" && cardType != "modal"){
-        backdrop.classList.remove("active");
-      }
-      if (cardType == "notification"){
-        window.setTimeout(function(){
-          closeCard(element);
-        }, 4000);
-      }
-      if (cardType == "modal"){
-        window.setTimeout(function(){
+      closeCard(card);
+      return;
+    }
+    if (cardType != "notification"){
+      var activeCards = Array.from(document.querySelectorAll(".card.active"));
+      activeCards.forEach(function(activeCard){
+        var activeCardType = activeCard.classList[1];
+        if (activeCardType == cardType || activeCardType == "modal"){
+          activeCard.classList.remove("active");
+        }
+      });
+    }
+    card.classList.add("active");
+    if (cardType != ("notification" || "modal")){
+      backdrop.classList.remove("active");
+    }
+    if (cardType == "notification"){
+      window.setTimeout(function(){
+        closeCard(card);
+      }, 4000);
+    }
+    if (cardType == "modal"){
+      document.body.addEventListener("keydown",catchCardNavigation);
+      backdrop.classList.add("active");
+      var transitionDuration = parseInt(getElementStyle(card,"--transition-slow").split("m").join("").split("s").join("") * 100);
+      window.setTimeout(function(){
+        var previousElement = card.querySelector(`[data-previous="${previous}"]`);
+        if (previousElement){
+          previousElement.focus();
+        } else {
           var navigable = getNavigableElements(card);
           if (navigable.length != 0){
             navigable[0].focus();
           }
-        }, 125);
-        backdrop.classList.add("active");
-      }
-    }
-    if (cardType == "modal"){
-      activeModal = element;
+        }
+      }, transitionDuration);
+      activeModal = card;
     }
     if (cardType == "widget"){
-      activeWidget = element;
+      activeWidget = card;
     }
   }
-  function closeCard(element){
-    if (element == undefined) return;
-    var card = document.getElementById(element), cardType = card.classList[1];
-    document.getElementById(element).classList.remove("active");
+  function closeCard(card){
+    if (!card) return;
+    var cardType = card.classList[1];
+    card.classList.remove("active");
     if (cardType == "modal"){
+      document.body.removeEventListener("keydown",catchCardNavigation);
       backdrop.classList.remove("active");
-    }
-    if (activeModal == "welcome" && parentWindow){
-      workspaceInput.focus();
-    }
-    if (activeModal == "settings"){
-      loadSettings();
-    }
-    if (cardType == "modal"){
       activeModal = undefined;
     }
     if (cardType == "widget"){
       activeWidget = undefined;
+    }
+    if (card == welcome && parentWindow){
+      workspaceInput.focus();
+    }
+    if (card == settings){
+      loadSettings();
+    }
+  }
+  function catchCardNavigation(event){
+    if (!activeModal || event.key != "Tab" || document.activeElement != document.body) return;
+    var navigable = getNavigableElements(activeModal);
+    if (event.shiftKey){
+      event.preventDefault();
+      navigable[navigable.length - 1].focus();
+    } else {
+      event.preventDefault();
+      navigable[0].focus();
     }
   }
   function changeState(action){
@@ -2459,7 +2466,7 @@
   function importColor(){
     insertColor = true;
     if (!picker.classList.contains("active")){
-      openCard("picker");
+      openCard(picker);
     }
     if (window.getSelection().toString().length > 0){
       pickerInput.value = window.getSelection();
