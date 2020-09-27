@@ -5,7 +5,7 @@
 
 <title>Smart Text Editor</title>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover user-scalable=no">
 <meta name="author" content="Brandon Bennett">
 <meta name="description" content="The text editor that requires only a browser and a keyboard!">
 <meta name="google-site-verification" content="_LrfHy7pIualH1TolkQ5b3Po0dtjYrx-QQsiXelwx20"/>
@@ -17,6 +17,16 @@
 <link rel="alternate icon" type="image/png" sizes="16x16" href="resources/icon-16.png">
 <link rel="alternate icon" type="image/png" sizes="32x32" href="resources/icon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="resources/icon-apple-touch-icon.png">
+<link rel="apple-touch-startup-image" href="resources/startup-iphone5.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"/>
+<link rel="apple-touch-startup-image" href="resources/startup-iphone6.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)"/>
+<link rel="apple-touch-startup-image" href="resources/startup-iphoneplus.png" media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)"/>
+<link rel="apple-touch-startup-image" href="resources/startup-iphonex.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)"/>
+<link rel="apple-touch-startup-image" href="resources/startup-iphonexr.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)"/>
+<link rel="apple-touch-startup-image" href="resources/startup-iphonexsmax.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)"/>
+<link rel="apple-touch-startup-image" href="resources/startup-ipad.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)"/>
+<link rel="apple-touch-startup-image" href="resources/startup-ipadpro1.png" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)"/>
+<link rel="apple-touch-startup-image" href="resources/startup-ipadpro3.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)"/>
+<link rel="apple-touch-startup-image" href="resources/startup-ipadpro2.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)"/>
 <link rel="mask-icon" href="resources/icon-mask-icon.svg" color="#ee8800">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cousine&family=Noto+Sans&family=Rubik&display=swap">
 <link rel="stylesheet" href="https://offroaders123.github.io/Numbered-Textarea-Plugin/styles.css">
@@ -52,6 +62,7 @@
     --container-medium-hover: hsl(var(--primary-hue),var(--primary-sat),17.6%);
 
     --text-dark: #000000;
+    --text-dark-contrast: hsl(var(--primary-hue),var(--tertiary-sat),20%);
     --text-medium: hsl(var(--primary-hue),var(--tertiary-sat),66.7%);
     --text-medium-contrast: hsl(var(--primary-hue),var(--tertiary-sat),80%);
     --text-medium-additional: hsl(var(--primary-hue),var(--secondary-sat),46.7%);
@@ -62,7 +73,8 @@
     --border-radius-medium: min(1.25vw, 5px);
     --border-radius-large: min(2.5vw, 10px);
     --box-shadow: #000000bf;
-    --outline: var(--text-medium-contrast);
+    --outline-dark: var(--text-dark-contrast);
+    --outline-medium: var(--text-medium-contrast);
 
     --transition-slow: 0.5s;
     --transition-medium: 0.25s;
@@ -130,29 +142,53 @@
     z-index: 3;
     transition: opacity 0.25s;
   }
+  body.camera-left #header {
+    padding-left: calc(env(safe-area-inset-left) + min(1.5vw, 12px));
+    padding-right: calc(env(safe-area-inset-bottom) + min(1.5vw, 12px));
+  }
+  body.camera-right #header {
+    padding-left: calc(env(safe-area-inset-bottom) + min(1.5vw, 12px));
+    padding-right: calc(env(safe-area-inset-right) + min(1.5vw, 12px));
+  }
+  body.camera-left #workspace, body.camera-left #preview {
+    border-left: env(safe-area-inset-left) solid;
+  }
+  body.camera-right #workspace, body.camera-right #preview {
+    border-right: env(safe-area-inset-right) solid;
+  }
+  body.camera-left #main.text #workspace, body.camera-right #main.text #workspace {
+    border-color: var(--textarea-light);
+  }
+  body.camera-left #main:not(.text) #workspace, body.camera-right #main:not(.text) #workspace {
+    border-color: var(--textarea-dark);
+  }
+  body.camera-left #preview, body.camera-right #preview {
+    border-color: var(--container-medium);
+  }
+  body.camera-right .card.notification, body.camera-right .card.action, body.camera-right .card.widget {
+    right: env(safe-area-inset-right);
+  }
   button {
+    padding: min(0.5vw, 2px) min(1vw, 8px);
+    min-width: min(8vw, 75px);
     color: var(--text-medium);
     font-size: min(2.5vw, 14.5px);
+    background: var(--button);
     border: none;
     border-radius: var(--border-radius-medium);
+    box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow), 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
+    --focus-border: transparent;
     outline: none;
     cursor: pointer;
     transition: var(--transition-fast);
     transition-property: color, background, opacity;
   }
-  button:not(.nav) {
-    padding: min(0.5vw, 2px) min(1vw, 8px);
-    min-width: min(8vw, 75px);
-    background: var(--button);
-    box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow), 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
-    --focus-border: transparent;
-  }
-  button:hover, button:focus, .dropdown.active > button, .select:hover .dropdown button {
+  button:hover, button:focus, button.tab:focus-within, button.tab.active, .dropdown.active > button, .select:hover .dropdown button {
     color: var(--text-hover);
     background: var(--button-hover);
   }
   button:focus {
-    --focus-border: var(--outline);
+    --focus-border: var(--outline-medium);
   }
   button::-moz-focus-inner {
     border: none;
@@ -160,11 +196,51 @@
   button.warning:hover, button.warning:focus {
     background: var(--button-warning-hover);
   }
-  button.nav {
-    padding: min(0.5vw, 2px);
+  button.tab {
+    padding: min(1.5vw, 6px);
+    padding-left: min(3vw, 12px);
+    position: relative;
+    min-width: unset;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: min(3vw, 12px);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  button.tab::after, [data-numbered-container]::after, #workspace .files::after {
+    content: "";
     position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    pointer-events: none;
+    transition: var(--transition-medium);
+    transition-property: background, box-shadow;
+  }
+  button.tab.drag::after, [data-numbered-container].drag::after, #workspace .files.drag::after {
+    background: var(--textarea-drag-background);
+    box-shadow: 0 0 4px 4px var(--textarea-drag-border) inset;
+  }
+  button.tab > button, button.nav {
+    padding: min(0.5vw, 2px);
+    min-width: unset;
     background: none;
     box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
+  }
+  button.tab > button {
+    margin-left: min(3vw, 12px);
+    width: min(3.5vw, 18px);
+    height: min(3.5vw, 18px);
+  }
+  button.tab > button svg, button.nav > svg {
+    width: 100%;
+    height: 100%;
+  }
+  button.nav {
+    position: absolute;
   }
   button.nav.back {
     left: 0;
@@ -172,16 +248,12 @@
   button.nav.close {
     right: 0;
   }
-  button svg {
+  button > svg {
     fill: var(--text-medium);
     transition: var(--transition-fast) fill;
   }
-  button:hover svg, button:focus svg, .dropdown:hover button svg, .dropdown:focus-within button svg, .dropdown.active button svg, .dropdown li:hover > svg, .dropdown li:focus > svg, .dropdown li:focus-within > svg, .dropdown li.active > svg {
+  button:hover > svg, button:focus > svg, .dropdown:hover button > svg, .dropdown:focus-within button > svg, .dropdown.active button > svg, .dropdown li:hover > svg, .dropdown li:focus > svg, .dropdown li:focus-within > svg, .dropdown li.active > svg {
     fill: var(--text-hover);
-  }
-  button.nav svg {
-    width: 100%;
-    height: 100%;
   }
   [data-numbered-container], input[type="text"] {
     font-family: unset;
@@ -190,6 +262,7 @@
     border-radius: 0;
   }
   [data-numbered-container] {
+    position: relative;
     resize: none;
   }
   [data-numbered-container]:focus-within, input[type="text"] {
@@ -210,7 +283,8 @@
     -webkit-appearance: none;
   }
   [data-numbered-container] textarea {
-    word-wrap: normal;
+    line-height: normal;
+    overflow-wrap: normal;
   }
   span.info {
     display: flex;
@@ -238,7 +312,7 @@
     text-decoration-color: var(--text-hover);
   }
   a:focus {
-    --focus-border: var(--outline);
+    --focus-border: var(--outline-medium);
   }
   input[type="range"] {
     padding: min(3vw, 12px) min(0.75vw, 3px);
@@ -253,7 +327,7 @@
     -webkit-appearance: none;
   }
   input[type="range"]:focus {
-    --focus-border: var(--outline);
+    --focus-border: var(--outline-medium);
   }
   input[type="range"]::-webkit-slider-thumb {
     margin-top: calc(min(1.75vw, 7px) * -1);
@@ -348,7 +422,7 @@
     width: min(2.75vw, 12px);
     height: min(2.75vw, 12px);
   }
-  .dropdown button svg {
+  .dropdown button > svg {
     margin-left: min(2vw, 8px);
     transform: rotate(90deg);
   }
@@ -375,7 +449,6 @@
     padding: min(1.75vw, 8px);
     position: relative;
     display: flex;
-    justify-content: space-between;
     align-items: center;
     color: var(--text-medium-contrast);
     font-size: min(2.75vw, 12.5px);
@@ -388,12 +461,26 @@
     transition: var(--transition-fast);
     transition-property: color, background;
   }
+  .dropdown li {
+    justify-content: space-between;
+  }
+  .dropdown a > img {
+    margin-right: min(1.75vw, 8px);
+    width: min(4vw, 16px);
+    height: min(4vw, 16px);
+  }
+  .dropdown a > img.rounded {
+    border-radius: var(--border-radius-small);
+  }
+  .dropdown a > img.invert {
+    filter: invert() hue-rotate(180deg);
+  }
   .dropdown li span {
     margin-left: min(4vw, 16px);
     color: var(--text-medium-additional);
     font-size: min(2.5vw, 11px);
   }
-  .dropdown li svg {
+  .dropdown li > svg {
     fill: var(--text-medium-additional);
     transition: var(--transition-fast);
     transition-property: fill, transform;
@@ -403,7 +490,7 @@
     background: var(--container-medium-hover);
   }
   .dropdown li:focus, .dropdown a:focus {
-    --focus-border: var(--outline);
+    --focus-border: var(--outline-medium);
   }
   .dropdown ul ul {
     position: absolute;
@@ -422,7 +509,7 @@
       transform-origin: top center;
       overflow-y: auto;
     }
-    .dropdown li svg {
+    .dropdown li > svg {
       transform: rotate(90deg);
     }
   }
@@ -468,18 +555,18 @@
     min-width: 100%;
   }
   .checkbox {
-    padding: min(0.75vw, 3px);
+    padding: min(1vw, 4px);
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: var(--border-radius-medium);
-    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
+    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
     --focus-border: transparent;
     outline: none;
     cursor: pointer;
   }
   .checkbox:focus {
-    --focus-border: var(--outline);
+    --focus-border: var(--outline-medium);
   }
   .checkbox input[type="checkbox"] {
     display: none;
@@ -513,7 +600,7 @@
     background: var(--range-track-hover);
     border-color: var(--text-hover);
   }
-  .checkbox label svg {
+  .checkbox label > svg {
     padding: min(0.55vw, 3px);
     position: absolute;
     left: 0;
@@ -526,12 +613,12 @@
     transition: var(--transition-fast) ease-out;
     transition-property: fill, transform;
   }
-  .checkbox input[type="checkbox"]:checked + label svg {
+  .checkbox input[type="checkbox"]:checked + label > svg {
     fill: var(--text-medium);
     transform: rotate(0deg) scale(1);
     transition-style: ease-in;
   }
-  .checkbox:hover input[type="checkbox"]:checked + label svg, .checkbox:focus input[type="checkbox"]:checked + label svg {
+  .checkbox:hover input[type="checkbox"]:checked + label > svg, .checkbox:focus input[type="checkbox"]:checked + label > svg {
     fill: var(--text-hover);
   }
 
@@ -542,10 +629,10 @@
   }
   [data-tooltip]::before, [data-tooltip]::after {
     position: absolute;
-    display: flex;
+    left: 50%;
     opacity: 0;
     pointer-events: none;
-    transform: scale(var(--scale));
+    transform: translateX(-50%) scale(var(--scale));
     --scale: 0.85;
     transition: var(--transition-fast) ease-out;
     transition-property: opacity, transform;
@@ -555,13 +642,15 @@
     padding: min(2vw, 8px);
     bottom: calc(100% + min(3vw, 12px));
     min-width: min(12vw, 48px);
-    justify-content: center;
-    align-items: center;
+    max-width: 100%;
     color: var(--text-hover);
     font-size: min(2.75vw, 12px);
     background: var(--container-medium-hover);
     border-radius: var(--border-radius-large);
     box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow);
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
     transform-origin: center bottom;
   }
   [data-tooltip]::after {
@@ -593,6 +682,7 @@
     white-space: nowrap;
     visibility: hidden;
     pointer-events: none;
+    overflow-y: hidden;
     transition: var(--transition-medium);
     transition-property: max-height, visibility, opacity, transform;
   }
@@ -604,8 +694,9 @@
     position: fixed;
     left: 50%;
     top: 50%;
-    z-index: 1;
+    max-height: calc(80% - min(4.5vw, 24px));
     border-radius: var(--border-radius-large);
+    z-index: 2;
     transform: translate(-50%,-50%) scale(var(--scale));
     --scale: 0.15;
     transform-origin: center center;
@@ -616,7 +707,6 @@
   .card.modal.scale {
     padding: min(6vh, 2vw);
     border-radius: calc(var(--border-radius-large) + min(1.5vh, 0.5vw));
-    z-index: 2;
     transform: translate(-50%,50vh) scale(1);
   }
   .card.notification, .card.action, .card.widget {
@@ -625,7 +715,6 @@
     right: 0;
     max-height: calc(100% - min(4.5vw, 24px));
     border-radius: var(--border-radius-large);
-    overflow-y: hidden;
   }
   .card.notification, .card.widget {
     min-width: min(50vw, 250px);
@@ -633,11 +722,12 @@
   .card.notification {
     margin: min(4vw, 20px);
     bottom: 0;
-    z-index: 2;
+    z-index: 3;
     transform: translateX(calc(100% + min(8vw, 40px)));
   }
   .card.action, .card.widget {
     margin: min(2.5vw, 12px);
+    z-index: 1;
     transform: scaleY(var(--scale));
     --scale: 0.15;
     transform-origin: top center;
@@ -655,7 +745,7 @@
     justify-content: center;
     align-items: center;
   }
-  .card.action button svg {
+  .card.action button > svg {
     width: min(2.5vw, 12px);
     height: min(2.5vw, 12px);
   }
@@ -742,7 +832,7 @@
     width: min(3.5vw, 18px);
     height: min(3.5vw, 18px);
   }
-  .card [data-numbered-container], .card [data-numbered-container]::after, .card input[type="text"] {
+  .card [data-numbered-container], .card input[type="text"] {
     border-radius: var(--border-radius-medium);
   }
   .card [data-numbered-container], .card input[type="text"] {
@@ -753,18 +843,18 @@
     position: relative;
     max-width: 50vw;
     height: min(25vw, 75px);
-    max-height: min(25vw, 25vh);
   }
-  .card [data-numbered-container]::after, .card input[type="text"] {
+  .card [data-numbered-container]::before, .card input[type="text"] {
     box-shadow: 0 2px 4px var(--box-shadow) inset;
   }
-  .card [data-numbered-container]::after {
+  .card [data-numbered-container]::before {
     content: "";
     position: absolute;
     width: 100%;
     height: 100%;
-    box-shadow: 0 2px 4px var(--box-shadow) inset;
+    border-radius: inherit;
     pointer-events: none;
+    z-index: 1;
   }
   .card [data-numbered-container].expand {
     height: 150px;
@@ -773,15 +863,13 @@
     width: 100%;
     display: flex;
     justify-content: space-around;
+    overflow-y: auto;
   }
   .card.modal .content span {
     font-size: min(2.5vw, 14.5px);
   }
   .card.modal.scale .content span {
     font-size: min(4.5vh, 1.5vw);
-  }
-  .card.widget .content {
-    overflow-y: auto;
   }
   .card .content .item {
     margin: auto 0;
@@ -836,34 +924,18 @@
     justify-content: space-between;
     align-items: center;
     background: var(--container-dark);
-    z-index: 1;
-    transition: box-shadow var(--transition-slow);
-  }
-  #header.text, #header.code, #header.split {
-    box-shadow: 0 1px 8px var(--box-shadow);
-  }
-  #header.split.vertical {
-    box-shadow: -50vw 1px 8px var(--box-shadow);
-  }
-  #header.preview.horizontal {
-    box-shadow: none;
-  }
-  #header.preview.vertical {
-    box-shadow: -100vw 1px 8px transparent;
+    z-index: 2;
   }
   #header.resize, #workspace.resize, #preview.resize {
     pointer-events: none;
     transition: none;
   }
-  #header .options {
+  #header .menubar {
     display: flex;
     align-items: center;
   }
-  #header .options > * + * {
+  #header .menubar > * + * {
     margin-left: min(1.5vw, 12px);
-  }
-  #load, #save {
-    display: none;
   }
   #header .title {
     position: absolute;
@@ -909,6 +981,7 @@
   #main {
     position: relative;
     flex: 1;
+    border-bottom: env(safe-area-inset-bottom) solid var(--container-dark);
   }
   #main.text [data-numbered-container], #main.text input[type="text"] {
     font-family: var(--font-family-sans-serif);
@@ -931,7 +1004,7 @@
     flex-direction: column;
     transition: var(--transition-slow);
   }
-  #workspace::after {
+  #workspace::before, #workspace::after {
     content: "";
     position: absolute;
     left: 0;
@@ -939,8 +1012,11 @@
     width: 100%;
     height: 100%;
     pointer-events: none;
-    transition: var(--transition-medium);
-    transition-property: background, box-shadow;
+    transition: box-shadow var(--transition-slow);
+  }
+  #workspace::before {
+    box-shadow: 0 9px 8px -8px var(--box-shadow) inset;
+    z-index: 1;
   }
   #workspace.text {
     --size: 100%;
@@ -962,10 +1038,6 @@
     visibility: hidden;
     opacity: 0;
   }
-  #workspace.drag::after {
-    background: var(--textarea-drag-background);
-    box-shadow: 0 0 4px 4px var(--textarea-drag-border) inset;
-  }
   #workspace.horizontal, #preview.horizontal {
     width: 100%;
     height: var(--size);
@@ -974,14 +1046,93 @@
     width: var(--size);
     height: 100%;
   }
+  #workspace.split.horizontal::after, #workspace.preview.horizontal::after {
+    box-shadow: 0 -9px 8px -8px var(--box-shadow) inset;
+  }
+  #workspace.split.vertical::after, #workspace.preview.vertical::after {
+    box-shadow: -9px 0 8px -8px var(--box-shadow) inset;
+  }
+  #workspace .files {
+    padding: 0 min(1.5vw, 12px);
+    padding-top: min(0.75vw, 6px);
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    background: #141414;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  #workspace .files::-webkit-scrollbar {
+    display: none;
+  }
+  #workspace .files > * {
+    flex-shrink: 0;
+    z-index: 1;
+  }
+  #workspace .files > * + * {
+    margin-left: min(2vw, 8px);
+  }
+  #workspace .files button.tab {
+    color: var(--text-medium-contrast);
+    background: #2a2a2a;
+  }
+  #workspace .files button.tab:hover, #workspace .files button.tab:focus, #workspace .files button.tab:focus-within {
+    color: var(--text-hover);
+    background: #3a3a3a;
+  }
+  #workspace .files button.tab:not(.active) {
+    box-shadow: 0 calc(min(0.75vw, 3px) * -1) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow) inset, 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow), 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
+  }
+  #workspace .files button.tab.active {
+    cursor: unset;
+  }
+  #workspace .files button.tab.active > button > svg {
+    opacity: 0.55;
+    transition-property: fill, opacity;
+    transition-duration: var(--transition-slow), var(--transition-fast);
+  }
+  #workspace .files button.tab.active > button:hover > svg, #workspace .files button.tab.active > button:focus > svg {
+    opacity: 1;
+  }
+  #workspace.text .files button.tab.active {
+    color: var(--text-dark);
+    background: var(--textarea-light);
+  }
+  #workspace.text .files button.tab.active:hover, #workspace.text .files button.tab.active:focus {
+    --focus-border: var(--outline-dark);
+  }
+  #workspace.text .files button.tab.active > button > svg {
+    fill: var(--text-dark);
+  }
+  #workspace.text .files button.tab.active > button:hover, #workspace.text .files button.tab.active > button:focus {
+    --focus-border: var(--outline-dark);
+  }
+  #workspace:not(.text) .files button.tab.active > button > svg {
+    fill: var(--text-light);
+  }
+  #workspace:not(.text) .files button.tab.active {
+    color: var(--text-light);
+    background: var(--textarea-dark);
+  }
+  #workspace .files button.tab.active.resize {
+    transition-duration: var(--transition-slow);
+  }
   #workspace [data-numbered-container] {
     flex-grow: 1;
+    height: 0;
     background: none;
+    visibility: hidden;
+    opacity: 0;
+    transition: color var(--transition-slow);
+  }
+  #workspace [data-numbered-container].active {
+    height: 100%;
+    visibility: visible;
+    opacity: 1;
   }
   #workspace [data-numbered-container] ol {
     padding-left: 16px;
     padding-right: 16px;
-    transition-property: color;
   }
   #workspace.text [data-numbered-container] textarea {
     white-space: pre-wrap;
@@ -992,7 +1143,6 @@
     justify-content: center;
     align-items: center;
     background: var(--button);
-    box-shadow: 0 -1px 8px var(--box-shadow);
     transition: var(--transition-slow), background var(--transition-fast);
   }
   #scaler.active, #scaler:hover {
@@ -1036,7 +1186,7 @@
     font-size: min(2.75vw, 12px);
     background: var(--button);
     border-radius: var(--border-radius-medium);
-    box-shadow: 0 0 min(2vw, 8px) min(0.25vw, 1px) var(--box-shadow);
+    box-shadow: 0 0 min(2vw, 8px) var(--box-shadow);
     visibility: hidden;
     opacity: 0;
     z-index: 1;
@@ -1045,7 +1195,7 @@
     transition: var(--transition-fast) ease-out;
     transition-property: color, background, visibility, opacity, transform;
   }
-  #scaler.active > .handle, #scaler:hover > .handle {
+  #scaler:hover .handle, #scaler.active .handle {
     color: var(--text-hover);
     background: var(--button-hover);
     visibility: visible;
@@ -1082,7 +1232,7 @@
     visibility: hidden;
     opacity: 0;
     pointer-events: none;
-    z-index: 1;
+    z-index: 2;
     transition: var(--transition-medium);
     transition-property: visibility, opacity;
   }
@@ -1162,7 +1312,7 @@
       content: "Loading...";
     }
   }
-  #loading svg {
+  #loading > svg {
     width: 25vmin;
     height: 25vmin;
     fill: var(--text-light);
@@ -1220,14 +1370,15 @@
   </symbol>
 </svg>
 
-<header id="header" class="text horizontal">
-  <section class="options">
+<header id="header">
+  <section class="menubar">
     <div class="dropdown">
       <button>File</button>
       <ul>
-        <li onclick="openEditorWindow();">New<span>Ctrl + Shift + C</span></li>
-        <li onclick="load.click();"><input id="load" type="file" accept="text/*,image/*,audio/*,.html,.css,.js,.json,.svg,.webmanifest,.md">Open<span>Ctrl + Shift + L</span></li>
-        <li onclick="saveAs();"><a id="save"></a>Save<span>Ctrl + Shift + S</span></li>
+        <li onclick="createFile('Untitled.txt');">New File<span>Ctrl + Shift + X</span></li>
+        <li onclick="openEditorWindow();">New Window<span>Ctrl + Shift + C</span></li>
+        <li onclick="loadFiles();">Open<span>Ctrl + Shift + L</span></li>
+        <li onclick="saveAs();"><a id="save" style="display: none;"></a>Save<span>Ctrl + Shift + S</span></li>
         <li>Save As...
           <svg><use href="#arrow"/></svg>
           <ul>
@@ -1264,15 +1415,16 @@
         <li>Online Resources...
           <svg><use href="#arrow"/></svg>
           <ul>
-            <a href="https://webformatter.com">Code Formatter</a>
-            <a href="https://www.sharedrop.io">File Transferer</a>
-            <a href="https://www.diffchecker.com/">Difference Finder</a>
-            <a href="https://caniuse.com/">Compatibility Checker</a>
-            <a href="https://web.dev/measure/">Performance Tester</a>
-            <a href="https://realfavicongenerator.net/">Favicon Generator</a>
-            <a href="https://www.svgminify.com/">SVG Simplifier</a>
-            <a href="https://www.uuidgenerator.net/">UUID Generator</a>
-            <a href="https://cryptii.com/">Text Encryptor</a>
+            <a href="https://webformatter.com"><img src="resources/web-formatter.svg">Code Formatter</a>
+            <a href="https://www.sharedrop.io"><img class="invert" src="resources/sharedrop.svg">File Transferer</a>
+            <a href="https://www.diffchecker.com/"><img src="resources/diffchecker.svg">Difference Finder</a>
+            <a href="https://caniuse.com/"><img src="resources/caniuse.svg">Compatibility Checker</a>
+            <a href="https://web.dev/measure/"><img src="resources/webdev.svg">Performance Tester</a>
+            <a href="https://realfavicongenerator.net/"><img class="rounded" src="resources/real-favicon-generator.svg">Favicon Generator</a>
+            <a href="https://appsco.pe/developer/splash-screens/"><img class="invert" src="resources/appscope.svg">Splash Generator</a>
+            <a href="https://www.svgminify.com/"><img src="resources/svgminify.svg">SVG Simplifier</a>
+            <a href="https://www.uuidgenerator.net/"><img src="resources/online-uuid-generator.svg">UUID Generator</a>
+            <a href="https://cryptii.com/"><img src="resources/cryptii.svg">Text Encryptor</a>
           </ul>
         </li>
       </ul>
@@ -1280,7 +1432,7 @@
     <button onclick="openCard(settings);">Settings</button>
   </section>
   <section class="title">
-    <img src="resources/icon.svg" alt="">
+    <img src="resources/icon.svg">
     <span>Smart Text Editor</span>
   </section>
   <section class="attribution">
@@ -1290,9 +1442,7 @@
 
 <main id="main" class="text horizontal">
   <section id="workspace" class="text horizontal">
-    <div data-numbered-container>
-      <textarea id="workspaceInput" placeholder="Welcome to the Smart Text Editor! This site was created to allow for text editing and code development within your browser!"></textarea>
-    </div>
+    <section id="files" class="files"></section>
   </section>
   <section id="scaler" class="text horizontal">
     <div class="handle">▲<br>▼</div>
@@ -1301,7 +1451,7 @@
   <section id="backdrop"></section>
   <section id="welcome" class="card modal scale">
     <div class="header">
-      <img class="pencil" src="resources/icon.svg" alt="">
+      <img class="pencil" src="resources/icon.svg">
       <span>Smart Text Editor</span>
     </div>
     <div class="content">
@@ -1365,7 +1515,7 @@
         </div>
       </div>
     </div>
-    <button id="installButton"><img class="pencil" src="resources/icon.svg" alt="">Install Smart Text Editor</button>
+    <button id="installButton"><img class="pencil" src="resources/icon.svg">Install Smart Text Editor</button>
     <div class="options">
       <button onclick="openCard(theme);" data-previous="theme">Theme...</button>
       <button class="warning" onclick="resetSettings();">Reset All Settings</button>
@@ -1403,7 +1553,7 @@
   </section>
   <section id="reset" class="card notification">
     <div class="header">
-      <img class="pencil" src="resources/icon.svg" alt="">
+      <img class="pencil" src="resources/icon.svg">
       <span>Reset Settings</span>
     </div>
     <div class="content">
@@ -1492,8 +1642,8 @@
       </div>
     </div>
     <div class="options">
-      <button onclick="activateEncoder('encode');">Encode</button>
-      <button onclick="activateEncoder('decode');">Decode</button>
+      <button onclick="activateEncoder(true);">Encode</button>
+      <button onclick="activateEncoder(false);">Decode</button>
       <button onclick="changeTextarea(encoderInput,'');">Clear</button>
     </div>
     <div class="options">
@@ -1512,7 +1662,11 @@
 
 <script>
   var storage = window.localStorage, view = "text", orientation = "horizontal", refresh = "true", title = "true", transitions = "true", installPrompt, loadedFile, sourceChange = false, mustSave = false, activeModal, activeWidget, cachedColor, insertColor = false, encodeComponent = false;
+  var workspaceInput = function(){
+    return workspace.querySelector("[data-numbered-container].active textarea");
+  };
   window.addEventListener("load",function(){
+    createFile();
     if (parentWindow){
       if ("ontouchstart" in document.documentElement){
         openCard(editingTools);
@@ -1531,7 +1685,7 @@
           }
         }, 2100);
       }
-      workspaceInput.focus();
+      workspaceInput().focus();
     }
     pickerInputRefresh();
     forceRefresh();
@@ -1547,6 +1701,7 @@
     if ("serviceWorker" in navigator && parentWindow && window.location.protocol == "https:"){
       navigator.serviceWorker.register("service-worker.js");
     }
+    setOffsetOrientation();
   });
   window.addEventListener("beforeinstallprompt",function(event){
     event.preventDefault();
@@ -1565,13 +1720,17 @@
       closeCard(activeModal);
     }
     if (event.ctrlKey){
+      if (event.key == "X"){
+        blockShortcut(event);
+        createFile();
+      }
       if (event.key == "C"){
         blockShortcut(event);
         openEditorWindow();
       }
       if (event.key == "L"){
         blockShortcut(event);
-        load.click();
+        loadFiles();
       }
       if (event.key == "S"){
         blockShortcut(event);
@@ -1603,9 +1762,7 @@
       }
       if (event.key == "Enter"){
         blockShortcut(event);
-        if (view == "split" || view == "preview"){
-          forceRefresh();
-        }
+        if (view == "split" || view == "preview") forceRefresh();
       }
       if (event.key == "E"){
         blockShortcut(event);
@@ -1658,32 +1815,15 @@
       }, 50);
     }
   });
-  document.documentElement.addEventListener("dragover",function(event){
-    event.preventDefault();
-    workspace.classList.add("drag");
-    event.dataTransfer.dropEffect = "copy";
-  });
-  document.documentElement.addEventListener("dragleave",function(){
-    workspace.classList.remove("drag");
-  });
-  document.documentElement.addEventListener("drop",function(event){
-    event.preventDefault();
-    workspace.classList.remove("drag");
-    if (event.dataTransfer.types.includes("Files")){
-      load.files = event.dataTransfer.files;
-      confirmOverwrite(importFile,event);
-    } else {
-      textEdit("insert",event.dataTransfer.getData("text"),true);
-    }
-  });
+  window.addEventListener("orientationchange",setOffsetOrientation);
   var inputElements = Array.from(document.querySelectorAll("button, textarea, input"));
   inputElements.forEach(function(inputElement){
     inputElement.addEventListener("click",function(){
       inputElement.focus();
     });
   });
-  var textareas = Array.from(document.getElementsByTagName("textarea"));
-  textareas.forEach(function(textarea){
+  var textareas = document.getElementsByTagName("textarea");
+  Array.from(textareas).forEach(function(textarea){
     addInputCharacteristics(textarea);
     disableLineCount(textarea);
   });
@@ -1695,6 +1835,10 @@
   anchors.forEach(function(anchor){
     anchor.rel = "noopener";
     anchor.target = "_blank";
+  });
+  var images = Array.from(document.querySelectorAll("img:not([alt])"));
+  images.forEach(function(image){
+    image.alt = "";
   });
   var dropdowns = Array.from(document.getElementsByClassName("dropdown"));
   dropdowns.forEach(function(dropdown){
@@ -1709,7 +1853,8 @@
         button.focus();
       }
     });
-    var button = dropdown.getElementsByTagName("button")[0], menus = Array.from(dropdown.getElementsByTagName("ul")), submenus = Array.from(dropdown.querySelectorAll("li > ul")), options = Array.from(dropdown.getElementsByTagName("li"));
+    dropdown.setAttribute("aria-label","Dropdown");
+    var button = dropdown.getElementsByTagName("button")[0], menus = Array.from(dropdown.getElementsByTagName("ul")), submenus = Array.from(dropdown.querySelectorAll("li > ul")), options = Array.from(dropdown.querySelectorAll("li, a"));
     button.addEventListener("click",function(){
       var currentDropdown = dropdown;
       dropdowns.forEach(function(dropdown){
@@ -1756,9 +1901,7 @@
             navigable[navigable.indexOf(document.activeElement) - 1].focus();
           }
         }
-        if (event.key == "Tab"){
-          event.preventDefault();
-        }
+        if (event.key == "Tab") event.preventDefault();
       });
     });
     submenus.forEach(function(submenu){
@@ -1766,13 +1909,9 @@
         openSubmenu(event);
       });
       submenu.parentElement.addEventListener("keydown",function(event){
-        if (event.key == "Enter" || event.key == " " || event.key == "ArrowRight"){
-          openSubmenu(event);
-        }
+        if (event.key == "Enter" || event.key == " " || event.key == "ArrowRight") openSubmenu(event);
         if (event.key == "ArrowLeft"){
-          if (submenu.parentElement.classList.contains("active")){
-            event.stopPropagation();
-          }
+          if (submenu.parentElement.classList.contains("active")) event.stopPropagation();
           submenu.parentElement.focus();
           submenu.parentElement.classList.remove("active");
         }
@@ -1815,7 +1954,7 @@
           submenu.parentElement.classList.remove("active");
         });
       });
-      option.setAttribute("tabindex","0");
+      if (option.tagName.toLowerCase() != "a") option.setAttribute("tabindex","0");
     });
     function checkDropdown(){
       if (dropdown.contains(document.activeElement)) return;
@@ -1841,6 +1980,7 @@
       }
     });
     checkbox.setAttribute("tabindex","0");
+    checkbox.setAttribute("aria-label","Checkbox");
     var input = checkbox.querySelector("input[type='checkbox']");
     input.addEventListener("click",function(event){
       event.stopPropagation();
@@ -1853,12 +1993,14 @@
       backButton.addEventListener("click",function(){
         openCard(document.getElementById(backButton.getAttribute("data-parent")),card.id);
       });
+      backButton.setAttribute("aria-label","Back");
     }
     var closeButton = card.querySelector("button.nav.close");
     if (closeButton != null){
       closeButton.addEventListener("click",function(){
         closeCard(closeButton.parentElement.parentElement);
       });
+      closeButton.setAttribute("aria-label","Close");
     }
     var navigable = getNavigableElements(card);
     card.addEventListener("keydown",function(event){
@@ -1904,22 +2046,31 @@
     pickerChannel.min = "0";
     pickerChannel.max = "255";
   });
-  load.addEventListener("change",function(event){
-    confirmOverwrite(importFile,event);
-  });
   save.addEventListener("click",function(event){
     event.stopPropagation();
   });
-  workspaceInput.addEventListener("input",function(){
-    sourceChange = true;
-    mustSave = true;
-    if (view == "split" || view == "preview"){
-      previewRefresh();
-    }
+  files.addEventListener("dragover",function(event){
+    event.preventDefault();
+    files.classList.add("drag");
+    event.dataTransfer.dropEffect = "copy";
   });
-  workspaceInput.addEventListener("click",function(){
-    if (insertColor){
-      insertColor = false;
+  files.addEventListener("dragleave",function(){
+    files.classList.remove("drag");
+  });
+  files.addEventListener("drop",function(event){
+    event.preventDefault();
+    files.classList.remove("drag");
+    if (event.dataTransfer.types.includes("Files")){
+      var dataTransferFiles = Array.from(event.dataTransfer.files);
+      dataTransferFiles.forEach(function(file){
+        var reader = new FileReader();
+        reader.readAsText(file,"UTF-8");
+        reader.addEventListener("loadend",function(){
+          createFile(file.name,reader.result);
+        });
+      });
+    } else {
+      createFile(undefined,event.dataTransfer.getData("text"));
     }
   });
   scaler.addEventListener("touchstart",function(){
@@ -1942,9 +2093,7 @@
   installButton.addEventListener("click",function(){
     installPrompt.prompt();
     installPrompt.userChoice.then(function(result){
-      if (result.outcome == "accepted"){
-        installButton.classList.remove("active");
-      }
+      if (result.outcome == "accepted") installButton.classList.remove("active");
     });
   });
   primaryHueSetting.addEventListener("input",function(){
@@ -1978,32 +2127,124 @@
       pickerInput.focus();
     }
   });
+  function createFile(name,value){
+    var identifier = Math.random();
+    var container = document.createElement("div");
+    container.setAttribute("identifier",identifier);
+    container.setAttribute("data-numbered-container",true);
+    var textarea = document.createElement("textarea");
+    textarea.placeholder = "Welcome to the Smart Text Editor! This site was created to allow for text editing and code development within your browser!";
+    textarea.addEventListener("input",function(){
+      sourceChange = true;
+      mustSave = true;
+      if (view == "split" || view == "preview") previewRefresh();
+    });
+    textarea.addEventListener("click",function(){
+      if (insertColor) insertColor = false;
+    });
+    container.appendChild(textarea);
+    workspace.appendChild(container);
+    if (!name) name = "Untitled.txt";
+    if (value) textarea.value = value;
+    addInputCharacteristics(textarea);
+    establishNumberedContainer(container);
+    if (view == "text") disableLineCount(textarea);
+    var tab = document.createElement("button");
+    tab.classList.add("tab");
+    tab.setAttribute("identifier",identifier);
+    tab.innerHTML = name;
+    var closeButton = document.createElement("button");
+    closeButton.innerHTML = "<svg><use href='#close'/></svg>";
+    closeButton.addEventListener("click",function(event){
+      event.stopPropagation();
+      closeFile(tab);
+    });
+    tab.appendChild(closeButton);
+    files.appendChild(tab);
+    tab.addEventListener("click",function(){
+      if (!tab.classList.contains("active")) openFile(tab);
+    });
+    tab.addEventListener("dragover",function(event){
+      blockShortcut(event);
+      tab.classList.add("drag");
+      event.dataTransfer.dropEffect = "copy";
+      if (!tab.classList.contains("active")) openFile(tab);
+    });
+    tab.addEventListener("dragleave",function(){
+      tab.classList.remove("drag");
+    });
+    tab.addEventListener("drop",function(event){
+      blockShortcut(event);
+      tab.classList.remove("drag");
+      if (event.dataTransfer.types.includes("Files")){
+        var reader = new FileReader();
+        reader.readAsText(event.dataTransfer.files[0],"UTF-8");
+        reader.addEventListener("loadend",function(){
+          changeTextarea(textarea,reader.result);
+          textarea.scrollTop = 0;
+        });
+      } else {
+        textEdit("insert",event.dataTransfer.getData("text"),true,textarea);
+      }
+    });
+    loadedFile = name;
+    openFile(tab);
+  }
+  function openFile(tab){
+    var identifier = tab.getAttribute("identifier");
+    var tabs = Array.from(files.querySelectorAll("button.tab"));
+    tabs.forEach(function(tab){
+      tab.classList.remove("active");
+      tab.classList.remove("resize");
+    });
+    tab.classList.add("active");
+    var transitionDuration = parseInt(getElementStyle(tab,"transition-duration").split("m").join("").split("s").join("") * 1000);
+    window.setTimeout(function(){
+      tab.classList.add("resize");
+    }, transitionDuration);
+    var activeFiles = Array.from(workspace.querySelectorAll("[data-numbered-container].active"));
+    activeFiles.forEach(function(activeFile){
+      activeFile.classList.remove("active");
+    });
+    var editor = workspace.querySelector(`[data-numbered-container][identifier="${identifier}"]`);
+    editor.classList.add("active");
+    forceRefresh();
+    document.title = `${tab.textContent} - Smart Text Editor`;
+  }
+  function closeFile(tab){
+    var identifier = tab.getAttribute("identifier");
+    var tabs = Array.from(files.querySelectorAll("button.tab"));
+    if (tab == tabs[0] && tabs[1] && tab.classList.contains("active")){
+      openFile(tabs[1]);
+    }
+    if (tab == tabs[tabs.length - 1] && tab != tabs[0] && tab.classList.contains("active")){
+      openFile(tabs[tabs.length - 2]);
+    }
+    if (tab != tabs[0] && tab.classList.contains("active")){
+      openFile(tabs[tabs.indexOf(tab) + 1]);
+    }
+    files.removeChild(tab);
+    var editor = workspace.querySelector(`[data-numbered-container][identifier="${identifier}"]`);
+    workspace.removeChild(editor);
+  }
   function loadSettings(input){
     if (parentWindow){
       var savedView = storage.getItem("view");
       if (savedView){
-        if (input == "initial"){
-          changeView(savedView);
-        }
+        if (input == "initial") changeView(savedView);
         updateSelect("view",savedView);
       }
       var savedOrientation = storage.getItem("orientation");
       if (savedOrientation){
-        if (input == "initial"){
-          changeOrientation(savedOrientation);
-        }
+        if (input == "initial") changeOrientation(savedOrientation);
         updateSelect("orientation",savedOrientation);
       }
       var savedEditingTools = storage.getItem("editingTools");
       if (savedEditingTools){
         var editingOpen = editingTools.classList.contains("active");
         if (input == "initial"){
-          if (savedEditingTools == "yes" && !editingOpen){
-            openCard(editingTools);
-          }
-          if (savedEditingTools == "no" && editingOpen){
-            closeCard(editingTools);
-          }
+          if (savedEditingTools == "yes" && !editingOpen) openCard(editingTools);
+          if (savedEditingTools == "no" && editingOpen) closeCard(editingTools);
         }
         updateSelect("editingTools",savedEditingTools);
       }
@@ -2030,23 +2271,22 @@
   }
   function resetSettings(){
     var ask = confirm("Are you sure you want to reset all settings?\nThis cannot be undone.");
-    if (ask){
-      closeCard(reset);
-      window.setTimeout(function(){
-        updateSelect("view","text");
-        updateSelect("orientation","horizontal");
-        updateSelect("editingTools","automatic");
-        refresh = "true";
-        updateCheckbox("refresh","true");
-        title = "true";
-        updateCheckbox("title","true");
-        changeTransitions("true");
-        updateCheckbox("transitions","true");
-        resetTheme();
-        storage.clear();
-      }, 50);
-      openCard(reset);
-    }
+    if (!ask) return;
+    closeCard(reset);
+    window.setTimeout(function(){
+      updateSelect("view","text");
+      updateSelect("orientation","horizontal");
+      updateSelect("editingTools","automatic");
+      refresh = "true";
+      updateCheckbox("refresh","true");
+      title = "true";
+      updateCheckbox("title","true");
+      changeTransitions("true");
+      updateCheckbox("transitions","true");
+      resetTheme();
+      storage.clear();
+    }, 50);
+    openCard(reset);
   }
   function updateSetting(item,value){
     storage.setItem(item,value);
@@ -2060,12 +2300,8 @@
     if (value == undefined){
       value = document.getElementById(`${item}Setting`).checked;
     } else {
-      if (value == "true"){
-        document.getElementById(`${item}Setting`).checked = "true";
-      }
-      if (value == "false"){
-        document.getElementById(`${item}Setting`).removeAttribute("checked");
-      }
+      if (value == "true") document.getElementById(`${item}Setting`).checked = "true";
+      if (value == "false") document.getElementById(`${item}Setting`).removeAttribute("checked");
     }
     updateSetting(item,value);
   }
@@ -2095,11 +2331,42 @@
       document.documentElement.classList.remove("reduced-motion");
     }, 500);
   }
-  function addInputCharacteristics(item){
-    item.spellcheck = false;
-    item.autocomplete = "off";
-    item.autocapitalize = "off";
-    item.setAttribute("autocorrect","off");
+  function setOffsetOrientation(){
+    document.body.classList.remove("camera-left");
+    document.body.classList.remove("camera-right");
+    var angle = window.orientation;
+    if (angle == 90) document.body.classList.add("camera-left");
+    if (angle == -90) document.body.classList.add("camera-right");
+  }
+  function addInputCharacteristics(input){
+    input.spellcheck = false;
+    input.autocomplete = "off";
+    input.autocapitalize = "off";
+    input.setAttribute("autocorrect","off");
+    if (input.tagName.toLowerCase() != "textarea") return;
+    var container = input.parentElement;
+    container.addEventListener("dragover",function(event){
+      event.preventDefault();
+      container.classList.add("drag");
+      event.dataTransfer.dropEffect = "copy";
+    });
+    container.addEventListener("dragleave",function(){
+      container.classList.remove("drag");
+    });
+    container.addEventListener("drop",function(event){
+      event.preventDefault();
+      container.classList.remove("drag");
+      if (event.dataTransfer.types.includes("Files")){
+        var reader = new FileReader();
+        reader.readAsText(event.dataTransfer.files[0],"UTF-8");
+        reader.addEventListener("loadend",function(){
+          changeTextarea(input,reader.result);
+          input.scrollTop = 0;
+        });
+      } else {
+        textEdit("insert",event.dataTransfer.getData("text"),true,input);
+      }
+    });
   }
   function addQueryParameters(queryEntries){
     var queryParameters = new URLSearchParams(window.location.search);
@@ -2122,7 +2389,7 @@
     history.pushState(null,"",completeAddress);
   }
   function changeView(newView){
-    var elements = [header,main,workspace,scaler,preview];
+    var elements = [main,workspace,scaler,preview];
     elements.forEach(function(element){
       changeClass(element,view,newView);
     });
@@ -2132,12 +2399,12 @@
       refreshTool.disabled = true;
     }
     if (newView == "text"){
-      textareas.forEach(function(textarea){
+      Array.from(textareas).forEach(function(textarea){
         disableLineCount(textarea);
       });
     }
     if (newView != "text"){
-      textareas.forEach(function(textarea){
+      Array.from(textareas).forEach(function(textarea){
         enableLineCount(textarea);
       });
     }
@@ -2154,15 +2421,21 @@
     view = newView;
     previewRefresh();
   }
-  function changeOrientation(input){
-    var elements = [header,main,workspace,scaler,preview], newOrientation;
-    if (!input){
+  function changeOrientation(newOrientation){
+    var elements = [main,workspace,scaler,preview];
+    if (!newOrientation){
       if (orientation == "horizontal"){
         newOrientation = "vertical";
       } else {
         newOrientation = "horizontal";
       }
-      changeView("code");
+      var transitionDuration;
+      if (view != "code"){
+        changeView("code");
+        transitionDuration = parseInt(getElementStyle(workspace,"transition-duration").split("m").join("").split("s").join("") * 1000);
+      } else {
+        transitionDuration = 0;
+      }
       window.setTimeout(function(){
         elements.forEach(function(element){
           changeClass(element,orientation,newOrientation);
@@ -2170,12 +2443,11 @@
         scaler.style.transition = "none";
         preview.style.transition = "none";
         orientation = newOrientation;
-      }, 500);
-      window.setTimeout(function(){
-        changeView("split");
-      }, 550);
+        window.setTimeout(function(){
+          changeView("split");
+        }, 25);
+      }, transitionDuration);
     } else {
-      newOrientation = input;
       elements.forEach(function(element){
         changeClass(element,orientation,newOrientation);
       });
@@ -2203,9 +2475,7 @@
       navigable = Array.from(container.querySelectorAll("button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), a[href]:not([disabled]), [tabindex]:not([tabindex='-1'])"));
     }
     navigable.forEach(function(element){
-      if (getElementStyle(element,"display") == "none"){
-        navigable.splice(navigable.indexOf(element),1);
-      }
+      if (getElementStyle(element,"display") == "none") navigable.splice(navigable.indexOf(element),1);
     });
     return navigable;
   }
@@ -2215,20 +2485,17 @@
   function confirmOverwrite(action,event){
     if (mustSave){
       var ask = confirm("Changes you made may not be saved.");
-      if (ask){
-        action(event);
-        closeCard(activeModal);
-      }
+      if (!ask) return;
+      action(event);
+      closeCard(activeModal);
     } else {
       action(event);
       closeCard(activeModal);
     }
   }
-  function changeTextarea(textarea,newValue){
-    textarea.value = newValue;
-    if (textarea.parentElement.hasAttribute("data-numbered-container")){
-      updateLineCount(textarea);
-    }
+  function changeTextarea(textarea,value){
+    textarea.value = value;
+    if (textarea.parentElement.hasAttribute("data-numbered-container")) updateLineCount(textarea);
   }
   function blockShortcut(event){
     event.preventDefault();
@@ -2246,6 +2513,29 @@
       editor.moveTo(window.screenX,window.screenY);
     }
   }
+
+
+  function loadFiles(){
+    var input = document.createElement("input");
+    input.type = "file";
+    input.multiple = true;
+    input.accept = "text/*,image/*,audio/*,.html,.css,.js,.json,.svg,.webmanifest,.md";
+    input.click();
+    input.addEventListener("change",function(){
+      var files = Array.from(input.files);
+      files.forEach(function(file){
+        var reader = new FileReader();
+        reader.readAsText(file,"UTF-8");
+        reader.addEventListener("loadend",function(){
+          createFile(file.name,reader.result);
+        });
+      });
+      input.value = null;
+    });
+  }
+
+
+/*
   function importFile(){
     closeCard(activeModal);
     var reader = new FileReader(), fileName = load.files[0].name, fileExtension = fileName.split(".").pop(), mimeType = load.files[0].type;
@@ -2264,12 +2554,11 @@
       if (type == "text" || type == "application" || subType == "svg+xml"){
         reader.readAsText(load.files[0],"UTF-8");
         reader.addEventListener("loadend",function(){
-          changeTextarea(workspaceInput,reader.result);
-          workspaceInput.scrollTop = 0;
+          createFile(fileName,reader.result);
+          workspaceInput().scrollTop = 0;
           mustSave = false;
           forceRefresh();
         });
-        loadedFile = fileName;
         if (subType == "plain"){
           changeView("text");
         }
@@ -2286,14 +2575,16 @@
           textEdit("insert",reader.result,true);
         });
       }
-      document.title = `${fileName} - Smart Text Editor`;
     } else {
       alert("Sorry, that file type isn't supported.");
     }
     load.value = null;
   }
+*/
+
+
   function saveAs(extension){
-    var blob = new Blob([workspaceInput.value],{type: "text/plain"});
+    var blob = new Blob([workspaceInput().value],{type: "text/plain"});
     save.href = URL.createObjectURL(blob);
     if (!extension){
       if (loadedFile){
@@ -2317,47 +2608,39 @@
       display.moveTo(window.screen.width / 6,window.screen.height / 6);
     }
     display.document.open();
-    display.document.write(workspaceInput.value);
+    display.document.write(workspaceInput().value);
     display.document.close();
   }
-  function textEdit(type,text,focus){
-    var cursor = workspaceInput.selectionStart;
-    if (focus){
-      workspaceInput.focus();
-    }
+  function textEdit(type,text,focus,textarea){
+    if (!textarea) textarea = workspaceInput();
+    var cursor = textarea.selectionStart;
+    if (focus) textarea.focus();
     if (type == "insert"){
-      workspaceInput.setRangeText(text);
-      workspaceInput.setSelectionRange(cursor,cursor + text.length);
+      textarea.setRangeText(text);
+      textarea.setSelectionRange(cursor,cursor + text.length);
     }
     if (type == "delete"){
-      workspaceInput.setSelectionRange(cursor,cursor + text);
-      workspaceInput.setRangeText("");
+      textarea.setSelectionRange(cursor,cursor + text);
+      textarea.setRangeText("");
     }
-    updateLineCount(workspaceInput);
+    updateLineCount(textarea);
     sourceChange = true;
     mustSave = true;
     previewRefresh();
   }
   function openCard(card,previous){
     if (!card) return;
+    if (card.classList.contains("active")) return closeCard(card);
     var cardType = card.classList[1];
-    if (card.classList.contains("active")){
-      closeCard(card);
-      return;
-    }
     if (cardType != "notification"){
       var activeCards = Array.from(document.querySelectorAll(".card.active"));
       activeCards.forEach(function(activeCard){
         var activeCardType = activeCard.classList[1];
-        if (activeCardType == cardType || activeCardType == "modal"){
-          activeCard.classList.remove("active");
-        }
+        if (activeCardType == cardType || activeCardType == "modal") activeCard.classList.remove("active");
       });
     }
     card.classList.add("active");
-    if (cardType != ("notification" || "modal")){
-      backdrop.classList.remove("active");
-    }
+    if (cardType != ("notification" || "modal")) backdrop.classList.remove("active");
     if (cardType == "notification"){
       window.setTimeout(function(){
         closeCard(card);
@@ -2366,7 +2649,7 @@
     if (cardType == "modal"){
       document.body.addEventListener("keydown",catchCardNavigation);
       backdrop.classList.add("active");
-      var transitionDuration = parseInt(getElementStyle(card,"--transition-medium").split("m").join("").split("s").join("") * 150);
+      var transitionDuration = parseInt(getElementStyle(card,"transition-duration").split("m").join("").split("s").join("") * 500);
       window.setTimeout(function(){
         document.activeElement.blur();
         var previousElement = card.querySelector(`[data-previous="${previous}"]`);
@@ -2374,9 +2657,7 @@
       }, transitionDuration);
       activeModal = card;
     }
-    if (cardType == "widget"){
-      activeWidget = card;
-    }
+    if (cardType == "widget") activeWidget = card;
   }
   function closeCard(card){
     if (!card) return;
@@ -2387,15 +2668,9 @@
       backdrop.classList.remove("active");
       activeModal = undefined;
     }
-    if (cardType == "widget"){
-      activeWidget = undefined;
-    }
-    if (card == welcome && parentWindow){
-      workspaceInput.focus();
-    }
-    if (card == settings){
-      loadSettings();
-    }
+    if (cardType == "widget") activeWidget = undefined;
+    if (card == welcome && parentWindow) workspaceInput().focus();
+    if (card == settings) loadSettings();
   }
   function catchCardNavigation(event){
     if (!activeModal || event.key != "Tab" || document.activeElement != document.body) return;
@@ -2409,11 +2684,11 @@
     }
   }
   function changeState(action){
-    workspaceInput.focus();
+    workspaceInput().focus();
     document.execCommand(action);
   }
   function activateReplacer(){
-    changeTextarea(workspaceInput,workspaceInput.value.split(replacerFind.value).join(replacerReplace.value));
+    changeTextarea(workspaceInput(),workspaceInput().value.split(replacerFind.value).join(replacerReplace.value));
     sourceChange = true;
     mustSave = true;
     previewRefresh();
@@ -2429,50 +2704,39 @@
   }
   function pickerInputRefresh(){
     var get = pickerInput.value.replace("#","");
-    if (get.length == 3 || get.length == 6){
-      cachedColor = get;
-      if (cachedColor.length == 3){
-        cachedColor = cachedColor.match(/.{1}/g);
-        cachedColor.forEach(function(item,index){
-          cachedColor[index] = item + item;
-        });
-      }
-      if (cachedColor.length == 6){
-        cachedColor = cachedColor.match(/.{1,2}/g);
-      }
+    if (get.length != 3 || get.length != 6) return;
+    cachedColor = get;
+    if (cachedColor.length == 3){
+      cachedColor = cachedColor.match(/.{1}/g);
       cachedColor.forEach(function(item,index){
-        cachedColor[index] = parseInt(item,16);
+        cachedColor[index] = item + item;
       });
-      redChannel.value = cachedColor[0];
-      greenChannel.value = cachedColor[1];
-      blueChannel.value = cachedColor[2];
-      cachedColor = `#${convertHex(redChannel.value)}${convertHex(greenChannel.value)}${convertHex(blueChannel.value)}`;
-      pickerPreview.style.background = cachedColor;
     }
+    if (cachedColor.length == 6) cachedColor = cachedColor.match(/.{1,2}/g);
+    cachedColor.forEach(function(item,index){
+      cachedColor[index] = parseInt(item,16);
+    });
+    redChannel.value = cachedColor[0];
+    greenChannel.value = cachedColor[1];
+    blueChannel.value = cachedColor[2];
+    cachedColor = `#${convertHex(redChannel.value)}${convertHex(greenChannel.value)}${convertHex(blueChannel.value)}`;
+    pickerPreview.style.background = cachedColor;
   }
   function channelRefresh(){
     cachedColor = `#${convertHex(redChannel.value)}${convertHex(greenChannel.value)}${convertHex(blueChannel.value)}`;
     pickerPreview.style.background = cachedColor;
     pickerInput.value = cachedColor;
-    if (insertColor){
-      textEdit("insert",cachedColor,true);
-    }
+    if (insertColor) textEdit("insert",cachedColor,true);
   }
   function convertHex(channel){
     var hex = parseInt(channel).toString(16);
-    if (hex.length == 1){
-      hex = 0 + hex;
-    }
+    if (hex.length == 1) hex = 0 + hex;
     return hex;
   }
   function importColor(){
     insertColor = true;
-    if (!picker.classList.contains("active")){
-      openCard(picker);
-    }
-    if (window.getSelection().toString().length > 0){
-      pickerInput.value = window.getSelection();
-    }
+    if (!picker.classList.contains("active")) openCard(picker);
+    if (window.getSelection().toString().length > 0) pickerInput.value = window.getSelection();
     pickerInput.focus();
     pickerInputRefresh();
   }
@@ -2486,10 +2750,8 @@
     insertColor = true;
   }
   function deletePicker(){
-    var selectionCount = workspaceInput.selectionEnd - workspaceInput.selectionStart;
-    if (selectionCount){
-      textEdit("delete",selectionCount,true);
-    }
+    var selectionCount = workspaceInput().selectionEnd - workspaceInput().selectionStart;
+    if (selectionCount) textEdit("delete",selectionCount,true);
     insertColor = false;
   }
   function activateFormatter(format){
@@ -2499,25 +2761,17 @@
       alert("Invalid JSON data.");
     }
   }
-  function activateEncoder(format){
+  function activateEncoder(encode){
     if (encodeComponent){
-      if (format == "encode"){
-        changeTextarea(encoderInput,encodeURIComponent(encoderInput.value));
-      }
-      if (format == "decode"){
-        changeTextarea(encoderInput,decodeURIComponent(encoderInput.value));
-      }
+      if (encode) changeTextarea(encoderInput,encodeURIComponent(encoderInput.value));
+      if (!encode) changeTextarea(encoderInput,decodeURIComponent(encoderInput.value));
     } else {
-      if (format == "encode"){
-        changeTextarea(encoderInput,encodeURI(encoderInput.value));
-      }
-      if (format == "decode"){
-        changeTextarea(encoderInput,decodeURI(encoderInput.value));
-      }
+      if (encode) changeTextarea(encoderInput,encodeURI(encoderInput.value));
+      if (!encode) changeTextarea(encoderInput,decodeURI(encoderInput.value));
     }
   }
   function insertTemplate(){
-    changeTextarea(workspaceInput,decodeURI("%3C!DOCTYPE%20html%3E%0A%3Chtml%20lang=%22en-US%22%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20margin:%200;%0A%20%20%20%20padding:%200;%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20width:%20100vw;%0A%20%20%20%20height:%20100vh;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E"));
+    changeTextarea(workspaceInput(),decodeURI("%3C!DOCTYPE%20html%3E%0A%3Chtml%20lang=%22en-US%22%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20margin:%200;%0A%20%20%20%20padding:%200;%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20width:%20100vw;%0A%20%20%20%20height:%20100vh;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E"));
     sourceChange = true;
     changeView("split");
   }
@@ -2529,13 +2783,12 @@
     refresh = cachedData;
   }
   function previewRefresh(){
-    if (refresh == "true" && sourceChange){
-      preview.src = "about:blank";
-      preview.contentWindow.document.open();
-      preview.contentWindow.document.write(workspaceInput.value);
-      preview.contentWindow.document.close();
-      sourceChange = false;
-    }
+    if (refresh != "true" || !sourceChange) return;
+    preview.src = "about:blank";
+    preview.contentWindow.document.open();
+    preview.contentWindow.document.write(workspaceInput().value);
+    preview.contentWindow.document.close();
+    sourceChange = false;
   }
   function toggleScaling(){
     header.classList.toggle("resize");
@@ -2562,18 +2815,12 @@
       }
       windowAxis = window.innerWidth;
     }
-    if (cursorOffset <= 80){
-      cursorOffset = 80;
-    }
+    if (cursorOffset <= 80) cursorOffset = 80;
     if (orientation == "horizontal"){
-      if (cursorOffset >= windowAxis - 80 - header.offsetHeight){
-        cursorOffset = windowAxis - 80 - header.offsetHeight;
-      }
+      if (cursorOffset >= windowAxis - 80 - header.offsetHeight) cursorOffset = windowAxis - 80 - header.offsetHeight;
     }
     if (orientation == "vertical"){
-      if (cursorOffset >= windowAxis - 80){
-        cursorOffset = windowAxis - 80;
-      }
+      if (cursorOffset >= windowAxis - 80) cursorOffset = windowAxis - 80;
     }
     if (orientation == "horizontal"){
       workspace.style.height = `calc(${cursorOffset}px - 8px)`;
