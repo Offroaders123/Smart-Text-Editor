@@ -17,16 +17,16 @@
 <link rel="alternate icon" type="image/png" sizes="16x16" href="resources/icon-16.png">
 <link rel="alternate icon" type="image/png" sizes="32x32" href="resources/icon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="resources/icon-apple-touch-icon.png">
-<link rel="apple-touch-startup-image" href="resources/startup-iphone5.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"/>
-<link rel="apple-touch-startup-image" href="resources/startup-iphone6.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)"/>
-<link rel="apple-touch-startup-image" href="resources/startup-iphoneplus.png" media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)"/>
-<link rel="apple-touch-startup-image" href="resources/startup-iphonex.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)"/>
-<link rel="apple-touch-startup-image" href="resources/startup-iphonexr.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)"/>
-<link rel="apple-touch-startup-image" href="resources/startup-iphonexsmax.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)"/>
-<link rel="apple-touch-startup-image" href="resources/startup-ipad.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)"/>
-<link rel="apple-touch-startup-image" href="resources/startup-ipadpro1.png" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)"/>
-<link rel="apple-touch-startup-image" href="resources/startup-ipadpro3.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)"/>
-<link rel="apple-touch-startup-image" href="resources/startup-ipadpro2.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)"/>
+<link rel="apple-touch-startup-image" href="https://offroaders123.github.io/Smart-Text-Editor/resources/startup-iphone5.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"/>
+<link rel="apple-touch-startup-image" href="https://offroaders123.github.io/Smart-Text-Editor/resources/startup-iphone6.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)"/>
+<link rel="apple-touch-startup-image" href="https://offroaders123.github.io/Smart-Text-Editor/resources/startup-iphoneplus.png" media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)"/>
+<link rel="apple-touch-startup-image" href="https://offroaders123.github.io/Smart-Text-Editor/resources/startup-iphonex.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)"/>
+<link rel="apple-touch-startup-image" href="https://offroaders123.github.io/Smart-Text-Editor/resources/startup-iphonexr.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)"/>
+<link rel="apple-touch-startup-image" href="https://offroaders123.github.io/Smart-Text-Editor/resources/startup-iphonexsmax.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)"/>
+<link rel="apple-touch-startup-image" href="https://offroaders123.github.io/Smart-Text-Editor/resources/startup-ipad.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)"/>
+<link rel="apple-touch-startup-image" href="https://offroaders123.github.io/Smart-Text-Editor/resources/startup-ipadpro1.png" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)"/>
+<link rel="apple-touch-startup-image" href="https://offroaders123.github.io/Smart-Text-Editor/resources/startup-ipadpro3.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)"/>
+<link rel="apple-touch-startup-image" href="https://offroaders123.github.io/Smart-Text-Editor/resources/startup-ipadpro2.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)"/>
 <link rel="mask-icon" href="resources/icon-mask-icon.svg" color="#ee8800">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cousine&family=Noto+Sans&family=Rubik&display=swap">
 <link rel="stylesheet" href="https://offroaders123.github.io/Numbered-Textarea-Plugin/styles.css">
@@ -252,7 +252,7 @@
     fill: var(--text-medium);
     transition: var(--transition-fast) fill;
   }
-  button:hover > svg, button:focus > svg, .dropdown:hover button > svg, .dropdown:focus-within button > svg, .dropdown.active button > svg, .dropdown li:hover > svg, .dropdown li:focus > svg, .dropdown li:focus-within > svg, .dropdown li.active > svg {
+  button:hover > svg, button:focus > svg, button.tab:hover > button > svg, button.tab:focus > button > svg, .dropdown:hover button > svg, .dropdown:focus-within button > svg, .dropdown.active button > svg, .dropdown li:hover > svg, .dropdown li:focus > svg, .dropdown li:focus-within > svg, .dropdown li.active > svg {
     fill: var(--text-hover);
   }
   [data-numbered-container], input[type="text"] {
@@ -1091,14 +1091,14 @@
     transition-property: fill, opacity;
     transition-duration: var(--transition-slow), var(--transition-fast);
   }
-  #workspace .files button.tab.active > button:hover > svg, #workspace .files button.tab.active > button:focus > svg {
+  #workspace .files button.tab.active:hover > button > svg, #workspace .files button.tab.active:focus > button > svg, #workspace .files button.tab.active:focus-within > button > svg {
     opacity: 1;
   }
   #workspace.text .files button.tab.active {
     color: var(--text-dark);
     background: var(--textarea-light);
   }
-  #workspace.text .files button.tab.active:hover, #workspace.text .files button.tab.active:focus {
+  #workspace.text .files button.tab.active:focus {
     --focus-border: var(--outline-dark);
   }
   #workspace.text .files button.tab.active > button > svg {
