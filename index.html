@@ -126,7 +126,7 @@
     display: flex;
     flex-direction: column;
     color: var(--text-medium);
-    background: var(--body);
+    background: var(--container-dark);
     overflow: hidden;
     user-select: none;
     -webkit-user-select: none;
@@ -150,20 +150,20 @@
     padding-left: calc(env(safe-area-inset-bottom) + min(1.5vw, 12px));
     padding-right: calc(env(safe-area-inset-right) + min(1.5vw, 12px));
   }
-  body.camera-left #workspace, body.camera-left #preview {
-    border-left: env(safe-area-inset-left) solid;
+  body.camera-left #workspace [data-numbered-container] {
+    padding-left: env(safe-area-inset-left);
   }
-  body.camera-right #workspace, body.camera-right #preview {
-    border-right: env(safe-area-inset-right) solid;
+  body.camera-left #workspace .files {
+    padding-left: calc(env(safe-area-inset-left) + min(1.5vw, 12px));
   }
-  body.camera-left #main.text #workspace, body.camera-right #main.text #workspace {
-    border-color: var(--textarea-light);
+  body.camera-left #preview.preview {
+    border-left-width: env(safe-area-inset-left);
   }
-  body.camera-left #main:not(.text) #workspace, body.camera-right #main:not(.text) #workspace {
-    border-color: var(--textarea-dark);
+  body.camera-right #workspace [data-numbered-container] {
+    padding-right: env(safe-area-inset-right);
   }
-  body.camera-left #preview, body.camera-right #preview {
-    border-color: var(--container-medium);
+  body.camera-right #preview {
+    border-right-width: env(safe-area-inset-right);
   }
   body.camera-right .card.notification, body.camera-right .card.action, body.camera-right .card.widget {
     right: env(safe-area-inset-right);
@@ -694,7 +694,7 @@
     position: fixed;
     left: 50%;
     top: 50%;
-    max-height: calc(80% - min(4.5vw, 24px));
+    max-height: calc(95% - min(4.5vw, 24px));
     border-radius: var(--border-radius-large);
     z-index: 2;
     transform: translate(-50%,-50%) scale(var(--scale));
@@ -783,6 +783,9 @@
   }
   .card.action.active, .card.widget.active {
     transform: scaleY(1);
+  }
+  .card > :not(.content) {
+    flex-shrink: 0;
   }
   .card .header {
     position: relative;
@@ -981,7 +984,7 @@
   #main {
     position: relative;
     flex: 1;
-    border-bottom: env(safe-area-inset-bottom) solid var(--container-dark);
+    background: var(--body);
   }
   #main.text [data-numbered-container], #main.text input[type="text"] {
     font-family: var(--font-family-sans-serif);
@@ -1123,7 +1126,8 @@
     background: none;
     visibility: hidden;
     opacity: 0;
-    transition: color var(--transition-slow);
+    transition: var(--transition-slow);
+    transition-property: padding, color;
   }
   #workspace [data-numbered-container].active {
     height: 100%;
@@ -1208,7 +1212,7 @@
     right: 0;
     bottom: 0;
     background: #ffffff;
-    border: none;
+    border: 0 solid var(--container-medium);
     transition: var(--transition-slow);
   }
   #preview.text, #preview.code {
