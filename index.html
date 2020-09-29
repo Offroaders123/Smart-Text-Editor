@@ -12,6 +12,7 @@
 <meta name="theme-color" content="#191919">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Smart Text Editor">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/svg+xml" href="resources/icon.svg">
 <link rel="alternate icon" type="image/png" sizes="16x16" href="resources/icon-16.png">
@@ -51,7 +52,7 @@
     --secondary-sat: calc(var(--primary-sat) * 0.5);
     --tertiary-sat: calc(var(--primary-sat) * 0.125);
 
-    --body: hsl(var(--primary-hue),var(--primary-sat),7.1%);
+    --main: hsl(var(--primary-hue),var(--primary-sat),7.1%);
 
     --font-family-interface: -apple-system, BlinkMacSystemFont, "Rubik", sans-serif;
     --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Noto Sans", sans-serif;
@@ -91,6 +92,9 @@
     --button-hover: hsl(var(--primary-hue),var(--secondary-sat),29%);
     --button-warning-hover: #bb2222;
 
+    --tab: hsl(var(--primary-hue),var(--secondary-sat),15.3%);
+    --tab-hover: hsl(var(--primary-hue),var(--secondary-sat),21.6%);
+
     --textarea-code-color: var(--text-light);
     --textarea-dark: hsl(var(--primary-hue),var(--secondary-sat),12.2%);
     --textarea-medium: hsl(var(--primary-hue),var(--secondary-sat),14.5%);
@@ -119,14 +123,20 @@
     --fade-opacity: 1;
     --fade-pointer-events: all;
   }
-  body {
+  html {
     position: fixed;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
+    background: var(--container-dark);
+    overflow: hidden;
+  }
+  body {
+    position: relative;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     color: var(--text-medium);
-    background: var(--container-dark);
     overflow: hidden;
     user-select: none;
     -webkit-user-select: none;
@@ -183,7 +193,7 @@
     transition: var(--transition-fast);
     transition-property: color, background, opacity;
   }
-  button:hover, button:focus, button.tab:focus-within, button.tab.active, .dropdown.active > button, .select:hover .dropdown button {
+  button:hover, button:focus, .dropdown.active > button, .select:hover .dropdown button {
     color: var(--text-hover);
     background: var(--button-hover);
   }
@@ -204,9 +214,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    color: var(--text-medium-contrast);
     font-size: min(3vw, 12px);
+    background: var(--tab);
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+  }
+  button.tab:hover, button.tab:focus, button.tab:focus-within, button.tab.active {
+    color: var(--text-hover);
+    background: var(--tab-hover);
   }
   button.tab::after, [data-numbered-container]::after, #workspace .files::after {
     content: "";
@@ -442,7 +458,7 @@
     transform: scaleY(var(--scale));
     --scale: 0.15;
     transform-origin: top center;
-    transition: var(--transition-fast) ease-out;
+    transition: var(--transition-fast) ease-in;
     transition-property: visibility, opacity, transform;
   }
   .dropdown li, .dropdown a {
@@ -528,7 +544,7 @@
     opacity: 1;
     pointer-events: all;
     transform: scale(1);
-    transition-style: ease-in;
+    transition-timing-function: ease-out;
   }
   .select {
     margin: min(0.75vw, 3px);
@@ -610,13 +626,13 @@
     border-radius: var(--border-radius-medium);
     transform: rotate(-45deg) scale(0);
     transform-origin: 45% 65%;
-    transition: var(--transition-fast) ease-out;
+    transition: var(--transition-fast) ease-in;
     transition-property: fill, transform;
   }
   .checkbox input[type="checkbox"]:checked + label > svg {
     fill: var(--text-medium);
     transform: rotate(0deg) scale(1);
-    transition-style: ease-in;
+    transition-timing-function: ease-out;
   }
   .checkbox:hover input[type="checkbox"]:checked + label > svg, .checkbox:focus input[type="checkbox"]:checked + label > svg {
     fill: var(--text-hover);
@@ -634,7 +650,7 @@
     pointer-events: none;
     transform: translateX(-50%) scale(var(--scale));
     --scale: 0.85;
-    transition: var(--transition-fast) ease-out;
+    transition: var(--transition-fast) ease-in;
     transition-property: opacity, transform;
   }
   [data-tooltip]::before {
@@ -664,7 +680,7 @@
   [data-tooltip]:hover::before, [data-tooltip]:hover::after, [data-tooltip]:focus::before, [data-tooltip]:focus::after, [data-tooltip]:focus-within::before, [data-tooltip]:focus-within::after, [data-tooltip].focused::before, [data-tooltip].focused::after {
     opacity: 1;
     --scale: 1;
-    transition-style: ease-in;
+    transition-timing-function: ease-out;
   }
   .buffering {
     animation: rotate 4s infinite linear;
@@ -929,6 +945,11 @@
     background: var(--container-dark);
     z-index: 2;
   }
+  @media (display-mode: standalone) {
+    #header {
+      padding-top: calc(env(safe-area-inset-top) + min(1.5vw, 12px));
+    }
+  }
   #header.resize, #workspace.resize, #preview.resize {
     pointer-events: none;
     transition: none;
@@ -984,7 +1005,7 @@
   #main {
     position: relative;
     flex: 1;
-    background: var(--body);
+    background: var(--main);
   }
   #main.text [data-numbered-container], #main.text input[type="text"] {
     font-family: var(--font-family-sans-serif);
@@ -1061,7 +1082,7 @@
     position: relative;
     flex-shrink: 0;
     display: flex;
-    background: #141414;
+    background: var(--main);
     overflow-x: auto;
     scrollbar-width: none;
   }
@@ -1074,14 +1095,6 @@
   }
   #workspace .files > * + * {
     margin-left: min(2vw, 8px);
-  }
-  #workspace .files button.tab {
-    color: var(--text-medium-contrast);
-    background: #2a2a2a;
-  }
-  #workspace .files button.tab:hover, #workspace .files button.tab:focus, #workspace .files button.tab:focus-within {
-    color: var(--text-hover);
-    background: #3a3a3a;
   }
   #workspace .files button.tab:not(.active) {
     box-shadow: 0 calc(min(0.75vw, 3px) * -1) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow) inset, 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow), 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
@@ -1196,7 +1209,7 @@
     z-index: 1;
     transform: scale(0.25) rotate(var(--rotate));
     transform-origin: center center;
-    transition: var(--transition-fast) ease-out;
+    transition: var(--transition-fast) ease-in;
     transition-property: color, background, visibility, opacity, transform;
   }
   #scaler:hover .handle, #scaler.active .handle {
@@ -1205,7 +1218,7 @@
     visibility: visible;
     opacity: 1;
     transform: scale(1) rotate(var(--rotate));
-    transition-style: ease-in;
+    transition-timing-function: ease-out;
   }
   #preview {
     position: absolute;
@@ -2115,10 +2128,10 @@
     document.documentElement.style.setProperty("--textarea-drag-hue",dragHueSetting.value);
   });
   dragHueSetting.addEventListener("focus",function(){
-    workspace.classList.add("drag");
+    workspaceInput().parentElement.classList.add("drag");
   });
   dragHueSetting.addEventListener("blur",function(){
-    workspace.classList.remove("drag");
+    workspaceInput().parentElement.classList.remove("drag");
   });
   codeColorSetting.addEventListener("input",function(){
     tempReducedMotion();
@@ -2202,7 +2215,7 @@
       tab.classList.remove("resize");
     });
     tab.classList.add("active");
-    var transitionDuration = parseInt(getElementStyle(tab,"transition-duration").split("m").join("").split("s").join("") * 1000);
+    var transitionDuration = parseInt(getElementStyle(tab,"transition-duration").split("s").join("") * 1000);
     window.setTimeout(function(){
       tab.classList.add("resize");
     }, transitionDuration);
@@ -2436,7 +2449,7 @@
       var transitionDuration;
       if (view != "code"){
         changeView("code");
-        transitionDuration = parseInt(getElementStyle(workspace,"transition-duration").split("m").join("").split("s").join("") * 1000);
+        transitionDuration = parseInt(getElementStyle(workspace,"transition-duration").split("s").join("") * 1000);
       } else {
         transitionDuration = 0;
       }
@@ -2653,7 +2666,7 @@
     if (cardType == "modal"){
       document.body.addEventListener("keydown",catchCardNavigation);
       backdrop.classList.add("active");
-      var transitionDuration = parseInt(getElementStyle(card,"transition-duration").split("m").join("").split("s").join("") * 500);
+      var transitionDuration = parseInt(getElementStyle(card,"transition-duration").split("s").join("") * 500);
       window.setTimeout(function(){
         document.activeElement.blur();
         var previousElement = card.querySelector(`[data-previous="${previous}"]`);
