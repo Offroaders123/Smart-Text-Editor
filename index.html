@@ -241,22 +241,30 @@
     box-shadow: 0 0 4px 4px var(--textarea-drag-border) inset;
   }
   button.tab > button, button.nav {
-    padding: min(0.5vw, 2px);
     min-width: unset;
     background: none;
-    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
   }
   button.tab > button {
     margin-left: min(3vw, 12px);
-    width: min(3.5vw, 18px);
-    height: min(3.5vw, 18px);
+    padding: min(0.75vw, 3px);
+    width: min(4vw, 16px);
+    height: min(4vw, 16px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: none;
+  }
+  button.tab > button:hover, button.tab > button:focus {
+    background: #ffffff3a;
   }
   button.tab > button > svg, button.nav > svg {
     width: 100%;
     height: 100%;
   }
   button.nav {
+    padding: min(0.5vw, 2px);
     position: absolute;
+    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
   }
   button.nav.back {
     left: 0;
@@ -1108,9 +1116,6 @@
     cursor: unset;
     z-index: 1;
   }
-  #workspace .files button.tab.active > button > svg {
-    transition-duration: var(--transition-slow);
-  }
   #workspace.text .files button.tab.active {
     color: var(--text-dark);
     background: var(--textarea-light);
@@ -1118,11 +1123,11 @@
   #workspace.text .files button.tab.active:focus {
     --focus-border: var(--outline-dark);
   }
+  #workspace.text .files button.tab.active > button:hover, #workspace.text .files button.tab.active > button:focus {
+    background: #0000004a;
+  }
   #workspace.text .files button.tab.active > button > svg {
     fill: var(--text-dark);
-  }
-  #workspace.text .files button.tab.active > button:hover, #workspace.text .files button.tab.active > button:focus {
-    --focus-border: var(--outline-dark);
   }
   #workspace:not(.text) .files button.tab.active > button > svg {
     fill: var(--text-light);
@@ -1131,7 +1136,7 @@
     color: var(--text-light);
     background: var(--textarea-dark);
   }
-  #workspace .files button.tab.active.resize {
+  #workspace .files button.tab.active.resize, #workspace .files button.tab.active.resize > button > svg {
     transition-duration: var(--transition-slow);
   }
   #workspace [data-numbered-container] {
@@ -2482,7 +2487,7 @@
         newOrientation = "horizontal";
       }
       var transitionDuration;
-      if (view != "code"){
+      if (view == "split" || view == "preview"){
         changeView("code");
         transitionDuration = parseInt(getElementStyle(workspace,"transition-duration").split("s").join("") * 1000);
       } else {
