@@ -245,7 +245,7 @@
     background: none;
   }
   button.tab > button {
-    margin-left: min(3vw, 12px);
+    margin-left: min(1vw, 4px);
     padding: min(0.75vw, 3px);
     width: min(4vw, 16px);
     height: min(4vw, 16px);
@@ -253,6 +253,9 @@
     justify-content: center;
     align-items: center;
     box-shadow: none;
+  }
+  button.tab > button:first-of-type {
+    margin-left: min(3vw, 12px);
   }
   button.tab > button:hover, button.tab > button:focus {
     background: #ffffff3a;
@@ -2201,6 +2204,16 @@
     tab.classList.add("tab");
     tab.setAttribute("data-identifier",identifier);
     tab.innerHTML = name;
+    var renameButton = document.createElement("button");
+    renameButton.innerHTML = "<svg><use href='#back'/></svg>";
+    renameButton.addEventListener("click",function(event){
+      event.stopPropagation();
+      var fileName = renameButton.parentElement.childNodes[0];
+      var newFileName = prompt(`Enter a new file name for ${fileName.nodeValue}`);
+      if (!newFileName) return;
+      fileName.nodeValue = `${newFileName}`;
+    });
+    tab.appendChild(renameButton);
     var closeButton = document.createElement("button");
     closeButton.innerHTML = "<svg><use href='#close'/></svg>";
     closeButton.addEventListener("click",function(event){
@@ -2261,15 +2274,9 @@
   function closeFile(tab){
     var identifier = tab.getAttribute("data-identifier");
     var tabs = Array.from(files.querySelectorAll("button.tab"));
-    if (tab == tabs[0] && tabs[1] && tab.classList.contains("active")){
-      openFile(tabs[1]);
-    }
-    if (tab == tabs[tabs.length - 1] && tab != tabs[0] && tab.classList.contains("active")){
-      openFile(tabs[tabs.length - 2]);
-    }
-    if (tab != tabs[0] && tab.classList.contains("active")){
-      openFile(tabs[tabs.indexOf(tab) + 1]);
-    }
+    if (tab == tabs[0] && tabs[1] && tab.classList.contains("active")) openFile(tabs[1]);
+    if (tab == tabs[tabs.length - 1] && tab != tabs[0] && tab.classList.contains("active")) openFile(tabs[tabs.length - 2]);
+    if (tab != tabs[0] && tab.classList.contains("active")) openFile(tabs[tabs.indexOf(tab) + 1]);
     files.removeChild(tab);
     var editor = workspace.querySelector(`[data-numbered-container][data-identifier="${identifier}"]`);
     workspace.removeChild(editor);
