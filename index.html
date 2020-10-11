@@ -34,9 +34,7 @@
 
 <script>
   var parentWindow = (window.self == window.top);
-  if (parentWindow){
-    document.documentElement.classList.add("fade");
-  }
+  if (parentWindow) document.documentElement.classList.add("fade");
 </script>
 
 <style>
@@ -1852,6 +1850,9 @@
       }
     }
   });
+  window.addEventListener("dblclick",function(event){
+    event.preventDefault();
+  });
   window.addEventListener("resize",function(event){
     if (view == "split"){
       var currentWidth = window.innerWidth, currentHeight = window.innerHeight;
@@ -2209,7 +2210,7 @@
     renameButton.addEventListener("click",function(event){
       event.stopPropagation();
       var fileName = renameButton.parentElement.childNodes[0];
-      var newFileName = prompt(`Enter a new file name for ${fileName.nodeValue}`);
+      var newFileName = prompt(`Enter a new file name for "${fileName.nodeValue}"`,fileName.nodeValue);
       if (!newFileName) return;
       fileName.nodeValue = `${newFileName}`;
     });
@@ -2875,7 +2876,12 @@
       }
       windowAxis = window.innerWidth;
     }
-    if (cursorOffset <= 80) cursorOffset = 80;
+    if (orientation == "horizontal"){
+      if (cursorOffset <= 80 + files.offsetHeight) cursorOffset = 80 + files.offsetHeight;
+    }
+    if (orientation == "vertical"){
+      if (cursorOffset <= 80) cursorOffset = 80;
+    }
     if (orientation == "horizontal"){
       if (cursorOffset >= windowAxis - 80 - header.offsetHeight) cursorOffset = windowAxis - 80 - header.offsetHeight;
     }
