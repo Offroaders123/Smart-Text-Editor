@@ -5,7 +5,7 @@
 
 <title>Smart Text Editor</title>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="author" content="Brandon Bennett">
 <meta name="description" content="The text editor that requires only a browser and a keyboard!">
 <meta name="google-site-verification" content="_LrfHy7pIualH1TolkQ5b3Po0dtjYrx-QQsiXelwx20">
@@ -43,6 +43,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: var(--font-family-interface);
+    -webkit-tap-highlight-color: #e5e5e54d;
   }
   :root {
     --primary-hue: 0;
@@ -306,6 +307,7 @@
   }
   [data-numbered-container] textarea, input[type="text"] {
     -webkit-appearance: none;
+    transition: caret-color var(--transition-slow);
   }
   [data-numbered-container] textarea {
     line-height: normal;
@@ -320,6 +322,9 @@
     content: "\26A0";
     margin-right: min(1.25vw, 5px);
     font-size: 150%;
+  }
+  img {
+    -webkit-touch-callout: none;
   }
   a {
     color: inherit;
@@ -859,11 +864,11 @@
     height: min(3.5vw, 18px);
   }
   .card [data-numbered-container], .card input[type="text"] {
-    border-radius: var(--border-radius-medium);
-  }
-  .card [data-numbered-container], .card input[type="text"] {
     color: var(--text-light);
+    caret-color: var(--text-light);
     background: var(--textarea-medium);
+    border-radius: var(--border-radius-medium);
+    transition: color var(--transition-slow);
   }
   .card [data-numbered-container] {
     position: relative;
@@ -1020,6 +1025,7 @@
   #main:not(.text) [data-numbered-container], #main:not(.text) input[type="text"] {
     font-family: var(--font-family-monospace);
     color: var(--textarea-code-color);
+    caret-color: var(--textarea-code-color);
   }
   #main.horizontal.resize {
     cursor: row-resize;
@@ -1159,6 +1165,7 @@
     padding-right: 16px;
   }
   #workspace.text [data-numbered-container] textarea {
+    caret-color: var(--text-dark);
     white-space: pre-wrap;
   }
   #scaler {

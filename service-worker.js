@@ -1,10 +1,8 @@
-var cacheVersion = 1.99;
+var cacheVersion = 2.00;
 self.addEventListener("activate",function(event){
   event.waitUntil(caches.keys().then(function(cacheVersions){
     return Promise.all(cacheVersions.map(function(cache){
-      if (cache != cacheVersion){
-        return caches.delete(cache);
-      }
+      if (cache != cacheVersion) return caches.delete(cache);
     }));
   }));
 });
