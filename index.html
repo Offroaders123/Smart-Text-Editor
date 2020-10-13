@@ -43,7 +43,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: var(--font-family-interface);
-    -webkit-tap-highlight-color: #e5e5e54d;
+    -webkit-tap-highlight-color: transparent;
   }
   :root {
     --primary-hue: 0;
@@ -1369,6 +1369,11 @@
   <symbol id="close" viewBox="0 0 512 512">
     <path d="m1.5795 65.78 64.201-64.201 190.22 190.22 190.22-190.22 64.201 64.201-190.22 190.22 190.22 190.22-64.201 64.201-190.22-190.22-190.22 190.22-64.201-64.201 190.22-190.22z"/>
   </symbol>
+  <symbol id="rename" viewBox="0 0 512 512">
+    <path d="m-0.0618 512.07v-128.63l128.63 128.63z"/>
+    <path d="m383.21 0.052969 128.72 128.72-88.63 88.63-128.72-128.72z"/>
+    <path d="m252.59 130.63 128.72 128.72-210.68 210.68-128.72-128.72z"/>
+  </symbol>
   <symbol id="undo" viewBox="0 0 512 512">
     <path d="m133.64 437.65-133.64-133.64h267.28z"/>
     <path d="m512 249c-0.72363-111.33-91.271-201.16-202.61-200.98-111.33 0.17137-201.61 90.272-201.99 201.61l52.695 0.18028c0.28168-82.334 67.039-148.97 149.37-149.09 82.334-0.12673 149.3 66.299 149.83 148.63z"/>
@@ -2213,7 +2218,7 @@
     tab.setAttribute("data-identifier",identifier);
     tab.innerHTML = name;
     var renameButton = document.createElement("button");
-    renameButton.innerHTML = "<svg><use href='#back'/></svg>";
+    renameButton.innerHTML = "<svg><use href='#rename'/></svg>";
     renameButton.addEventListener("click",function(event){
       event.stopPropagation();
       var fileName = renameButton.parentElement.childNodes[0];
