@@ -35,6 +35,7 @@
 <script>
   var parentWindow = (window.self == window.top);
   if (parentWindow) document.documentElement.classList.add("fade");
+  var fileSystemAccess = (("chooseFileSystemEntries" in window) || ("showOpenFilePicker" in window));
 </script>
 
 <style>
@@ -1146,6 +1147,15 @@
   #workspace .files button.tab.active.resize, #workspace .files button.tab.active.resize > button > svg {
     transition-duration: var(--transition-slow);
   }
+  #workspace .files button.tab[data-unsaved] {
+    padding-left: min(2vw, 8px);
+  }
+  #workspace .files button.tab[data-unsaved]::before {
+    content: "*";
+    margin-right: min(0.5vw, 2px);
+    font-size: 125%;
+    line-height: min(4vw, 16px);
+  }
   #workspace [data-numbered-container] {
     flex-grow: 1;
     height: 0;
@@ -1414,16 +1424,16 @@
         <li onclick="createFile();">New File<span>Ctrl + Shift + X</span></li>
         <li onclick="openEditorWindow();">New Window<span>Ctrl + Shift + C</span></li>
         <li onclick="loadFiles();">Open<span>Ctrl + Shift + L</span></li>
-        <li onclick="saveAs();">Save<span>Ctrl + Shift + S</span></li>
+        <li onclick="saveFile();">Save<span>Ctrl + Shift + S</span></li>
         <li>Save As...
           <svg><use href="#arrow"/></svg>
           <ul>
-            <li onclick="saveAs('txt');">Plain Text<span>.txt</span></li>
-            <li onclick="saveAs('html');">HTML<span>.html</span></li>
-            <li onclick="saveAs('css');">CSS<span>.css</span></li>
-            <li onclick="saveAs('js');">JavaScript<span>.js</span></li>
-            <li onclick="saveAs('json');">JSON<span>.json</span></li>
-            <li onclick="saveAs('svg');">SVG<span>.svg</span></li>
+            <li onclick="saveFile('txt');">Plain Text<span>.txt</span></li>
+            <li onclick="saveFile('html');">HTML<span>.html</span></li>
+            <li onclick="saveFile('css');">CSS<span>.css</span></li>
+            <li onclick="saveFile('js');">JavaScript<span>.js</span></li>
+            <li onclick="saveFile('json');">JSON<span>.json</span></li>
+            <li onclick="saveFile('svg');">SVG<span>.svg</span></li>
           </ul>
         </li>
       </ul>
@@ -1697,10 +1707,7 @@
 <script src="https://offroaders123.github.io/Numbered-Textarea-Plugin/script.js"></script>
 
 <script>
-  var storage = window.localStorage, view = "text", orientation = "horizontal", refresh = "true", title = "true", transitions = "true", installPrompt, sourceChange = false, mustSave = false, activeModal, activeWidget, cachedColor, insertColor = false;
-  var workspaceInput = function(){
-    return workspace.querySelector("[data-numbered-container].active textarea");
-  };
+  var storage = window.localStorage, editorFiles = {}, view = "text", orientation = "horizontal", refresh = "true", title = "true", transitions = "true", installPrompt, sourceChange = false, activeModal, activeWidget, cachedColor, insertColor = false;
   window.addEventListener("load",function(){
     createFile();
     if (parentWindow){
@@ -1721,7 +1728,7 @@
           }
         }, 2100);
       }
-      workspaceInput().focus();
+      getCurrentEditor().focus();
     }
     pickerInputRefresh();
     forceRefresh();
@@ -1745,7 +1752,7 @@
     installButton.classList.add("active");
   });
   window.addEventListener("beforeunload",function(){
-    if (parentWindow && mustSave){
+    if (parentWindow && (files.querySelectorAll("button.tab[data-unsaved]").length > 0)){
       event.preventDefault();
       event.returnValue = "";
     }
@@ -1798,7 +1805,7 @@
       }
       if (event.key == "S"){
         blockShortcut(event);
-        saveAs();
+        saveFile();
       }
       if (event.key == "!"){
         blockShortcut(event);
@@ -2175,10 +2182,10 @@
     document.documentElement.style.setProperty("--textarea-drag-hue",dragHueSetting.value);
   });
   dragHueSetting.addEventListener("focus",function(){
-    workspaceInput().parentElement.classList.add("drag");
+    getCurrentEditor().parentElement.classList.add("drag");
   });
   dragHueSetting.addEventListener("blur",function(){
-    workspaceInput().parentElement.classList.remove("drag");
+    getCurrentEditor().parentElement.classList.remove("drag");
   });
   codeColorSetting.addEventListener("input",function(){
     tempReducedMotion();
@@ -2193,6 +2200,7 @@
   });
   function createFile(name,value){
     var identifier = Math.random();
+    var tab = document.createElement("button");
     var container = document.createElement("div");
     container.setAttribute("data-identifier",identifier);
     container.setAttribute("data-numbered-container",true);
@@ -2200,7 +2208,7 @@
     textarea.placeholder = "Welcome to the Smart Text Editor! This site was created to allow for text editing and code development within your browser!";
     textarea.addEventListener("input",function(){
       sourceChange = true;
-      mustSave = true;
+      if (!tab.hasAttribute("data-unsaved")) tab.setAttribute("data-unsaved",true);
       if (view == "split" || view == "preview") previewRefresh();
     });
     textarea.addEventListener("click",function(){
@@ -2213,7 +2221,6 @@
     addInputCharacteristics(textarea);
     establishNumberedContainer(container);
     if (view == "text") disableLineCount(textarea);
-    var tab = document.createElement("button");
     tab.classList.add("tab");
     tab.setAttribute("data-identifier",identifier);
     tab.innerHTML = name;
@@ -2262,6 +2269,7 @@
       }
     });
     openFile(tab);
+    return identifier;
   }
   function openFile(tab){
     var identifier = tab.getAttribute("data-identifier");
@@ -2285,6 +2293,10 @@
     document.title = `${tab.textContent} - Smart Text Editor`;
   }
   function closeFile(tab){
+    if (tab.hasAttribute("data-unsaved")){
+      var ask = confirm(`Are you sure you would like to close "${getFileName(undefined,tab)}"?\nRecent changes have not yet been saved.`);
+      if (!ask) return;
+    }
     var identifier = tab.getAttribute("data-identifier");
     var tabs = Array.from(files.querySelectorAll("button.tab"));
     if (tab == tabs[0] && tabs[1] && tab.classList.contains("active")) openFile(tabs[1]);
@@ -2293,9 +2305,17 @@
     files.removeChild(tab);
     var editor = workspace.querySelector(`[data-numbered-container][data-identifier="${identifier}"]`);
     workspace.removeChild(editor);
+    if (editorFiles[identifier]) delete editorFiles[identifier];
   }
-  function getFileName(result){
-    var tab = files.querySelector("button.tab.active"), fileName = tab.textContent;
+  function getCurrentEditor(){
+    return workspace.querySelector("[data-numbered-container].active textarea");
+  }
+  function getCurrentTab(){
+    return files.querySelector("button.tab.active");
+  }
+  function getFileName(result,tab){
+    if (!tab) tab = files.querySelector("button.tab.active");
+    var fileName = tab.textContent;
     if (!result) return fileName;
     if (result == "name"){
       var name = getFileName().split(".");
@@ -2560,7 +2580,7 @@
     return window.getComputedStyle(element).getPropertyValue(property);
   }
   function confirmOverwrite(action,event){
-    if (mustSave){
+    if (getCurrentTab().hasAttribute("data-unsaved")){
       var ask = confirm("Changes you made may not be saved.");
       if (!ask) return;
       action(event);
@@ -2590,29 +2610,69 @@
       editor.moveTo(window.screenX,window.screenY);
     }
   }
-
-
-  function loadFiles(){
-    var input = document.createElement("input");
-    input.type = "file";
-    input.multiple = true;
-    input.accept = "text/*,image/*,audio/*,.html,.css,.js,.json,.svg,.webmanifest,.md";
-    input.click();
-    input.addEventListener("change",function(){
-      var files = Array.from(input.files);
-      files.forEach(function(file){
-        var reader = new FileReader();
-        reader.readAsText(file,"UTF-8");
-        reader.addEventListener("loadend",function(){
-          createFile(file.name,reader.result);
+  
+  
+  async function loadFiles(){
+    if (!fileSystemAccess){
+      var input = document.createElement("input");
+      input.type = "file";
+      input.multiple = true;
+      input.accept = "text/*,image/*,audio/*,.html,.css,.js,.json,.svg,.webmanifest,.md";
+      input.click();
+      input.addEventListener("change",function(){
+        var files = Array.from(input.files);
+        files.forEach(function(file){
+          var reader = new FileReader();
+          reader.readAsText(file,"UTF-8");
+          reader.addEventListener("loadend",function(){
+            createFile(file.name,reader.result);
+          });
         });
+        input.value = null;
       });
-      input.value = null;
-    });
+    } else {
+      var fileHandles;
+      if ("chooseFileSystemEntries" in window){
+        fileHandles = await window.chooseFileSystemEntries({
+          type: "open-file",
+          multiple: true,
+          accepts: [
+            {
+              mimeTypes: ["text/*","image/*","audio/*"],
+              extensions: ["txt","html","css","js","json","svg","webmanifest","md"]
+            }
+          ]
+        }).catch(function(error){
+          return;
+        });
+      }
+      if ("showOpenFilePicker" in window){
+        fileHandles = await window.showOpenFilePicker({
+          multiple: true,
+          types: [
+            {
+              accept: {
+                "text/*": [".txt",".html",".css",".js",".json",".webmanifest",".md"],
+                "image/*": [".svg"],
+                "audio/*": []
+              }
+            }
+          ]
+        }).catch(function(error){
+          return;
+        });
+      }
+      if (!fileHandles) return;
+      fileHandles.forEach(async function(fileHandle){
+        var file = await fileHandle.getFile();
+        var identifier = createFile(await file.name,await file.text());
+        editorFiles[identifier] = await fileHandle;
+      });
+    }
   }
-
-
-/*
+  
+  
+  /*
   function importFile(){
     closeCard(activeModal);
     var reader = new FileReader(), fileName = load.files[0].name, fileExtension = fileName.split(".").pop(), mimeType = load.files[0].type;
@@ -2632,7 +2692,7 @@
         reader.readAsText(load.files[0],"UTF-8");
         reader.addEventListener("loadend",function(){
           createFile(fileName,reader.result);
-          workspaceInput().scrollTop = 0;
+          getCurrentEditor().scrollTop = 0;
           mustSave = false;
           forceRefresh();
         });
@@ -2657,20 +2717,45 @@
     }
     load.value = null;
   }
-*/
-
-
-  function saveAs(extension){
-    var blob = new Blob([workspaceInput().value],{type: "text/plain"});
-    var save = document.createElement("a");
-    save.href = URL.createObjectURL(blob);
-    if (!extension){
-      save.download = getFileName();
+  */
+  
+  
+  async function saveFile(extension){
+    if (!fileSystemAccess || extension){
+      var blob = new Blob([getCurrentEditor().value],{type: "text/plain"});
+      var save = document.createElement("a");
+      save.href = URL.createObjectURL(blob);
+      if (!extension){
+        save.download = getFileName();
+      } else {
+        save.download = `${getFileName("name")}.${extension}`;
+      }
+      save.click();
     } else {
-      save.download = `${getFileName("name")}.${extension}`;
+      var identifier = files.querySelector("button.tab.active").getAttribute("data-identifier");
+      var fileHandle;
+      if (!editorFiles[identifier]){
+        if ("chooseFileSystemEntries" in window){
+          fileHandle = await window.chooseFileSystemEntries().catch(function(error){
+            return;
+          });
+        }
+        if ("showOpenFilePicker" in window){
+          fileHandle = await window.showSaveFilePicker().catch(function(error){
+            return;
+          });
+        }
+        if (!fileHandle) return;
+        editorFiles[identifier] = await fileHandle;
+      }
+      var writable = await editorFiles[identifier].createWritable().catch(function(error){
+        return;
+      });
+      if (!writable) return;
+      await writable.write(getCurrentEditor().value);
+      await writable.close();
     }
-    save.click();
-    mustSave = false;
+    getCurrentTab().removeAttribute("data-unsaved");
   }
   function openDisplay(){
     var windowFeatures = "", standalone = (window.matchMedia("(display-mode: standalone)").matches || "standalone" in navigator || !window.menubar.visible), hiddenChrome = (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight), fullscreen = (window.matchMedia("(display-mode: fullscreen)").matches || (!window.screenY && !window.screenTop && hiddenChrome) || (!window.screenY && !window.screenTop && standalone));
@@ -2681,11 +2766,11 @@
       display.moveTo(window.screen.width / 6,window.screen.height / 6);
     }
     display.document.open();
-    display.document.write(workspaceInput().value);
+    display.document.write(getCurrentEditor().value);
     display.document.close();
   }
   function textEdit(type,text,focus,textarea){
-    if (!textarea) textarea = workspaceInput();
+    if (!textarea) textarea = getCurrentEditor();
     var cursor = textarea.selectionStart;
     if (focus) textarea.focus();
     if (type == "insert"){
@@ -2698,7 +2783,7 @@
     }
     updateLineCount(textarea);
     sourceChange = true;
-    mustSave = true;
+    getCurrentTab().setAttribute("data-unsaved",true);
     previewRefresh();
   }
   function openCard(card,previous){
@@ -2742,7 +2827,7 @@
       activeModal = undefined;
     }
     if (cardType == "widget") activeWidget = undefined;
-    if (card == welcome && parentWindow) workspaceInput().focus();
+    if (card == welcome && parentWindow) getCurrentEditor().focus();
     if (card == settings) loadSettings();
   }
   function catchCardNavigation(event){
@@ -2757,13 +2842,13 @@
     }
   }
   function changeState(action){
-    workspaceInput().focus();
+    getCurrentEditor().focus();
     document.execCommand(action);
   }
   function activateReplacer(){
-    changeTextarea(workspaceInput(),workspaceInput().value.split(replacerFind.value).join(replacerReplace.value));
+    changeTextarea(getCurrentEditor(),getCurrentEditor().value.split(replacerFind.value).join(replacerReplace.value));
     sourceChange = true;
-    mustSave = true;
+    getCurrentTab().setAttribute("data-unsaved",true);
     previewRefresh();
   }
   function flipReplacer(){
@@ -2823,7 +2908,7 @@
     insertColor = true;
   }
   function deletePicker(){
-    var selectionCount = workspaceInput().selectionEnd - workspaceInput().selectionStart;
+    var selectionCount = getCurrentEditor().selectionEnd - getCurrentEditor().selectionStart;
     if (selectionCount) textEdit("delete",selectionCount,true);
     insertColor = false;
   }
@@ -2844,14 +2929,16 @@
     }
   }
   function insertTemplate(){
-    changeTextarea(workspaceInput(),decodeURI("%3C!DOCTYPE%20html%3E%0A%3Chtml%20lang=%22en-US%22%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20margin:%200;%0A%20%20%20%20padding:%200;%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20width:%20100vw;%0A%20%20%20%20height:%20100vh;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E"));
+    changeTextarea(getCurrentEditor(),decodeURI("%3C!DOCTYPE%20html%3E%0A%3Chtml%20lang=%22en-US%22%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E"));
     sourceChange = true;
-    changeView("split");
+    if (view == "text") changeView("code");
+    if (view == "preview") changeView("split");
   }
   function forceRefresh(){
     var cachedData = refresh;
     refresh = "true";
     sourceChange = true;
+    preview.contentWindow.location.reload();
     previewRefresh();
     refresh = cachedData;
   }
@@ -2859,7 +2946,7 @@
     if (refresh != "true" || !sourceChange) return;
     preview.src = "about:blank";
     preview.contentWindow.document.open();
-    preview.contentWindow.document.write(workspaceInput().value);
+    preview.contentWindow.document.write(getCurrentEditor().value);
     preview.contentWindow.document.close();
     sourceChange = false;
   }
