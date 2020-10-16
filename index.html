@@ -18,24 +18,23 @@
 <link rel="alternate icon" type="image/png" sizes="16x16" href="resources/icon-16.png">
 <link rel="alternate icon" type="image/png" sizes="32x32" href="resources/icon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="resources/icon-apple-touch-icon.png">
-<link rel="apple-touch-startup-image" href="https://offroaders123.github.io/Smart-Text-Editor/resources/startup-iphone5.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)">
-<link rel="apple-touch-startup-image" href="https://offroaders123.github.io/Smart-Text-Editor/resources/startup-iphone6.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)">
-<link rel="apple-touch-startup-image" href="https://offroaders123.github.io/Smart-Text-Editor/resources/startup-iphoneplus.png" media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)">
-<link rel="apple-touch-startup-image" href="https://offroaders123.github.io/Smart-Text-Editor/resources/startup-iphonex.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
-<link rel="apple-touch-startup-image" href="https://offroaders123.github.io/Smart-Text-Editor/resources/startup-iphonexr.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)">
-<link rel="apple-touch-startup-image" href="https://offroaders123.github.io/Smart-Text-Editor/resources/startup-iphonexsmax.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)">
-<link rel="apple-touch-startup-image" href="https://offroaders123.github.io/Smart-Text-Editor/resources/startup-ipad.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)">
-<link rel="apple-touch-startup-image" href="https://offroaders123.github.io/Smart-Text-Editor/resources/startup-ipadpro1.png" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)">
-<link rel="apple-touch-startup-image" href="https://offroaders123.github.io/Smart-Text-Editor/resources/startup-ipadpro3.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)">
-<link rel="apple-touch-startup-image" href="https://offroaders123.github.io/Smart-Text-Editor/resources/startup-ipadpro2.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)">
+<link rel="apple-touch-startup-image" href="resources/startup-iphone5.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)">
+<link rel="apple-touch-startup-image" href="resources/startup-iphone6.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)">
+<link rel="apple-touch-startup-image" href="resources/startup-iphoneplus.png" media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)">
+<link rel="apple-touch-startup-image" href="resources/startup-iphonex.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
+<link rel="apple-touch-startup-image" href="resources/startup-iphonexr.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)">
+<link rel="apple-touch-startup-image" href="resources/startup-iphonexsmax.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)">
+<link rel="apple-touch-startup-image" href="resources/startup-ipad.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)">
+<link rel="apple-touch-startup-image" href="resources/startup-ipadpro1.png" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)">
+<link rel="apple-touch-startup-image" href="resources/startup-ipadpro3.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)">
+<link rel="apple-touch-startup-image" href="resources/startup-ipadpro2.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)">
 <link rel="mask-icon" href="resources/icon-mask-icon.svg" color="#ee8800">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cousine&family=Noto+Sans&family=Rubik&display=swap">
 <link rel="stylesheet" href="https://offroaders123.github.io/Numbered-Textarea-Plugin/styles.css">
 
 <script>
-  var parentWindow = (window.self == window.top);
+  var parentWindow = (window.self == window.top), fileSystemAccess = (("chooseFileSystemEntries" in window) || ("showOpenFilePicker" in window));
   if (parentWindow) document.documentElement.classList.add("fade");
-  var fileSystemAccess = (("chooseFileSystemEntries" in window) || ("showOpenFilePicker" in window));
 </script>
 
 <style>
@@ -309,10 +308,13 @@
   }
   [data-numbered-container] textarea, input[type="text"] {
     -webkit-appearance: none;
-    transition: caret-color var(--transition-slow);
+    transition: var(--transition-slow);
+    transition-property: caret-color, scrollbar-color;
   }
   [data-numbered-container] textarea {
     overflow-wrap: normal;
+    scrollbar-width: inherit;
+    scrollbar-color: inherit;
   }
   span.info {
     display: flex;
@@ -470,6 +472,8 @@
     opacity: 0;
     pointer-events: none;
     list-style: none;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar) var(--container-medium);
     transform: scaleY(var(--scale));
     --scale: 0.15;
     transform-origin: top center;
@@ -712,6 +716,7 @@
     visibility: hidden;
     pointer-events: none;
     overflow-y: hidden;
+    scrollbar-color: var(--scrollbar) var(--container-dark);
     transition: var(--transition-medium);
     transition-property: max-height, visibility, opacity, transform;
   }
@@ -875,6 +880,8 @@
     position: relative;
     max-width: 50vw;
     height: min(25vw, 75px);
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar) var(--textarea-medium);
   }
   .card [data-numbered-container]::before, .card input[type="text"] {
     box-shadow: 0 2px 4px var(--box-shadow) inset;
@@ -896,6 +903,8 @@
     display: flex;
     justify-content: space-around;
     overflow-y: auto;
+    scrollbar-width: inherit;
+    scrollbar-color: inherit;
   }
   .card.modal .content span {
     font-size: min(2.5vw, 14.5px);
@@ -1164,6 +1173,12 @@
     opacity: 0;
     transition: var(--transition-slow);
     transition-property: padding, color;
+  }
+  #workspace.text [data-numbered-container] {
+    scrollbar-color: var(--scrollbar) var(--textarea-light);
+  }
+  #workspace:not(.text) [data-numbered-container] {
+    scrollbar-color: var(--scrollbar) var(--textarea-dark);
   }
   #workspace [data-numbered-container].active {
     height: 100%;
@@ -1774,9 +1789,7 @@
       }
       if (event.key == "{"){
         event.preventDefault();
-        var activeTab = files.querySelector("button.tab.active");
-        var tabs = Array.from(files.querySelectorAll("button.tab"));
-        var newTab;
+        var activeTab = files.querySelector("button.tab.active"), tabs = Array.from(files.querySelectorAll("button.tab")), newTab;
         if (activeTab == tabs[0]){
           newTab = tabs[tabs.length - 1];
         } else {
@@ -1786,9 +1799,7 @@
       }
       if (event.key == "}"){
         event.preventDefault();
-        var activeTab = files.querySelector("button.tab.active");
-        var tabs = Array.from(files.querySelectorAll("button.tab"));
-        var newTab;
+        var activeTab = files.querySelector("button.tab.active"), tabs = Array.from(files.querySelectorAll("button.tab")), newTab;
         if (activeTab == tabs[tabs.length - 1]){
           newTab = tabs[0];
         } else {
@@ -2207,9 +2218,7 @@
     }
   });
   function createFile(name,value){
-    var identifier = Math.random();
-    var tab = document.createElement("button");
-    var container = document.createElement("div");
+    var identifier = Math.random(), tab = document.createElement("button"), container = document.createElement("div");
     container.setAttribute("data-identifier",identifier);
     container.setAttribute("data-numbered-container",true);
     var textarea = document.createElement("textarea");
@@ -2236,10 +2245,10 @@
     renameButton.innerHTML = "<svg><use href='#rename'/></svg>";
     renameButton.addEventListener("click",function(event){
       event.stopPropagation();
-      var fileName = renameButton.parentElement.childNodes[0];
-      var newFileName = prompt(`Enter a new file name for "${fileName.nodeValue}"`,fileName.nodeValue);
+      var fileName = renameButton.parentElement.childNodes[0], newFileName = prompt(`Enter a new file name for "${fileName.nodeValue}"`,fileName.nodeValue);
       if (!newFileName) return;
       fileName.nodeValue = `${newFileName}`;
+      if (tab == getCurrentTab()) titleRefresh(newFileName);
     });
     tab.appendChild(renameButton);
     var closeButton = document.createElement("button");
@@ -2282,8 +2291,7 @@
     return identifier;
   }
   function openFile(tab){
-    var identifier = tab.getAttribute("data-identifier");
-    var tabs = Array.from(files.querySelectorAll("button.tab"));
+    var identifier = tab.getAttribute("data-identifier"), tabs = Array.from(files.querySelectorAll("button.tab"));
     tabs.forEach(function(tab){
       tab.classList.remove("active");
       tab.classList.remove("resize");
@@ -2300,15 +2308,14 @@
     var editor = workspace.querySelector(`[data-numbered-container][data-identifier="${identifier}"]`);
     editor.classList.add("active");
     forceRefresh();
-    document.title = `${tab.textContent} - Smart Text Editor`;
+    titleRefresh(tab.textContent);
   }
   function closeFile(tab){
     if (tab.hasAttribute("data-unsaved")){
       var ask = confirm(`Are you sure you would like to close "${getFileName(undefined,tab)}"?\nRecent changes have not yet been saved.`);
       if (!ask) return;
     }
-    var identifier = tab.getAttribute("data-identifier");
-    var tabs = Array.from(files.querySelectorAll("button.tab"));
+    var identifier = tab.getAttribute("data-identifier"), tabs = Array.from(files.querySelectorAll("button.tab"));
     if (tab == tabs[0] && tabs[1] && tab.classList.contains("active")) openFile(tabs[1]);
     if (tab == tabs[tabs.length - 1] && tab != tabs[0] && tab.classList.contains("active")) openFile(tabs[tabs.length - 2]);
     if (tab != tabs[0] && tab.classList.contains("active")) openFile(tabs[tabs.indexOf(tab) + 1]);
@@ -2333,6 +2340,9 @@
       return name.join(".");
     }
     if (result == "extension") return fileName.split(".").pop();
+  }
+  function titleRefresh(value){
+    document.title = `${value} - Smart Text Editor`;
   }
   function loadSettings(input){
     if (parentWindow){
@@ -2496,6 +2506,7 @@
     history.pushState(null,"",completeAddress);
   }
   function changeView(newView){
+    if (main.classList.contains("resize")) return;
     var elements = [main,workspace,scaler,preview];
     elements.forEach(function(element){
       changeClass(element,view,newView);
@@ -2529,6 +2540,7 @@
     previewRefresh();
   }
   function changeOrientation(newOrientation){
+    if (main.classList.contains("resize")) return;
     var elements = [main,workspace,scaler,preview];
     if (!newOrientation){
       if (orientation == "horizontal"){
@@ -2670,8 +2682,7 @@
       }
       if (!fileHandles) return;
       fileHandles.forEach(async function(fileHandle){
-        var file = await fileHandle.getFile();
-        var identifier = createFile(await file.name,await file.text());
+        var file = await fileHandle.getFile(), identifier = createFile(await file.name,await file.text());
         editorFiles[identifier] = await fileHandle;
       });
     }
@@ -2728,8 +2739,9 @@
   
   async function saveFile(extension){
     if (!fileSystemAccess || extension){
-      var blob = new Blob([getCurrentEditor().value],{type: "text/plain"});
-      var save = document.createElement("a");
+      var blob = new Blob([getCurrentEditor().value],{
+        type: "text/plain"
+      }), save = document.createElement("a");
       save.href = URL.createObjectURL(blob);
       if (!extension){
         save.download = getFileName();
@@ -2738,8 +2750,7 @@
       }
       save.click();
     } else {
-      var identifier = files.querySelector("button.tab.active").getAttribute("data-identifier");
-      var fileHandle;
+      var identifier = files.querySelector("button.tab.active").getAttribute("data-identifier"), fileHandle;
       if (!editorFiles[identifier]){
         if ("chooseFileSystemEntries" in window){
           fileHandle = await window.chooseFileSystemEntries().catch(function(error){
@@ -2755,7 +2766,7 @@
         editorFiles[identifier] = await fileHandle;
       }
       var writable = await editorFiles[identifier].createWritable().catch(function(error){
-        return;
+        alert(`"${getFileName()}" could not be saved.`);
       });
       if (!writable) return;
       await writable.write(getCurrentEditor().value);
@@ -2966,7 +2977,7 @@
   function setScaling(event){
     var cursorOffset, windowAxis;
     if (orientation == "horizontal"){
-      if (event instanceof TouchEvent){
+      if ("TouchEvent" in window && event instanceof TouchEvent){
         cursorOffset = event.touches[0].clientY - header.offsetHeight;
       } else {
         cursorOffset = event.clientY - header.offsetHeight;
@@ -2974,7 +2985,7 @@
       windowAxis = window.innerHeight;
     }
     if (orientation == "vertical"){
-      if (event instanceof TouchEvent){
+      if ("TouchEvent" in window && event instanceof TouchEvent){
         cursorOffset = event.touches[0].clientX;
       } else {
         cursorOffset = event.clientX;
@@ -3005,7 +3016,7 @@
     }
   }
   function removeScaling(event){
-    if (event instanceof TouchEvent){
+    if ("TouchEvent" in window && event instanceof TouchEvent){
       document.body.removeEventListener("touchmove",setScaling,{ passive: true });
       document.body.removeEventListener("touchend",removeScaling,{ passive: true });
       toggleScaling();
