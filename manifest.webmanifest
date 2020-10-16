@@ -25,25 +25,25 @@
   ],
   "shortcuts": [
     {
-      "name": "Start with HTML Template",
+      "name": "HTML Template",
       "short_name": "HTML Template",
-      "description": "Create a new project, starting with an HTML template",
+      "description": "Create a new file with boilerplate HTML to start with",
       "url": "https://offroaders123.github.io/Smart-Text-Editor/?template=true",
       "icons": [
         {
-          "src": "resources/icon-192.png",
+          "src": "resources/template-192.png",
           "sizes": "192x192"
         }
       ]
     },
     {
-      "name": "Open Settings",
+      "name": "Settings",
       "short_name": "Settings",
       "description": "Open settings for Smart Text Editor",
       "url": "https://offroaders123.github.io/Smart-Text-Editor/?settings=true",
       "icons": [
         {
-          "src": "resources/icon-192.png",
+          "src": "resources/settings-192.png",
           "sizes": "192x192"
         }
       ]

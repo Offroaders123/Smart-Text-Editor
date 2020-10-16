@@ -297,6 +297,7 @@
   }
   [data-numbered-container] ol, [data-numbered-container] textarea, input[type="text"] {
     padding: 8px;
+    line-height: normal;
   }
   [data-numbered-container] ol {
     color: inherit;
@@ -311,7 +312,6 @@
     transition: caret-color var(--transition-slow);
   }
   [data-numbered-container] textarea {
-    line-height: normal;
     overflow-wrap: normal;
   }
   span.info {
@@ -1423,8 +1423,8 @@
       <ul>
         <li onclick="createFile();">New File<span>Ctrl + Shift + X</span></li>
         <li onclick="openEditorWindow();">New Window<span>Ctrl + Shift + C</span></li>
-        <li onclick="loadFiles();">Open<span>Ctrl + Shift + L</span></li>
-        <li onclick="saveFile();">Save<span>Ctrl + Shift + S</span></li>
+        <li onclick="loadFiles();">Open<span>Ctrl + O</span></li>
+        <li onclick="saveFile();">Save<span>Ctrl + S</span></li>
         <li>Save As...
           <svg><use href="#arrow"/></svg>
           <ul>
@@ -1759,20 +1759,21 @@
   });
   window.addEventListener("keydown",function(event){
     if (event.key == "Escape" && activeModal){
-      blockShortcut(event);
+      event.preventDefault();
+      event.stopPropagation();
       closeCard(activeModal);
     }
     if (event.ctrlKey){
       if (event.key == "X"){
-        blockShortcut(event);
+        event.preventDefault();
         createFile();
       }
       if (event.key == "D"){
-        blockShortcut(event);
+        event.preventDefault();
         closeFile(files.querySelector("button.tab.active"));
       }
       if (event.key == "{"){
-        blockShortcut(event);
+        event.preventDefault();
         var activeTab = files.querySelector("button.tab.active");
         var tabs = Array.from(files.querySelectorAll("button.tab"));
         var newTab;
@@ -1784,7 +1785,7 @@
         openFile(newTab);
       }
       if (event.key == "}"){
-        blockShortcut(event);
+        event.preventDefault();
         var activeTab = files.querySelector("button.tab.active");
         var tabs = Array.from(files.querySelectorAll("button.tab"));
         var newTab;
@@ -1796,75 +1797,75 @@
         openFile(newTab);
       }
       if (event.key == "C"){
-        blockShortcut(event);
+        event.preventDefault();
         openEditorWindow();
       }
-      if (event.key == "L"){
-        blockShortcut(event);
+      if (event.key == "o"){
+        event.preventDefault();
         loadFiles();
       }
-      if (event.key == "S"){
-        blockShortcut(event);
+      if (event.key == "s"){
+        event.preventDefault();
         saveFile();
       }
       if (event.key == "!"){
-        blockShortcut(event);
+        event.preventDefault();
         changeView("text");
       }
       if (event.key == "@"){
-        blockShortcut(event);
+        event.preventDefault();
         changeView("code");
       }
       if (event.key == "#"){
-        blockShortcut(event);
+        event.preventDefault();
         changeView("split");
       }
       if (event.key == "$"){
-        blockShortcut(event);
+        event.preventDefault();
         changeView("preview");
       }
       if (event.key == "%"){
-        blockShortcut(event);
+        event.preventDefault();
         changeOrientation();
       }
       if (event.key == "^"){
-        blockShortcut(event);
+        event.preventDefault();
         openDisplay();
       }
       if (event.key == "Enter"){
-        blockShortcut(event);
+        event.preventDefault();
         if (view == "split" || view == "preview") forceRefresh();
       }
       if (event.key == "E"){
-        blockShortcut(event);
+        event.preventDefault();
         openCard(editingTools);
       }
       if (event.key == "F"){
-        blockShortcut(event);
+        event.preventDefault();
         openCard(replacer);
       }
       if (event.key == "K"){
-        blockShortcut(event);
+        event.preventDefault();
         openCard(picker);
       }
       if (event.key == "G"){
-        blockShortcut(event);
+        event.preventDefault();
         importColor();
       }
       if (event.key == "R"){
-        blockShortcut(event);
+        event.preventDefault();
         openCard(formatter);
       }
       if (event.key == "Y"){
-        blockShortcut(event);
+        event.preventDefault();
         openCard(encoder);
       }
       if (event.key == "H"){
-        blockShortcut(event);
+        event.preventDefault();
         confirmOverwrite(insertTemplate);
       }
       if (event.key == ">"){
-        blockShortcut(event);
+        event.preventDefault();
         openCard(settings);
       }
     }
@@ -1922,7 +1923,8 @@
     dropdown.addEventListener("keydown",function(event){
       if (!dropdown.classList.contains("active")) return;
       if (event.key == "Escape" || event.key == "Tab"){
-        blockShortcut(event);
+        event.preventDefault();
+        event.stopPropagation();
         disableDropdown(dropdown);
         button.focus();
       }
@@ -1959,19 +1961,23 @@
         var navigable = getNavigableElements(menu,true);
         if (event.key == "ArrowDown"){
           if (document.activeElement == navigable[navigable.length - 1]){
-            blockShortcut(event);
+            event.preventDefault();
+            event.stopPropagation();
             navigable[0].focus();
           } else {
-            blockShortcut(event);
+            event.preventDefault();
+            event.stopPropagation();
             navigable[navigable.indexOf(document.activeElement) + 1].focus();
           }
         }
         if (event.key == "ArrowUp"){
           if (document.activeElement == navigable[0]){
-            blockShortcut(event);
+            event.preventDefault();
+            event.stopPropagation();
             navigable[navigable.length - 1].focus();
           } else {
-            blockShortcut(event);
+            event.preventDefault();
+            event.stopPropagation();
             navigable[navigable.indexOf(document.activeElement) - 1].focus();
           }
         }
@@ -2011,13 +2017,15 @@
       option.addEventListener("keydown",function(event){
         if (option.querySelector(":scope > ul") != null) return;
         if (event.key == "Enter" || event.key == " "){
-          blockShortcut(event);
+          event.preventDefault();
+          event.stopPropagation();
           option.click();
           button.focus();
         }
         if (!dropdown.parentElement.classList.contains("select")) return;
         if (event.key == "Escape" || event.key == "Tab"){
-          blockShortcut(event);
+          event.preventDefault();
+          event.stopPropagation();
           disableDropdown(dropdown);
           button.focus();
         }
@@ -2246,7 +2254,8 @@
       if (!tab.classList.contains("active")) openFile(tab);
     });
     tab.addEventListener("dragover",function(event){
-      blockShortcut(event);
+      event.preventDefault();
+      event.stopPropagation();
       tab.classList.add("drag");
       event.dataTransfer.dropEffect = "copy";
       if (!tab.classList.contains("active")) openFile(tab);
@@ -2255,7 +2264,8 @@
       tab.classList.remove("drag");
     });
     tab.addEventListener("drop",function(event){
-      blockShortcut(event);
+      event.preventDefault();
+      event.stopPropagation();
       tab.classList.remove("drag");
       if (event.dataTransfer.types.includes("Files")){
         var reader = new FileReader();
@@ -2593,10 +2603,6 @@
   function changeTextarea(textarea,value){
     textarea.value = value;
     if (textarea.parentElement.hasAttribute("data-numbered-container")) updateLineCount(textarea);
-  }
-  function blockShortcut(event){
-    event.preventDefault();
-    event.stopPropagation();
   }
   function openEditorWindow(){
     var windowFeatures = "", standalone = (window.matchMedia("(display-mode: standalone)").matches || "standalone" in navigator || !window.menubar.visible), hiddenChrome = (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight), fullscreen = (window.matchMedia("(display-mode: fullscreen)").matches || (!window.screenY && !window.screenTop && hiddenChrome) || (!window.screenY && !window.screenTop && standalone));
