@@ -701,6 +701,10 @@
   }
   .buffering {
     animation: rotate 4s infinite linear;
+    animation-play-state: paused;
+  }
+  .buffering.active {
+    animation-play-state: running;
   }
   @keyframes rotate {
     from {
@@ -1166,7 +1170,6 @@
     line-height: min(4vw, 16px);
   }
   #workspace [data-numbered-container] {
-    flex-grow: 1;
     height: 0;
     background: none;
     visibility: hidden;
@@ -1732,16 +1735,16 @@
       loadSettings("initial");
       window.setTimeout(function(){
         document.documentElement.classList.remove("fade");
-      }, 50);
+      },50);
       if (title == "true"){
         window.setTimeout(function(){
           openCard(welcome);
-        }, 100);
+        },100);
         window.setTimeout(function(){
           if (activeModal == welcome){
             closeCard(welcome);
           }
-        }, 2100);
+        },2100);
       }
       getCurrentEditor().focus();
     }
@@ -1789,23 +1792,25 @@
       }
       if (event.key == "{"){
         event.preventDefault();
-        var activeTab = files.querySelector("button.tab.active"), tabs = Array.from(files.querySelectorAll("button.tab")), newTab;
+        var activeTab = files.querySelector("button.tab.active"), tabs = Array.from(files.querySelectorAll("button.tab")), newTab, withinEditor = (document.activeElement == getCurrentEditor());
         if (activeTab == tabs[0]){
           newTab = tabs[tabs.length - 1];
         } else {
           newTab = tabs[tabs.indexOf(activeTab) - 1];
         }
         openFile(newTab);
+        if (withinEditor) getCurrentEditor().focus();
       }
       if (event.key == "}"){
         event.preventDefault();
-        var activeTab = files.querySelector("button.tab.active"), tabs = Array.from(files.querySelectorAll("button.tab")), newTab;
+        var activeTab = files.querySelector("button.tab.active"), tabs = Array.from(files.querySelectorAll("button.tab")), newTab, withinEditor = (document.activeElement == getCurrentEditor());
         if (activeTab == tabs[tabs.length - 1]){
           newTab = tabs[0];
         } else {
           newTab = tabs[tabs.indexOf(activeTab) + 1];
         }
         openFile(newTab);
+        if (withinEditor) getCurrentEditor().focus();
       }
       if (event.key == "C"){
         event.preventDefault();
@@ -1894,11 +1899,11 @@
             header.classList.add("resize");
             window.setTimeout(function(){
               header.classList.remove("resize");
-            }, 50);
+            },50);
           }
         } else if (window.innerHeight == currentHeight) return;
         changeView("split");
-      }, 50);
+      },50);
     }
   });
   window.addEventListener("orientationchange",setOffsetOrientation);
@@ -2017,7 +2022,7 @@
         var navigable = getNavigableElements(submenu,true);
         window.setTimeout(function(){
           navigable[0].focus();
-        }, 50);
+        },50);
       }
     });
     options.forEach(function(option){
@@ -2287,7 +2292,9 @@
         textEdit("insert",event.dataTransfer.getData("text"),true,textarea);
       }
     });
+    var withinEditor = (document.activeElement == getCurrentEditor());
     openFile(tab);
+    if (withinEditor) getCurrentEditor().focus();
     return identifier;
   }
   function openFile(tab){
@@ -2300,7 +2307,7 @@
     var transitionDuration = parseInt(getElementStyle(tab,"transition-duration").split("s").join("") * 1000);
     window.setTimeout(function(){
       tab.classList.add("resize");
-    }, transitionDuration);
+    },transitionDuration);
     var activeFiles = Array.from(workspace.querySelectorAll("[data-numbered-container].active"));
     activeFiles.forEach(function(activeFile){
       activeFile.classList.remove("active");
@@ -2315,10 +2322,11 @@
       var ask = confirm(`Are you sure you would like to close "${getFileName(undefined,tab)}"?\nRecent changes have not yet been saved.`);
       if (!ask) return;
     }
-    var identifier = tab.getAttribute("data-identifier"), tabs = Array.from(files.querySelectorAll("button.tab"));
+    var identifier = tab.getAttribute("data-identifier"), tabs = Array.from(files.querySelectorAll("button.tab")), withinEditor = (document.activeElement == getCurrentEditor());
     if (tab == tabs[0] && tabs[1] && tab.classList.contains("active")) openFile(tabs[1]);
     if (tab == tabs[tabs.length - 1] && tab != tabs[0] && tab.classList.contains("active")) openFile(tabs[tabs.length - 2]);
     if (tab != tabs[0] && tab.classList.contains("active")) openFile(tabs[tabs.indexOf(tab) + 1]);
+    if (withinEditor) getCurrentEditor().focus();
     files.removeChild(tab);
     var editor = workspace.querySelector(`[data-numbered-container][data-identifier="${identifier}"]`);
     workspace.removeChild(editor);
@@ -2383,7 +2391,7 @@
         } else {
           changeTransitions(transitions);
         }
-      }, 50);
+      },50);
     }
   }
   function resetSettings(){
@@ -2402,7 +2410,7 @@
       updateCheckbox("transitions","true");
       resetTheme();
       storage.clear();
-    }, 50);
+    },50);
     openCard(reset);
   }
   function updateSetting(item,value){
@@ -2446,7 +2454,7 @@
     document.documentElement.classList.add("reduced-motion");
     window.setTimeout(function(){
       document.documentElement.classList.remove("reduced-motion");
-    }, 500);
+    },500);
   }
   function setOffsetOrientation(){
     document.body.classList.remove("camera-left");
@@ -2564,8 +2572,8 @@
         orientation = newOrientation;
         window.setTimeout(function(){
           changeView("split");
-        }, 25);
-      }, transitionDuration);
+        },25);
+      },transitionDuration);
     } else {
       elements.forEach(function(element){
         changeClass(element,orientation,newOrientation);
@@ -2819,7 +2827,7 @@
     if (cardType == "notification"){
       window.setTimeout(function(){
         closeCard(card);
-      }, 4000);
+      },4000);
     }
     if (cardType == "modal"){
       document.body.addEventListener("keydown",catchCardNavigation);
@@ -2829,7 +2837,7 @@
         document.activeElement.blur();
         var previousElement = card.querySelector(`[data-previous="${previous}"]`);
         if (previousElement) previousElement.focus();
-      }, transitionDuration);
+      },transitionDuration);
       activeModal = card;
     }
     if (cardType == "widget") activeWidget = card;
@@ -2856,6 +2864,19 @@
     } else {
       event.preventDefault();
       navigable[0].focus();
+    }
+  }
+  function toggleLoadingOverlay(){
+    loading.classList.toggle("active");
+    var buffering = loading.querySelector("svg");
+    if (loading.classList.contains("active")){
+      buffering.classList.add("active");
+    } else {
+      var transitionDuration = parseInt(getElementStyle(loading,"transition-duration").split("s").join("") * 1000);
+      window.setTimeout(function(){
+        if (loading.classList.contains("active")) return;
+        buffering.classList.remove("active");
+      },transitionDuration);
     }
   }
   function changeState(action){
