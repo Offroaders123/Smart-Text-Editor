@@ -1,4 +1,4 @@
-var cacheVersion = 2.05;
+var cacheVersion = 2.06;
 self.addEventListener("activate",function(event){
   event.waitUntil(caches.keys().then(function(cacheVersions){
     return Promise.all(cacheVersions.map(function(cache){
@@ -17,4 +17,13 @@ self.addEventListener("fetch",function(event){
     caches.match(event.request).then(function(resolve){
       return resolve;
   })}));
+});
+self.addEventListener("message",function(event){
+  if (event.data == "clear-cache"){
+    caches.keys().then(function(cacheVersions){
+      return Promise.all(cacheVersions.map(function(cache){
+        return caches.delete(cache);
+      }));
+    });
+  }
 });

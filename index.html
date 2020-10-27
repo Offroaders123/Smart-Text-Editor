@@ -33,8 +33,9 @@
 <link rel="stylesheet" href="https://offroaders123.github.io/Numbered-Textarea-Plugin/styles.css">
 
 <script>
-  var parentWindow = (window.self == window.top), fileSystemAccess = (("chooseFileSystemEntries" in window) || ("showOpenFilePicker" in window));
+  var parentWindow = (window.self == window.top), fileSystemAccess = (("chooseFileSystemEntries" in window) || ("showOpenFilePicker" in window)), appleDevice = (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform));
   if (parentWindow) document.documentElement.classList.add("fade");
+  if (appleDevice) document.documentElement.classList.add("apple-device");
 </script>
 
 <style>
@@ -510,7 +511,7 @@
   .dropdown a > img.invert {
     filter: invert() hue-rotate(180deg);
   }
-  .dropdown li span {
+  .dropdown li > span {
     margin-left: min(4vw, 16px);
     color: var(--text-medium-additional);
     font-size: min(2.5vw, 11px);
@@ -656,6 +657,24 @@
   .checkbox:hover input[type="checkbox"]:checked + label > svg, .checkbox:focus input[type="checkbox"]:checked + label > svg {
     fill: var(--text-hover);
   }
+  html:not(.apple-device) .shortcut.ctrl::before {
+    content: "Ctrl + ";
+  }
+  html:not(.apple-device) .shortcut.ctrl-shift::before {
+    content: "Ctrl + Shift + ";
+  }
+  html.apple-device .shortcut {
+    font-size: min(3vw, 12px);
+  }
+  html.apple-device .shortcut.command::before {
+    content: "\2318";
+  }
+  html.apple-device .shortcut.shift-command::before {
+    content: "\21E7\2318";
+  }
+  html.apple-device .shortcut.ctrl-command::before {
+    content: "\2303\2318";
+  }
   [data-tooltip] {
     position: relative;
   }
@@ -700,7 +719,7 @@
     transition-timing-function: ease-out;
   }
   .buffering {
-    animation: rotate 4s infinite linear;
+    animation: rotate 2s infinite linear;
     animation-play-state: paused;
   }
   .buffering.active {
@@ -739,14 +758,6 @@
     --scale: 0.15;
     transform-origin: center center;
   }
-  .card.modal:not(.scale) {
-    min-width: min(35vw, 225px);
-  }
-  .card.modal.scale {
-    padding: min(6vh, 2vw);
-    border-radius: calc(var(--border-radius-large) + min(1.5vh, 0.5vw));
-    transform: translate(-50%,50vh) scale(1);
-  }
   .card.notification, .card.action, .card.widget {
     padding: min(2.5vw, 12px);
     position: absolute;
@@ -773,7 +784,7 @@
   .card.action {
     flex-direction: row;
   }
-  .card.action > * + * {
+  .card.action > *:not(.hidden) + * {
     margin-left: min(2.5vw, 12px);
   }
   .card.action button {
@@ -782,6 +793,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+  .card.action button.hidden {
+    display: none;
   }
   .card.action button > svg {
     width: min(2.5vw, 12px);
@@ -801,14 +815,6 @@
   }
   .card.modal.active {
     transform: translate(-50%,-50%) scale(1);
-  }
-  .card.modal.scale.active {
-    animation: grow var(--transition-medium);
-  }
-  @keyframes grow {
-    0% {
-      transform: translate(-50%,-50%) scale(var(--scale));
-    }
   }
   .card.notification.active {
     animation: pop var(--transition-medium) var(--transition-delay);
@@ -835,18 +841,11 @@
   .card.modal .header {
     margin-bottom: min(3vw, 16px);
   }
-  .card.modal.scale .header {
-    margin-bottom: min(5.25vh, 1.75vw);
-  }
   .card.notification .header, .card.widget .header {
     margin-bottom: min(2.5vw, 12px);
   }
   .card.modal .header span {
     font-size: min(5vw, 24px);
-  }
-  .card.modal.scale .header span {
-    color: var(--text-light);
-    font-size: min(9vh, 3vw);
   }
   .card.notification .header span, .card.widget .header span {
     font-size: min(3vw, 16px);
@@ -857,13 +856,6 @@
   }
   .card .header .pencil {
     margin-right: min(3vw, 10px);
-  }
-  .card.modal.scale .pencil {
-    width: min(15vh, 5vw);
-    height: min(15vh, 5vw);
-  }
-  .card.modal.scale .header .pencil {
-    margin-right: min(3vh, 1vw);
   }
   .card.modal button.nav {
     width: min(4.25vw, 21px);
@@ -912,9 +904,6 @@
   }
   .card.modal .content span {
     font-size: min(2.5vw, 14.5px);
-  }
-  .card.modal.scale .content span {
-    font-size: min(4.5vh, 1.5vw);
   }
   .card .content .item {
     margin: auto 0;
@@ -1104,13 +1093,14 @@
     box-shadow: -9px 0 8px -8px var(--box-shadow) inset;
   }
   #workspace .files {
-    padding: 0 min(1.5vw, 12px);
+    padding-left: min(1.5vw, 12px);
     padding-top: min(0.75vw, 6px);
     position: relative;
     flex-shrink: 0;
     display: flex;
     background: var(--main);
     overflow-x: auto;
+    scroll-behavior: smooth;
     scrollbar-width: none;
   }
   #workspace .files::before {
@@ -1130,12 +1120,34 @@
   #workspace .files > * {
     flex-shrink: 0;
   }
+  #workspace .files > *:last-child::before {
+    content: "";
+    position: absolute;
+    left: 100%;
+    top: 0;
+    width: min(1.5vw, 12px);
+    height: 100%;
+    pointer-events: none;
+  }
   #workspace .files > * + * {
     margin-left: min(2vw, 8px);
   }
   #workspace .files button.tab.active {
     cursor: unset;
     z-index: 1;
+  }
+  #workspace .files button.tab > [data-file-name] {
+    display: flex;
+    align-items: center;
+  }
+  #workspace .files button.tab[data-unsaved] {
+    padding-left: min(2vw, 8px);
+  }
+  #workspace .files button.tab[data-unsaved] > [data-file-name]::before {
+    content: "*";
+    margin-right: min(0.5vw, 2px);
+    font-size: 125%;
+    line-height: min(4vw, 16px);
   }
   #workspace.text .files button.tab.active {
     color: var(--text-dark);
@@ -1159,15 +1171,6 @@
   }
   #workspace .files button.tab.active.resize, #workspace .files button.tab.active.resize > button > svg {
     transition-duration: var(--transition-slow);
-  }
-  #workspace .files button.tab[data-unsaved] {
-    padding-left: min(2vw, 8px);
-  }
-  #workspace .files button.tab[data-unsaved]::before {
-    content: "*";
-    margin-right: min(0.5vw, 2px);
-    font-size: 125%;
-    line-height: min(4vw, 16px);
   }
   #workspace [data-numbered-container] {
     height: 0;
@@ -1330,50 +1333,27 @@
     --range-track-hover: #000066;
   }
   #loading {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: var(--text-light);
-    background: var(--loading-background);
+    margin: min(2.5vw, 12px);
+    position: absolute;
+    right: 0;
+    bottom: 0;
     visibility: hidden;
     opacity: 0;
     z-index: 2;
-    transition: var(--transition-slow);
-    transition-property: visibility, opacity;
-  }
-  #loading::after {
-    content: "Loading...";
-    margin-top: min(8vw, 32px);
-    width: 7ch;
-    font-size: min(5vw, 29px);
   }
   #loading.active {
     visibility: visible;
     opacity: 1;
   }
-  #loading.active::after {
-    animation: loading 2s infinite linear;
-  }
-  @keyframes loading {
-    0%, 100% {
-      content: "Loading.";
-    }
-    33% {
-      content: "Loading..";
-    }
-    66% {
-      content: "Loading...";
-    }
-  }
   #loading > svg {
-    width: 25vmin;
-    height: 25vmin;
+    width: 15vmin;
+    height: 15vmin;
+    transition: fill var(--transition-slow);
+  }
+  #main.text #loading > svg {
+    fill: var(--text-dark);
+  }
+  #main:not(.text) #loading > svg {
     fill: var(--text-light);
   }
 </style>
@@ -1439,10 +1419,10 @@
     <div class="dropdown">
       <button>File</button>
       <ul>
-        <li onclick="createFile();">New File<span>Ctrl + Shift + X</span></li>
-        <li onclick="openEditorWindow();">New Window<span>Ctrl + Shift + C</span></li>
-        <li onclick="loadFiles();">Open<span>Ctrl + O</span></li>
-        <li onclick="saveFile();">Save<span>Ctrl + S</span></li>
+        <li onclick="createFile();">New File<span class="shortcut ctrl-shift shift-command">X</span></li>
+        <li onclick="openEditorWindow();">New Window<span class="shortcut ctrl-shift shift-command">C</span></li>
+        <li onclick="loadFiles();">Open<span class="shortcut ctrl command">O</span></li>
+        <li onclick="saveFile();">Save<span class="shortcut ctrl command">S</span></li>
         <li>Save As...
           <svg><use href="#arrow"/></svg>
           <ul>
@@ -1459,23 +1439,23 @@
     <div class="dropdown">
       <button>View</button>
       <ul>
-        <li onclick="changeView('text');">Text<span>Ctrl + Shift + 1</span></li>
-        <li onclick="changeView('code');">Code<span>Ctrl + Shift + 2</span></li>
-        <li onclick="changeView('split');">Split<span>Ctrl + Shift + 3</span></li>
-        <li onclick="changeView('preview');">Preview<span>Ctrl + Shift + 4</span></li>
-        <li onclick="changeOrientation();">Orientation<span>Ctrl + Shift + 5</span></li>
-        <li onclick="openDisplay();">Display<span>Ctrl + Shift + 6</span></li>
+        <li onclick="changeView('text');">Text<span class="shortcut ctrl-shift ctrl-command">1</span></li>
+        <li onclick="changeView('code');">Code<span class="shortcut ctrl-shift ctrl-command">2</span></li>
+        <li onclick="changeView('split');">Split<span class="shortcut ctrl-shift ctrl-command">3</span></li>
+        <li onclick="changeView('preview');">Preview<span class="shortcut ctrl-shift ctrl-command">4</span></li>
+        <li onclick="changeOrientation();">Orientation<span class="shortcut ctrl-shift ctrl-command">5</span></li>
+        <li onclick="openDisplay();">Display<span class="shortcut ctrl-shift ctrl-command">6</span></li>
       </ul>
     </div>
     <div class="dropdown">
       <button>Tools</button>
       <ul>
-        <li onclick="openCard(editingTools);">Editing Tools<span>Ctrl + Shift + E</span></li>
-        <li onclick="openCard(replacer);">Replace Text<span>Ctrl + Shift + F</span></li>
-        <li onclick="openCard(picker);">Color Picker<span>Ctrl + Shift + K</span></li>
-        <li onclick="openCard(formatter);">JSON Formatter<span>Ctrl + Shift + R</span></li>
-        <li onclick="openCard(encoder);">URI Encoder<span>Ctrl + Shift + Y</span></li>
-        <li onclick="confirmOverwrite(insertTemplate);">Import HTML Template<span>Ctrl + Shift + H</span></li>
+        <li onclick="openCard(editingTools);">Editing Tools<span class="shortcut ctrl-shift shift-command">E</span></li>
+        <li onclick="openCard(replacer);">Replace Text<span class="shortcut ctrl-shift shift-command">F</span></li>
+        <li onclick="openCard(picker);">Color Picker<span class="shortcut ctrl-shift shift-command">K</span></li>
+        <li onclick="openCard(formatter);">JSON Formatter<span class="shortcut ctrl-shift shift-command">R</span></li>
+        <li onclick="openCard(encoder);">URI Encoder<span class="shortcut ctrl-shift shift-command">Y</span></li>
+        <li onclick="confirmOverwrite(insertTemplate);">Import HTML Template<span class="shortcut ctrl-shift shift-command">H</span></li>
         <li>Online Resources...
           <svg><use href="#arrow"/></svg>
           <ul>
@@ -1513,18 +1493,6 @@
   </section>
   <iframe id="preview" class="text horizontal" src="about:blank"></iframe>
   <section id="backdrop"></section>
-  <section id="welcome" class="card modal scale">
-    <div class="header">
-      <img class="pencil" src="resources/icon.svg">
-      <span>Smart Text Editor</span>
-    </div>
-    <div class="content">
-      <div class="item">
-        <span>Welcome to the Smart Text Editor!</span>
-        <span>Created by Brandon Bennett</span>
-      </div>
-    </div>
-  </section>
   <section id="settings" class="card modal">
     <div class="header">
       <span>Settings</span>
@@ -1569,20 +1537,15 @@
           <input id="refreshSetting" type="checkbox" oninput="updateCheckbox('refresh');" checked>
           <label for="refreshSetting"><svg><use href="#check"/></svg>Automatically Refresh Preview</label>
         </div>
-        <div class="checkbox">
-          <input id="titleSetting" type="checkbox" oninput="updateCheckbox('title');" checked>
-          <label for="titleSetting"><svg><use href="#check"/></svg>Show Title on Startup</label>
-        </div>
-        <div class="checkbox">
-          <input id="transitionsSetting" type="checkbox" oninput="updateCheckbox('transitions');" checked>
-          <label for="transitionsSetting"><svg><use href="#check"/></svg>Smooth Transitions</label>
-        </div>
       </div>
     </div>
     <button id="installButton"><img class="pencil" src="resources/icon.svg">Install Smart Text Editor</button>
     <div class="options">
       <button onclick="openCard(theme);" data-previous="theme">Theme...</button>
-      <button class="warning" onclick="resetSettings();">Reset All Settings</button>
+      <button class="warning" onclick="resetSettings();">Reset Settings</button>
+    </div>
+    <div class="options">
+      <button class="warning" onclick="clearCache();">Clear Offline Cache</button>
     </div>
     <div class="options">
       <a href="https://github.com/Offroaders123/Smart-Text-Editor/">Smart Text Editor on GitHub</a>
@@ -1725,29 +1688,22 @@
 <script src="https://offroaders123.github.io/Numbered-Textarea-Plugin/script.js"></script>
 
 <script>
-  var storage = window.localStorage, editorFiles = {}, view = "text", orientation = "horizontal", refresh = "true", title = "true", transitions = "true", installPrompt, sourceChange = false, activeModal, activeWidget, cachedColor, insertColor = false;
+  var storage = window.localStorage, editorFiles = {}, view = "text", orientation = "horizontal", refresh = "true", installPrompt, sourceChange = false, activeModal, activeWidget, cachedColor, insertColor = false;
   window.addEventListener("load",function(){
     createFile();
     if (parentWindow){
-      if ("ontouchstart" in document.documentElement){
-        openCard(editingTools);
-      }
+      if ("ontouchstart" in document.documentElement) openCard(editingTools);
       loadSettings("initial");
       window.setTimeout(function(){
         document.documentElement.classList.remove("fade");
       },50);
-      if (title == "true"){
-        window.setTimeout(function(){
-          openCard(welcome);
-        },100);
-        window.setTimeout(function(){
-          if (activeModal == welcome){
-            closeCard(welcome);
-          }
-        },2100);
-      }
       getCurrentEditor().focus();
     }
+    if (CSS.supports("-moz-appearance: none")){
+      undoTool.classList.add("hidden");
+      redoTool.classList.add("hidden");
+    }
+    setOffsetOrientation();
     pickerInputRefresh();
     forceRefresh();
     var queryParameters = new URLSearchParams(window.location.search);
@@ -1759,10 +1715,7 @@
       openCard(settings);
       removeQueryParameters(["settings"]);
     }
-    if ("serviceWorker" in navigator && parentWindow && window.location.protocol == "https:"){
-      navigator.serviceWorker.register("service-worker.js");
-    }
-    setOffsetOrientation();
+    if ("serviceWorker" in navigator && parentWindow && window.location.protocol == "https:") navigator.serviceWorker.register("service-worker.js");
   });
   window.addEventListener("beforeinstallprompt",function(event){
     event.preventDefault();
@@ -1776,114 +1729,136 @@
     }
   });
   window.addEventListener("keydown",function(event){
-    if (event.key == "Escape" && activeModal){
+    var pressed = key => (event.key.toLowerCase() == key.toLowerCase()), ctrl = (event.ctrlKey && !appleDevice), command = (event.metaKey && appleDevice), shift = (event.shiftKey || (event.key.toUpperCase() == event.key)), ctrlShift = (ctrl && shift), shiftCommand = (shift && command), ctrlCommand = (event.ctrlKey && command);
+    if (pressed("Escape") && activeModal){
       event.preventDefault();
+      if (event.repeat) return;
       event.stopPropagation();
       closeCard(activeModal);
     }
-    if (event.ctrlKey){
-      if (event.key == "X"){
-        event.preventDefault();
-        createFile();
+    if ((ctrlShift || shiftCommand) && pressed("x")){
+      event.preventDefault();
+      if (event.repeat) return;
+      createFile();
+    }
+    if ((ctrlShift || shiftCommand) && pressed("d")){
+      event.preventDefault();
+      if (event.repeat) return;
+      closeFile(files.querySelector("button.tab.active"));
+    }
+    if ((ctrlShift || ctrlCommand) && (pressed("[") || pressed("{"))){
+      event.preventDefault();
+      if (event.repeat) return;
+      var activeTab = files.querySelector("button.tab.active"), tabs = Array.from(files.querySelectorAll("button.tab")), newTab, withinEditor = (document.activeElement == getCurrentEditor());
+      if (activeTab == tabs[0]){
+        newTab = tabs[tabs.length - 1];
+      } else {
+        newTab = tabs[tabs.indexOf(activeTab) - 1];
       }
-      if (event.key == "D"){
-        event.preventDefault();
-        closeFile(files.querySelector("button.tab.active"));
+      openFile(newTab);
+      if (withinEditor) getCurrentEditor().focus();
+    }
+    if ((ctrlShift || ctrlCommand) && (pressed("]") || pressed("}"))){
+      event.preventDefault();
+      if (event.repeat) return;
+      var activeTab = files.querySelector("button.tab.active"), tabs = Array.from(files.querySelectorAll("button.tab")), newTab, withinEditor = (document.activeElement == getCurrentEditor());
+      if (activeTab == tabs[tabs.length - 1]){
+        newTab = tabs[0];
+      } else {
+        newTab = tabs[tabs.indexOf(activeTab) + 1];
       }
-      if (event.key == "{"){
-        event.preventDefault();
-        var activeTab = files.querySelector("button.tab.active"), tabs = Array.from(files.querySelectorAll("button.tab")), newTab, withinEditor = (document.activeElement == getCurrentEditor());
-        if (activeTab == tabs[0]){
-          newTab = tabs[tabs.length - 1];
-        } else {
-          newTab = tabs[tabs.indexOf(activeTab) - 1];
-        }
-        openFile(newTab);
-        if (withinEditor) getCurrentEditor().focus();
-      }
-      if (event.key == "}"){
-        event.preventDefault();
-        var activeTab = files.querySelector("button.tab.active"), tabs = Array.from(files.querySelectorAll("button.tab")), newTab, withinEditor = (document.activeElement == getCurrentEditor());
-        if (activeTab == tabs[tabs.length - 1]){
-          newTab = tabs[0];
-        } else {
-          newTab = tabs[tabs.indexOf(activeTab) + 1];
-        }
-        openFile(newTab);
-        if (withinEditor) getCurrentEditor().focus();
-      }
-      if (event.key == "C"){
-        event.preventDefault();
-        openEditorWindow();
-      }
-      if (event.key == "o"){
-        event.preventDefault();
-        loadFiles();
-      }
-      if (event.key == "s"){
-        event.preventDefault();
-        saveFile();
-      }
-      if (event.key == "!"){
-        event.preventDefault();
-        changeView("text");
-      }
-      if (event.key == "@"){
-        event.preventDefault();
-        changeView("code");
-      }
-      if (event.key == "#"){
-        event.preventDefault();
-        changeView("split");
-      }
-      if (event.key == "$"){
-        event.preventDefault();
-        changeView("preview");
-      }
-      if (event.key == "%"){
-        event.preventDefault();
-        changeOrientation();
-      }
-      if (event.key == "^"){
-        event.preventDefault();
-        openDisplay();
-      }
-      if (event.key == "Enter"){
-        event.preventDefault();
-        if (view == "split" || view == "preview") forceRefresh();
-      }
-      if (event.key == "E"){
-        event.preventDefault();
-        openCard(editingTools);
-      }
-      if (event.key == "F"){
-        event.preventDefault();
-        openCard(replacer);
-      }
-      if (event.key == "K"){
-        event.preventDefault();
-        openCard(picker);
-      }
-      if (event.key == "G"){
-        event.preventDefault();
-        importColor();
-      }
-      if (event.key == "R"){
-        event.preventDefault();
-        openCard(formatter);
-      }
-      if (event.key == "Y"){
-        event.preventDefault();
-        openCard(encoder);
-      }
-      if (event.key == "H"){
-        event.preventDefault();
-        confirmOverwrite(insertTemplate);
-      }
-      if (event.key == ">"){
-        event.preventDefault();
-        openCard(settings);
-      }
+      openFile(newTab);
+      if (withinEditor) getCurrentEditor().focus();
+    }
+    if ((ctrlShift || shiftCommand) && pressed("c")){
+      event.preventDefault();
+      if (event.repeat) return;
+      openEditorWindow();
+    }
+    if ((ctrl || command) && pressed("o")){
+      event.preventDefault();
+      if (event.repeat) return;
+      loadFiles();
+    }
+    if ((ctrl || command) && pressed("s")){
+      event.preventDefault();
+      if (event.repeat) return;
+      saveFile();
+    }
+    if ((ctrlShift || ctrlCommand) && (pressed("1") || pressed("!"))){
+      event.preventDefault();
+      if (event.repeat) return;
+      changeView("text");
+    }
+    if ((ctrlShift || ctrlCommand) && (pressed("2") || pressed("@"))){
+      event.preventDefault();
+      if (event.repeat) return;
+      changeView("code");
+    }
+    if ((ctrlShift || ctrlCommand) && (pressed("3") || pressed("#"))){
+      event.preventDefault();
+      if (event.repeat) return;
+      changeView("split");
+    }
+    if ((ctrlShift || ctrlCommand) && (pressed("4") || pressed("$"))){
+      event.preventDefault();
+      if (event.repeat) return;
+      changeView("preview");
+    }
+    if ((ctrlShift || ctrlCommand) && (pressed("5") || pressed("%"))){
+      event.preventDefault();
+      if (event.repeat) return;
+      changeOrientation();
+    }
+    if ((ctrlShift || ctrlCommand) && (pressed("6") || pressed("^"))){
+      event.preventDefault();
+      if (event.repeat) return;
+      openDisplay();
+    }
+    if ((ctrlShift || shiftCommand) && pressed("Enter")){
+      event.preventDefault();
+      if (event.repeat) return;
+      if (view == "split" || view == "preview") forceRefresh();
+    }
+    if ((ctrlShift || shiftCommand) && pressed("e")){
+      event.preventDefault();
+      if (event.repeat) return;
+      openCard(editingTools);
+    }
+    if ((ctrlShift || shiftCommand) && pressed("f")){
+      event.preventDefault();
+      if (event.repeat) return;
+      openCard(replacer);
+    }
+    if ((ctrlShift || shiftCommand) && pressed("k")){
+      event.preventDefault();
+      if (event.repeat) return;
+      openCard(picker);
+    }
+    if ((ctrlShift || shiftCommand) && pressed("g")){
+      event.preventDefault();
+      if (event.repeat) return;
+      importColor();
+    }
+    if ((ctrlShift || shiftCommand) && pressed("r")){
+      event.preventDefault();
+      if (event.repeat) return;
+      openCard(formatter);
+    }
+    if ((ctrlShift || shiftCommand) && pressed("y")){
+      event.preventDefault();
+      if (event.repeat) return;
+      openCard(encoder);
+    }
+    if ((ctrlShift || shiftCommand) && pressed("h")){
+      event.preventDefault();
+      if (event.repeat) return;
+      confirmOverwrite(insertTemplate);
+    }
+    if ((ctrlShift || shiftCommand) && (pressed(".") || pressed(">"))){
+      event.preventDefault();
+      if (event.repeat) return;
+      openCard(settings);
     }
   });
   window.addEventListener("dblclick",function(event){
@@ -2126,9 +2101,7 @@
       label.classList.add("focused");
     });
     themeChannel.addEventListener("mouseout",function(){
-      if (document.activeElement != themeChannel){
-        label.classList.remove("focused");
-      }
+      if (document.activeElement != themeChannel) label.classList.remove("focused");
     });
     themeChannel.addEventListener("focus",function(){
       label.classList.add("focused");
@@ -2181,9 +2154,6 @@
   });
   backdrop.addEventListener("click",function(){
     closeCard(activeModal);
-  });
-  welcome.addEventListener("click",function(){
-    closeCard(welcome);
   });
   installButton.addEventListener("click",function(){
     installPrompt.prompt();
@@ -2245,14 +2215,17 @@
     if (view == "text") disableLineCount(textarea);
     tab.classList.add("tab");
     tab.setAttribute("data-identifier",identifier);
-    tab.innerHTML = name;
+    var fileName = document.createElement("span");
+    fileName.innerText = name;
+    fileName.setAttribute("data-file-name",true);
+    tab.appendChild(fileName);
     var renameButton = document.createElement("button");
     renameButton.innerHTML = "<svg><use href='#rename'/></svg>";
     renameButton.addEventListener("click",function(event){
       event.stopPropagation();
-      var fileName = renameButton.parentElement.childNodes[0], newFileName = prompt(`Enter a new file name for "${fileName.nodeValue}"`,fileName.nodeValue);
+      var newFileName = prompt(`Enter a new file name for "${fileName.innerText}"`,fileName.innerText);
       if (!newFileName) return;
-      fileName.nodeValue = `${newFileName}`;
+      fileName.innerText = `${newFileName}`;
       if (tab == getCurrentTab()) titleRefresh(newFileName);
     });
     tab.appendChild(renameButton);
@@ -2314,8 +2287,9 @@
     });
     var editor = workspace.querySelector(`[data-numbered-container][data-identifier="${identifier}"]`);
     editor.classList.add("active");
+    setFileTabVisibility(tab);
     forceRefresh();
-    titleRefresh(tab.textContent);
+    titleRefresh(tab.querySelector("[data-file-name]").innerText);
   }
   function closeFile(tab){
     if (tab.hasAttribute("data-unsaved")){
@@ -2331,6 +2305,27 @@
     var editor = workspace.querySelector(`[data-numbered-container][data-identifier="${identifier}"]`);
     workspace.removeChild(editor);
     if (editorFiles[identifier]) delete editorFiles[identifier];
+  }
+  function setFileTabVisibility(tab){
+    var obstructedLeft = (tab.offsetLeft <= files.scrollLeft), obstructedRight = (tab.offsetLeft + tab.clientWidth >= files.scrollLeft + files.clientWidth);
+    if (!obstructedLeft && !obstructedRight) return;
+    var spacingOffset = 0;
+    if (obstructedLeft){
+      if (!tab.previousElementSibling){
+        spacingOffset = parseInt(getElementStyle(files,"padding-left").split("px").join(""));
+      } else {
+        spacingOffset = parseInt(getElementStyle(tab,"margin-left").split("px").join(""));
+      }
+      files.scrollTo(tab.offsetLeft - spacingOffset,0);
+    }
+    if (obstructedRight){
+      if (tab.nextElementSibling){
+        spacingOffset = parseInt(getElementStyle(tab.nextElementSibling,"margin-left").split("px").join(""));
+      } else {
+        spacingOffset = parseInt(getElementStyle(tab,"::before","width").split("px").join(""));
+      }
+      files.scrollTo(tab.offsetLeft + tab.clientWidth + spacingOffset - files.clientWidth,0);
+    }
   }
   function getCurrentEditor(){
     return workspace.querySelector("[data-numbered-container].active textarea");
@@ -2378,20 +2373,6 @@
         refresh = savedRefresh;
         updateCheckbox("refresh",savedRefresh);
       }
-      var savedTitle = storage.getItem("title");
-      if (savedTitle){
-        title = savedTitle;
-        updateCheckbox("title",savedTitle);
-      }
-      window.setTimeout(function(){
-        var savedTransitions = storage.getItem("transitions");
-        if (savedTransitions){
-          changeTransitions(savedTransitions);
-          updateCheckbox("transitions",savedTransitions);
-        } else {
-          changeTransitions(transitions);
-        }
-      },50);
     }
   }
   function resetSettings(){
@@ -2404,10 +2385,6 @@
       updateSelect("editingTools","automatic");
       refresh = "true";
       updateCheckbox("refresh","true");
-      title = "true";
-      updateCheckbox("title","true");
-      changeTransitions("true");
-      updateCheckbox("transitions","true");
       resetTheme();
       storage.clear();
     },50);
@@ -2433,6 +2410,11 @@
   function updateCapitalization(value){
     return value.charAt(0).toUpperCase() + value.slice(1);
   }
+  function clearCache(){
+    var ask = confirm("Are you sure you want to clear all offline cache?\nThis site will no longer work offline.");
+    if (!ask) return;
+    navigator.serviceWorker.controller.postMessage("clear-cache");
+  }
   function resetTheme(){
     tempReducedMotion();
     document.documentElement.style.removeProperty("--primary-hue");
@@ -2450,7 +2432,6 @@
     });
   }
   function tempReducedMotion(){
-    if (transitions != "true") return;
     document.documentElement.classList.add("reduced-motion");
     window.setTimeout(function(){
       document.documentElement.classList.remove("reduced-motion");
@@ -2515,6 +2496,7 @@
   }
   function changeView(newView){
     if (main.classList.contains("resize")) return;
+    if (newView != "preview") workspace.addEventListener("transitionend",checkViewTabVisibility);
     var elements = [main,workspace,scaler,preview];
     elements.forEach(function(element){
       changeClass(element,view,newView);
@@ -2546,6 +2528,10 @@
     }
     view = newView;
     previewRefresh();
+    function checkViewTabVisibility(){
+      workspace.removeEventListener("transitionend",checkViewTabVisibility);
+      setFileTabVisibility(getCurrentTab());
+    }
   }
   function changeOrientation(newOrientation){
     if (main.classList.contains("resize")) return;
@@ -2586,14 +2572,6 @@
     element.removeAttribute("style");
     element.classList.add(newStyle);
   }
-  function changeTransitions(newTransition){
-    if (newTransition == "true"){
-      document.documentElement.classList.remove("reduced-motion");
-    } else {
-      document.documentElement.classList.add("reduced-motion");
-    }
-    transitions = newTransition;
-  }
   function getNavigableElements(container,scope){
     var navigable;
     if (scope){
@@ -2606,8 +2584,12 @@
     });
     return navigable;
   }
-  function getElementStyle(element,property){
-    return window.getComputedStyle(element).getPropertyValue(property);
+  function getElementStyle(element,pseudo,property){
+    if (!property){
+      property = pseudo;
+      pseudo = null;
+    }
+    return window.getComputedStyle(element,pseudo).getPropertyValue(property);
   }
   function confirmOverwrite(action,event){
     if (getCurrentTab().hasAttribute("data-unsaved")){
@@ -2636,14 +2618,12 @@
       editor.moveTo(window.screenX,window.screenY);
     }
   }
-  
-  
   async function loadFiles(){
     if (!fileSystemAccess){
       var input = document.createElement("input");
       input.type = "file";
       input.multiple = true;
-      input.accept = "text/*,image/*,audio/*,.html,.css,.js,.json,.svg,.webmanifest,.md";
+      input.accept = "text/*,.html,.css,.js,.json,.svg,.webmanifest,.md";
       input.click();
       input.addEventListener("change",function(){
         var files = Array.from(input.files);
@@ -2664,7 +2644,7 @@
           multiple: true,
           accepts: [
             {
-              mimeTypes: ["text/*","image/*","audio/*"],
+              mimeTypes: "text/*",
               extensions: ["txt","html","css","js","json","svg","webmanifest","md"]
             }
           ]
@@ -2679,8 +2659,7 @@
             {
               accept: {
                 "text/*": [".txt",".html",".css",".js",".json",".webmanifest",".md"],
-                "image/*": [".svg"],
-                "audio/*": []
+                "image/svg+xml": ".svg"
               }
             }
           ]
@@ -2695,56 +2674,6 @@
       });
     }
   }
-  
-  
-  /*
-  function importFile(){
-    closeCard(activeModal);
-    var reader = new FileReader(), fileName = load.files[0].name, fileExtension = fileName.split(".").pop(), mimeType = load.files[0].type;
-    if (fileExtension == "webmanifest"){
-      mimeType = "application/manifest+json";
-    }
-    if (fileExtension == "markdown" || fileExtension == "md"){
-      mimeType = "text/markdown";
-    }
-    var type = mimeType.split("/")[0], subType = mimeType.split("/")[1], validTypes = ["text","image","audio"], validSubtypes = ["javascript","json","manifest+json","markdown"];
-    if (mimeType == ""){
-      alert("File mime type is undefined, please choose a different file extension to import.");
-      return;
-    }
-    if (validTypes.includes(type) || validSubtypes.includes(subType)){
-      if (type == "text" || type == "application" || subType == "svg+xml"){
-        reader.readAsText(load.files[0],"UTF-8");
-        reader.addEventListener("loadend",function(){
-          createFile(fileName,reader.result);
-          getCurrentEditor().scrollTop = 0;
-          mustSave = false;
-          forceRefresh();
-        });
-        if (subType == "plain"){
-          changeView("text");
-        }
-        if (subType != "plain" && subType != "html" && subType != "svg+xml"){
-          changeView("code");
-        }
-        if (subType == "html" || subType == "svg+xml"){
-          changeView("split");
-        }
-      }
-      if ((type == "image" && subType != "svg+xml") || type == "audio"){
-        reader.readAsDataURL(load.files[0]);
-        reader.addEventListener("loadend",function(){
-          textEdit("insert",reader.result,true);
-        });
-      }
-    } else {
-      alert("Sorry, that file type isn't supported.");
-    }
-    load.value = null;
-  }
-  */
-  
-  
   async function saveFile(extension){
     if (!fileSystemAccess || extension){
       var blob = new Blob([getCurrentEditor().value],{
@@ -2852,7 +2781,6 @@
       activeModal = undefined;
     }
     if (cardType == "widget") activeWidget = undefined;
-    if (card == welcome && parentWindow) getCurrentEditor().focus();
     if (card == settings) loadSettings();
   }
   function catchCardNavigation(event){
