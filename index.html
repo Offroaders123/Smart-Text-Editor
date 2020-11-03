@@ -5,11 +5,11 @@
 
 <title>Smart Text Editor</title>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="author" content="Brandon Bennett">
 <meta name="description" content="The text editor that requires only a browser and a keyboard!">
 <meta name="google-site-verification" content="_LrfHy7pIualH1TolkQ5b3Po0dtjYrx-QQsiXelwx20">
-<meta name="theme-color" content="#191919">
+<meta id="themeColor" name="theme-color" content="#191919">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Smart Text Editor">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -162,7 +162,7 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    background: var(--container-dark);
+    background: #191919;
     opacity: var(--startup-fade-opacity);
     pointer-events: var(--startup-fade-pointer-events);
     z-index: 3;
@@ -1371,6 +1371,9 @@
     margin: min(0.75vw, 3px);
     margin-right: min(3vw, 10px);
   }
+  #codeColorSetting {
+    color: var(--textarea-code-color);
+  }
   #pickerPreview {
     min-width: min(20vw, 86px);
     min-height: min(20vw, 86px);
@@ -1590,6 +1593,10 @@
           <label for="refreshSetting"><svg><use href="#check"/></svg>Automatically Refresh Preview</label>
         </div>
         <div class="checkbox">
+          <input id="responsiveSetting" type="checkbox" oninput="updateCheckbox('responsive');" checked>
+          <label for="responsiveSetting"><svg><use href="#check"/></svg>Screen Density Scaling</label>
+        </div>
+        <div class="checkbox">
           <input id="editingToolsSetting" type="checkbox" oninput="updateCheckbox('editingTools');">
           <label for="editingToolsSetting"><svg><use href="#check"/></svg>Open Editing Tools</label>
         </div>
@@ -1620,7 +1627,6 @@
     </div>
     <div class="content">
       <div class="item list expand">
-        <span class="info">These settings currently don't<br>save between sessions</span>
         <label for="primaryHueSetting">Primary Hue</label>
         <input id="primaryHueSetting" type="range" value="0" min="0" max="360" data-display="#value°">
         <label for="primarySatSetting">Primary Saturation</label>
@@ -1765,6 +1771,7 @@
     view: "text",
     orientation: "horizontal",
     refresh: "true",
+    responsive: "true",
     active_editing_tools: false,
     active_modal: false,
     active_widget: false,
@@ -1777,6 +1784,7 @@
     createFile();
     if (parentWindow){
       loadSettings("initial");
+      loadTheme();
       window.setTimeout(function(){
         document.documentElement.classList.remove("startup-fade");
       },50);
@@ -2258,16 +2266,19 @@
   primaryHueSetting.addEventListener("input",function(){
     tempReducedMotion();
     document.documentElement.style.setProperty("--primary-hue",primaryHueSetting.value);
-    document.querySelector("[name='theme-color']").content = getElementStyle(document.documentElement,"--container-dark");
+    themeColor.content = getElementStyle(document.documentElement,"--container-dark");
+    updateSetting("primaryHue",primaryHueSetting.value);
   });
   primarySatSetting.addEventListener("input",function(){
     tempReducedMotion();
     document.documentElement.style.setProperty("--primary-sat",`${primarySatSetting.value}%`);
-    document.querySelector("[name='theme-color']").content = getElementStyle(document.documentElement,"--container-dark");
+    themeColor.content = getElementStyle(document.documentElement,"--container-dark");
+    updateSetting("primarySat",primarySatSetting.value);
   });
   dragHueSetting.addEventListener("input",function(){
     tempReducedMotion();
     document.documentElement.style.setProperty("--textarea-drag-hue",dragHueSetting.value);
+    updateSetting("dragHue",dragHueSetting.value);
   });
   dragHueSetting.addEventListener("focus",function(){
     getCurrentEditor().parentElement.classList.add("drag");
@@ -2278,6 +2289,7 @@
   codeColorSetting.addEventListener("input",function(){
     tempReducedMotion();
     document.documentElement.style.setProperty("--textarea-code-color",codeColorSetting.value);
+    updateSetting("codeColor",codeColorSetting.value);
   });
   pickerInput.addEventListener("input",function(){
     pickerInputRefresh();
@@ -2467,6 +2479,13 @@
       editor.refresh = savedRefresh;
       updateCheckbox("refresh",savedRefresh);
     }
+    var savedResponsive = editor.storage.getItem("responsive");
+    if (savedResponsive){
+      if (savedResponsive == "true") viewport.content = "width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no";
+      if (savedResponsive == "false") viewport.content = "";
+      editor.responsive = savedResponsive;
+      updateCheckbox("responsive",savedResponsive);
+    }
   }
   function resetSettings(){
     var ask = confirm("Are you sure you want to reset all settings?\nThis cannot be undone.");
@@ -2478,6 +2497,9 @@
       updateSelect("editingTools","no");
       editor.refresh = "true";
       updateCheckbox("refresh","true");
+      editor.responsive = "true";
+      updateCheckbox("responsive","true");
+      viewport.content = "width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no";
       resetTheme();
       editor.storage.clear();
     },50);
@@ -2508,13 +2530,44 @@
     if (!ask) return;
     navigator.serviceWorker.controller.postMessage("clear-cache");
   }
+  function loadTheme(){
+    if (!parentWindow) return;
+    var savedPrimaryHue = editor.storage.getItem("primaryHue");
+    if (savedPrimaryHue){
+      document.documentElement.style.setProperty("--primary-hue",savedPrimaryHue);
+      themeColor.content = getElementStyle(document.documentElement,"--container-dark");
+      primaryHueSetting.value = parseInt(savedPrimaryHue);
+      var label = primaryHueSetting.parentElement.querySelector("label[for='primaryHueSetting']");
+      label.setAttribute("data-tooltip",primaryHueSetting.getAttribute("data-display").split("#value").join(primaryHueSetting.value));
+    }
+    var savedPrimarySat = editor.storage.getItem("primarySat");
+    if (savedPrimarySat){
+      document.documentElement.style.setProperty("--primary-sat",`${savedPrimarySat}%`);
+      themeColor.content = getElementStyle(document.documentElement,"--container-dark");
+      primarySatSetting.value = parseInt(savedPrimarySat);
+      var label = primarySatSetting.parentElement.querySelector("label[for='primarySatSetting']");
+      label.setAttribute("data-tooltip",primarySatSetting.getAttribute("data-display").split("#value").join(primarySatSetting.value));
+    }
+    var savedDragHue = editor.storage.getItem("dragHue");
+    if (savedDragHue){
+      document.documentElement.style.setProperty("--textarea-drag-hue",savedDragHue);
+      dragHueSetting.value = savedDragHue;
+      var label = dragHueSetting.parentElement.querySelector("label[for='dragHueSetting']");
+      label.setAttribute("data-tooltip",dragHueSetting.getAttribute("data-display").split("#value").join(dragHueSetting.value));
+    }
+    var savedCodeColor = editor.storage.getItem("codeColor");
+    if (savedCodeColor){
+      document.documentElement.style.setProperty("--textarea-code-color",savedCodeColor);
+      codeColorSetting.value = savedCodeColor;
+    }
+  }
   function resetTheme(){
     tempReducedMotion();
     document.documentElement.style.removeProperty("--primary-hue");
     document.documentElement.style.removeProperty("--primary-sat");
-    document.documentElement.style.removeProperty("--textarea-code-color");
     document.documentElement.style.removeProperty("--textarea-drag-hue");
-    document.querySelector("[name='theme-color']").content = getElementStyle(document.documentElement,"--container-dark");
+    document.documentElement.style.removeProperty("--textarea-code-color");
+    themeColor.content = getElementStyle(document.documentElement,"--container-dark");
     primaryHueSetting.value = 0;
     primarySatSetting.value = 0;
     dragHueSetting.value = 240;
@@ -2523,6 +2576,10 @@
       var label = themeChannel.parentElement.querySelector(`label[for="${themeChannel.id}"]`);
       label.setAttribute("data-tooltip",themeChannel.getAttribute("data-display").split("#value").join(themeChannel.value));
     });
+    editor.storage.removeItem("primaryHue");
+    editor.storage.removeItem("primarySat");
+    editor.storage.removeItem("dragHue");
+    editor.storage.removeItem("codeColor");
   }
   function tempReducedMotion(){
     document.documentElement.classList.add("reduced-motion");
@@ -2899,6 +2956,7 @@
     if (card == editingTools) editor.active_editing_tools = false;
     if (cardType == "widget") editor.active_widget = false;
     if (card == settings) loadSettings();
+    if (card == theme) loadTheme();
     setFilesSectionOffset();
   }
   function minimizeCard(card){

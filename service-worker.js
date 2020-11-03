@@ -1,5 +1,5 @@
 var worker = {
-  cache_version: 2.09
+  cache_version: 2.10
 }
 self.addEventListener("activate",function(event){
   event.waitUntil(caches.keys().then(function(cacheVersions){
