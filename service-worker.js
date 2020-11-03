@@ -1,22 +1,23 @@
-var cacheVersion = 2.08;
+var worker = {
+  cache_version: 2.09
+}
 self.addEventListener("activate",function(event){
   event.waitUntil(caches.keys().then(function(cacheVersions){
     return Promise.all(cacheVersions.map(function(cache){
-      if (cache != cacheVersion) return caches.delete(cache);
+      if (cache != worker.cache_version) return caches.delete(cache);
     }));
   }));
 });
 self.addEventListener("fetch",function(event){
   event.respondWith(fetch(event.request).then(function(resolve){
     var resolveClone = resolve.clone();
-    caches.open(cacheVersion).then(function(cache){
+    caches.open(worker.cache_version).then(function(cache){
       cache.put(event.request,resolveClone);
     });
     return resolve;
-    }).catch(function(error){
-    caches.match(event.request).then(function(resolve){
-      return resolve;
-  })}));
+  }).catch(function(error){
+    return caches.match(event.request);
+  }));
 });
 self.addEventListener("message",function(event){
   if (event.data == "clear-cache"){

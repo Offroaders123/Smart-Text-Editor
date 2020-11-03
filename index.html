@@ -1800,11 +1800,12 @@
     }
     if ("serviceWorker" in navigator && parentWindow && window.location.protocol == "https:"){
       navigator.serviceWorker.register("service-worker.js");
-      if ((navigator.serviceWorker.controller)) clearCacheButton.parentElement.classList.remove("hidden");
+      if (!(navigator.serviceWorker.controller)) return;
+      navigator.serviceWorker.addEventListener("message",function(event){
+        if (event.data == "clear-cache-success") openCard(clearCacheSuccess);
+      });
+      clearCacheButton.parentElement.classList.remove("hidden");
     }
-  });
-  window.addEventListener("message",function(event){
-    if (event.data == "clear-cache-success") openCard(clearCacheSuccess);
   });
   window.addEventListener("beforeinstallprompt",function(event){
     event.preventDefault();
