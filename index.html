@@ -1796,7 +1796,6 @@
     }
     setOffsetOrientation();
     pickerInputRefresh();
-    forceRefresh();
     var queryParameters = new URLSearchParams(window.location.search);
     if (queryParameters.get("template")){
       confirmOverwrite(insertTemplate);
@@ -1977,6 +1976,9 @@
     },50);
   });
   window.addEventListener("orientationchange",setOffsetOrientation);
+  window.addEventListener("contextmenu",function(event){
+    event.preventDefault();
+  });
   var textareas = document.getElementsByTagName("textarea");
   Array.from(textareas).forEach(function(textarea){
     addInputCharacteristics(textarea);
@@ -1990,6 +1992,9 @@
   anchors.forEach(function(anchor){
     anchor.rel = "noopener";
     anchor.target = "_blank";
+    anchor.addEventListener("contextmenu",function(event){
+      event.stopPropagation();
+    });
   });
   var images = Array.from(document.querySelectorAll("img:not([alt])"));
   images.forEach(function(image){
@@ -2260,7 +2265,7 @@
   installButton.addEventListener("click",function(){
     installPrompt.prompt();
     installPrompt.userChoice.then(function(result){
-      if (result.outcome == "accepted") installButton.classList.remove("active");
+      if (result.outcome == "accepted") installButton.parentElement.classList.add("hidden");
     });
   });
   primaryHueSetting.addEventListener("input",function(){
@@ -2477,12 +2482,13 @@
     var savedRefresh = editor.storage.getItem("refresh");
     if (savedRefresh){
       editor.refresh = savedRefresh;
+      if (editor.refresh == "true") previewRefresh();
       updateCheckbox("refresh",savedRefresh);
     }
     var savedResponsive = editor.storage.getItem("responsive");
     if (savedResponsive){
       if (savedResponsive == "true") viewport.content = "width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no";
-      if (savedResponsive == "false") viewport.content = "";
+      if (savedResponsive == "false") viewport.content = "user-scalable=no";
       editor.responsive = savedResponsive;
       updateCheckbox("responsive",savedResponsive);
     }
@@ -2599,26 +2605,32 @@
     input.autocomplete = "off";
     input.autocapitalize = "off";
     input.setAttribute("autocorrect","off");
-    if (input.tagName.toLowerCase() != "textarea") return;
-    var container = input.parentElement;
-    container.addEventListener("dragover",function(event){
-      container.classList.add("drag");
-      event.dataTransfer.dropEffect = "copy";
+    input.addEventListener("contextmenu",function(event){
+      event.stopPropagation();
     });
-    container.addEventListener("dragleave",function(){
-      container.classList.remove("drag");
-    });
-    container.addEventListener("drop",function(event){
-      container.classList.remove("drag");
-      if (!event.dataTransfer.types.includes("Files")) return updateLineCount(input);
-      event.preventDefault();
-      var reader = new FileReader();
-      reader.readAsText(event.dataTransfer.files[0],"UTF-8");
-      reader.addEventListener("loadend",function(){
-        changeTextarea(input,reader.result);
-        input.scrollTop = 0;
+    /*if (input.tagName.toLowerCase() == "input"){
+    }*/
+    if (input.tagName.toLowerCase() == "textarea"){
+      var container = input.parentElement;
+      container.addEventListener("dragover",function(event){
+        container.classList.add("drag");
+        event.dataTransfer.dropEffect = "copy";
       });
-    });
+      container.addEventListener("dragleave",function(){
+        container.classList.remove("drag");
+      });
+      container.addEventListener("drop",function(event){
+        container.classList.remove("drag");
+        if (!event.dataTransfer.types.includes("Files")) return updateLineCount(input);
+        event.preventDefault();
+        var reader = new FileReader();
+        reader.readAsText(event.dataTransfer.files[0],"UTF-8");
+        reader.addEventListener("loadend",function(){
+          changeTextarea(input,reader.result);
+          input.scrollTop = 0;
+        });
+      });
+    }
   }
   function addQueryParameters(queryEntries){
     var queryParameters = new URLSearchParams(window.location.search);
@@ -2828,7 +2840,7 @@
       var blob = new Blob([getCurrentEditor().value],{
         type: "text/plain"
       }), save = document.createElement("a");
-      save.href = URL.createObjectURL(blob);
+      save.href = window.URL.createObjectURL(blob);
       if (!extension){
         save.download = getFileName();
       } else {
@@ -3014,9 +3026,9 @@
     previewRefresh();
   }
   function flipReplacer(){
-    var cachedData = replacerFind.value;
+    var findContent = replacerFind.value;
     changeTextarea(replacerFind,replacerReplace.value);
-    changeTextarea(replacerReplace,cachedData);
+    changeTextarea(replacerReplace,findContent);
   }
   function clearReplacer(){
     changeTextarea(replacerFind,"");
@@ -3097,12 +3109,12 @@
     if (editor.view == "preview") changeView("split");
   }
   function forceRefresh(){
-    var cachedData = refresh;
+    var currentSetting = editor.refresh;
     editor.refresh = "true";
     sourceChange = true;
     preview.contentWindow.location.reload();
     previewRefresh();
-    editor.refresh = cachedData;
+    editor.refresh = currentSetting;
   }
   function previewRefresh(){
     if (editor.refresh != "true" || !sourceChange) return;
