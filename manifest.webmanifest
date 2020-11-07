@@ -23,6 +23,15 @@
       "purpose": "maskable"
     }
   ],
+  "file_handlers": [
+    {
+      "action": "https://offroaders123.github.io/Smart-Text-Editor/",
+      "accept": {
+        "text/*": [".txt",".html",".css",".js",".json",".webmanifest",".md",".mcmeta"],
+        "image/svg+xml": [".svg"]
+      }
+    }
+  ],
   "shortcuts": [
     {
       "name": "HTML Template",

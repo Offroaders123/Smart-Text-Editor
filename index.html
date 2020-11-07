@@ -42,8 +42,9 @@
 <link rel="stylesheet" href="https://offroaders123.github.io/Numbered-Textarea-Plugin/styles.css">
 
 <script>
-  var parentWindow = (window.self == window.top), fileSystemAccess = (("chooseFileSystemEntries" in window) || ("showOpenFilePicker" in window)), touchDevice = ("ontouchstart" in document.documentElement), appleDevice = (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform));
+  var parentWindow = (window.self == window.top), fileSystemAccess = (("chooseFileSystemEntries" in window) || ("showOpenFilePicker" in window)), fileHandling = (("launchQueue" in window) && ("LaunchParams" in window)), touchDevice = ("ontouchstart" in window), appleDevice = (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform));
   if (parentWindow) document.documentElement.classList.add("startup-fade");
+  if (touchDevice) document.documentElement.classList.add("touch-device");
   if (appleDevice) document.documentElement.classList.add("apple-device");
 </script>
 
@@ -117,8 +118,7 @@
     --range-track: hsl(var(--primary-hue),var(--secondary-sat),12.5%);
     --range-track-hover: hsl(var(--primary-hue),var(--secondary-sat),18.8%);
 
-    --card-background: #19191960;
-    --loading-background: #000000bf;
+    --card-backdrop: #19191960;
 
     --startup-fade-opacity: 0;
     --startup-fade-pointer-events: none;
@@ -298,7 +298,7 @@
   button.nav.minimize > svg {
     transition: fill var(--transition-fast), transform var(--transition-medium);
   }
-  button:hover > svg, button:focus > svg, button.tab:hover > button > svg, button.tab:focus > button > svg, .dropdown:hover button > svg, .dropdown:focus-within button > svg, .dropdown.active button > svg, .dropdown li:hover > svg, .dropdown li:focus > svg, .dropdown li:focus-within > svg, .dropdown li.active > svg {
+  button:hover > svg, button:focus > svg, button.tab:hover > button > svg, button.tab:focus > button > svg, button.tab:focus-within > button > svg, .dropdown:hover button > svg, .dropdown:focus-within button > svg, .dropdown.active button > svg, .dropdown li:hover > svg, .dropdown li:focus > svg, .dropdown li:focus-within > svg, .dropdown li.active > svg {
     fill: var(--text-hover);
   }
   [data-numbered-container], input[type="text"] {
@@ -471,6 +471,12 @@
     position: relative;
     display: flex;
   }
+  .dropdown.context-menu {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 2;
+  }
   .dropdown svg {
     width: min(2.75vw, 12px);
     height: min(2.75vw, 12px);
@@ -496,9 +502,13 @@
     scrollbar-color: var(--scrollbar) var(--container-medium);
     transform: scaleY(var(--scale));
     --scale: 0.15;
-    transform-origin: top center;
+    transform-origin: center top;
     transition: var(--transition-fast) ease-in;
     transition-property: visibility, opacity, transform;
+  }
+  .dropdown.context-menu ul {
+    transform: scale(var(--scale));
+    transform-origin: left top;
   }
   .dropdown li, .dropdown a {
     padding: min(1.75vw, 8px);
@@ -561,7 +571,7 @@
       left: 0;
       top: 100%;
       transform: scaleY(var(--scale));
-      transform-origin: top center;
+      transform-origin: center top;
       overflow-y: auto;
     }
     .dropdown li > svg {
@@ -584,6 +594,9 @@
     pointer-events: all;
     transform: scale(1);
     transition-timing-function: ease-out;
+  }
+  :root.touch-device .dropdown.context-menu.active > ul {
+    transition: var(--transition-medium) ease-out;
   }
   .select {
     margin: min(0.75vw, 3px);
@@ -676,22 +689,22 @@
   .checkbox:hover input[type="checkbox"]:checked + label > svg, .checkbox:focus input[type="checkbox"]:checked + label > svg {
     fill: var(--text-hover);
   }
-  html:not(.apple-device) .shortcut.ctrl::before {
+  :root:not(.apple-device) .shortcut.ctrl::before {
     content: "Ctrl + ";
   }
-  html:not(.apple-device) .shortcut.ctrl-shift::before {
+  :root:not(.apple-device) .shortcut.ctrl-shift::before {
     content: "Ctrl + Shift + ";
   }
-  html.apple-device .shortcut {
+  :root.apple-device .shortcut {
     font-size: min(3vw, 12px);
   }
-  html.apple-device .shortcut.command::before {
+  :root.apple-device .shortcut.command::before {
     content: "\2318";
   }
-  html.apple-device .shortcut.shift-command::before {
+  :root.apple-device .shortcut.shift-command::before {
     content: "\21E7\2318";
   }
-  html.apple-device .shortcut.ctrl-command::before {
+  :root.apple-device .shortcut.ctrl-command::before {
     content: "\2303\2318";
   }
   [data-tooltip] {
@@ -775,7 +788,6 @@
     z-index: 2;
     transform: translate(-50%,-50%) scale(var(--scale));
     --scale: 0.15;
-    transform-origin: center center;
   }
   .card.notification, .card.action, .card.widget {
     padding: min(2.5vw, 12px);
@@ -799,7 +811,7 @@
     z-index: 1;
     transform: scaleY(var(--scale));
     --scale: 0.15;
-    transform-origin: top center;
+    transform-origin: center top;
   }
   .card.action {
     flex-direction: row;
@@ -837,10 +849,12 @@
   .card.action.active ~ .card.widget.active {
     transform: translateY(min(13.5vw, 68px)) scaleY(1);
   }
-  .card.active, #backdrop.active {
+  .card.active, #cardBackdrop.active, #contextMenuBackdrop.active {
     visibility: visible;
-    opacity: 1;
     pointer-events: all;
+  }
+  .card.active, #cardBackdrop.active {
+    opacity: 1;
   }
   .card.modal.active {
     transform: translate(-50%,-50%) scale(1);
@@ -1207,10 +1221,14 @@
   #workspace .files button.tab[data-unsaved] {
     padding-left: min(2vw, 8px);
   }
+  #workspace .files button.tab[data-unsaved] > [data-file-name] {
+    font-style: italic;
+  }
   #workspace .files button.tab[data-unsaved] > [data-file-name]::before {
     content: "*";
     margin-right: min(0.5vw, 2px);
     font-size: 125%;
+    font-style: normal;
     line-height: min(4vw, 16px);
   }
   #workspace.text .files button.tab.active {
@@ -1233,7 +1251,7 @@
     color: var(--text-light);
     background: var(--textarea-dark);
   }
-  #workspace .files button.tab.active.resize, #workspace .files button.tab.active.resize > button > svg {
+  #workspace .files button.tab.active.fade, #workspace .files button.tab.active.fade > button > svg {
     transition-duration: var(--transition-slow);
   }
   #workspace [data-numbered-container] {
@@ -1317,7 +1335,6 @@
     opacity: 0;
     z-index: 1;
     transform: scale(0.25) rotate(var(--rotate));
-    transform-origin: center center;
     transition: var(--transition-fast) ease-in;
     transition-property: color, background, visibility, opacity, transform;
   }
@@ -1348,19 +1365,24 @@
   #preview.preview {
     --size: 100%;
   }
-  #backdrop {
+  #cardBackdrop, #contextMenuBackdrop {
     position: fixed;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background: var(--card-background);
     visibility: hidden;
-    opacity: 0;
     pointer-events: none;
     z-index: 2;
+  }
+  #cardBackdrop {
+    background: var(--card-backdrop);
+    opacity: 0;
     transition: var(--transition-medium);
     transition-property: visibility, opacity;
+  }
+  #contextMenuBackdrop {
+    transition: visibility var(--transition-fast);
   }
   #installButton {
     display: flex;
@@ -1558,7 +1580,7 @@
     <div class="handle">▲<br>▼</div>
   </section>
   <iframe id="preview" class="text horizontal" src="about:blank"></iframe>
-  <section id="backdrop"></section>
+  <section id="cardBackdrop"></section>
   <section id="settings" class="card modal">
     <div class="header">
       <span>Settings</span>
@@ -1661,8 +1683,8 @@
     </div>
   </section>
   <section id="editingTools" class="card action">
-    <button id="undoTool" onclick="changeState('undo');"><svg><use href="#undo"/></svg></button>
-    <button id="redoTool" onclick="changeState('redo');"><svg><use href="#redo"/></svg></button>
+    <button id="undoTool" onclick="callCommand(getCurrentEditor(),'undo'); this.focus();"><svg><use href="#undo"/></svg></button>
+    <button id="redoTool" onclick="callCommand(getCurrentEditor(),'redo'); this.focus();"><svg><use href="#redo"/></svg></button>
     <button id="refreshTool" onclick="forceRefresh();" disabled><svg><use href="#refresh"/></svg></button>
   </section>
   <section id="replacer" class="card widget">
@@ -1757,6 +1779,17 @@
       </div>
     </div>
   </section>
+  <section id="contextMenuBackdrop"></section>
+  <section id="contextMenu" class="dropdown context-menu">
+    <ul>
+      <li onclick="callCommand(editor.context_menu_previous,'undo');">Undo<span class="shortcut ctrl command">Z</span></li>
+      <li onclick="callCommand(editor.context_menu_previous,'redo');">Redo<span class="shortcut ctrl-shift shift-command">Z</span></li>
+      <li onclick="callCommand(editor.context_menu_previous,'cut');">Cut<span class="shortcut ctrl command">X</span></li>
+      <li onclick="callCommand(editor.context_menu_previous,'copy');">Copy<span class="shortcut ctrl command">C</span></li>
+      <li onclick="callCommand(editor.context_menu_previous,'paste');">Paste<span class="shortcut ctrl command">V</span></li>
+      <li onclick="editor.context_menu_previous.select();">Select All<span class="shortcut ctrl command">A</span></li>
+    </ul>
+  </section>
   <section id="loading">
     <svg class="buffering"><use href="#buffering"/></svg>
   </section>
@@ -1774,14 +1807,25 @@
     responsive: "true",
     active_editing_tools: false,
     active_modal: false,
+    modal_previous: null,
     active_widget: false,
-    previous_element: false,
+    context_menu_previous: null,
+    long_touch: null,
     picker_color: null,
     insert_color: false
   };
   var installPrompt, sourceChange = false;
   window.addEventListener("load",function(){
-    createFile();
+    if (fileHandling && fileSystemAccess){
+      window.launchQueue.setConsumer(function(launchParams){
+        if (!launchParams.files.length) return;
+        launchParams.files.forEach(async function(fileHandle){
+          var file = await fileHandle.getFile(), identifier = createFile(await file.name,await file.text());
+          editor.files[identifier] = await fileHandle;
+        });
+      });
+    }
+    if (!files.querySelectorAll("button.tab").length) createFile();
     if (parentWindow){
       loadSettings("initial");
       loadTheme();
@@ -1789,10 +1833,6 @@
         document.documentElement.classList.remove("startup-fade");
       },50);
       if (!touchDevice) getCurrentEditor().focus();
-    }
-    if (CSS.supports("-moz-appearance: none")){
-      undoTool.classList.add("hidden");
-      redoTool.classList.add("hidden");
     }
     setOffsetOrientation();
     pickerInputRefresh();
@@ -1825,13 +1865,24 @@
       event.returnValue = "";
     }
   });
-  window.addEventListener("keydown",function(event){
+  window.addEventListener("resize",function(event){
+    if (editor.view != "split" || !main.hasAttribute("data-scaling-offset")) return;
+    var currentWidth = window.innerWidth, currentHeight = window.innerHeight;
+    window.setTimeout(function(){
+      if (editor.orientation == "horizontal" && window.innerHeight == currentHeight) return;
+      if (editor.orientation == "vertical" && window.innerWidth == currentWidth) return;
+      changeView("split");
+    },50);
+  });
+  window.addEventListener("orientationchange",setOffsetOrientation);
+  document.body.addEventListener("keydown",function(event){
     var pressed = key => (event.key.toLowerCase() == key.toLowerCase()), ctrl = (event.ctrlKey && !appleDevice), command = (event.metaKey && appleDevice), shift = (event.shiftKey || (event.key.toUpperCase() == event.key)), ctrlShift = (ctrl && shift), shiftCommand = (shift && command), ctrlCommand = (event.ctrlKey && command);
-    if (pressed("Escape") && editor.active_modal){
+    if (pressed("Escape")){
       event.preventDefault();
       if (event.repeat) return;
       event.stopPropagation();
-      closeCard(editor.active_modal);
+      if (contextMenu.classList.contains("active")) return closeContextMenu();
+      if (editor.active_modal) closeCard(editor.active_modal);
     }
     if ((ctrlShift || shiftCommand) && pressed("x")){
       event.preventDefault();
@@ -1963,20 +2014,7 @@
       openCard(settings);
     }
   });
-  window.addEventListener("dblclick",function(event){
-    event.preventDefault();
-  });
-  window.addEventListener("resize",function(event){
-    if (editor.view != "split" || !main.hasAttribute("data-scaling-offset")) return;
-    var currentWidth = window.innerWidth, currentHeight = window.innerHeight;
-    window.setTimeout(function(){
-      if (editor.orientation == "horizontal" && window.innerHeight == currentHeight) return;
-      if (editor.orientation == "vertical" && window.innerWidth == currentWidth) return;
-      changeView("split");
-    },50);
-  });
-  window.addEventListener("orientationchange",setOffsetOrientation);
-  window.addEventListener("contextmenu",function(event){
+  document.body.addEventListener("contextmenu",function(event){
     event.preventDefault();
   });
   var textareas = document.getElementsByTagName("textarea");
@@ -2002,45 +2040,47 @@
   });
   var dropdowns = Array.from(document.getElementsByClassName("dropdown"));
   dropdowns.forEach(function(dropdown){
+    var button = dropdown.getElementsByTagName("button")[0], menus = Array.from(dropdown.getElementsByTagName("ul")), submenus = Array.from(dropdown.querySelectorAll("li > ul")), options = Array.from(dropdown.querySelectorAll("li, a"));
     dropdown.addEventListener("click",function(event){
       event.stopPropagation();
     });
     dropdown.addEventListener("keydown",function(event){
       if (!dropdown.classList.contains("active")) return;
-      if (event.key == "Escape" || event.key == "Tab"){
+      if (event.key == "Escape" || (event.key == "Tab" && dropdown != contextMenu)){
         event.preventDefault();
         event.stopPropagation();
         disableDropdown(dropdown);
-        button.focus();
+        if (button) button.focus();
       }
     });
     dropdown.setAttribute("aria-label","Dropdown");
-    var button = dropdown.getElementsByTagName("button")[0], menus = Array.from(dropdown.getElementsByTagName("ul")), submenus = Array.from(dropdown.querySelectorAll("li > ul")), options = Array.from(dropdown.querySelectorAll("li, a"));
-    button.addEventListener("click",function(){
-      var currentDropdown = dropdown;
-      dropdowns.forEach(function(dropdown){
-        if (dropdown == currentDropdown) return;
-        disableDropdown(dropdown);
+    if (button){
+      button.addEventListener("click",function(){
+        var currentDropdown = dropdown;
+        dropdowns.forEach(function(dropdown){
+          if (dropdown == currentDropdown || dropdown == contextMenu) return;
+          disableDropdown(dropdown);
+        });
+        dropdown.classList.toggle("active");
+        if (dropdown.classList.contains("active")){
+          document.body.addEventListener("click",checkDropdown);
+        } else {
+          document.body.removeEventListener("click",checkDropdown);
+        }
       });
-      dropdown.classList.toggle("active");
-      if (dropdown.classList.contains("active")){
-        document.body.addEventListener("click",checkDropdown);
-      } else {
-        document.body.removeEventListener("click",checkDropdown);
-      }
-    });
-    button.addEventListener("keydown",function(event){
-      if (!dropdown.classList.contains("active")) return;
-      var navigable = getNavigableElements(menus[0],true);
-      if (event.key == "ArrowDown"){
-        event.preventDefault();
-        navigable[0].focus();
-      }
-      if (event.key == "ArrowUp"){
-        event.preventDefault();
-        navigable[navigable.length - 1].focus();
-      }
-    });
+      button.addEventListener("keydown",function(event){
+        if (!dropdown.classList.contains("active")) return;
+        var navigable = getNavigableElements(menus[0],true);
+        if (event.key == "ArrowDown"){
+          event.preventDefault();
+          navigable[0].focus();
+        }
+        if (event.key == "ArrowUp"){
+          event.preventDefault();
+          navigable[navigable.length - 1].focus();
+        }
+      });
+    }
     menus.forEach(function(menu){
       menu.addEventListener("keydown",function(event){
         var navigable = getNavigableElements(menu,true);
@@ -2105,14 +2145,16 @@
           event.preventDefault();
           event.stopPropagation();
           option.click();
-          button.focus();
+          if (button) button.focus();
         }
         if (!dropdown.parentElement.classList.contains("select")) return;
         if (event.key == "Escape" || event.key == "Tab"){
           event.preventDefault();
           event.stopPropagation();
           disableDropdown(dropdown);
-          button.focus();
+          if (dropdown == contextMenu){
+            editor.menu_previous.focus();
+          } else if (button) button.focus();
         }
       });
       option.addEventListener("mouseenter",function(){
@@ -2133,6 +2175,10 @@
         submenu.parentElement.classList.remove("active");
       });
       dropdown.classList.remove("active");
+      if (dropdown != contextMenu) return;
+      contextMenuBackdrop.classList.remove("active");
+      editor.context_menu_previous.focus();
+      editor.context_menu_previous = null;
     }
   });
   var checkboxes = Array.from(document.getElementsByClassName("checkbox"));
@@ -2250,16 +2296,15 @@
   });
   scaler.addEventListener("touchstart",function(){
     toggleScaling();
-    document.body.addEventListener("touchmove",setScaling,{ passive: true });
-    document.body.addEventListener("touchend",removeScaling,{ passive: true });
+    document.addEventListener("touchmove",setScaling,{ passive: true });
+    document.addEventListener("touchend",removeScaling,{ passive: true });
   },{ passive: true });
   scaler.addEventListener("mousedown",function(){
     toggleScaling();
-    document.body.addEventListener("mousemove",setScaling);
-    document.body.addEventListener("mouseup",removeScaling);
-    document.body.addEventListener("mouseleave",removeScaling);
+    document.addEventListener("mousemove",setScaling);
+    document.addEventListener("mouseup",removeScaling);
   });
-  backdrop.addEventListener("click",function(){
+  cardBackdrop.addEventListener("click",function(){
     closeCard(editor.active_modal);
   });
   installButton.addEventListener("click",function(){
@@ -2302,6 +2347,14 @@
       textEdit("insert",editor.picker_color,true);
       pickerInput.focus();
     }
+  });
+  contextMenuBackdrop.addEventListener("click",function(event){
+    if (!contextMenu.classList.contains("active")) return;
+    event.stopPropagation();
+    closeContextMenu();
+  });
+  contextMenuBackdrop.addEventListener("contextmenu",function(){
+    if (contextMenu.classList.contains("active")) closeContextMenu();
   });
   function createFile(name,value){
     var identifier = Math.random(), tab = document.createElement("button"), container = document.createElement("div");
@@ -2375,19 +2428,19 @@
     var identifier = tab.getAttribute("data-identifier"), tabs = Array.from(files.querySelectorAll("button.tab"));
     tabs.forEach(function(tab){
       tab.classList.remove("active");
-      tab.classList.remove("resize");
+      tab.classList.remove("fade");
     });
     tab.classList.add("active");
     var transitionDuration = parseInt(getElementStyle(tab,"transition-duration").split("s").join("") * 1000);
     window.setTimeout(function(){
-      tab.classList.add("resize");
+      tab.classList.add("fade");
     },transitionDuration);
     var activeFiles = Array.from(workspace.querySelectorAll("[data-numbered-container].active"));
     activeFiles.forEach(function(activeFile){
       activeFile.classList.remove("active");
     });
-    var editor = workspace.querySelector(`[data-numbered-container][data-identifier="${identifier}"]`);
-    editor.classList.add("active");
+    var container = workspace.querySelector(`[data-numbered-container][data-identifier="${identifier}"]`);
+    container.classList.add("active");
     setFileTabVisibility(tab);
     forceRefresh();
     titleRefresh(tab.querySelector("[data-file-name]").innerText);
@@ -2403,8 +2456,8 @@
     if (tab != tabs[0] && tab.classList.contains("active")) openFile(tabs[tabs.indexOf(tab) + 1]);
     if (withinEditor) getCurrentEditor().focus();
     files.removeChild(tab);
-    var editor = workspace.querySelector(`[data-numbered-container][data-identifier="${identifier}"]`);
-    workspace.removeChild(editor);
+    var container = workspace.querySelector(`[data-numbered-container][data-identifier="${identifier}"]`);
+    workspace.removeChild(container);
     if (editor.files[identifier]) delete editor.files[identifier];
   }
   function setFileTabVisibility(tab){
@@ -2605,13 +2658,26 @@
     input.autocomplete = "off";
     input.autocapitalize = "off";
     input.setAttribute("autocorrect","off");
-    input.addEventListener("contextmenu",function(event){
-      event.stopPropagation();
-    });
-    /*if (input.tagName.toLowerCase() == "input"){
-    }*/
+    if (input.tagName.toLowerCase() == "input"){
+      input.addEventListener("contextmenu",openContextMenu);
+      input.addEventListener("touchstart",function(event){
+        editor.long_touch = window.setTimeout(function(){
+          openContextMenu(event);
+        },750);
+      });
+      input.addEventListener("touchmove",cancelLongTouch);
+      input.addEventListener("touchend",cancelLongTouch);
+    }
     if (input.tagName.toLowerCase() == "textarea"){
       var container = input.parentElement;
+      container.addEventListener("contextmenu",openContextMenu);
+      container.addEventListener("touchstart",function(event){
+        editor.long_touch = window.setTimeout(function(){
+          openContextMenu(event);
+        },750);
+      });
+      container.addEventListener("touchmove",cancelLongTouch);
+      container.addEventListener("touchend",cancelLongTouch);
       container.addEventListener("dragover",function(event){
         container.classList.add("drag");
         event.dataTransfer.dropEffect = "copy";
@@ -2654,7 +2720,7 @@
   }
   function changeView(newView){
     if (main.classList.contains("resize")) return;
-    if (newView != "preview") workspace.addEventListener("transitionend",checkViewTabVisibility);
+    if (newView != "preview") workspace.addEventListener("transitionend",setViewVisibility);
     var elements = [main,workspace,scaler,preview];
     elements.forEach(function(element){
       changeClass(element,editor.view,newView);
@@ -2688,11 +2754,11 @@
     }
     editor.view = newView;
     previewRefresh();
-    function checkViewTabVisibility(){
-      workspace.removeEventListener("transitionend",checkViewTabVisibility);
+    function setViewVisibility(){
+      workspace.removeEventListener("transitionend",setViewVisibility);
       setFileTabVisibility(getCurrentTab());
+      setFilesSectionOffset();
     }
-    setFilesSectionOffset();
   }
   function changeOrientation(newOrientation){
     if (main.classList.contains("resize")) return;
@@ -2770,13 +2836,13 @@
   function openEditorWindow(){
     var windowFeatures = "", standalone = (window.matchMedia("(display-mode: standalone)").matches || "standalone" in navigator || !window.menubar.visible), hiddenChrome = (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight), fullscreen = (window.matchMedia("(display-mode: fullscreen)").matches || (!window.screenY && !window.screenTop && hiddenChrome) || (!window.screenY && !window.screenTop && standalone));
     if (standalone || fullscreen) windowFeatures = "popup";
-    var editor = window.open(window.location.href,"_blank",windowFeatures);
+    var newEditor = window.open(window.location.href,"_blank",windowFeatures);
     if (fullscreen){
-      editor.resizeTo(window.screen.width * 2/3,window.screen.height * 2/3);
-      editor.moveTo(window.screen.width / 6,window.screen.height / 6);
+      newEditor.resizeTo(window.screen.width * 2/3,window.screen.height * 2/3);
+      newEditor.moveTo(window.screen.width / 6,window.screen.height / 6);
     } else if (standalone){
-      editor.resizeTo(window.outerWidth,window.outerHeight);
-      editor.moveTo(window.screenX,window.screenY);
+      newEditor.resizeTo(window.outerWidth,window.outerHeight);
+      newEditor.moveTo(window.screenX,window.screenY);
     }
   }
   async function loadFiles(){
@@ -2784,7 +2850,7 @@
       var input = document.createElement("input");
       input.type = "file";
       input.multiple = true;
-      input.accept = "text/*,.html,.css,.js,.json,.svg,.webmanifest,.md";
+      input.accept = "text/*,.html,.css,.js,.json,.svg,.webmanifest,.md,.mcmeta";
       input.click();
       input.addEventListener("change",function(){
         var files = Array.from(input.files);
@@ -2805,8 +2871,8 @@
           multiple: true,
           accepts: [
             {
-              mimeTypes: ["text/*"],
-              extensions: ["txt","html","css","js","json","svg","webmanifest","md"]
+              mimeTypes: ["text/*","image/svg+xml"],
+              extensions: ["txt","html","css","js","json","svg","webmanifest","md","mcmeta"]
             }
           ]
         }).catch(function(error){
@@ -2819,7 +2885,7 @@
           types: [
             {
               accept: {
-                "text/*": [".txt",".html",".css",".js",".json",".webmanifest",".md"],
+                "text/*": [".txt",".html",".css",".js",".json",".webmanifest",".md",".mcmeta"],
                 "image/svg+xml": [".svg"]
               }
             }
@@ -2920,7 +2986,7 @@
       });
     }
     card.classList.add("active");
-    if (cardType != ("notification" || "modal")) backdrop.classList.remove("active");
+    if (cardType != ("notification" || "modal")) cardBackdrop.classList.remove("active");
     if (cardType == "notification"){
       window.setTimeout(function(){
         closeCard(card);
@@ -2928,9 +2994,9 @@
     }
     if (card == editingTools) editor.active_editing_tools = true;
     if (cardType == "modal"){
-      if (!editor.active_modal) editor.previous_element = document.activeElement;
+      if (!editor.active_modal) editor.modal_previous = document.activeElement;
       document.body.addEventListener("keydown",catchCardNavigation);
-      backdrop.classList.add("active");
+      cardBackdrop.classList.add("active");
       var transitionDuration = parseInt(getElementStyle(card,"transition-duration").split("s").join("") * 500);
       window.setTimeout(function(){
         document.activeElement.blur();
@@ -2954,15 +3020,15 @@
     }
     if (cardType == "modal"){
       document.body.removeEventListener("keydown",catchCardNavigation);
-      backdrop.classList.remove("active");
+      cardBackdrop.classList.remove("active");
       editor.active_modal = false;
-      if (editor.previous_element){
-        if (workspace.contains(editor.previous_element) && getElementStyle(editor.previous_element,"visibility") == "hidden"){
+      if (editor.modal_previous){
+        if (workspace.contains(editor.modal_previous) && getElementStyle(editor.modal_previous,"visibility") == "hidden"){
           getCurrentEditor().focus();
         } else {
-          editor.previous_element.focus();
+          editor.modal_previous.focus();
         }
-        editor.previous_element = false;
+        editor.modal_previous = null;
       }
     }
     if (card == editingTools) editor.active_editing_tools = false;
@@ -2992,7 +3058,7 @@
     setFilesSectionOffset();
   }
   function catchCardNavigation(event){
-    if (!editor.active_modal || event.key != "Tab" || document.activeElement != document.body) return;
+    if (!editor.active_modal || contextMenu.classList.contains("active") || event.key != "Tab" || document.activeElement != document.body) return;
     var navigable = getNavigableElements(editor.active_modal);
     if (event.shiftKey){
       event.preventDefault();
@@ -3000,6 +3066,64 @@
     } else {
       event.preventDefault();
       navigable[0].focus();
+    }
+  }
+  function openContextMenu(event){
+    event.preventDefault();
+    event.stopPropagation();
+    if (editor.long_touch) editor.long_touch = null;
+    contextMenu.classList.add("active");
+    contextMenuBackdrop.classList.add("active");
+    editor.context_menu_previous = document.activeElement;
+    var pageLocation = {}, transformOrigin = {};
+    if (touchDevice && event instanceof TouchEvent){
+      pageLocation.left = event.touches[0].pageX;
+      pageLocation.top = event.touches[0].pageY;
+    } else {
+      pageLocation.left = event.pageX;
+      pageLocation.top = event.pageY;
+    }
+    transformOrigin.left = pageLocation.left;
+    transformOrigin.top = pageLocation.top;
+    var dropdown = contextMenu.querySelectorAll("ul")[0];
+    if (pageLocation.left + dropdown.offsetWidth > window.innerWidth) pageLocation.left = window.innerWidth - dropdown.offsetWidth;
+    if (pageLocation.top + dropdown.offsetHeight > window.innerHeight) pageLocation.top = window.innerHeight - dropdown.offsetHeight;
+    transformOrigin.left -= pageLocation.left;
+    transformOrigin.top -= pageLocation.top;
+    contextMenu.style.left = `${pageLocation.left}px`;
+    contextMenu.style.top = `${pageLocation.top}px`;
+    dropdown.style.transformOrigin = `${transformOrigin.left}px ${transformOrigin.top}px`;
+    document.body.addEventListener("keydown",catchContextMenuNavigation);
+    var transitionDuration = parseInt(getElementStyle(dropdown,"transition-duration").split("s").join("") * 500);
+    window.setTimeout(function(){
+      document.activeElement.blur();
+    },transitionDuration);
+  }
+  function closeContextMenu(){
+    contextMenu.classList.remove("active");
+    contextMenuBackdrop.classList.remove("active");
+    editor.context_menu_previous.focus();
+    editor.context_menu_previous = null;
+    document.body.removeEventListener("keydown",catchContextMenuNavigation);
+  }
+  function catchContextMenuNavigation(event){
+    event.stopPropagation();
+    if (!contextMenu.classList.contains("active") || document.activeElement != document.body) return;
+    var navigable = getNavigableElements(contextMenu);
+    if (event.key == "Tab") event.preventDefault();
+    if (event.key == "ArrowUp"){
+      event.preventDefault();
+      navigable[navigable.length - 1].focus();
+    }
+    if (event.key == "ArrowDown"){
+      event.preventDefault();
+      navigable[0].focus();
+    }
+  }
+  function cancelLongTouch(){
+    if (!contextMenu.classList.contains("active") && editor.long_touch){
+      window.clearTimeout(editor.long_touch);
+      editor.long_touch = null;
     }
   }
   function toggleLoadingOverlay(){
@@ -3015,9 +3139,13 @@
       },transitionDuration);
     }
   }
-  function changeState(action){
-    getCurrentEditor().focus();
-    document.execCommand(action);
+  async function callCommand(element,action){
+    element.focus();
+    if (action == "paste"){
+      var clipboardText = await navigator.clipboard.readText();
+      document.execCommand("insertText",false,clipboardText);
+    } else document.execCommand(action);
+    if ((action == "undo" || action == "redo") && element.parentElement.hasAttribute("data-numbered-container")) updateLineCount(element);
   }
   function activateReplacer(){
     changeTextarea(getCurrentEditor(),getCurrentEditor().value.split(replacerFind.value).join(replacerReplace.value));
@@ -3133,7 +3261,7 @@
   }
   function setScaling(event){
     var scalingOffset, scalingRange = {};
-    if ("TouchEvent" in window && event instanceof TouchEvent){
+    if (touchDevice && event instanceof TouchEvent){
       if (editor.orientation == "horizontal") scalingOffset = event.touches[0].clientY - header.offsetHeight;
       if (editor.orientation == "vertical") scalingOffset = event.touches[0].clientX;
     } else {
@@ -3164,14 +3292,13 @@
     }
   }
   function removeScaling(event){
-    if ("TouchEvent" in window && event instanceof TouchEvent){
-      document.body.removeEventListener("touchmove",setScaling,{ passive: true });
-      document.body.removeEventListener("touchend",removeScaling,{ passive: true });
+    if (touchDevice && event instanceof TouchEvent){
+      document.removeEventListener("touchmove",setScaling);
+      document.removeEventListener("touchend",removeScaling);
       toggleScaling();
     } else {
-      document.body.removeEventListener("mousemove",setScaling);
-      document.body.removeEventListener("mouseup",removeScaling);
-      document.body.removeEventListener("mouseleave",removeScaling);
+      document.removeEventListener("mousemove",setScaling);
+      document.removeEventListener("mouseup",removeScaling);
       toggleScaling();
     }
   }
