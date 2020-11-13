@@ -2512,8 +2512,8 @@
     editor.install_prompt.prompt();
     editor.install_prompt.userChoice.then(function(result){
       if (result.outcome == "accepted"){
-        installOption.classList.remove("hidden");
-        installButton.classList.remove("hidden");
+        installOption.classList.add("hidden");
+        installButton.classList.add("hidden");
       }
     });
   }
