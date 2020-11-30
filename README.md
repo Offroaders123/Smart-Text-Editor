@@ -1,7 +1,7 @@
 <table>
   <tr>
     <td>
-      <img width="64" src="resources/icon.svg">
+      <img width="64" src="https://offroaders123.github.io/Smart-Text-Editor/resources/icon.svg">
     </td>
     <td>
       <h1>Smart Text Editor</h1>

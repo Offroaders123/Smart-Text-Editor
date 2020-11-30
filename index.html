@@ -11,8 +11,8 @@
 <meta name="google-site-verification" content="_LrfHy7pIualH1TolkQ5b3Po0dtjYrx-QQsiXelwx20">
 <meta property="og:title" content="Smart Text Editor">
 <meta property="og:description" content="The text editor that requires only a browser and a keyboard!">
-<meta property="og:image" content="resources/share-1200.png">
-<meta property="og:url" content="http://offroaders123.github.io/Smart-Text-Editor/">
+<meta property="og:image" content="https://offroaders123.github.io/Smart-Text-Editor/resources/share-1200.png">
+<meta property="og:url" content="https://offroaders123.github.io/Smart-Text-Editor/">
 <meta name="twitter:card" content="summary_large_image">
 <meta id="themeColor" name="theme-color" content="#191919">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -48,11 +48,49 @@
 <link rel="stylesheet" href="https://offroaders123.github.io/Numbered-Textarea-Plugin/styles.css">
 
 <script>
-  var parentWindow = (window.self == window.top), fileSystemAccess = (("chooseFileSystemEntries" in window) || ("showOpenFilePicker" in window)), fileHandling = (("launchQueue" in window) && ("LaunchParams" in window)), webSharing = (navigator.share), touchDevice = ("ontouchstart" in window), appleDevice = (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform));
-  if (parentWindow) document.documentElement.classList.add("startup-fade");
-  if (webSharing) document.documentElement.classList.add("web-sharing");
-  if (touchDevice) document.documentElement.classList.add("touch-device");
-  if (appleDevice) document.documentElement.classList.add("apple-device");
+  var editor = {
+    appearance: {
+      parent_window: (window.self == window.top),
+      standalone: () => (window.matchMedia("(display-mode: standalone)").matches || "standalone" in navigator || !window.menubar.visible),
+      hidden_chrome: () => (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight),
+      fullscreen: () => (window.matchMedia("(display-mode: fullscreen)").matches || (!window.screenY && !window.screenTop && editor.appearance.hidden_chrome()) || (!window.screenY && !window.screenTop && editor.appearance.standalone()))
+    },
+    environment: {
+      touch_device: ("ontouchstart" in window),
+      apple_device: (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform)),
+      macOS_device: (/(Mac)/i.test(navigator.platform) && navigator.standalone == undefined),
+      mozilla_browser: (CSS.supports("-moz-appearance: none"))
+    },
+    api_support: {
+      file_system: ("chooseFileSystemEntries" in window || "showOpenFilePicker" in window),
+      file_handling: ("launchQueue" in window && "LaunchParams" in window),
+      web_sharing: (navigator.share)
+    },
+    files: {},
+    storage: window.localStorage,
+    view: "text",
+    orientation: "horizontal",
+    refresh: "true",
+    responsive: "true",
+    active_editing_tools: false,
+    active_modal: false,
+    modal_previous: null,
+    active_widget: false,
+    context_menu_previous: null,
+    long_touch: {
+      timeout: null,
+      selection: null
+    },
+    picker_color: null,
+    insert_color: false,
+    install_prompt: null
+  };
+  var sourceChange = false;
+  if (editor.appearance.parent_window) document.documentElement.classList.add("startup-fade");
+  if (editor.environment.touch_device) document.documentElement.classList.add("touch-device");
+  if (editor.environment.apple_device) document.documentElement.classList.add("apple-device");
+  if (editor.environment.macOS_device) document.documentElement.classList.add("macOS-device");
+  if (editor.api_support.web_sharing) document.documentElement.classList.add("web-sharing");
 </script>
 
 <style>
@@ -101,6 +139,7 @@
 
     --selection-color: #000000;
     --selection-background: #b4d5ffbf;
+    --selection-background-inactive: #ccccccbf;
 
     --scrollbar: hsl(var(--primary-hue),var(--secondary-sat),47.8%);
     --scrollbar-hover: hsl(var(--primary-hue),var(--secondary-sat),60.4%);
@@ -117,8 +156,8 @@
     --textarea-medium: hsl(var(--primary-hue),var(--secondary-sat),14.5%);
     --textarea-light: #eae2d1;
     --textarea-drag-hue: 240;
-    --textarea-drag-background: hsla(var(--textarea-drag-hue),100%,50%,25%);
-    --textarea-drag-border: hsl(var(--textarea-drag-hue),100%,50%);
+    --textarea-drag-background: hsla(var(--textarea-drag-hue),100%,50%,10%);
+    --textarea-drag-border: hsl(var(--textarea-drag-hue),100%,50%,50%);
 
     --range-thumb: var(--button);
     --range-thumb-hover: var(--button-hover);
@@ -129,6 +168,9 @@
 
     --startup-fade-opacity: 0;
     --startup-fade-pointer-events: none;
+  }
+  :root:-moz-window-inactive {
+    --selection-background: var(--selection-background-inactive);
   }
   :root.reduced-motion, :root.startup-fade {
     --transition-slow: 0s;
@@ -201,6 +243,37 @@
   body.camera-right .card.notification, body.camera-right .card.action, body.camera-right .card.widget {
     right: env(safe-area-inset-right);
   }
+  span.info {
+    display: flex;
+    align-items: center;
+    color: #ffcd00;
+  }
+  span.info::before {
+    content: "\26A0";
+    margin-right: min(1.25vw, 5px);
+    font-size: 150%;
+  }
+  img, a {
+    -webkit-touch-callout: none;
+  }
+  a {
+    color: inherit;
+    font-size: min(2vw, 14.5px);
+    border-radius: var(--border-radius-small);
+    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
+    --focus-border: transparent;
+    text-decoration-color: transparent;
+    outline: none;
+    transition: var(--transition-fast);
+    transition-property: color, text-decoration-color;
+  }
+  a:hover, a:focus {
+    color: var(--text-hover);
+    text-decoration-color: var(--text-hover);
+  }
+  a:focus {
+    --focus-border: var(--outline-medium);
+  }
   button {
     padding: min(0.5vw, 2px) min(1vw, 8px);
     min-width: min(8vw, 75px);
@@ -269,9 +342,9 @@
     transition: var(--transition-medium);
     transition-property: background, box-shadow;
   }
-  button.tab.drag::after, [data-numbered-container].drag::after, #workspace .files.drag::after {
+  [data-numbered-container].drag::after, #workspace .files.drag::after {
     background: var(--textarea-drag-background);
-    box-shadow: 0 0 min(1vw, 4px) min(1vw, 4px) var(--textarea-drag-border) inset;
+    box-shadow: 0 0 min(1vw, 4px) min(0.75vw, 6px) var(--textarea-drag-border) inset;
   }
   button > svg {
     fill: var(--text-medium);
@@ -322,14 +395,14 @@
     font-family: unset;
     font-size: 13px;
     border: none;
-    border-radius: 0;
+    outline: none;
   }
   [data-numbered-container] {
     position: relative;
-    resize: none;
   }
-  [data-numbered-container]:focus-within, input[type="text"] {
-    outline: none;
+  input[type="text"] {
+    border-radius: 0;
+    -webkit-appearance: none;
   }
   [data-numbered-container] ol, [data-numbered-container] textarea, input[type="text"] {
     padding: 8px;
@@ -340,49 +413,14 @@
     background: transparent;
     opacity: 0.55;
   }
-  [data-numbered-container] li::before {
-    font-family: inherit;
-  }
   [data-numbered-container] textarea, input[type="text"] {
-    -webkit-appearance: none;
     transition: var(--transition-slow);
     transition-property: caret-color, scrollbar-color;
   }
   [data-numbered-container] textarea {
-    overflow-wrap: normal;
+    resize: none;
     scrollbar-width: inherit;
     scrollbar-color: inherit;
-  }
-  span.info {
-    display: flex;
-    align-items: center;
-    color: #ffcd00;
-  }
-  span.info::before {
-    content: "\26A0";
-    margin-right: min(1.25vw, 5px);
-    font-size: 150%;
-  }
-  img, a {
-    -webkit-touch-callout: none;
-  }
-  a {
-    color: inherit;
-    font-size: min(2vw, 14.5px);
-    border-radius: var(--border-radius-small);
-    box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border);
-    --focus-border: transparent;
-    text-decoration-color: transparent;
-    outline: none;
-    transition: var(--transition-fast);
-    transition-property: color, text-decoration-color;
-  }
-  a:hover, a:focus {
-    color: var(--text-hover);
-    text-decoration-color: var(--text-hover);
-  }
-  a:focus {
-    --focus-border: var(--outline-medium);
   }
   input[type="range"] {
     padding: min(3vw, 12px) min(0.75vw, 3px);
@@ -446,13 +484,6 @@
   input[type="range"]:hover::-moz-range-track, input[type="range"]:focus::-moz-range-track {
     background: var(--range-track-hover);
   }
-  hr {
-    width: 100%;
-    height: min(0.5vw, 2px);
-    background: var(--text-medium);
-    border: none;
-    border-radius: var(--border-radius-medium);
-  }
   :disabled {
     opacity: 0.5;
     pointer-events: none;
@@ -466,6 +497,9 @@
     color: var(--selection-color);
     background: var(--selection-background);
   }
+  ::selection:window-inactive {
+    background: var(--selection-background-inactive);
+  }
   ::-webkit-scrollbar {
     width: min(3vw, 12px);
     height: min(3vw, 12px);
@@ -476,13 +510,43 @@
   ::-webkit-scrollbar-thumb {
     width: min(9vw, 36px);
     height: min(9vw, 36px);
+    background: var(--scrollbar);
     background-clip: content-box;
-    background-color: var(--scrollbar);
     border: min(0.5vw, 2px) solid transparent;
     border-radius: var(--border-radius-large);
   }
   ::-webkit-scrollbar-thumb:hover {
     background-color: var(--scrollbar-hover);
+  }
+  :root:not(.apple-device) .shortcut.ctrl::before {
+    content: "Ctrl + ";
+  }
+  :root:not(.apple-device) .shortcut.ctrl-shift::before {
+    content: "Ctrl + Shift + ";
+  }
+  :root.apple-device .shortcut {
+    font-size: min(3vw, 12px);
+  }
+  :root.apple-device .shortcut.command::before {
+    content: "\2318";
+  }
+  :root.apple-device .shortcut.shift-command::before {
+    content: "\21E7\2318";
+  }
+  :root.apple-device .shortcut.ctrl-command::before {
+    content: "\2303\2318";
+  }
+  .buffering {
+    animation: rotate 2s infinite linear;
+    animation-play-state: paused;
+  }
+  .buffering.active {
+    animation-play-state: running;
+  }
+  @keyframes rotate {
+    from {
+      transform: rotate(-360deg);
+    }
   }
   .dropdown {
     position: relative;
@@ -702,24 +766,6 @@
   .checkbox:hover input[type="checkbox"]:checked + label > svg, .checkbox:focus input[type="checkbox"]:checked + label > svg {
     fill: var(--text-hover);
   }
-  :root:not(.apple-device) .shortcut.ctrl::before {
-    content: "Ctrl + ";
-  }
-  :root:not(.apple-device) .shortcut.ctrl-shift::before {
-    content: "Ctrl + Shift + ";
-  }
-  :root.apple-device .shortcut {
-    font-size: min(3vw, 12px);
-  }
-  :root.apple-device .shortcut.command::before {
-    content: "\2318";
-  }
-  :root.apple-device .shortcut.shift-command::before {
-    content: "\21E7\2318";
-  }
-  :root.apple-device .shortcut.ctrl-command::before {
-    content: "\2303\2318";
-  }
   [data-tooltip] {
     position: relative;
   }
@@ -762,18 +808,6 @@
     opacity: 1;
     --scale: 1;
     transition-timing-function: ease-out;
-  }
-  .buffering {
-    animation: rotate 2s infinite linear;
-    animation-play-state: paused;
-  }
-  .buffering.active {
-    animation-play-state: running;
-  }
-  @keyframes rotate {
-    from {
-      transform: rotate(-360deg);
-    }
   }
   .card {
     display: flex;
@@ -844,13 +878,13 @@
     max-height: calc(100% - min(12vw, 58px) - min(13.5vw, 68px));
     transform: translateY(min(13.5vw, 68px)) scaleY(var(--scale));
   }
-  #main.split.vertical:not(.files-offset) .card.action, #main.split.vertical:not(.files-offset) .card.widget, #main.preview .card.action, #main.preview .card.widget {
+  #main.split.horizontal:not(.files-offset) .card.action, #main.split.horizontal:not(.files-offset) .card.widget, #main.preview .card.action, #main.preview .card.widget {
     top: 0;
   }
-  #main.split.vertical:not(.files-offset) .card.widget:not(.minimize), #main.preview .card.widget:not(.minimize) {
+  #main.split.horizontal:not(.files-offset) .card.widget:not(.minimize), #main.preview .card.widget:not(.minimize) {
     max-height: calc(100% - min(4.5vw, 24px));
   }
-  #main.split.vertical:not(.files-offset) .card.action.active ~ .card.widget:not(.minimize), #main.preview .card.action.active ~ .card.widget:not(.minimize) {
+  #main.split.horizontal:not(.files-offset) .card.action.active ~ .card.widget:not(.minimize), #main.preview .card.action.active ~ .card.widget:not(.minimize) {
     max-height: calc(100% - min(4.5vw, 24px) - min(13.5vw, 68px));
   }
   .card.action.active ~ .card.widget.active {
@@ -879,73 +913,18 @@
     transform: scaleY(1);
   }
   .card.widget.minimize {
-    max-height: min(8vw, 42px);
+    max-height: min(8.5vw, 42px);
     transform: translateX(calc(100% - min(3.5vw, 18px) - min(2.5vw, 12px))) scaleY(0);
   }
   .card.widget.minimize.active {
     transform: translateX(calc(100% - min(3.5vw, 18px) - min(2.5vw, 12px))) scaleY(1);
   }
   .card.action.active ~ .card.widget.minimize {
-    max-height: min(8vw, 42px);
+    max-height: min(8.5vw, 42px);
     transform: translate(calc(100% - min(3.5vw, 18px) - min(2.5vw, 12px)),min(13.5vw, 68px)) scaleY(0);
   }
   .card.action.active ~ .card.widget.minimize.active {
     transform: translate(calc(100% - min(3.5vw, 18px) - min(2.5vw, 12px)),min(13.5vw, 68px)) scaleY(1);
-  }
-  .card.widget.minimize button.nav.minimize {
-    right: calc(100% - min(3.5vw, 18px));
-  }
-  .card.widget.minimize button.nav.minimize > svg {
-    transform: scaleX(-1);
-  }
-  .card > :not(.content) {
-    flex-shrink: 0;
-  }
-  .card .header {
-    position: relative;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .card.modal .header {
-    margin-bottom: min(3vw, 16px);
-  }
-  .card.notification .header, .card.widget .header {
-    margin-bottom: min(2.5vw, 12px);
-  }
-  .card.widget .header > :not(.minimize), .card.widget .content, .card.widget .options {
-    transition: var(--transition-medium);
-    transition-property: visibility, opacity;
-  }
-  .card.modal .header span {
-    font-size: min(5vw, 24px);
-  }
-  .card.notification .header span, .card.widget .header span {
-    font-size: min(3vw, 16px);
-  }
-  .card .icon {
-    width: min(5vw, 24px);
-    height: min(5vw, 24px);
-  }
-  .card .header .icon {
-    margin-right: min(3vw, 10px);
-  }
-  .card.modal button.nav {
-    width: min(4.25vw, 21px);
-    height: min(4.25vw, 21px);
-  }
-  .card.notification button.nav, .card.widget button.nav {
-    width: min(3.5vw, 18px);
-    height: min(3.5vw, 18px);
-  }
-  .card.widget button.nav.minimize {
-    right: min(4.75vw, 24px);
-    transition: right var(--transition-medium);
-  }
-  .card.widget.minimize .header > :not(.minimize), .card.widget.minimize .content, .card.widget.minimize .options {
-    visibility: hidden;
-    opacity: 0;
   }
   .card [data-numbered-container], .card input[type="text"] {
     color: var(--text-light);
@@ -975,6 +954,61 @@
   }
   .card [data-numbered-container].expand {
     height: 150px;
+  }
+  .card .icon {
+    width: min(5vw, 24px);
+    height: min(5vw, 24px);
+  }
+  .card > :not(.content) {
+    flex-shrink: 0;
+  }
+  .card .header {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .card.modal .header {
+    margin-bottom: min(3vw, 16px);
+  }
+  .card.notification .header, .card.widget .header {
+    margin-bottom: min(2.5vw, 12px);
+  }
+  .card.widget .header > :not(.minimize), .card.widget .content, .card.widget .options {
+    transition: var(--transition-medium);
+    transition-property: visibility, opacity;
+  }
+  .card.modal .header span {
+    font-size: min(5vw, 24px);
+  }
+  .card.notification .header span, .card.widget .header span {
+    font-size: min(3vw, 16px);
+  }
+  .card .header .icon {
+    margin-right: min(3vw, 10px);
+  }
+  .card.modal button.nav {
+    width: min(4.25vw, 21px);
+    height: min(4.25vw, 21px);
+  }
+  .card.notification button.nav, .card.widget button.nav {
+    width: min(3.5vw, 18px);
+    height: min(3.5vw, 18px);
+  }
+  .card.widget button.nav.minimize {
+    right: min(4.75vw, 24px);
+    transition: right var(--transition-medium);
+  }
+  .card.widget.minimize button.nav.minimize {
+    right: calc(100% - min(3.5vw, 18px));
+  }
+  .card.widget.minimize button.nav.minimize > svg {
+    transform: scaleX(-1);
+  }
+  .card.widget.minimize .header > :not(.minimize), .card.widget.minimize .content, .card.widget.minimize .options {
+    visibility: hidden;
+    opacity: 0;
   }
   .card.modal > *:not(.header) + * {
     margin-top: min(2.6vw, 16px);
@@ -1112,10 +1146,10 @@
     caret-color: var(--textarea-code-color);
   }
   #main.horizontal.resize {
-    cursor: row-resize;
+    cursor: col-resize;
   }
   #main.vertical.resize {
-    cursor: col-resize;
+    cursor: row-resize;
   }
   #workspace {
     position: absolute;
@@ -1163,18 +1197,18 @@
     opacity: 0;
   }
   #workspace.horizontal, #preview.horizontal {
-    width: 100%;
-    height: var(--size);
-  }
-  #workspace.vertical, #preview.vertical {
     width: var(--size);
     height: 100%;
   }
+  #workspace.vertical, #preview.vertical {
+    width: 100%;
+    height: var(--size);
+  }
   #workspace.split.horizontal::after, #workspace.preview.horizontal::after {
-    box-shadow: 0 -9px min(1.5vw, 6px) -8px var(--box-shadow) inset;
+    box-shadow: -9px 0 min(1.5vw, 6px) -8px var(--box-shadow) inset;
   }
   #workspace.split.vertical::after, #workspace.preview.vertical::after {
-    box-shadow: -9px 0 min(1.5vw, 6px) -8px var(--box-shadow) inset;
+    box-shadow: 0 -9px min(1.5vw, 6px) -8px var(--box-shadow) inset;
   }
   #workspace .files {
     padding-left: min(1.5vw, 12px);
@@ -1318,18 +1352,18 @@
     opacity: 0;
   }
   #scaler.horizontal {
-    bottom: var(--axis);
-    width: 100%;
-    height: var(--size);
-    cursor: row-resize;
-    --rotate: 0deg;
-  }
-  #scaler.vertical {
     right: var(--axis);
     width: var(--size);
     height: 100%;
     cursor: col-resize;
     --rotate: 90deg;
+  }
+  #scaler.vertical {
+    bottom: var(--axis);
+    width: 100%;
+    height: var(--size);
+    cursor: row-resize;
+    --rotate: 0deg;
   }
   #scaler .handle {
     padding: min(0.5vw, 2px);
@@ -1529,7 +1563,16 @@
             <li onclick="saveFile('css');">CSS<span>.css</span></li>
             <li onclick="saveFile('js');">JavaScript<span>.js</span></li>
             <li onclick="saveFile('json');">JSON<span>.json</span></li>
-            <li onclick="saveFile('svg');">SVG<span>.svg</span></li>
+            <li>More...
+              <svg><use href="#arrow"/></svg>
+              <ul>
+                <li onclick="saveFile('webmanifest');">Web Manifest<span>.webmanifest</span></li>
+                <li onclick="saveFile('md');">Markdown<span>.md</span></li>
+                <li onclick="saveFile('mcmeta');">MCMETA<span>.mcmeta</span></li>
+                <li onclick="saveFile('xml');">XML<span>.xml</span></li>
+                <li onclick="saveFile('svg');">SVG<span>.svg</span></li>
+              </ul>
+            </li>
           </ul>
         </li>
       </ul>
@@ -1759,7 +1802,7 @@
     <div class="options">
       <button onclick="activateFormatter('  ');">Format</button>
       <button onclick="activateFormatter('');">Collapse</button>
-      <button onclick="changeTextarea(formatterInput,'');">Clear</button>
+      <button onclick="formatterInput.num_changeValue('');">Clear</button>
     </div>
   </section>
   <section id="encoder" class="card widget">
@@ -1778,7 +1821,7 @@
     <div class="options">
       <button onclick="activateEncoder(true);">Encode</button>
       <button onclick="activateEncoder(false);">Decode</button>
-      <button onclick="changeTextarea(encoderInput,'');">Clear</button>
+      <button onclick="encoderInput.num_changeValue('');">Clear</button>
     </div>
     <div class="options">
       <div class="checkbox">
@@ -1791,7 +1834,7 @@
     <ul>
       <li class="window" onclick="window.location.reload();">Reload<span class="shortcut ctrl command">R</span></li>
       <li class="link" onclick="editor.context_menu_previous.click();">Open in New Tab</li>
-      <li class="web-sharing link" onclick="shareLink(editor.context_menu_previous);">Share Link</li>
+      <li class="web-sharing link" onclick="navigator.share({ url: editor.context_menu_previous.href });">Share Link</li>
       <li class="web-sharing-alt link" onclick="navigator.clipboard.writeText(editor.context_menu_previous.href).catch(function(error){ alert('Clipboard could not be written to, please check site permissions for clipboard use.'); });">Copy Link</li>
       <li class="editing" onclick="callCommand(editor.context_menu_previous,'undo');">Undo<span class="shortcut ctrl command">Z</span></li>
       <li class="editing" onclick="callCommand(editor.context_menu_previous,'redo');">Redo<span class="shortcut ctrl-shift shift-command">Z</span></li>
@@ -1799,7 +1842,7 @@
       <li class="editing" onclick="callCommand(editor.context_menu_previous,'copy');">Copy<span class="shortcut ctrl command">C</span></li>
       <li class="editing" onclick="callCommand(editor.context_menu_previous,'paste');">Paste<span class="shortcut ctrl command">V</span></li>
       <li class="editing" onclick="editor.context_menu_previous.select();">Select All<span class="shortcut ctrl command">A</span></li>
-      <li class="web-sharing editing" onclick="shareText(window.getSelection());">Share Text</li>
+      <li class="web-sharing editing" onclick="navigator.share({ text: editor.long_touch.selection });">Share Text</li>
     </ul>
   </section>
   <section id="loading">
@@ -1810,58 +1853,9 @@
 <script src="https://offroaders123.github.io/Numbered-Textarea-Plugin/script.js"></script>
 
 <script>
-  var editor = {
-    storage: window.localStorage,
-    files: {},
-    view: "text",
-    orientation: "horizontal",
-    refresh: "true",
-    responsive: "true",
-    active_editing_tools: false,
-    active_modal: false,
-    modal_previous: null,
-    active_widget: false,
-    context_menu_previous: null,
-    long_touch: null,
-    picker_color: null,
-    insert_color: false,
-    install_prompt: null
-  };
-  var sourceChange = false;
-  window.addEventListener("load",function(){
-    createFile();
-    if (fileHandling && fileSystemAccess){
-      window.launchQueue.setConsumer(function(launchParams){
-        if (!launchParams.files.length) return;
-        closeFile(getCurrentTab());
-        launchParams.files.forEach(async function(fileHandle){
-          var file = await fileHandle.getFile(), identifier = createFile(await file.name,await file.text());
-          editor.files[identifier] = await fileHandle;
-        });
-      });
-    }
-    if (parentWindow){
-      loadSettings("initial");
-      loadTheme();
-      window.setTimeout(function(){
-        document.documentElement.classList.remove("startup-fade");
-      },50);
-      if (!touchDevice) getCurrentEditor().focus();
-    }
-    setOffsetOrientation();
-    pickerInputRefresh();
-    var queryParameters = new URLSearchParams(window.location.search);
-    if (queryParameters.get("template")){
-      confirmOverwrite(insertTemplate);
-      removeQueryParameters(["template"]);
-    }
-    if (queryParameters.get("settings")){
-      openCard(settings);
-      removeQueryParameters(["settings"]);
-    }
-    if ("serviceWorker" in navigator && parentWindow && window.location.protocol == "https:"){
-      navigator.serviceWorker.register("service-worker.js");
-      if (!(navigator.serviceWorker.controller)) return;
+  if ("serviceWorker" in navigator && editor.appearance.parent_window && window.location.protocol == "https:"){
+    navigator.serviceWorker.register("service-worker.js");
+    if (navigator.serviceWorker.controller){
       navigator.serviceWorker.addEventListener("message",function(event){
         if (event.data.action == "load-files"){
           var files = Array.from(event.data.files);
@@ -1878,6 +1872,257 @@
       clearCacheOption.classList.remove("hidden");
       clearCacheButton.classList.remove("hidden");
     }
+  }
+  document.querySelectorAll("a[href]").forEach(function(anchor){
+    anchor.rel = "noopener";
+    anchor.target = "_blank";
+    anchor.addEventListener("contextmenu",function(event){
+      if (editor.environment.mozilla_browser){
+        event.stopPropagation();
+        dropdowns.forEach(function(dropdown){
+          if (dropdown.contains(event.target)) return;
+          closeDropdown(dropdown);
+        });
+        return;
+      }
+      openContextMenu(event,"link");
+    });
+    if (editor.environment.mozilla_browser) return;
+    anchor.addEventListener("touchstart",function(event){
+      editor.long_touch.timeout = window.setTimeout(function(){
+        openContextMenu(event,"link");
+      },750);
+    });
+    anchor.addEventListener("touchmove",cancelLongTouch);
+    anchor.addEventListener("touchend",cancelLongTouch);
+  });
+  document.querySelectorAll("img:not([alt])").forEach(function(image){
+    image.alt = "";
+  });
+  document.querySelectorAll("textarea").forEach(function(textarea){
+    addInputCharacteristics(textarea);
+    textarea.num_disableLineCount();
+  });
+  document.querySelectorAll("input[type='text']").forEach(function(input){
+    addInputCharacteristics(input);
+  });
+  var dropdowns = document.querySelectorAll(".dropdown");
+  dropdowns.forEach(function(dropdown){
+    var button = dropdown.querySelector("button"), menus = dropdown.querySelectorAll("ul"), submenus = dropdown.querySelectorAll("li > ul"), options = dropdown.querySelectorAll("li, a");
+    dropdown.addEventListener("click",function(event){
+      event.stopPropagation();
+    });
+    dropdown.addEventListener("keydown",function(event){
+      if (!dropdown.classList.contains("active")) return;
+      if ((event.key == "Escape" || event.key == "Tab") && dropdown != contextMenu){
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.key == "Tab") return;
+        closeDropdown(dropdown);
+        if (button) button.focus();
+      }
+    });
+    if (button){
+      if (!dropdown.classList.contains("alternate")){
+        button.addEventListener("click",function(){
+          openDropdown(dropdown);
+        });
+      } else {
+        button.addEventListener("contextmenu",function(){
+          openDropdown(dropdown);
+        });
+        button.addEventListener("touchstart",function(){
+          editor.long_touch.timeout = window.setTimeout(function(){
+            openDropdown(dropdown);
+          },750);
+        });
+        button.addEventListener("touchmove",cancelLongTouch);
+        button.addEventListener("touchend",cancelLongTouch);
+      }
+      button.addEventListener("keydown",function(event){
+        if (!dropdown.classList.contains("active")) return;
+        var navigable = getNavigableElements(menus[0],true);
+        if (event.key == "ArrowDown"){
+          event.preventDefault();
+          navigable[0].focus();
+        }
+        if (event.key == "ArrowUp"){
+          event.preventDefault();
+          navigable[navigable.length - 1].focus();
+        }
+      });
+    }
+    menus.forEach(function(menu){
+      menu.addEventListener("keydown",function(event){
+        var navigable = getNavigableElements(menu,true);
+        if (event.key == "ArrowDown"){
+          if (document.activeElement == navigable[navigable.length - 1]){
+            event.preventDefault();
+            event.stopPropagation();
+            navigable[0].focus();
+          } else {
+            event.preventDefault();
+            event.stopPropagation();
+            navigable[navigable.indexOf(document.activeElement) + 1].focus();
+          }
+        }
+        if (event.key == "ArrowUp"){
+          if (document.activeElement == navigable[0]){
+            event.preventDefault();
+            event.stopPropagation();
+            navigable[navigable.length - 1].focus();
+          } else {
+            event.preventDefault();
+            event.stopPropagation();
+            navigable[navigable.indexOf(document.activeElement) - 1].focus();
+          }
+        }
+        if (event.key == "Tab") event.preventDefault();
+      });
+    });
+    submenus.forEach(function(submenu){
+      submenu.parentElement.addEventListener("click",function(event){
+        openSubmenu(event);
+      });
+      submenu.parentElement.addEventListener("keydown",function(event){
+        if (event.key == "Enter" || event.key == " " || event.key == "ArrowRight") openSubmenu(event);
+        if (event.key == "ArrowLeft"){
+          if (submenu.parentElement.classList.contains("active")) event.stopPropagation();
+          submenu.parentElement.focus();
+          submenu.parentElement.classList.remove("active");
+        }
+      });
+      submenu.parentElement.addEventListener("mouseenter",function(){
+        submenu.parentElement.classList.add("active");
+      });
+      function openSubmenu(event){
+        event.stopPropagation();
+        if (submenu.contains(document.activeElement)) return;
+        submenu.parentElement.classList.add("active");
+        var navigable = getNavigableElements(submenu,true);
+        window.setTimeout(function(){
+          navigable[0].focus();
+        },50);
+      }
+    });
+    options.forEach(function(option){
+      option.addEventListener("click",function(){
+        if (option.querySelector(":scope > ul") != null) return;
+        if (dropdown == contextMenu){
+          closeContextMenu();
+        } else closeDropdown(dropdown);
+      });
+      option.addEventListener("keydown",function(event){
+        if (option.querySelector(":scope > ul") != null) return;
+        if (event.key == "Enter" || event.key == " "){
+          event.preventDefault();
+          event.stopPropagation();
+          option.click();
+          if (button) button.focus();
+        }
+        if (!dropdown.parentElement.classList.contains("select")) return;
+        if (event.key == "Escape" || event.key == "Tab"){
+          event.preventDefault();
+          event.stopPropagation();
+          closeDropdown(dropdown);
+          button.focus();
+        }
+      });
+      option.addEventListener("mouseenter",function(){
+        submenus.forEach(function(submenu){
+          if (option == submenu.parentElement || submenu.contains(option) || submenu.contains(document.activeElement)) return;
+          submenu.parentElement.classList.remove("active");
+        });
+      });
+      if (option.tagName.toLowerCase() != "a") option.setAttribute("tabindex","0");
+    });
+  });
+  document.querySelectorAll(".checkbox").forEach(function(checkbox){
+    checkbox.addEventListener("click",function(){
+      input.click();
+    });
+    checkbox.addEventListener("keydown",function(event){
+      if (event.key == "Enter" || event.key == " "){
+        event.preventDefault();
+        input.click();
+      }
+    });
+    checkbox.setAttribute("tabindex","0");
+    checkbox.setAttribute("aria-label","Checkbox");
+    var input = checkbox.querySelector("input[type='checkbox']");
+    input.addEventListener("click",function(event){
+      event.stopPropagation();
+    });
+  });
+  var cards = document.querySelectorAll(".card");
+  cards.forEach(function(card){
+    var backButton = card.querySelector("button.nav.back");
+    if (backButton != null){
+      backButton.addEventListener("click",function(){
+        openCard(document.querySelector(`#${backButton.getAttribute("data-parent")}`),card.id);
+      });
+      backButton.setAttribute("aria-label","Back");
+    }
+    var minimizeButton = card.querySelector("button.nav.minimize");
+    if (minimizeButton != null){
+      minimizeButton.addEventListener("click",function(){
+        minimizeCard(card);
+      });
+      minimizeButton.addEventListener("keydown",function(event){
+        if (event.key != "Enter") return;
+        event.preventDefault();
+        if (event.repeat) return;
+        minimizeButton.click();
+      });
+      minimizeButton.setAttribute("aria-label","Minimize");
+    }
+    var closeButton = card.querySelector("button.nav.close");
+    if (closeButton != null){
+      closeButton.addEventListener("click",function(){
+        closeCard(closeButton.parentElement.parentElement);
+      });
+      closeButton.setAttribute("aria-label","Close");
+    }
+    var navigable = getNavigableElements(card);
+    card.addEventListener("keydown",function(event){
+      if (!card.classList.contains("modal")) return;
+      if (event.key == "Tab"){
+        if (event.shiftKey){
+          if (document.activeElement == navigable[0]){
+            event.preventDefault();
+            navigable[navigable.length - 1].focus();
+          }
+        } else if (document.activeElement == navigable[navigable.length - 1]){
+          event.preventDefault();
+          navigable[0].focus();
+        }
+      }
+    });
+  });
+  var themeChannels = theme.querySelectorAll("input[type='range']");
+  themeChannels.forEach(function(themeChannel){
+    var label = themeChannel.parentElement.querySelector(`label[for="${themeChannel.id}"]`);
+    themeChannel.addEventListener("input",function(){
+      label.setAttribute("data-tooltip",themeChannel.getAttribute("data-display").split("#value").join(themeChannel.value));
+    });
+    themeChannel.addEventListener("mouseenter",function(){
+      label.classList.add("focused");
+    });
+    themeChannel.addEventListener("mouseout",function(){
+      if (document.activeElement != themeChannel) label.classList.remove("focused");
+    });
+    themeChannel.addEventListener("focus",function(){
+      label.classList.add("focused");
+    });
+    themeChannel.addEventListener("blur",function(){
+      label.classList.remove("focused");
+    });
+    label.setAttribute("data-tooltip",themeChannel.getAttribute("data-display").split("#value").join(themeChannel.value));
+  });
+  picker.querySelectorAll("input[type='range']").forEach(function(pickerChannel){
+    pickerChannel.addEventListener("input",channelRefresh);
+    pickerChannel.min = "0";
+    pickerChannel.max = "255";
   });
   window.addEventListener("beforeinstallprompt",function(event){
     event.preventDefault();
@@ -1886,7 +2131,7 @@
     installButton.classList.remove("hidden");
   });
   window.addEventListener("beforeunload",function(event){
-    if (parentWindow && (files.querySelectorAll("button.tab[data-unsaved]").length > 0)){
+    if (editor.appearance.parent_window && (files.querySelectorAll("button.tab[data-unsaved]").length > 0)){
       event.preventDefault();
       event.returnValue = "";
     }
@@ -1896,13 +2141,13 @@
     if (editor.view != "split" || !main.hasAttribute("data-scaling-offset")) return;
     var currentWidth = window.innerWidth, currentHeight = window.innerHeight;
     window.setTimeout(function(){
-      if ((editor.orientation == "horizontal" && window.innerHeight == currentHeight) || (editor.orientation == "vertical" && window.innerWidth == currentWidth)) return;
+      if ((editor.orientation == "horizontal" && window.innerWidth == currentWidth) || (editor.orientation == "vertical" && window.innerHeight == currentHeight)) return;
       changeView("split");
     },50);
   });
-  window.addEventListener("orientationchange",setOffsetOrientation);
+  window.addEventListener("orientationchange",refreshSafeAreaInsets);
   document.body.addEventListener("keydown",function(event){
-    var pressed = key => (event.key.toLowerCase() == key.toLowerCase()), ctrl = (event.ctrlKey && !appleDevice), command = (event.metaKey && appleDevice), shift = (event.shiftKey || ((event.key.toUpperCase() == event.key) && (event.key + event.key == event.key * 2))), ctrlShift = (ctrl && shift), shiftCommand = (shift && command), ctrlCommand = (event.ctrlKey && command);
+    var pressed = key => (event.key.toLowerCase() == key.toLowerCase()), ctrl = (event.ctrlKey && !editor.environment.apple_device), command = (event.metaKey && editor.environment.apple_device), shift = (event.shiftKey || ((event.key.toUpperCase() == event.key) && (event.key + event.key == event.key * 2))), ctrlShift = (ctrl && shift), shiftCommand = (shift && command), ctrlCommand = (event.ctrlKey && command);
     if (pressed("Escape")){
       event.preventDefault();
       if (event.repeat) return;
@@ -2039,253 +2284,20 @@
   document.body.addEventListener("contextmenu",function(event){
     event.preventDefault();
   });
-  var textareas = document.getElementsByTagName("textarea");
-  Array.from(textareas).forEach(function(textarea){
-    addInputCharacteristics(textarea);
-    disableLineCount(textarea);
-  });
-  var inputTexts = Array.from(document.querySelectorAll("input[type='text']"));
-  inputTexts.forEach(function(inputText){
-    addInputCharacteristics(inputText);
-  });
-  var anchors = Array.from(document.querySelectorAll("a[href]"));
-  anchors.forEach(function(anchor){
-    anchor.rel = "noopener";
-    anchor.target = "_blank";
-    anchor.addEventListener("contextmenu",function(event){
-      openContextMenu(event,"link");
-    });
-    anchor.addEventListener("touchstart",function(event){
-      editor.long_touch = window.setTimeout(function(){
-        openContextMenu(event,"link");
-      },750);
-    });
-    anchor.addEventListener("touchmove",cancelLongTouch);
-    anchor.addEventListener("touchend",cancelLongTouch);
-  });
-  var images = Array.from(document.querySelectorAll("img:not([alt])"));
-  images.forEach(function(image){
-    image.alt = "";
-  });
-  var dropdowns = Array.from(document.getElementsByClassName("dropdown"));
-  dropdowns.forEach(function(dropdown){
-    var button = dropdown.getElementsByTagName("button")[0], menus = Array.from(dropdown.getElementsByTagName("ul")), submenus = Array.from(dropdown.querySelectorAll("li > ul")), options = Array.from(dropdown.querySelectorAll("li, a"));
-    dropdown.addEventListener("click",function(event){
-      event.stopPropagation();
-    });
-    dropdown.addEventListener("keydown",function(event){
-      if (!dropdown.classList.contains("active")) return;
-      if ((event.key == "Escape" || event.key == "Tab") && dropdown != contextMenu){
-        event.preventDefault();
-        event.stopPropagation();
-        if (event.key == "Tab") return;
-        closeDropdown(dropdown);
-        if (button) button.focus();
-      }
-    });
-    if (button){
-      if (!dropdown.classList.contains("alternate")){
-        button.addEventListener("click",function(){
-          openDropdown(dropdown);
-        });
-      } else {
-        button.addEventListener("contextmenu",function(){
-          openDropdown(dropdown);
-        });
-        button.addEventListener("touchstart",function(){
-          editor.long_touch = window.setTimeout(function(){
-            openDropdown(dropdown);
-          },750);
-        });
-        button.addEventListener("touchmove",cancelLongTouch);
-        button.addEventListener("touchend",cancelLongTouch);
-      }
-      button.addEventListener("keydown",function(event){
-        if (!dropdown.classList.contains("active")) return;
-        var navigable = getNavigableElements(menus[0],true);
-        if (event.key == "ArrowDown"){
-          event.preventDefault();
-          navigable[0].focus();
-        }
-        if (event.key == "ArrowUp"){
-          event.preventDefault();
-          navigable[navigable.length - 1].focus();
-        }
-      });
-    }
-    menus.forEach(function(menu){
-      menu.addEventListener("keydown",function(event){
-        var navigable = getNavigableElements(menu,true);
-        if (event.key == "ArrowDown"){
-          if (document.activeElement == navigable[navigable.length - 1]){
-            event.preventDefault();
-            event.stopPropagation();
-            navigable[0].focus();
-          } else {
-            event.preventDefault();
-            event.stopPropagation();
-            navigable[navigable.indexOf(document.activeElement) + 1].focus();
-          }
-        }
-        if (event.key == "ArrowUp"){
-          if (document.activeElement == navigable[0]){
-            event.preventDefault();
-            event.stopPropagation();
-            navigable[navigable.length - 1].focus();
-          } else {
-            event.preventDefault();
-            event.stopPropagation();
-            navigable[navigable.indexOf(document.activeElement) - 1].focus();
-          }
-        }
-        if (event.key == "Tab") event.preventDefault();
-      });
-    });
-    submenus.forEach(function(submenu){
-      submenu.parentElement.addEventListener("click",function(event){
-        openSubmenu(event);
-      });
-      submenu.parentElement.addEventListener("keydown",function(event){
-        if (event.key == "Enter" || event.key == " " || event.key == "ArrowRight") openSubmenu(event);
-        if (event.key == "ArrowLeft"){
-          if (submenu.parentElement.classList.contains("active")) event.stopPropagation();
-          submenu.parentElement.focus();
-          submenu.parentElement.classList.remove("active");
-        }
-      });
-      submenu.parentElement.addEventListener("mouseenter",function(){
-        submenu.parentElement.classList.add("active");
-      });
-      function openSubmenu(event){
-        event.stopPropagation();
-        if (submenu.contains(document.activeElement)) return;
-        submenu.parentElement.classList.add("active");
-        var navigable = getNavigableElements(submenu,true);
-        window.setTimeout(function(){
-          navigable[0].focus();
-        },50);
-      }
-    });
-    options.forEach(function(option){
-      option.addEventListener("click",function(){
-        if (option.querySelector(":scope > ul") != null) return;
-        if (dropdown == contextMenu){
+  document.body.addEventListener("drop",function(){
+    var activeDropdowns = document.querySelectorAll(".dropdown.active");
+    if (activeDropdowns){
+      activeDropdowns.forEach(function(activeDropdown){
+        if (activeDropdown == contextMenu){
           closeContextMenu();
-        } else closeDropdown(dropdown);
+        } else closeDropdown(activeDropdown);
       });
-      option.addEventListener("keydown",function(event){
-        if (option.querySelector(":scope > ul") != null) return;
-        if (event.key == "Enter" || event.key == " "){
-          event.preventDefault();
-          event.stopPropagation();
-          option.click();
-          if (button) button.focus();
-        }
-        if (!dropdown.parentElement.classList.contains("select")) return;
-        if (event.key == "Escape" || event.key == "Tab"){
-          event.preventDefault();
-          event.stopPropagation();
-          closeDropdown(dropdown);
-          button.focus();
-        }
-      });
-      option.addEventListener("mouseenter",function(){
-        submenus.forEach(function(submenu){
-          if (option == submenu.parentElement || submenu.contains(option) || submenu.contains(document.activeElement)) return;
-          submenu.parentElement.classList.remove("active");
-        });
-      });
-      if (option.tagName.toLowerCase() != "a") option.setAttribute("tabindex","0");
-    });
-  });
-  var checkboxes = Array.from(document.getElementsByClassName("checkbox"));
-  checkboxes.forEach(function(checkbox){
-    checkbox.addEventListener("click",function(){
-      input.click();
-    });
-    checkbox.addEventListener("keydown",function(event){
-      if (event.key == "Enter" || event.key == " "){
-        event.preventDefault();
-        input.click();
-      }
-    });
-    checkbox.setAttribute("tabindex","0");
-    checkbox.setAttribute("aria-label","Checkbox");
-    var input = checkbox.querySelector("input[type='checkbox']");
-    input.addEventListener("click",function(event){
-      event.stopPropagation();
-    });
-  });
-  var cards = Array.from(document.getElementsByClassName("card"));
-  cards.forEach(function(card){
-    var backButton = card.querySelector("button.nav.back");
-    if (backButton != null){
-      backButton.addEventListener("click",function(){
-        openCard(document.getElementById(backButton.getAttribute("data-parent")),card.id);
-      });
-      backButton.setAttribute("aria-label","Back");
     }
-    var minimizeButton = card.querySelector("button.nav.minimize");
-    if (minimizeButton != null){
-      minimizeButton.addEventListener("click",function(){
-        minimizeCard(card);
-      });
-      minimizeButton.addEventListener("keydown",function(event){
-        if (event.key != "Enter") return;
-        event.preventDefault();
-        if (event.repeat) return;
-        minimizeButton.click();
-      });
-      minimizeButton.setAttribute("aria-label","Minimize");
-    }
-    var closeButton = card.querySelector("button.nav.close");
-    if (closeButton != null){
-      closeButton.addEventListener("click",function(){
-        closeCard(closeButton.parentElement.parentElement);
-      });
-      closeButton.setAttribute("aria-label","Close");
-    }
-    var navigable = getNavigableElements(card);
-    card.addEventListener("keydown",function(event){
-      if (!card.classList.contains("modal")) return;
-      if (event.key == "Tab"){
-        if (event.shiftKey){
-          if (document.activeElement == navigable[0]){
-            event.preventDefault();
-            navigable[navigable.length - 1].focus();
-          }
-        } else if (document.activeElement == navigable[navigable.length - 1]){
-          event.preventDefault();
-          navigable[0].focus();
-        }
-      }
-    });
   });
-  var themeChannels = Array.from(theme.querySelectorAll("input[type='range']"));
-  themeChannels.forEach(function(themeChannel){
-    var label = themeChannel.parentElement.querySelector(`label[for="${themeChannel.id}"]`);
-    themeChannel.addEventListener("input",function(){
-      label.setAttribute("data-tooltip",themeChannel.getAttribute("data-display").split("#value").join(themeChannel.value));
+  document.body.addEventListener("dragend",function(){
+    document.querySelectorAll("textarea").forEach(function(textarea){
+      textarea.num_refreshLineCount();
     });
-    themeChannel.addEventListener("mouseenter",function(){
-      label.classList.add("focused");
-    });
-    themeChannel.addEventListener("mouseout",function(){
-      if (document.activeElement != themeChannel) label.classList.remove("focused");
-    });
-    themeChannel.addEventListener("focus",function(){
-      label.classList.add("focused");
-    });
-    themeChannel.addEventListener("blur",function(){
-      label.classList.remove("focused");
-    });
-    label.setAttribute("data-tooltip",themeChannel.getAttribute("data-display").split("#value").join(themeChannel.value));
-  });
-  var pickerChannels = Array.from(picker.querySelectorAll("input[type='range']"));
-  pickerChannels.forEach(function(pickerChannel){
-    pickerChannel.addEventListener("input",channelRefresh);
-    pickerChannel.min = "0";
-    pickerChannel.max = "255";
   });
   files.addEventListener("dragover",function(event){
     event.preventDefault();
@@ -2299,8 +2311,10 @@
     event.preventDefault();
     files.classList.remove("drag");
     if (event.dataTransfer.types.includes("Files")){
-      var dataTransferFiles = Array.from(event.dataTransfer.files);
+      var dataTransferFiles = Array.from(event.dataTransfer.files), accept = ["txt","html","css","js","json","webmanifest","xml","svg","md","mcmeta","lang","h","fragment","vertex","fxh","hlsl","ihlsl"];
       dataTransferFiles.forEach(function(file){
+        var extension = file.name.split(".").pop().toLowerCase();
+        if (accept.indexOf(extension) < 0) return;
         var reader = new FileReader();
         reader.readAsText(file,"UTF-8");
         reader.addEventListener("loadend",function(){
@@ -2353,10 +2367,44 @@
   pickerInput.addEventListener("input",function(){
     pickerInputRefresh();
     if (editor.insert_color){
-      textEdit("insert",editor.picker_color,true);
+      textEdit("insert",editor.picker_color);
       pickerInput.focus();
     }
   });
+  createFile();
+  if (editor.api_support.file_handling && editor.api_support.file_system){
+    window.launchQueue.setConsumer(function(launchParams){
+      if (!launchParams.files.length) return;
+      closeFile(getCurrentTab());
+      launchParams.files.forEach(async function(fileHandle){
+        var file = await fileHandle.getFile(), identifier = createFile(await file.name,await file.text());
+        editor.files[identifier] = await fileHandle;
+      });
+    });
+  }
+  if (editor.appearance.parent_window){
+    loadSettings("initial");
+    loadTheme();
+    window.setTimeout(function(){
+      document.documentElement.classList.remove("startup-fade");
+    },50);
+    if (!editor.environment.touch_device) getCurrentEditor().focus();
+  }
+  if (editor.environment.mozilla_browser){
+    undoTool.classList.add("hidden");
+    redoTool.classList.add("hidden");
+  }
+  refreshSafeAreaInsets();
+  pickerInputRefresh();
+  var queryParameters = new URLSearchParams(window.location.search);
+  if (queryParameters.get("template")){
+    confirmOverwrite(insertTemplate);
+    removeQueryParameters(["template"]);
+  }
+  if (queryParameters.get("settings")){
+    openCard(settings);
+    removeQueryParameters(["settings"]);
+  }
   function createFile(name,value){
     var identifier = Math.random(), tab = document.createElement("button"), container = document.createElement("div");
     container.setAttribute("data-identifier",identifier);
@@ -2375,9 +2423,10 @@
     workspace.appendChild(container);
     if (!name) name = "Untitled.txt";
     if (value) textarea.value = value;
+    textarea.selectionStart = 0;
+    textarea.selectionEnd = 0;
     addInputCharacteristics(textarea);
-    establishNumberedContainer(container);
-    if (editor.view == "text") disableLineCount(textarea);
+    if (editor.view == "text") textarea.num_disableLineCount();
     tab.classList.add("tab");
     tab.setAttribute("data-identifier",identifier);
     var fileName = document.createElement("span");
@@ -2408,17 +2457,12 @@
     tab.addEventListener("dragover",function(event){
       event.preventDefault();
       event.stopPropagation();
-      tab.classList.add("drag");
       event.dataTransfer.dropEffect = "copy";
       if (!tab.classList.contains("active")) openFile(tab);
-    });
-    tab.addEventListener("dragleave",function(){
-      tab.classList.remove("drag");
     });
     tab.addEventListener("drop",function(event){
       event.preventDefault();
       event.stopPropagation();
-      tab.classList.remove("drag");
     });
     var withinEditor = (document.activeElement == getCurrentEditor());
     openFile(tab);
@@ -2426,7 +2470,7 @@
     return identifier;
   }
   function openFile(tab){
-    var identifier = tab.getAttribute("data-identifier"), tabs = Array.from(files.querySelectorAll("button.tab"));
+    var identifier = tab.getAttribute("data-identifier"), tabs = files.querySelectorAll("button.tab");
     tabs.forEach(function(tab){
       tab.classList.remove("active");
       tab.classList.remove("fade");
@@ -2436,7 +2480,7 @@
     window.setTimeout(function(){
       tab.classList.add("fade");
     },transitionDuration);
-    var activeFiles = Array.from(workspace.querySelectorAll("[data-numbered-container].active"));
+    var activeFiles = workspace.querySelectorAll("[data-numbered-container].active");
     activeFiles.forEach(function(activeFile){
       activeFile.classList.remove("active");
     });
@@ -2479,7 +2523,7 @@
     }
   }
   function setFilesSectionOffset(){
-    if (editor.view != "split" || editor.orientation != "vertical" || !editor.active_widget && !editor.active_editing_tools) return;
+    if (editor.view != "split" || editor.orientation != "horizontal" || !editor.active_widget && !editor.active_editing_tools) return;
     var overflowOverlap, scalingOffset = parseInt(main.getAttribute("data-scaling-offset"));
     if (!scalingOffset) return main.classList.remove("files-offset");
     if (editor.active_editing_tools) overflowOverlap = parseInt(getElementStyle(editingTools,"width").split("px").join("")) + parseInt(getElementStyle(editingTools,"margin").split("px").join("")) + scalingOffset > parseInt(getElementStyle(main,"width").split("px").join(""));
@@ -2496,17 +2540,19 @@
   }
   function getFileName(result,tab){
     if (!tab) tab = getCurrentTab();
-    var fileName = tab.textContent;
+    var fileName = tab.innerText;
     if (!result) return fileName;
     if (result == "name"){
-      var name = getFileName().split(".");
+      var name = fileName.split(".");
       name.pop();
       return name.join(".");
     }
     if (result == "extension") return fileName.split(".").pop();
   }
   function titleRefresh(value){
-    document.title = `${value} - Smart Text Editor`;
+    /*if (editor.appearance.standalone()){
+      document.title = value;
+    } else*/ document.title = `${value} - Smart Text Editor`;
   }
   function installApp(){
     editor.install_prompt.prompt();
@@ -2514,11 +2560,12 @@
       if (result.outcome == "accepted"){
         installOption.classList.add("hidden");
         installButton.classList.add("hidden");
+        //titleRefresh(getCurrentTab().querySelector("[data-file-name]").innerText);
       }
     });
   }
   function loadSettings(input){
-    if (!parentWindow) return;
+    if (!editor.appearance.parent_window) return;
     var savedView = editor.storage.getItem("view");
     if (savedView){
       if (input == "initial") changeView(savedView);
@@ -2573,15 +2620,15 @@
   }
   function updateSelect(item,value){
     updateSetting(item,value);
-    var settingButton = document.getElementById(`${item}Setting`);
+    var settingButton = document.querySelector(`#${item}Setting`);
     settingButton.innerHTML = settingButton.innerHTML.replace(settingButton.textContent,updateCapitalization(value));
   }
   function updateCheckbox(item,value){
     if (value == undefined){
-      value = document.getElementById(`${item}Setting`).checked;
+      value = document.querySelector(`#${item}Setting`).checked;
     } else {
-      if (value == "true") document.getElementById(`${item}Setting`).checked = "true";
-      if (value == "false") document.getElementById(`${item}Setting`).removeAttribute("checked");
+      if (value == "true") document.querySelector(`#${item}Setting`).checked = "true";
+      if (value == "false") document.querySelector(`#${item}Setting`).removeAttribute("checked");
     }
     updateSetting(item,value);
   }
@@ -2596,7 +2643,7 @@
     });
   }
   function loadTheme(){
-    if (!parentWindow) return;
+    if (!editor.appearance.parent_window) return;
     var savedPrimaryHue = editor.storage.getItem("primaryHue");
     if (savedPrimaryHue){
       document.documentElement.style.setProperty("--primary-hue",savedPrimaryHue);
@@ -2652,7 +2699,7 @@
       document.documentElement.classList.remove("reduced-motion");
     },500);
   }
-  function setOffsetOrientation(){
+  function refreshSafeAreaInsets(){
     document.body.classList.remove("camera-left");
     document.body.classList.remove("camera-right");
     var angle = window.orientation;
@@ -2669,31 +2716,52 @@
         if (event.button == "2") event.preventDefault();
       });
       input.addEventListener("contextmenu",function(event){
+        if (editor.environment.mozilla_browser){
+          event.stopPropagation();
+          dropdowns.forEach(function(dropdown){
+            closeDropdown(dropdown);
+          });
+          return;
+        }
         openContextMenu(event,"editing");
       });
-      input.addEventListener("touchstart",function(event){
-        editor.long_touch = window.setTimeout(function(){
-          openContextMenu(event,"editing");
-        },750);
-      });
-      input.addEventListener("touchmove",cancelLongTouch);
-      input.addEventListener("touchend",cancelLongTouch);
+      if (!editor.environment.mozilla_browser){
+        input.addEventListener("touchstart",function(event){
+          editor.long_touch.timeout = window.setTimeout(function(){
+            openContextMenu(event,"editing");
+          },750);
+          editor.long_touch.selection = window.getSelection();
+        });
+        input.addEventListener("touchmove",cancelLongTouch);
+        input.addEventListener("touchend",cancelLongTouch);
+      }
     }
     if (input.tagName.toLowerCase() == "textarea"){
       var container = input.parentElement;
+      container.num_establishContainer();
       container.addEventListener("mousedown",function(event){
         if (event.button == "2") event.preventDefault();
       });
       container.addEventListener("contextmenu",function(event){
+        if (editor.environment.mozilla_browser){
+          event.stopPropagation();
+          dropdowns.forEach(function(dropdown){
+            closeDropdown(dropdown);
+          });
+          return;
+        }
         openContextMenu(event,"editing");
       });
-      container.addEventListener("touchstart",function(event){
-        editor.long_touch = window.setTimeout(function(){
-          openContextMenu(event,"editing");
-        },750);
-      });
-      container.addEventListener("touchmove",cancelLongTouch);
-      container.addEventListener("touchend",cancelLongTouch);
+      if (!editor.environment.mozilla_browser){
+        container.addEventListener("touchstart",function(event){
+          editor.long_touch.timeout = window.setTimeout(function(){
+            openContextMenu(event,"editing");
+          },750);
+          editor.long_touch.selection = window.getSelection();
+        });
+        container.addEventListener("touchmove",cancelLongTouch);
+        container.addEventListener("touchend",cancelLongTouch);
+      }
       container.addEventListener("dragover",function(event){
         container.classList.add("drag");
         event.dataTransfer.dropEffect = "copy";
@@ -2703,12 +2771,19 @@
       });
       container.addEventListener("drop",function(event){
         container.classList.remove("drag");
-        if (!event.dataTransfer.types.includes("Files")) return updateLineCount(input);
+        if (!event.dataTransfer.types.includes("Files")) return window.setTimeout(function(){
+          input.num_refreshLineCount();
+        },5);
         event.preventDefault();
+        if (event.dataTransfer.files.length > 1) return;
+        var accept = ["txt","html","css","js","json","webmanifest","xml","svg","md","mcmeta","lang","h","fragment","vertex","fxh","hlsl","ihlsl"], extension = event.dataTransfer.files[0].name.split(".").pop().toLowerCase();
+        if (accept.indexOf(extension) < 0) return;
         var reader = new FileReader();
         reader.readAsText(event.dataTransfer.files[0],"UTF-8");
         reader.addEventListener("loadend",function(){
-          changeTextarea(input,reader.result);
+          input.num_changeValue(reader.result);
+          input.selectionStart = 0;
+          input.selectionEnd = 0;
           input.scrollTop = 0;
         });
       });
@@ -2748,16 +2823,11 @@
       redoTool.disabled = false;
       refreshTool.disabled = true;
     }
-    if (newView == "text"){
-      Array.from(textareas).forEach(function(textarea){
-        disableLineCount(textarea);
-      });
-    }
-    if (newView != "text"){
-      Array.from(textareas).forEach(function(textarea){
-        enableLineCount(textarea);
-      });
-    }
+    document.querySelectorAll("textarea").forEach(function(textarea){
+      if (newView == "text"){
+        textarea.num_disableLineCount();
+      } else textarea.num_enableLineCount();
+    });
     if (newView == "split"){
       undoTool.disabled = false;
       redoTool.disabled = false;
@@ -2814,9 +2884,9 @@
   function getNavigableElements(container,scope){
     var navigable;
     if (scope){
-      navigable = Array.from(container.querySelectorAll(":scope > button:not([disabled]), :scope > textarea:not([disabled]), :scope > input:not([disabled]), :scope > select:not([disabled]), :scope > a[href]:not([disabled]), :scope > [tabindex]:not([tabindex='-1'])"));
-    } else navigable = Array.from(container.querySelectorAll("button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), a[href]:not([disabled]), [tabindex]:not([tabindex='-1'])"));
-    return navigable.filter(element => (getElementStyle(element,"display") != "none"));
+      navigable = container.querySelectorAll(":scope > button:not([disabled]), :scope > textarea:not([disabled]), :scope > input:not([disabled]), :scope > select:not([disabled]), :scope > a[href]:not([disabled]), :scope > [tabindex]:not([tabindex='-1'])");
+    } else navigable = container.querySelectorAll("button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), a[href]:not([disabled]), [tabindex]:not([tabindex='-1'])");
+    return Array.from(navigable).filter(element => (getElementStyle(element,"display") != "none"));
   }
   function getElementStyle(element,pseudo,property){
     if (!property){
@@ -2836,28 +2906,24 @@
       closeCard(editor.active_modal);
     }
   }
-  function changeTextarea(textarea,value){
-    textarea.value = value;
-    updateLineCount(textarea);
-  }
   function openEditorWindow(){
-    var windowFeatures = "", standalone = (window.matchMedia("(display-mode: standalone)").matches || "standalone" in navigator || !window.menubar.visible), hiddenChrome = (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight), fullscreen = (window.matchMedia("(display-mode: fullscreen)").matches || (!window.screenY && !window.screenTop && hiddenChrome) || (!window.screenY && !window.screenTop && standalone));
-    if (standalone || fullscreen) windowFeatures = "popup";
+    var windowFeatures = "";
+    if (editor.appearance.standalone() || editor.appearance.fullscreen()) windowFeatures = "popup";
     var newEditor = window.open(window.location.href,"_blank",windowFeatures);
-    if (fullscreen){
+    if (editor.appearance.fullscreen()){
       newEditor.resizeTo(window.screen.width * 2/3,window.screen.height * 2/3);
       newEditor.moveTo(window.screen.width / 6,window.screen.height / 6);
-    } else if (standalone){
+    } else if (editor.appearance.standalone()){
       newEditor.resizeTo(window.outerWidth,window.outerHeight);
       newEditor.moveTo(window.screenX,window.screenY);
     }
   }
   async function loadFiles(){
-    if (!fileSystemAccess){
+    if (!editor.api_support.file_system){
       var input = document.createElement("input");
       input.type = "file";
       input.multiple = true;
-      input.accept = "text/*,.html,.css,.js,.json,.svg,.webmanifest,.md,.mcmeta";
+      input.accept = "text/*,.html,.css,.js,.json,.webmanifest,.xml,.svg,.md,.mcmeta,.lang,.h,.fragment,.vertex,.fxh,.hlsl,.ihlsl";
       input.click();
       input.addEventListener("change",function(){
         var files = Array.from(input.files);
@@ -2879,7 +2945,7 @@
           accepts: [
             {
               mimeTypes: ["text/*","image/svg+xml"],
-              extensions: ["txt","html","css","js","json","svg","webmanifest","md","mcmeta"]
+              extensions: ["txt","html","css","js","json","webmanifest","xml","svg","md","mcmeta","lang","h","fragment","vertex","fxh","hlsl","ihlsl"]
             }
           ]
         }).catch(function(error){
@@ -2892,7 +2958,7 @@
           types: [
             {
               accept: {
-                "text/*": [".txt",".html",".css",".js",".json",".webmanifest",".md",".mcmeta"],
+                "text/*": [".txt",".html",".css",".js",".json",".webmanifest",".xml",".md",".mcmeta",".lang",".h",".fragment",".vertex",".fxh",".hlsl",".ihlsl"],
                 "image/svg+xml": [".svg"]
               }
             }
@@ -2909,7 +2975,7 @@
     }
   }
   async function saveFile(extension){
-    if (!fileSystemAccess || extension){
+    if (!editor.api_support.file_system || extension){
       var blob = new Blob([getCurrentEditor().value],{
         type: "text/plain"
       }), save = document.createElement("a");
@@ -2945,10 +3011,10 @@
     forceRefresh();
   }
   function openDisplay(){
-    var windowFeatures = "", standalone = (window.matchMedia("(display-mode: standalone)").matches || "standalone" in navigator || !window.menubar.visible), hiddenChrome = (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight), fullscreen = (window.matchMedia("(display-mode: fullscreen)").matches || (!window.screenY && !window.screenTop && hiddenChrome) || (!window.screenY && !window.screenTop && standalone));
-    if (standalone || fullscreen) windowFeatures = "popup";
+    var windowFeatures = "";
+    if (editor.appearance.standalone() || editor.appearance.fullscreen()) windowFeatures = "popup";
     var display = window.open("","_blank",windowFeatures);
-    if (standalone || fullscreen){
+    if (editor.appearance.standalone() || editor.appearance.fullscreen()){
       display.resizeTo(window.screen.width * 2/3,window.screen.height * 2/3);
       display.moveTo(window.screen.width / 6,window.screen.height / 6);
     }
@@ -2956,10 +3022,9 @@
     display.document.write(getCurrentEditor().value);
     display.document.close();
   }
-  function textEdit(type,text,focus,textarea){
-    if (!textarea) textarea = getCurrentEditor();
-    var cursor = textarea.selectionStart;
-    if (focus) textarea.focus();
+  function textEdit(type,text){
+    var textarea = getCurrentEditor(), cursor = textarea.selectionStart;
+    textarea.focus();
     if (type == "insert"){
       textarea.setRangeText(text);
       textarea.setSelectionRange(cursor,cursor + text.length);
@@ -2968,7 +3033,7 @@
       textarea.setSelectionRange(cursor,cursor + text);
       textarea.setRangeText("");
     }
-    updateLineCount(textarea);
+    textarea.num_refreshLineCount();
     sourceChange = true;
     getCurrentTab().setAttribute("data-unsaved",true);
     previewRefresh();
@@ -2978,7 +3043,7 @@
     if (card.classList.contains("active")) return closeCard(card);
     var cardType = card.classList[1];
     if (cardType != "notification"){
-      var activeCards = Array.from(document.querySelectorAll(".card.active"));
+      var activeCards = document.querySelectorAll(".card.active");
       activeCards.forEach(function(activeCard){
         var activeCardType = activeCard.classList[1];
         if (activeCardType == cardType || activeCardType == "modal"){
@@ -3008,7 +3073,7 @@
           editor.modal_previous = document.activeElement.closest(".dropdown").querySelector("button");
         } else editor.modal_previous = document.activeElement;
       }
-      var activeDropdowns = Array.from(document.querySelectorAll(".dropdown.active"));
+      var activeDropdowns = document.querySelectorAll(".dropdown.active");
       if (activeDropdowns){
         activeDropdowns.forEach(function(activeDropdown){
           if (activeDropdown == contextMenu){
@@ -3086,7 +3151,8 @@
     }
   }
   function openDropdown(event,dropdown){
-    if (editor.long_touch) editor.long_touch = null;
+    if (editor.long_touch.timeout) editor.long_touch.timeout = null;
+    if (editor.long_touch.selection) editor.long_touch.selection = null;
     var currentDropdown;
     if (!dropdown){
       currentDropdown = event;
@@ -3111,7 +3177,7 @@
     }
   }
   function closeDropdown(dropdown){
-    var submenus = Array.from(dropdown.querySelectorAll("li > ul"));
+    var submenus = dropdown.querySelectorAll("li > ul");
     submenus.forEach(function(submenu){
       submenu.parentElement.classList.remove("active");
     });
@@ -3128,7 +3194,7 @@
   function openContextMenu(event,type){
     event.preventDefault();
     event.stopPropagation();
-    if (editor.long_touch) editor.long_touch = null;
+    if (editor.long_touch.timeout) editor.long_touch.timeout = null;
     if (contextMenu.classList.contains("active")){
       closeContextMenu();
       var menu = contextMenu.querySelectorAll("ul")[0], transitionDuration = parseInt(getElementStyle(menu,"transition-duration").split("s").join("") * 1000);
@@ -3141,7 +3207,7 @@
     openDropdown(event,contextMenu);
     contextMenu.classList.add(type);
     var pageLocation = {}, transformOrigin = {};
-    if (touchDevice && event instanceof TouchEvent){
+    if (editor.environment.touch_device && event instanceof TouchEvent){
       pageLocation.left = event.touches[0].pageX;
       pageLocation.top = event.touches[0].pageY;
     } else {
@@ -3185,9 +3251,8 @@
     }
   }
   function cancelLongTouch(){
-    if (!editor.long_touch) return;
-    window.clearTimeout(editor.long_touch);
-    editor.long_touch = null;
+    if (editor.long_touch.timeout) window.clearTimeout(editor.long_touch.timeout);
+    if (editor.long_touch.selection) editor.long_touch.selection = null;
   }
   function toggleLoadingOverlay(){
     loading.classList.toggle("active");
@@ -3210,34 +3275,22 @@
       });
       document.execCommand("insertText",false,await clipboardText);
     } else document.execCommand(action);
-    if ((action == "undo" || action == "redo" || action == "paste") && element.parentElement.hasAttribute("data-numbered-container")) updateLineCount(element);
-  }
-  function shareText(value){
-    if (!webSharing) return;
-    navigator.share({
-      text: value
-    });
-  }
-  function shareLink(anchor){
-    if (!webSharing) return;
-    navigator.share({
-      url: anchor.href
-    });
+    if ((action == "undo" || action == "redo" || action == "paste") && element.parentElement.hasAttribute("data-numbered-container")) element.num_refreshLineCount();
   }
   function activateReplacer(){
-    changeTextarea(getCurrentEditor(),getCurrentEditor().value.split(replacerFind.value).join(replacerReplace.value));
+    getCurrentEditor().num_changeValue(getCurrentEditor().value.split(replacerFind.value).join(replacerReplace.value));
     sourceChange = true;
     getCurrentTab().setAttribute("data-unsaved",true);
     previewRefresh();
   }
   function flipReplacer(){
     var findContent = replacerFind.value;
-    changeTextarea(replacerFind,replacerReplace.value);
-    changeTextarea(replacerReplace,findContent);
+    replacerFind.num_changeValue(replacerReplace.value);
+    replacerReplace.num_changeValue(findContent);
   }
   function clearReplacer(){
-    changeTextarea(replacerFind,"");
-    changeTextarea(replacerReplace,"");
+    replacerFind.num_changeValue("");
+    replacerReplace.num_changeValue("");
   }
   function pickerInputRefresh(){
     var get = pickerInput.value.replace("#","");
@@ -3263,7 +3316,7 @@
     editor.picker_color = `#${convertHex(redChannel.value)}${convertHex(greenChannel.value)}${convertHex(blueChannel.value)}`;
     pickerPreview.style.background = editor.picker_color;
     pickerInput.value = editor.picker_color;
-    if (editor.insert_color) textEdit("insert",editor.picker_color,true);
+    if (editor.insert_color) textEdit("insert",editor.picker_color);
   }
   function convertHex(channel){
     var hex = parseInt(channel).toString(16);
@@ -3282,33 +3335,33 @@
     document.execCommand("copy");
   }
   function insertPicker(){
-    textEdit("insert",editor.picker_color,true);
+    textEdit("insert",editor.picker_color);
     channelRefresh();
     editor.insert_color = true;
   }
   function deletePicker(){
     var selectionCount = getCurrentEditor().selectionEnd - getCurrentEditor().selectionStart;
-    if (selectionCount) textEdit("delete",selectionCount,true);
+    if (selectionCount) textEdit("delete",selectionCount);
     editor.insert_color = false;
   }
   function activateFormatter(format){
     try {
-      changeTextarea(formatterInput,JSON.stringify(JSON.parse(formatterInput.value),false,format));
+      formatterInput.num_changeValue(JSON.stringify(JSON.parse(formatterInput.value),false,format));
     } catch (error){
       alert("Invalid JSON data.");
     }
   }
   function activateEncoder(encode){
     if (componentSetting.checked){
-      if (encode) changeTextarea(encoderInput,encodeURIComponent(encoderInput.value));
-      if (!encode) changeTextarea(encoderInput,decodeURIComponent(encoderInput.value));
+      if (encode) encoderInput.num_changeValue(encodeURIComponent(encoderInput.value));
+      if (!encode) encoderInput.num_changeValue(decodeURIComponent(encoderInput.value));
     } else {
-      if (encode) changeTextarea(encoderInput,encodeURI(encoderInput.value));
-      if (!encode) changeTextarea(encoderInput,decodeURI(encoderInput.value));
+      if (encode) encoderInput.num_changeValue(encodeURI(encoderInput.value));
+      if (!encode) encoderInput.num_changeValue(decodeURI(encoderInput.value));
     }
   }
   function insertTemplate(){
-    changeTextarea(getCurrentEditor(),decodeURI("%3C!DOCTYPE%20html%3E%0A%3Chtml%20lang=%22en-US%22%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E"));
+    getCurrentEditor().num_changeValue(decodeURI("%3C!DOCTYPE%20html%3E%0A%3Chtml%20lang=%22en-US%22%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E"));
     sourceChange = true;
     if (editor.view == "text") changeView("code");
     if (editor.view == "preview") changeView("split");
@@ -3338,38 +3391,38 @@
   }
   function setScaling(event){
     var scalingOffset, scalingRange = {};
-    if (touchDevice && event instanceof TouchEvent){
-      if (editor.orientation == "horizontal") scalingOffset = event.touches[0].clientY - header.offsetHeight;
-      if (editor.orientation == "vertical") scalingOffset = event.touches[0].clientX;
+    if (editor.environment.touch_device && event instanceof TouchEvent){
+      if (editor.orientation == "horizontal") scalingOffset = event.touches[0].clientX;
+      if (editor.orientation == "vertical") scalingOffset = event.touches[0].clientY - header.offsetHeight;
     } else {
-      if (editor.orientation == "horizontal") scalingOffset = event.clientY - header.offsetHeight;
-      if (editor.orientation == "vertical") scalingOffset = event.clientX;
+      if (editor.orientation == "horizontal") scalingOffset = event.clientX;
+      if (editor.orientation == "vertical") scalingOffset = event.clientY - header.offsetHeight;
     }
     if (editor.orientation == "horizontal"){
-      scalingRange.minimum = files.offsetHeight + 80;
-      scalingRange.maximum = window.innerHeight - header.offsetHeight - 80;
-    }
-    if (editor.orientation == "vertical"){
       scalingRange.minimum = 80;
       scalingRange.maximum = window.innerWidth - 80;
+    }
+    if (editor.orientation == "vertical"){
+      scalingRange.minimum = files.offsetHeight + 80;
+      scalingRange.maximum = window.innerHeight - header.offsetHeight - 80;
     }
     if (scalingOffset < scalingRange.minimum) scalingOffset = scalingRange.minimum;
     if (scalingOffset > scalingRange.maximum) scalingOffset = scalingRange.maximum;
     main.setAttribute("data-scaling-offset",scalingOffset);
     if (editor.orientation == "horizontal"){
-      workspace.style.height = `calc(${scalingOffset}px - 8px)`;
-      scaler.style.bottom = `calc(100% - ${scalingOffset}px - 8px)`;
-      preview.style.height = `calc(100% - ${scalingOffset}px - 8px)`;
-    }
-    if (editor.orientation == "vertical"){
       workspace.style.width = `calc(${scalingOffset}px - 8px)`;
       scaler.style.right = `calc(100% - ${scalingOffset}px - 8px)`;
       preview.style.width = `calc(100% - ${scalingOffset}px - 8px)`;
       setFilesSectionOffset();
     }
+    if (editor.orientation == "vertical"){
+      workspace.style.height = `calc(${scalingOffset}px - 8px)`;
+      scaler.style.bottom = `calc(100% - ${scalingOffset}px - 8px)`;
+      preview.style.height = `calc(100% - ${scalingOffset}px - 8px)`;
+    }
   }
   function removeScaling(event){
-    if (touchDevice && event instanceof TouchEvent){
+    if (editor.environment.touch_device && event instanceof TouchEvent){
       document.removeEventListener("touchmove",setScaling);
       document.removeEventListener("touchend",removeScaling);
       toggleScaling();

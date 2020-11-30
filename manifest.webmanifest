@@ -4,7 +4,7 @@
   "start_url": "https://offroaders123.github.io/Smart-Text-Editor/",
   "display": "standalone",
   "theme_color": "#191919",
-  "background_color": "#1d1d1d",
+  "background_color": "#191919",
   "icons": [
     {
       "src": "resources/icon-192.png",
@@ -27,7 +27,7 @@
     {
       "action": "https://offroaders123.github.io/Smart-Text-Editor/",
       "accept": {
-        "text/*": [".txt",".html",".css",".js",".json",".webmanifest",".md",".mcmeta"],
+        "text/*": [".txt",".html",".css",".js",".json",".webmanifest",".xml",".md",".mcmeta",".lang",".h",".fragment",".vertex",".fxh",".hlsl",".ihlsl"],
         "image/svg+xml": [".svg"]
       }
     }
@@ -40,7 +40,7 @@
       "files": [
         {
           "name": "media",
-          "accept": ["text/*",".txt",".html",".css",".js",".json",".webmanifest",".md",".mcmeta","image/svg+xml",".svg"]
+          "accept": ["text/*",".txt",".html",".css",".js",".json",".webmanifest",".xml",".md",".mcmeta",".lang",".h",".fragment",".vertex",".fxh",".hlsl",".ihlsl","image/svg+xml",".svg"]
         }
       ]
     }
