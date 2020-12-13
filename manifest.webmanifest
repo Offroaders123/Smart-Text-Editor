@@ -27,7 +27,11 @@
     {
       "action": "https://offroaders123.github.io/Smart-Text-Editor/",
       "accept": {
-        "*/*": [".*"]
+        "*/*": ["."],
+        "text/*": [".*"],
+        "application/*": [".*"],
+        "image/*": [".*"],
+        "audio/*": [".*"]
       }
     }
   ],
@@ -39,7 +43,7 @@
       "files": [
         {
           "name": "media",
-          "accept": ["*/*",".*"]
+          "accept": ["*.*",".","text/*","application/*","image/*","audio/*"]
         }
       ]
     }
