@@ -142,6 +142,7 @@
     --text-medium-additional: hsl(var(--primary-hue),var(--secondary-sat),46.7%);
     --text-light: #ffffff;
     --text-hover: #ffffff;
+    --text-info: #ffcd00;
 
     --border-radius-small: min(0.625vw, 2.5px);
     --border-radius-medium: min(1.25vw, 5px);
@@ -168,6 +169,8 @@
 
     --tab: hsl(var(--primary-hue),var(--secondary-sat),15.3%);
     --tab-hover: hsl(var(--primary-hue),var(--secondary-sat),21.6%);
+    --tab-button-dark: #ffffff3a;
+    --tab-button-light: #0000004a;
 
     --textarea-code-color: var(--text-light);
     --textarea-dark: hsl(var(--primary-hue),var(--secondary-sat),12.2%);
@@ -184,6 +187,7 @@
 
     --card-backdrop: #19191960;
 
+    --startup-fade-background: #191919;
     --startup-fade-opacity: 0;
     --startup-fade-pointer-events: none;
   }
@@ -229,7 +233,7 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    background: #191919;
+    background: var(--startup-fade-background);
     opacity: var(--startup-fade-opacity);
     pointer-events: var(--startup-fade-pointer-events);
     z-index: 3;
@@ -264,7 +268,7 @@
   span.info {
     display: flex;
     align-items: center;
-    color: #ffcd00;
+    color: var(--text-info);
   }
   span.info::before {
     content: "\26A0";
@@ -383,7 +387,7 @@
     margin-left: min(3vw, 12px);
   }
   button.tab > button:hover, button.tab > button:focus {
-    background: #ffffff3a;
+    background: var(--tab-button-dark);
   }
   button.nav > svg, button.tab > button > svg {
     width: 100%;
@@ -1301,7 +1305,7 @@
     --focus-border: var(--outline-dark);
   }
   #workspace.text .files button.tab.active > button:hover, #workspace.text .files button.tab.active > button:focus {
-    background: #0000004a;
+    background: var(--tab-button-light);
   }
   #workspace.text .files button.tab.active > button > svg {
     fill: var(--text-dark);
@@ -2124,6 +2128,10 @@
   });
   window.addEventListener("resize",event => {
     if (contextMenu.classList.contains("active")) closeContextMenu();
+    if (Editor.view != "preview"){
+      setFileTabVisibility(Editor.query.file.tab());
+      setFilesSectionOffset();
+    }
     if (Editor.view != "split" || !main.hasAttribute("data-scaling-offset")) return;
     var currentWidth = window.innerWidth, currentHeight = window.innerHeight;
     window.setTimeout(() => {
@@ -2292,16 +2300,20 @@
   files.addEventListener("drop",event => {
     event.preventDefault();
     files.classList.remove("drag");
-    if (event.dataTransfer.types.includes("Files")){
-      var dataTransferFiles = Array.from(event.dataTransfer.files);
-      dataTransferFiles.forEach(file => {
-        var extension = file.name.split(".").pop().toLowerCase();
-        if (Editor.preapproved_extensions.indexOf(extension) < 0) return;
-        var reader = new FileReader();
-        reader.readAsText(file,"UTF-8");
-        reader.addEventListener("loadend",() => createFile(file.name,reader.result));
-      });
-    } else createFile(undefined,event.dataTransfer.getData("text"));
+    Array.from(event.dataTransfer.items).forEach(async item => {
+      if (item.kind == "file"){
+        if (!Editor.api_support.file_system || !("getAsFileSystemHandle" in item)){
+          var file = item.getAsFile(), reader = new FileReader();
+          reader.readAsText(file,"UTF-8");
+          reader.addEventListener("loadend",() => createFile(file.name,reader.result));
+        } else {
+          var fileHandle = await item.getAsFileSystemHandle();
+          if (fileHandle.kind != "file") return;
+          var file = await fileHandle.getFile(), identifier = createFile(await file.name,await file.text());
+          Editor.file_handles[identifier] = await fileHandle;
+        }
+      } else if (item.kind == "string") createFile(undefined,event.dataTransfer.getData("text"));
+    });
   });
   scaler.addEventListener("touchstart",event => {
     if (event.touches.length != 1) return;
@@ -2472,7 +2484,7 @@
     files.removeChild(tab);
     var container = workspace.querySelector(`[data-numbered-container][data-identifier="${identifier}"]`);
     workspace.removeChild(container);
-    Editor.active_editor = null;
+    if (identifier == Editor.active_editor) Editor.active_editor = null;
     if (Editor.file_handles[identifier]) delete Editor.file_handles[identifier];
   }
   function setFileTabVisibility(tab){
@@ -2494,8 +2506,10 @@
   }
   function setFilesSectionOffset(){
     if (Editor.view != "split" || Editor.orientation != "horizontal" || !Editor.active_widget && !Editor.active_editing_tools) return;
-    var overflowOverlap, scalingOffset = parseInt(main.getAttribute("data-scaling-offset"));
-    if (!scalingOffset) return main.classList.remove("files-offset");
+    var overflowOverlap, scalingOffset;
+    if (main.hasAttribute("data-scaling-offset")){
+      scalingOffset = parseInt(main.getAttribute("data-scaling-offset"));
+    } else scalingOffset = workspace.offsetWidth;
     if (Editor.active_editing_tools) overflowOverlap = parseInt(getElementStyle(editingTools,"width").split("px").join("")) + parseInt(getElementStyle(editingTools,"margin").split("px").join("")) + scalingOffset > parseInt(getElementStyle(main,"width").split("px").join(""));
     if (Editor.active_widget && !Editor.active_widget.classList.contains("minimize") && !Editor.active_editing_tools) overflowOverlap = parseInt(getElementStyle(Editor.active_widget,"width").split("px").join("")) + parseInt(getElementStyle(Editor.active_widget,"margin").split("px").join("")) + scalingOffset > parseInt(getElementStyle(main,"width").split("px").join(""));
     if (overflowOverlap){
@@ -2708,19 +2722,8 @@
       container.addEventListener("dragleave",() => container.classList.remove("drag"));
       container.addEventListener("drop",event => {
         container.classList.remove("drag");
-        if (!event.dataTransfer.types.includes("Files")) return window.setTimeout(() => input.num_refreshLineCount(),5);
+        if (Array.from(event.dataTransfer.items)[0].kind == "string") return window.setTimeout(() => input.num_refreshLineCount(),5);
         event.preventDefault();
-        if (event.dataTransfer.files.length > 1) return;
-        var extension = event.dataTransfer.files[0].name.split(".").pop().toLowerCase();
-        if (Editor.preapproved_extensions.indexOf(extension) < 0) return;
-        var reader = new FileReader();
-        reader.readAsText(event.dataTransfer.files[0],"UTF-8");
-        reader.addEventListener("loadend",() => {
-          input.num_changeValue(reader.result);
-          input.selectionStart = 0;
-          input.selectionEnd = 0;
-          input.scrollTop = 0;
-        });
       });
     }
   }
@@ -2742,7 +2745,13 @@
   }
   function changeView(newView){
     if (main.classList.contains("resize")) return;
-    if (newView != "preview") workspace.addEventListener("transitionend",setViewVisibility);
+    if (newView != "preview"){
+      var transitionDuration = parseInt(getElementStyle(workspace,"transition-duration").split("s").join("") * 1000);
+      window.setTimeout(() => {
+        setFileTabVisibility(Editor.query.file.tab());
+        setFilesSectionOffset();
+      },transitionDuration);
+    }
     var elements = [main,workspace,scaler,preview];
     elements.forEach(element => changeClass(element,Editor.view,newView));
     if (main.hasAttribute("data-scaling-offset")) main.removeAttribute("data-scaling-offset");
@@ -2769,11 +2778,6 @@
     }
     Editor.view = newView;
     previewRefresh();
-    function setViewVisibility(){
-      workspace.removeEventListener("transitionend",setViewVisibility);
-      setFileTabVisibility(Editor.query.file.tab());
-      setFilesSectionOffset();
-    }
   }
   function changeOrientation(newOrientation){
     if (main.classList.contains("resize")) return;
@@ -2858,15 +2862,15 @@
       });
     } else {
       var fileHandles;
-      if ("chooseFileSystemEntries" in window){
-        fileHandles = await window.chooseFileSystemEntries({
-          type: "open-file",
+      if ("showOpenFilePicker" in window){
+        fileHandles = await window.showOpenFilePicker({
           multiple: true
         }).catch(error => {
           if (error.message.toLowerCase().includes("abort")) return;
         });
-      } else if ("showOpenFilePicker" in window){
-        fileHandles = await window.showOpenFilePicker({
+      } else if ("chooseFileSystemEntries" in window){
+        fileHandles = await window.chooseFileSystemEntries({
+          type: "open-file",
           multiple: true
         }).catch(error => {
           if (error.message.toLowerCase().includes("abort")) return;
@@ -2891,13 +2895,12 @@
     } else {
       var identifier = Editor.query.file.tab().getAttribute("data-identifier"), fileHandle;
       if (!Editor.file_handles[identifier]){
-        if ("chooseFileSystemEntries" in window){
-          fileHandle = await window.chooseFileSystemEntries().catch(error => {
-            if (error.message.toLowerCase().includes("abort")) return;
-          });
-        }
         if ("showOpenFilePicker" in window){
           fileHandle = await window.showSaveFilePicker().catch(error => {
+            if (error.message.toLowerCase().includes("abort")) return;
+          });
+        } else if ("chooseFileSystemEntries" in window){
+          fileHandle = await window.chooseFileSystemEntries().catch(error => {
             if (error.message.toLowerCase().includes("abort")) return;
           });
         }
