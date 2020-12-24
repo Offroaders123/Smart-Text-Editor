@@ -5,7 +5,7 @@
 
 <title>Smart Text Editor</title>
 <meta charset="UTF-8">
-<meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="author" content="Brandon Bennett">
 <meta name="description" content="The text editor that requires only a browser and a keyboard!">
 <meta name="google-site-verification" content="_LrfHy7pIualH1TolkQ5b3Po0dtjYrx-QQsiXelwx20">
@@ -14,7 +14,7 @@
 <meta property="og:image" content="resources/share-1200.png">
 <meta property="og:url" content="https://offroaders123.github.io/Smart-Text-Editor/">
 <meta name="twitter:card" content="summary_large_image">
-<meta id="themeColor" name="theme-color" content="#191919">
+<meta id="theme_color" name="theme-color" content="#191919">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Smart Text Editor">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -82,14 +82,13 @@
         }
       }
     },
-    preapproved_extensions: ["txt","html","css","js","php","json","webmanifest","xml","yaml","yml","dist","ini","md","markdown","mcmeta","lang","properties","h","fragment","vertex","fxh","hlsl","ihlsl","svg"],
+    preapproved_extensions: ["txt","html","css","js","php","json","webmanifest","xml","yaml","yml","dist","config","ini","md","markdown","mcmeta","lang","properties","material","h","fragment","vertex","fxh","hlsl","ihlsl","svg"],
     active_editor: null,
     file_handles: {},
     storage: window.localStorage,
     view: "text",
     orientation: "horizontal",
     refresh: "true",
-    responsive: "true",
     active_editing_tools: false,
     active_modal: false,
     modal_previous: null,
@@ -120,26 +119,21 @@
     -webkit-tap-highlight-color: transparent;
   }
   :root {
-    --primary-hue: 0;
-    --primary-sat: 0%;
-    --secondary-sat: calc(var(--primary-sat) * 0.5);
-    --tertiary-sat: calc(var(--primary-sat) * 0.125);
-
-    --main: hsl(var(--primary-hue),var(--primary-sat),7.1%);
+    --main: hsl(0,0%,7.1%);
 
     --font-family-interface: -apple-system, BlinkMacSystemFont, "Rubik", sans-serif;
     --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Noto Sans", sans-serif;
     --font-family-monospace: "Cousine", monospace;
 
-    --container-dark: hsl(var(--primary-hue),var(--primary-sat),9.8%);
-    --container-medium: hsl(var(--primary-hue),var(--primary-sat),11.4%);
-    --container-medium-hover: hsl(var(--primary-hue),var(--primary-sat),17.6%);
+    --container-dark: hsl(0,0%,9.8%);
+    --container-medium: hsl(0,0%,11.4%);
+    --container-medium-hover: hsl(0,0%,17.6%);
 
     --text-dark: #000000;
-    --text-dark-contrast: hsl(var(--primary-hue),var(--tertiary-sat),20%);
-    --text-medium: hsl(var(--primary-hue),var(--tertiary-sat),66.7%);
-    --text-medium-contrast: hsl(var(--primary-hue),var(--tertiary-sat),80%);
-    --text-medium-additional: hsl(var(--primary-hue),var(--secondary-sat),46.7%);
+    --text-dark-contrast: hsl(0,0%,20%);
+    --text-medium: hsl(0,0%,66.7%);
+    --text-medium-contrast: hsl(0,0%,80%);
+    --text-medium-additional: hsl(0,0%,46.7%);
     --text-light: #ffffff;
     --text-hover: #ffffff;
     --text-info: #ffcd00;
@@ -160,30 +154,30 @@
     --selection-background: #b4d5ffbf;
     --selection-background-inactive: #ccccccbf;
 
-    --scrollbar: hsl(var(--primary-hue),var(--secondary-sat),47.8%);
-    --scrollbar-hover: hsl(var(--primary-hue),var(--secondary-sat),60.4%);
+    --scrollbar: hsl(0,0%,47.8%);
+    --scrollbar-hover: hsl(0,0%,60.4%);
 
-    --button: hsl(var(--primary-hue),var(--secondary-sat),22.7%);
-    --button-hover: hsl(var(--primary-hue),var(--secondary-sat),29%);
+    --drag-background: hsl(240,100%,50%,10%);
+    --drag-border: hsl(240,100%,50%,50%);
+
+    --button: hsl(0,0%,22.7%);
+    --button-hover: hsl(0,0%,29%);
     --button-warning-hover: #bb2222;
 
-    --tab: hsl(var(--primary-hue),var(--secondary-sat),15.3%);
-    --tab-hover: hsl(var(--primary-hue),var(--secondary-sat),21.6%);
+    --tab: hsl(0,0%,15.3%);
+    --tab-hover: hsl(0,0%,21.6%);
     --tab-button-dark: #ffffff3a;
     --tab-button-light: #0000004a;
 
     --textarea-code-color: var(--text-light);
-    --textarea-dark: hsl(var(--primary-hue),var(--secondary-sat),12.2%);
-    --textarea-medium: hsl(var(--primary-hue),var(--secondary-sat),14.5%);
+    --textarea-dark: hsl(0,0%,12.2%);
+    --textarea-medium: hsl(0,0%,14.5%);
     --textarea-light: #eae2d1;
-    --textarea-drag-hue: 240;
-    --textarea-drag-background: hsla(var(--textarea-drag-hue),100%,50%,10%);
-    --textarea-drag-border: hsl(var(--textarea-drag-hue),100%,50%,50%);
 
     --range-thumb: var(--button);
     --range-thumb-hover: var(--button-hover);
-    --range-track: hsl(var(--primary-hue),var(--secondary-sat),12.5%);
-    --range-track-hover: hsl(var(--primary-hue),var(--secondary-sat),18.8%);
+    --range-track: hsl(0,0%,12.5%);
+    --range-track-hover: hsl(0,0%,18.8%);
 
     --card-backdrop: #19191960;
 
@@ -250,7 +244,7 @@
   body.camera-left #workspace [data-numbered-container] {
     padding-left: env(safe-area-inset-left);
   }
-  body.camera-left #workspace .files {
+  body.camera-left #files {
     padding-left: calc(env(safe-area-inset-left) + min(1.5vw, 12px));
   }
   body.camera-left #preview.preview {
@@ -310,7 +304,6 @@
     box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow), 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
     --focus-border: transparent;
     outline: none;
-    cursor: pointer;
     transition: var(--transition-fast);
     transition-property: color, background, opacity;
   }
@@ -352,7 +345,7 @@
     color: var(--text-hover);
     background: var(--tab-hover);
   }
-  button.tab::after, [data-numbered-container]::after, #workspace .files::after {
+  button.tab::after, [data-numbered-container]::after, #files::after {
     content: "";
     position: absolute;
     left: 0;
@@ -364,9 +357,9 @@
     transition: var(--transition-medium);
     transition-property: background, box-shadow;
   }
-  [data-numbered-container].drag::after, #workspace .files.drag::after {
-    background: var(--textarea-drag-background);
-    box-shadow: 0 0 min(1vw, 4px) min(0.75vw, 6px) var(--textarea-drag-border) inset;
+  [data-numbered-container].drag::after, #files.drag::after {
+    background: var(--drag-background);
+    box-shadow: 0 0 min(1vw, 4px) min(0.75vw, 6px) var(--drag-border) inset;
   }
   button > svg {
     fill: var(--text-medium);
@@ -453,7 +446,6 @@
     box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
     --focus-border: transparent;
     outline: none;
-    cursor: pointer;
     -webkit-appearance: none;
   }
   input[type="range"]:focus {
@@ -621,7 +613,6 @@
     box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
     --focus-border: transparent;
     outline: none;
-    cursor: pointer;
     white-space: nowrap;
     transition: var(--transition-fast);
     transition-property: color, background;
@@ -707,7 +698,6 @@
     margin: min(0.75vw, 3px);
     display: flex;
     justify-content: center;
-    cursor: pointer;
     transition: color var(--transition-fast);
   }
   .select:hover, .select:focus-within {
@@ -717,7 +707,6 @@
     padding-right: min(1vw, 4px);
     display: flex;
     align-items: center;
-    cursor: inherit;
   }
   .select button {
     justify-content: space-between;
@@ -734,7 +723,6 @@
     box-shadow: 0 0 0 min(0.25vw, 1px) var(--focus-border) inset;
     --focus-border: transparent;
     outline: none;
-    cursor: pointer;
   }
   .checkbox:focus {
     --focus-border: var(--outline-medium);
@@ -830,7 +818,7 @@
     filter: drop-shadow(0 min(0.5vw, 2px) min(0.25vw, 1px) var(--box-shadow));
     transform-origin: center top;
   }
-  [data-tooltip]:hover::before, [data-tooltip]:hover::after, [data-tooltip]:focus::before, [data-tooltip]:focus::after, [data-tooltip]:focus-within::before, [data-tooltip]:focus-within::after, [data-tooltip].focused::before, [data-tooltip].focused::after {
+  [data-tooltip]:hover::before, [data-tooltip]:hover::after, [data-tooltip]:focus::before, [data-tooltip]:focus::after, [data-tooltip]:focus-within::before, [data-tooltip]:focus-within::after {
     opacity: 1;
     --scale: 1;
     transition-timing-function: ease-out;
@@ -916,11 +904,11 @@
   .card.action.active ~ .card.widget.active {
     transform: translateY(min(13.5vw, 68px)) scaleY(1);
   }
-  .card.active, #backdrop.active {
+  .card.active, #card_backdrop.active {
     visibility: visible;
     pointer-events: all;
   }
-  .card.active, #backdrop.active {
+  .card.active, #card_backdrop.active {
     opacity: 1;
   }
   .card.modal.active {
@@ -1236,90 +1224,6 @@
   #workspace.split.vertical::after, #workspace.preview.vertical::after {
     box-shadow: 0 -9px min(1.5vw, 6px) -8px var(--box-shadow) inset;
   }
-  #workspace .files {
-    padding-left: min(1.5vw, 12px);
-    padding-top: min(0.75vw, 6px);
-    position: relative;
-    flex-shrink: 0;
-    display: flex;
-    background: var(--main);
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    scrollbar-width: none;
-  }
-  #workspace .files::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    box-shadow: 0 -9px min(1.5vw, 6px) -8px var(--box-shadow) inset;
-    pointer-events: none;
-    z-index: 1;
-  }
-  #workspace .files::-webkit-scrollbar {
-    display: none;
-  }
-  #workspace .files > * {
-    flex-shrink: 0;
-  }
-  #workspace .files > *:last-child::before {
-    content: "";
-    position: absolute;
-    left: 100%;
-    top: 0;
-    width: min(1.5vw, 12px);
-    height: 100%;
-    pointer-events: none;
-  }
-  #workspace .files > * + * {
-    margin-left: min(2vw, 8px);
-  }
-  #workspace .files button.tab.active {
-    cursor: unset;
-    z-index: 1;
-  }
-  #workspace .files button.tab > [data-file-name] {
-    display: flex;
-    align-items: center;
-  }
-  #workspace .files button.tab[data-unsaved] {
-    padding-left: min(2vw, 8px);
-  }
-  #workspace .files button.tab[data-unsaved] > [data-file-name] {
-    font-style: italic;
-  }
-  #workspace .files button.tab[data-unsaved] > [data-file-name]::before {
-    content: "*";
-    margin-right: min(0.5vw, 2px);
-    font-size: 125%;
-    font-style: normal;
-    line-height: min(4vw, 16px);
-  }
-  #workspace.text .files button.tab.active {
-    color: var(--text-dark);
-    background: var(--textarea-light);
-  }
-  #workspace.text .files button.tab.active:focus {
-    --focus-border: var(--outline-dark);
-  }
-  #workspace.text .files button.tab.active > button:hover, #workspace.text .files button.tab.active > button:focus {
-    background: var(--tab-button-light);
-  }
-  #workspace.text .files button.tab.active > button > svg {
-    fill: var(--text-dark);
-  }
-  #workspace:not(.text) .files button.tab.active > button > svg {
-    fill: var(--text-light);
-  }
-  #workspace:not(.text) .files button.tab.active {
-    color: var(--text-light);
-    background: var(--textarea-dark);
-  }
-  #workspace .files button.tab.active.fade, #workspace .files button.tab.active.fade > button > svg {
-    transition-duration: var(--transition-slow);
-  }
   #workspace [data-numbered-container] {
     height: 0;
     background: none;
@@ -1353,6 +1257,89 @@
   #workspace.text [data-numbered-container] textarea {
     caret-color: var(--text-dark);
     white-space: pre-wrap;
+  }
+  #files {
+    padding-left: min(1.5vw, 12px);
+    padding-top: min(0.75vw, 6px);
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    background: var(--main);
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+  }
+  #files::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    box-shadow: 0 -9px min(1.5vw, 6px) -8px var(--box-shadow) inset;
+    pointer-events: none;
+    z-index: 1;
+  }
+  #files::-webkit-scrollbar {
+    display: none;
+  }
+  #files > * {
+    flex-shrink: 0;
+  }
+  #files > *:last-child::before {
+    content: "";
+    position: absolute;
+    left: 100%;
+    top: 0;
+    width: min(1.5vw, 12px);
+    height: 100%;
+    pointer-events: none;
+  }
+  #files > * + * {
+    margin-left: min(2vw, 8px);
+  }
+  #files button.tab.active {
+    z-index: 1;
+  }
+  #files button.tab > [data-file-name] {
+    display: flex;
+    align-items: center;
+  }
+  #files button.tab[data-unsaved] {
+    padding-left: min(2vw, 8px);
+  }
+  #files button.tab[data-unsaved] > [data-file-name] {
+    font-style: italic;
+  }
+  #files button.tab[data-unsaved] > [data-file-name]::before {
+    content: "*";
+    margin-right: min(0.5vw, 2px);
+    font-size: 125%;
+    font-style: normal;
+    line-height: min(4vw, 16px);
+  }
+  #workspace.text #files button.tab.active {
+    color: var(--text-dark);
+    background: var(--textarea-light);
+  }
+  #workspace.text #files button.tab.active:focus {
+    --focus-border: var(--outline-dark);
+  }
+  #workspace.text #files button.tab.active > button:hover, #workspace.text #files button.tab.active > button:focus {
+    background: var(--tab-button-light);
+  }
+  #workspace.text #files button.tab.active > button > svg {
+    fill: var(--text-dark);
+  }
+  #workspace:not(.text) #files button.tab.active > button > svg {
+    fill: var(--text-light);
+  }
+  #workspace:not(.text) #files button.tab.active {
+    color: var(--text-light);
+    background: var(--textarea-dark);
+  }
+  #files button.tab.active.fade, #files button.tab.active.fade > button > svg {
+    transition-duration: var(--transition-slow);
   }
   #scaler {
     position: absolute;
@@ -1439,7 +1426,7 @@
   #preview.preview {
     --size: 100%;
   }
-  #backdrop {
+  #card_backdrop {
     position: fixed;
     left: 0;
     top: 0;
@@ -1453,45 +1440,44 @@
     transition: var(--transition-medium);
     transition-property: visibility, opacity;
   }
-  #installOption > img, #installButton > img {
+  #install_option > img, #install_button > img {
     margin-right: min(2vw, 8px);
     width: min(4.5vw, 20px);
     height: min(4.5vw, 20px);
   }
-  #installOption {
+  #install_option {
     justify-content: flex-start;
   }
-  #installButton + button::before {
+  #install_button + button::before {
     content: "Theme";
   }
-  #installButton.hidden + button::before {
+  #install_button.hidden + button::before {
     content: "Customize Theme";
   }
-  #themeButton {
+  #theme_button {
     padding: min(1.5vw, 6px) min(1vw, 8px);
   }
-  #codeColorSetting {
-    width: min(45vw, 220px);
+  #theme_setting {
     color: var(--textarea-code-color);
   }
-  #pickerPreview {
+  #picker_preview {
     min-width: min(20vw, 86px);
     min-height: min(20vw, 86px);
     border-radius: var(--border-radius-medium);
     box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow) inset;
   }
-  #pickerInput {
+  #picker_input {
     width: min(20vw, 86px);
   }
-  #redChannel {
+  #red_channel {
     --range-thumb-hover: #bb2222;
     --range-track-hover: #660000;
   }
-  #greenChannel {
+  #green_channel {
     --range-thumb-hover: #22bb22;
     --range-track-hover: #006600;
   }
-  #blueChannel {
+  #blue_channel {
     --range-thumb-hover: #2222bb;
     --range-track-hover: #000066;
   }
@@ -1520,6 +1506,8 @@
     fill: var(--text-light);
   }
 </style>
+
+<style id="theme_styles"></style>
 
 </head>
 
@@ -1625,11 +1613,11 @@
     <div class="dropdown">
       <button>Tools</button>
       <ul>
-        <li onclick="openCard(editingTools);">Editing Tools<span class="shortcut ctrl-shift shift-command">E</span></li>
-        <li onclick="openCard(replacer);">Replace Text<span class="shortcut ctrl-shift shift-command">F</span></li>
-        <li onclick="openCard(picker);">Color Picker<span class="shortcut ctrl-shift shift-command">P</span></li>
-        <li onclick="openCard(formatter);">JSON Formatter<span class="shortcut ctrl-shift shift-command">R</span></li>
-        <li onclick="openCard(encoder);">URI Encoder<span class="shortcut ctrl-shift shift-command">Y</span></li>
+        <li onclick="openCard(editing_tools_card);">Editing Tools<span class="shortcut ctrl-shift shift-command">E</span></li>
+        <li onclick="openCard(replacer_card);">Replace Text<span class="shortcut ctrl-shift shift-command">F</span></li>
+        <li onclick="openCard(picker_card);">Color Picker<span class="shortcut ctrl-shift shift-command">P</span></li>
+        <li onclick="openCard(formatter_card);">JSON Formatter<span class="shortcut ctrl-shift shift-command">R</span></li>
+        <li onclick="openCard(encoder_card);">URI Encoder<span class="shortcut ctrl-shift shift-command">Y</span></li>
         <li onclick="confirmOverwrite(insertTemplate);">Import HTML Template<span class="shortcut ctrl-shift shift-command">H</span></li>
         <li>Online Resources...
           <svg><use href="#arrow"/></svg>
@@ -1649,11 +1637,11 @@
       </ul>
     </div>
     <div class="dropdown alternate">
-      <button id="settingsButton" onclick="openCard(settings);">Settings</button>
+      <button onclick="openCard(settings_card);">Settings</button>
       <ul>
-        <li id="installOption" class="hidden" onclick="installApp();"><img src="resources/icon.svg">Install</button>
-        <li onclick="openCard(theme); Editor.modal_previous = this.closest('.dropdown').querySelector('button');">Theme Settings</li>
-        <li id="clearCacheOption" class="hidden" onclick="clearCache();">Clear Cache</li>
+        <li id="install_option" class="hidden" onclick="installApp();"><img src="resources/icon.svg">Install</button>
+        <li onclick="openCard(theme_card); Editor.modal_previous = this.closest('.dropdown').querySelector('button');">Theme Settings</li>
+        <li id="clear_cache_option" class="hidden" onclick="clearCache();">Clear Cache</li>
         <li onclick="resetSettings();">Reset Settings</li>
       </ul>
     </div>
@@ -1675,8 +1663,8 @@
     <div class="handle">▲<br>▼</div>
   </section>
   <iframe id="preview" class="text horizontal" src="about:blank"></iframe>
-  <section id="backdrop"></section>
-  <section id="settings" class="card modal">
+  <section id="card_backdrop"></section>
+  <section id="settings_card" class="card modal">
     <div class="header">
       <span>Settings</span>
       <button class="nav close"><svg><use href="#close"/></svg></button>
@@ -1684,9 +1672,9 @@
     <div class="content">
       <div class="item list start">
         <div class="select">
-          <label for="viewSetting">Default View:</label>
+          <label for="view_setting">Default View:</label>
           <div class="dropdown">
-            <button id="viewSetting">Text<svg><use href="#arrow"/></svg></button>
+            <button id="view_setting">Text<svg><use href="#arrow"/></svg></button>
             <ul>
               <li onclick="updateSelect('view','text');">Text</li>
               <li onclick="updateSelect('view','code');">Code</li>
@@ -1695,9 +1683,9 @@
           </div>
         </div>
         <div class="select">
-          <label for="orientationSetting">Default Orientation:</label>
+          <label for="orientation_setting">Default Orientation:</label>
           <div class="dropdown">
-            <button id="orientationSetting">Horizontal<svg><use href="#arrow"/></svg></button>
+            <button id="orientation_setting">Horizontal<svg><use href="#arrow"/></svg></button>
             <ul>
               <li onclick="updateSelect('orientation','horizontal');">Horizontal</li>
               <li onclick="updateSelect('orientation','vertical');">Vertical</li>
@@ -1705,51 +1693,42 @@
           </div>
         </div>
         <div class="checkbox">
-          <input id="refreshSetting" type="checkbox" oninput="updateCheckbox('refresh');" checked>
-          <label for="refreshSetting"><svg><use href="#check"/></svg>Automatically Refresh Preview</label>
+          <input id="refresh_setting" type="checkbox" oninput="updateCheckbox('refresh');" checked>
+          <label for="refresh_setting"><svg><use href="#check"/></svg>Automatically Refresh Preview</label>
         </div>
         <div class="checkbox">
-          <input id="responsiveSetting" type="checkbox" oninput="updateCheckbox('responsive');" checked>
-          <label for="responsiveSetting"><svg><use href="#check"/></svg>Screen Density Scaling</label>
-        </div>
-        <div class="checkbox">
-          <input id="editingToolsSetting" type="checkbox" oninput="updateCheckbox('editingTools');">
-          <label for="editingToolsSetting"><svg><use href="#check"/></svg>Open Editing Tools</label>
+          <input id="editing_tools_setting" type="checkbox" oninput="updateCheckbox('editing_tools');">
+          <label for="editing_tools_setting"><svg><use href="#check"/></svg>Open Editing Tools</label>
         </div>
       </div>
     </div>
     <div class="options">
-      <button id="installButton" class="hidden" onclick="installApp();"><img src="resources/icon.svg">Install</button>
-      <button id="themeButton" class="menu" onclick="openCard(theme);" data-previous="theme"><svg><use href="#arrow"/></svg></button>
+      <button id="install_button" class="hidden" onclick="installApp();"><img src="resources/icon.svg">Install</button>
+      <button id="theme_button" class="menu" onclick="openCard(theme_card);" data-previous-card="theme_card"><svg><use href="#arrow"/></svg></button>
     </div>
     <div class="options">
-      <button id="clearCacheButton" class="warning hidden" onclick="clearCache();">Clear Cache</button>
+      <button id="clear_cache_button" class="warning hidden" onclick="clearCache();">Clear Cache</button>
       <button class="warning" onclick="resetSettings();">Reset Settings</button>
     </div>
   </section>
-  <section id="theme" class="card modal">
+  <section id="theme_card" class="card modal">
     <div class="header">
       <span>Theme</span>
-      <button class="nav back" data-parent="settings"><svg><use href="#back"/></svg></button>
+      <button class="nav back" data-parent-card="settings_card"><svg><use href="#back"/></svg></button>
       <button class="nav close"><svg><use href="#close"/></svg></button>
     </div>
     <div class="content">
       <div class="item list expand">
-        <label for="primaryHueSetting">Primary Hue</label>
-        <input id="primaryHueSetting" type="range" value="0" min="0" max="360" data-display="#value°">
-        <label for="primarySatSetting">Primary Saturation</label>
-        <input id="primarySatSetting" type="range" value="0" min="0" max="100" data-display="#value%">
-        <label for="dragHueSetting">Drag and Drop Hue</label>
-        <input id="dragHueSetting" type="range" value="240" min="0" max="360" data-display="#value°">
-        <label for="codeColorSetting">Code Text Color</label>
-        <input id="codeColorSetting" type="text" placeholder="Any color format...">
+        <div data-numbered-container>
+          <textarea id="theme_setting" placeholder="CSS to modify..."></textarea>
+        </div>
       </div>
     </div>
     <div class="options">
       <button onclick="resetTheme();">Reset Theme</button>
     </div>
   </section>
-  <section id="reset" class="card notification">
+  <section id="reset_card" class="card notification">
     <div class="header">
       <img class="icon" src="resources/settings.svg">
       <span>Reset Settings</span>
@@ -1758,7 +1737,7 @@
       <div class="item">Your settings have been reset!</div>
     </div>
   </section>
-  <section id="clearCacheSuccess" class="card notification">
+  <section id="clear_cache_success_card" class="card notification">
     <div class="header">
       <img class="icon" src="resources/template.svg">
       <span>Cleared Cache</span>
@@ -1767,12 +1746,12 @@
       <div class="item">Successfully cleared offline cache!</div>
     </div>
   </section>
-  <section id="editingTools" class="card action">
-    <button id="undoTool" onclick="callCommand(Editor.query.file.textarea(),'undo'); this.focus();"><svg><use href="#undo"/></svg></button>
-    <button id="redoTool" onclick="callCommand(Editor.query.file.textarea(),'redo'); this.focus();"><svg><use href="#redo"/></svg></button>
-    <button id="refreshTool" onclick="forceRefresh();" disabled><svg><use href="#refresh"/></svg></button>
+  <section id="editing_tools_card" class="card action">
+    <button id="undo_tool" onclick="callCommand(Editor.query.file.textarea(),'undo'); this.focus();"><svg><use href="#undo"/></svg></button>
+    <button id="redo_tool" onclick="callCommand(Editor.query.file.textarea(),'redo'); this.focus();"><svg><use href="#redo"/></svg></button>
+    <button id="refresh_tool" onclick="forceRefresh();" disabled><svg><use href="#refresh"/></svg></button>
   </section>
-  <section id="replacer" class="card widget">
+  <section id="replacer_card" class="card widget">
     <div class="header">
       <span>Replace Text</span>
       <button class="nav minimize"><svg><use href="#minimize"/></svg></button>
@@ -1781,10 +1760,10 @@
     <div class="content">
       <div class="item list expand">
         <div data-numbered-container>
-          <textarea id="replacerFind" placeholder="Text to find..."></textarea>
+          <textarea id="replacer_find" placeholder="Text to find..."></textarea>
         </div>
         <div data-numbered-container>
-          <textarea id="replacerReplace" placeholder="Replace with..."></textarea>
+          <textarea id="replacer_replace" placeholder="Replace with..."></textarea>
         </div>
       </div>
     </div>
@@ -1794,7 +1773,7 @@
       <button onclick="clearReplacer();">Clear</button>
     </div>
   </section>
-  <section id="picker" class="card widget">
+  <section id="picker_card" class="card widget">
     <div class="header">
       <span>Color Picker</span>
       <button class="nav minimize"><svg><use href="#minimize"/></svg></button>
@@ -1802,16 +1781,16 @@
     </div>
     <div class="content">
       <div class="item list">
-        <div id="pickerPreview"></div>
-        <input id="pickerInput" type="text" value="#ee8800" maxlength="7" placeholder="#rrggbb">
+        <div id="picker_preview"></div>
+        <input id="picker_input" type="text" value="#ee8800" maxlength="7" placeholder="#rrggbb">
       </div>
       <div class="item list">
-        <label for="redChannel">Red</label>
-        <input id="redChannel" type="range">
-        <label for="greenChannel">Green</label>
-        <input id="greenChannel" type="range">
-        <label for="blueChannel">Blue</label>
-        <input id="blueChannel" type="range">
+        <label for="red_channel">Red</label>
+        <input id="red_channel" type="range">
+        <label for="green_channel">Green</label>
+        <input id="green_channel" type="range">
+        <label for="blue_channel">Blue</label>
+        <input id="blue_channel" type="range">
       </div>
     </div>
     <div class="options">
@@ -1820,7 +1799,7 @@
       <button onclick="deletePicker();">Delete</button>
     </div>
   </section>
-  <section id="formatter" class="card widget">
+  <section id="formatter_card" class="card widget">
     <div class="header">
       <span>JSON Formatter</span>
       <button class="nav minimize"><svg><use href="#minimize"/></svg></button>
@@ -1829,17 +1808,17 @@
     <div class="content">
       <div class="item expand">
         <div class="expand" data-numbered-container>
-          <textarea id="formatterInput" placeholder="JSON data to format..."></textarea>
+          <textarea id="formatter_input" placeholder="JSON data to format..."></textarea>
         </div>
       </div>
     </div>
     <div class="options">
       <button onclick="activateFormatter('  ');">Format</button>
       <button onclick="activateFormatter('');">Collapse</button>
-      <button onclick="formatterInput.num_changeValue('');">Clear</button>
+      <button onclick="formatter_input.num_changeValue('');">Clear</button>
     </div>
   </section>
-  <section id="encoder" class="card widget">
+  <section id="encoder_card" class="card widget">
     <div class="header">
       <span>URI Encoder</span>
       <button class="nav minimize"><svg><use href="#minimize"/></svg></button>
@@ -1848,23 +1827,23 @@
     <div class="content">
       <div class="item expand">
         <div class="expand" data-numbered-container>
-          <textarea id="encoderInput" placeholder="Text to encode..."></textarea>
+          <textarea id="encoder_input" placeholder="Text to encode..."></textarea>
         </div>
       </div>
     </div>
     <div class="options">
       <button onclick="activateEncoder(true);">Encode</button>
       <button onclick="activateEncoder(false);">Decode</button>
-      <button onclick="encoderInput.num_changeValue('');">Clear</button>
+      <button onclick="encoder_input.num_changeValue('');">Clear</button>
     </div>
     <div class="options">
       <div class="checkbox">
-        <input id="componentSetting" type="checkbox">
-        <label for="componentSetting"><svg><use href="#check"/></svg>Enable URI Component</label>
+        <input id="component_setting" type="checkbox">
+        <label for="component_setting"><svg><use href="#check"/></svg>Enable URI Component</label>
       </div>
     </div>
   </section>
-  <section id="contextMenu" class="dropdown context-menu">
+  <section id="context_menu" class="dropdown context-menu">
     <ul>
       <li class="window" onclick="window.location.reload();">Reload<span class="shortcut ctrl command">R</span></li>
       <li class="link" onclick="Editor.context_menu_previous.click();">Open in New Tab</li>
@@ -1916,7 +1895,7 @@
     dropdown.addEventListener("click",event => event.stopPropagation());
     dropdown.addEventListener("keydown",event => {
       if (!dropdown.classList.contains("active")) return;
-      if ((event.key == "Escape" || event.key == "Tab") && dropdown != contextMenu){
+      if ((event.key == "Escape" || event.key == "Tab") && dropdown != context_menu){
         event.preventDefault();
         event.stopPropagation();
         if (event.key == "Tab") return;
@@ -2000,7 +1979,7 @@
     options.forEach(option => {
       option.addEventListener("click",() => {
         if (option.querySelector(":scope > ul") != null) return;
-        if (dropdown == contextMenu){
+        if (dropdown == context_menu){
           closeContextMenu();
         } else closeDropdown(dropdown);
       });
@@ -2043,7 +2022,7 @@
   cards.forEach(card => {
     var backButton = card.querySelector("button.nav.back");
     if (backButton != null){
-      backButton.addEventListener("click",() => openCard(document.querySelector(`#${backButton.getAttribute("data-parent")}`),card.id));
+      backButton.addEventListener("click",() => openCard(document.querySelector(`#${backButton.getAttribute("data-parent-card")}`),card.id));
       backButton.setAttribute("aria-label","Back");
     }
     var minimizeButton = card.querySelector("button.nav.minimize");
@@ -2078,19 +2057,7 @@
       }
     });
   });
-  var themeChannels = theme.querySelectorAll("input[type='range']");
-  themeChannels.forEach(themeChannel => {
-    var label = themeChannel.parentElement.querySelector(`label[for="${themeChannel.id}"]`);
-    themeChannel.addEventListener("input",() => label.setAttribute("data-tooltip",themeChannel.getAttribute("data-display").split("#value").join(themeChannel.value)));
-    themeChannel.addEventListener("mouseenter",() => label.classList.add("focused"));
-    themeChannel.addEventListener("mouseout",() => {
-      if (document.activeElement != themeChannel) label.classList.remove("focused");
-    });
-    themeChannel.addEventListener("focus",() => label.classList.add("focused"));
-    themeChannel.addEventListener("blur",() => label.classList.remove("focused"));
-    label.setAttribute("data-tooltip",themeChannel.getAttribute("data-display").split("#value").join(themeChannel.value));
-  });
-  picker.querySelectorAll("input[type='range']").forEach(pickerChannel => {
+  picker_card.querySelectorAll("input[type='range']").forEach(pickerChannel => {
     pickerChannel.addEventListener("input",channelRefresh);
     pickerChannel.min = "0";
     pickerChannel.max = "255";
@@ -2108,18 +2075,18 @@
               reader.addEventListener("loadend",() => createFile(file.name,reader.result));
             });
           }
-          if (event.data.action == "clear-cache-success") openCard(clearCacheSuccess);
+          if (event.data.action == "clear-cache-success") openCard(clear_cache_success_card);
         });
-        clearCacheOption.classList.remove("hidden");
-        clearCacheButton.classList.remove("hidden");
+        clear_cache_option.classList.remove("hidden");
+        clear_cache_button.classList.remove("hidden");
       }
     }
   });
   window.addEventListener("beforeinstallprompt",event => {
     event.preventDefault();
     Editor.install_prompt = event;
-    installOption.classList.remove("hidden");
-    installButton.classList.remove("hidden");
+    install_option.classList.remove("hidden");
+    install_button.classList.remove("hidden");
   });
   window.addEventListener("beforeunload",event => {
     if (!Editor.appearance.parent_window || (files.querySelectorAll("button.tab[data-unsaved]").length == 0)) return;
@@ -2127,7 +2094,7 @@
     event.returnValue = "";
   });
   window.addEventListener("resize",event => {
-    if (contextMenu.classList.contains("active")) closeContextMenu();
+    if (context_menu.classList.contains("active")) closeContextMenu();
     if (Editor.view != "preview"){
       setFileTabVisibility(Editor.query.file.tab());
       setFilesSectionOffset();
@@ -2146,7 +2113,7 @@
       event.preventDefault();
       if (event.repeat) return;
       event.stopPropagation();
-      if (contextMenu.classList.contains("active")) return closeContextMenu();
+      if (context_menu.classList.contains("active")) return closeContextMenu();
       if (Editor.active_modal) closeCard(Editor.active_modal);
     }
     if ((ctrlShift || shiftCommand) && pressed("x")){
@@ -2232,17 +2199,17 @@
     if ((ctrlShift || shiftCommand) && pressed("e")){
       event.preventDefault();
       if (event.repeat) return;
-      openCard(editingTools);
+      openCard(editing_tools_card);
     }
     if ((ctrlShift || shiftCommand) && pressed("f")){
       event.preventDefault();
       if (event.repeat) return;
-      openCard(replacer);
+      openCard(replacer_card);
     }
     if ((ctrlShift || shiftCommand) && pressed("p")){
       event.preventDefault();
       if (event.repeat) return;
-      openCard(picker);
+      openCard(picker_card);
     }
     if ((ctrlShift || shiftCommand) && pressed("g")){
       event.preventDefault();
@@ -2252,12 +2219,12 @@
     if ((ctrlShift || shiftCommand) && pressed("r")){
       event.preventDefault();
       if (event.repeat) return;
-      openCard(formatter);
+      openCard(formatter_card);
     }
     if ((ctrlShift || shiftCommand) && pressed("y")){
       event.preventDefault();
       if (event.repeat) return;
-      openCard(encoder);
+      openCard(encoder_card);
     }
     if ((ctrlShift || shiftCommand) && pressed("h")){
       event.preventDefault();
@@ -2272,19 +2239,23 @@
     if ((ctrlShift || shiftCommand) && (pressed(".") || pressed(">"))){
       event.preventDefault();
       if (event.repeat) return;
-      openCard(settings);
+      openCard(settings_card);
     }
+  });
+  document.body.addEventListener("mousedown",event => {
+    if (event.button != 2) return;
+    event.preventDefault();
+    event.stopPropagation();
   });
   document.body.addEventListener("contextmenu",event => event.preventDefault());
   document.body.addEventListener("drop",() => {
     var activeDropdowns = document.querySelectorAll(".dropdown.active");
-    if (activeDropdowns){
-      activeDropdowns.forEach(activeDropdown => {
-        if (activeDropdown == contextMenu){
-          closeContextMenu();
-        } else closeDropdown(activeDropdown);
-      });
-    }
+    if (activeDropdowns == null) return;
+    activeDropdowns.forEach(activeDropdown => {
+      if (activeDropdown == context_menu){
+        closeContextMenu();
+      } else closeDropdown(activeDropdown);
+    });
   });
   document.body.addEventListener("dragend",() => document.querySelectorAll("textarea").forEach(textarea => textarea.num_refreshLineCount()));
   files.addEventListener("dragover",event => {
@@ -2326,36 +2297,16 @@
     document.addEventListener("mousemove",setScaling);
     document.addEventListener("mouseup",removeScaling);
   });
-  backdrop.addEventListener("click",() => closeCard(Editor.active_modal));
-  primaryHueSetting.addEventListener("input",() => {
-    tempReducedMotion();
-    document.documentElement.style.setProperty("--primary-hue",primaryHueSetting.value);
-    themeColor.content = getElementStyle(document.documentElement,"--container-dark");
-    updateSetting("primaryHue",primaryHueSetting.value);
+  card_backdrop.addEventListener("click",() => closeCard(Editor.active_modal));
+  theme_setting.addEventListener("input",() => {
+    theme_styles.innerText = theme_setting.value;
+    updateSetting("theme",theme_setting.value);
   });
-  primarySatSetting.addEventListener("input",() => {
-    tempReducedMotion();
-    document.documentElement.style.setProperty("--primary-sat",`${primarySatSetting.value}%`);
-    themeColor.content = getElementStyle(document.documentElement,"--container-dark");
-    updateSetting("primarySat",primarySatSetting.value);
-  });
-  dragHueSetting.addEventListener("input",() => {
-    tempReducedMotion();
-    document.documentElement.style.setProperty("--textarea-drag-hue",dragHueSetting.value);
-    updateSetting("dragHue",dragHueSetting.value);
-  });
-  dragHueSetting.addEventListener("focus",() => Editor.query.file.textarea().parentElement.classList.add("drag"));
-  dragHueSetting.addEventListener("blur",() => Editor.query.file.textarea().parentElement.classList.remove("drag"));
-  codeColorSetting.addEventListener("input",() => {
-    tempReducedMotion();
-    document.documentElement.style.setProperty("--textarea-code-color",codeColorSetting.value);
-    updateSetting("codeColor",codeColorSetting.value);
-  });
-  pickerInput.addEventListener("input",() => {
+  picker_input.addEventListener("input",() => {
     pickerInputRefresh();
     if (!Editor.insert_color) return;
     textEdit("insert",Editor.picker_color);
-    pickerInput.focus();
+    picker_input.focus();
   });
   createFile();
   if (Editor.api_support.file_handling && Editor.api_support.file_system){
@@ -2375,8 +2326,8 @@
     if (!Editor.environment.touch_device) Editor.query.file.textarea().focus();
   }
   if (Editor.environment.mozilla_browser){
-    undoTool.classList.add("hidden");
-    redoTool.classList.add("hidden");
+    undo_tool.classList.add("hidden");
+    redo_tool.classList.add("hidden");
   }
   refreshSafeAreaInsets();
   pickerInputRefresh();
@@ -2386,7 +2337,7 @@
     removeQueryParameters(["template"]);
   }
   if (queryParameters.get("settings")){
-    openCard(settings);
+    openCard(settings_card);
     removeQueryParameters(["settings"]);
   }
   function createFile(name,value){
@@ -2423,7 +2374,7 @@
       event.stopPropagation();
       var newFileName = prompt(`Enter a new file name for "${fileName.innerText}"`,fileName.innerText);
       if (!newFileName) return;
-      fileName.innerText = `${newFileName}`;
+      fileName.innerText = newFileName;
       if (tab == Editor.query.file.tab()) titleRefresh(newFileName);
     });
     tab.appendChild(renameButton);
@@ -2510,7 +2461,7 @@
     if (main.hasAttribute("data-scaling-offset")){
       scalingOffset = parseInt(main.getAttribute("data-scaling-offset"));
     } else scalingOffset = workspace.offsetWidth;
-    if (Editor.active_editing_tools) overflowOverlap = parseInt(getElementStyle(editingTools,"width").split("px").join("")) + parseInt(getElementStyle(editingTools,"margin").split("px").join("")) + scalingOffset > parseInt(getElementStyle(main,"width").split("px").join(""));
+    if (Editor.active_editing_tools) overflowOverlap = parseInt(getElementStyle(editing_tools,"width").split("px").join("")) + parseInt(getElementStyle(editing_tools,"margin").split("px").join("")) + scalingOffset > parseInt(getElementStyle(main,"width").split("px").join(""));
     if (Editor.active_widget && !Editor.active_widget.classList.contains("minimize") && !Editor.active_editing_tools) overflowOverlap = parseInt(getElementStyle(Editor.active_widget,"width").split("px").join("")) + parseInt(getElementStyle(Editor.active_widget,"margin").split("px").join("")) + scalingOffset > parseInt(getElementStyle(main,"width").split("px").join(""));
     if (overflowOverlap){
       main.classList.add("files-offset");
@@ -2523,8 +2474,8 @@
     Editor.install_prompt.prompt();
     Editor.install_prompt.userChoice.then(result => {
       if (result.outcome != "accepted") return;
-      installOption.classList.add("hidden");
-      installButton.classList.add("hidden");
+      install_option.classList.add("hidden");
+      install_button.classList.add("hidden");
     });
   }
   function loadSettings(input){
@@ -2542,9 +2493,9 @@
     var savedEditingTools = Editor.storage.getItem("editingTools");
     if (savedEditingTools){
       if (input == "initial"){
-        if (savedEditingTools == "true") openCard(editingTools);
+        if (savedEditingTools == "true") openCard(editing_tools_card);
       }
-      updateCheckbox("editingTools",savedEditingTools);
+      updateCheckbox("editing_tools",savedEditingTools);
     }
     var savedRefresh = Editor.storage.getItem("refresh");
     if (savedRefresh){
@@ -2552,46 +2503,37 @@
       if (Editor.refresh == "true") previewRefresh();
       updateCheckbox("refresh",savedRefresh);
     }
-    var savedResponsive = Editor.storage.getItem("responsive");
-    if (savedResponsive){
-      if (savedResponsive == "true") viewport.content = "width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no";
-      if (savedResponsive == "false") viewport.content = "user-scalable=no";
-      Editor.responsive = savedResponsive;
-      updateCheckbox("responsive",savedResponsive);
-    }
   }
   function resetSettings(){
     var ask = confirm("Are you sure you want to reset all settings?\nThis cannot be undone.");
     if (!ask) return;
-    closeCard(reset);
+    closeCard(reset_card);
     window.setTimeout(() => {
       updateSelect("view","text");
       updateSelect("orientation","horizontal");
-      updateSelect("editingTools","no");
+      updateSelect("editing_tools","no");
       Editor.refresh = "true";
       updateCheckbox("refresh","true");
-      Editor.responsive = "true";
-      updateCheckbox("responsive","true");
-      viewport.content = "width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no";
       resetTheme();
       Editor.storage.clear();
     },50);
-    openCard(reset);
+    openCard(reset_card);
   }
   function updateSetting(item,value){
     Editor.storage.setItem(item,value);
   }
   function updateSelect(item,value){
     updateSetting(item,value);
-    var settingButton = document.querySelector(`#${item}Setting`);
-    settingButton.innerHTML = settingButton.innerHTML.replace(settingButton.textContent,updateCapitalization(value));
+    var select = document.querySelector(`#${item}_setting`);
+    select.innerHTML = select.innerHTML.replace(select.textContent,updateCapitalization(value));
   }
   function updateCheckbox(item,value){
+    var checkbox = document.querySelector(`#${item}_setting`);
     if (value == undefined){
-      value = document.querySelector(`#${item}Setting`).checked;
+      value = checkbox.checked;
     } else {
-      if (value == "true") document.querySelector(`#${item}Setting`).checked = "true";
-      if (value == "false") document.querySelector(`#${item}Setting`).removeAttribute("checked");
+      if (value == "true") checkbox.checked = "true";
+      if (value == "false") checkbox.removeAttribute("checked");
     }
     updateSetting(item,value);
   }
@@ -2607,58 +2549,17 @@
   }
   function loadTheme(){
     if (!Editor.appearance.parent_window) return;
-    var savedPrimaryHue = Editor.storage.getItem("primaryHue");
-    if (savedPrimaryHue){
-      document.documentElement.style.setProperty("--primary-hue",savedPrimaryHue);
-      themeColor.content = getElementStyle(document.documentElement,"--container-dark");
-      primaryHueSetting.value = parseInt(savedPrimaryHue);
-      var label = primaryHueSetting.parentElement.querySelector("label[for='primaryHueSetting']");
-      label.setAttribute("data-tooltip",primaryHueSetting.getAttribute("data-display").split("#value").join(primaryHueSetting.value));
-    }
-    var savedPrimarySat = Editor.storage.getItem("primarySat");
-    if (savedPrimarySat){
-      document.documentElement.style.setProperty("--primary-sat",`${savedPrimarySat}%`);
-      themeColor.content = getElementStyle(document.documentElement,"--container-dark");
-      primarySatSetting.value = parseInt(savedPrimarySat);
-      var label = primarySatSetting.parentElement.querySelector("label[for='primarySatSetting']");
-      label.setAttribute("data-tooltip",primarySatSetting.getAttribute("data-display").split("#value").join(primarySatSetting.value));
-    }
-    var savedDragHue = Editor.storage.getItem("dragHue");
-    if (savedDragHue){
-      document.documentElement.style.setProperty("--textarea-drag-hue",savedDragHue);
-      dragHueSetting.value = savedDragHue;
-      var label = dragHueSetting.parentElement.querySelector("label[for='dragHueSetting']");
-      label.setAttribute("data-tooltip",dragHueSetting.getAttribute("data-display").split("#value").join(dragHueSetting.value));
-    }
-    var savedCodeColor = Editor.storage.getItem("codeColor");
-    if (savedCodeColor){
-      document.documentElement.style.setProperty("--textarea-code-color",savedCodeColor);
-      codeColorSetting.value = savedCodeColor;
+    var savedTheme = Editor.storage.getItem("theme");
+    if (savedTheme){
+      theme_styles.innerText = savedTheme;
+      theme_setting.num_changeValue(savedTheme);
     }
   }
   function resetTheme(){
-    tempReducedMotion();
-    document.documentElement.style.removeProperty("--primary-hue");
-    document.documentElement.style.removeProperty("--primary-sat");
-    document.documentElement.style.removeProperty("--textarea-drag-hue");
-    document.documentElement.style.removeProperty("--textarea-code-color");
-    themeColor.content = getElementStyle(document.documentElement,"--container-dark");
-    primaryHueSetting.value = 0;
-    primarySatSetting.value = 0;
-    dragHueSetting.value = 240;
-    codeColorSetting.value = "";
-    themeChannels.forEach(themeChannel => {
-      var label = themeChannel.parentElement.querySelector(`label[for="${themeChannel.id}"]`);
-      label.setAttribute("data-tooltip",themeChannel.getAttribute("data-display").split("#value").join(themeChannel.value));
-    });
-    Editor.storage.removeItem("primaryHue");
-    Editor.storage.removeItem("primarySat");
-    Editor.storage.removeItem("dragHue");
-    Editor.storage.removeItem("codeColor");
-  }
-  function tempReducedMotion(){
-    document.documentElement.classList.add("reduced-motion");
-    window.setTimeout(() => document.documentElement.classList.remove("reduced-motion"),500);
+    theme_styles.innerText = "";
+    theme_color.content = getElementStyle(document.documentElement,"--container-dark");
+    theme_setting.num_changeValue("");
+    Editor.storage.removeItem("theme");
   }
   function refreshSafeAreaInsets(){
     document.body.classList.remove("camera-left");
@@ -2757,9 +2658,9 @@
     if (main.hasAttribute("data-scaling-offset")) main.removeAttribute("data-scaling-offset");
     if (main.classList.contains("files-offset")) main.classList.remove("files-offset");
     if (newView == "text" || newView == "code"){
-      undoTool.disabled = false;
-      redoTool.disabled = false;
-      refreshTool.disabled = true;
+      undo_tool.disabled = false;
+      redo_tool.disabled = false;
+      refresh_tool.disabled = true;
     }
     document.querySelectorAll("textarea").forEach(textarea => {
       if (newView == "text"){
@@ -2767,14 +2668,14 @@
       } else textarea.num_enableLineCount();
     });
     if (newView == "split"){
-      undoTool.disabled = false;
-      redoTool.disabled = false;
-      refreshTool.disabled = false;
+      undo_tool.disabled = false;
+      redo_tool.disabled = false;
+      refresh_tool.disabled = false;
     }
     if (newView == "preview"){
-      undoTool.disabled = true;
-      redoTool.disabled = true;
-      refreshTool.disabled = false;
+      undo_tool.disabled = true;
+      redo_tool.disabled = true;
+      refresh_tool.disabled = false;
     }
     Editor.view = newView;
     previewRefresh();
@@ -2906,11 +2807,14 @@
         }
         if (!fileHandle) return;
         Editor.file_handles[identifier] = await fileHandle;
-      }
+      } else fileHandle = Editor.file_handles[identifier];
       var writable = await Editor.file_handles[identifier].createWritable().catch(error => alert(`"${Editor.query.file.name()}" could not be saved.`));
       if (!writable) return;
       await writable.write(Editor.query.file.textarea().value);
       await writable.close();
+      var file = await fileHandle.getFile(), fileName = await file.name, tab = Editor.query.file.tab(identifier);
+      tab.querySelector("[data-file-name]").innerText = fileName;
+      if (tab == Editor.query.file.tab()) titleRefresh(fileName);
     }
     Editor.query.file.tab().removeAttribute("data-unsaved");
     forceRefresh();
@@ -2959,12 +2863,12 @@
       });
     }
     card.classList.add("active");
-    if (cardType != ("notification" || "modal")) backdrop.classList.remove("active");
+    if (cardType != ("notification" || "modal")) card_backdrop.classList.remove("active");
     if (cardType == "notification") window.setTimeout(() => closeCard(card),4000);
-    if (card == editingTools) Editor.active_editing_tools = true;
+    if (card == editing_tools_card) Editor.active_editing_tools = true;
     if (cardType == "modal"){
       document.body.addEventListener("keydown",catchCardNavigation);
-      backdrop.classList.add("active");
+      card_backdrop.classList.add("active");
       if (!Editor.active_modal && !Editor.modal_previous){
         var dropdownChild = (document.activeElement.closest(".dropdown"));
         if (dropdownChild){
@@ -2973,14 +2877,14 @@
       }
       var activeDropdowns = document.querySelectorAll(".dropdown.active");
       activeDropdowns.forEach(activeDropdown => {
-        if (activeDropdown == contextMenu){
+        if (activeDropdown == context_menu){
           closeContextMenu();
         } else closeDropdown(activeDropdown);
       });
       var transitionDuration = parseInt(getElementStyle(card,"transition-duration").split("s").join("") * 500);
       window.setTimeout(() => {
         document.activeElement.blur();
-        var previousElement = card.querySelector(`[data-previous="${previous}"]`);
+        var previousElement = card.querySelector(`[data-previous-card="${previous}"]`);
         if (previousElement) previousElement.focus();
       },transitionDuration);
       Editor.active_modal = card;
@@ -2998,7 +2902,7 @@
     }
     if (cardType == "modal"){
       document.body.removeEventListener("keydown",catchCardNavigation);
-      backdrop.classList.remove("active");
+      card_backdrop.classList.remove("active");
       Editor.active_modal = false;
       if (Editor.modal_previous){
         if (workspace.contains(Editor.modal_previous) && getElementStyle(Editor.modal_previous,"visibility") == "hidden"){
@@ -3007,10 +2911,10 @@
         Editor.modal_previous = null;
       }
     }
-    if (card == editingTools) Editor.active_editing_tools = false;
+    if (card == editing_tools_card) Editor.active_editing_tools = false;
     if (cardType == "widget") Editor.active_widget = false;
-    if (card == settings) loadSettings();
-    if (card == theme) loadTheme();
+    if (card == settings_card) loadSettings();
+    if (card == theme_card) loadTheme();
     setFilesSectionOffset();
   }
   function minimizeCard(card){
@@ -3034,7 +2938,7 @@
     setFilesSectionOffset();
   }
   function catchCardNavigation(event){
-    if (!Editor.active_modal || contextMenu.classList.contains("active") || event.key != "Tab" || document.activeElement != document.body) return;
+    if (!Editor.active_modal || context_menu.classList.contains("active") || event.key != "Tab" || document.activeElement != document.body) return;
     var navigable = getNavigableElements(Editor.active_modal);
     if (event.shiftKey){
       event.preventDefault();
@@ -3057,23 +2961,23 @@
     currentDropdown.classList.toggle("active");
     if (currentDropdown.classList.contains("active")){
       document.body.addEventListener("click",catchDropdownExit);
-      if (currentDropdown == contextMenu) document.body.addEventListener("contextmenu",catchDropdownExit);
+      if (currentDropdown == context_menu) document.body.addEventListener("contextmenu",catchDropdownExit);
     } else {
       document.body.removeEventListener("click",catchDropdownExit);
-      if (currentDropdown == contextMenu) document.body.removeEventListener("contextmenu",catchDropdownExit);
+      if (currentDropdown == context_menu) document.body.removeEventListener("contextmenu",catchDropdownExit);
     }
     function catchDropdownExit(){
       if (currentDropdown.contains(document.activeElement)) return;
       closeDropdown(currentDropdown);
       document.body.removeEventListener("click",catchDropdownExit);
-      if (currentDropdown == contextMenu) document.body.removeEventListener("contextmenu",catchDropdownExit);
+      if (currentDropdown == context_menu) document.body.removeEventListener("contextmenu",catchDropdownExit);
     }
   }
   function closeDropdown(dropdown){
     var submenus = dropdown.querySelectorAll("li > ul");
     submenus.forEach(submenu => submenu.parentElement.classList.remove("active"));
     dropdown.classList.remove("active");
-    if (dropdown != contextMenu) return;
+    if (dropdown != context_menu) return;
     var menu = dropdown.querySelectorAll("ul")[0], transitionDuration = parseInt(getElementStyle(menu,"transition-duration").split("s").join("") * 1000);
     window.setTimeout(() => {
       var types = ["window","link","editing"];
@@ -3086,14 +2990,14 @@
     event.preventDefault();
     event.stopPropagation();
     if (Editor.long_touch.timeout) Editor.long_touch.timeout = null;
-    if (contextMenu.classList.contains("active")){
+    if (context_menu.classList.contains("active")){
       closeContextMenu();
-      var menu = contextMenu.querySelectorAll("ul")[0], transitionDuration = parseInt(getElementStyle(menu,"transition-duration").split("s").join("") * 1000);
+      var menu = context_menu.querySelectorAll("ul")[0], transitionDuration = parseInt(getElementStyle(menu,"transition-duration").split("s").join("") * 1000);
       return window.setTimeout(() => openContextMenu(event,type),transitionDuration);
     }
     Editor.context_menu_previous = event.target;
-    openDropdown(event,contextMenu);
-    contextMenu.classList.add(type);
+    openDropdown(event,context_menu);
+    context_menu.classList.add(type);
     var pageLocation = {}, transformOrigin = {};
     if (Editor.environment.touch_device && event instanceof TouchEvent){
       pageLocation.left = event.touches[0].pageX;
@@ -3104,28 +3008,28 @@
     }
     transformOrigin.left = pageLocation.left;
     transformOrigin.top = pageLocation.top;
-    var menu = contextMenu.querySelectorAll("ul")[0];
+    var menu = context_menu.querySelectorAll("ul")[0];
     if (pageLocation.left + menu.offsetWidth > window.innerWidth) pageLocation.left = window.innerWidth - menu.offsetWidth;
     if (pageLocation.top + menu.offsetHeight > window.innerHeight) pageLocation.top = window.innerHeight - menu.offsetHeight;
     transformOrigin.left -= pageLocation.left;
     transformOrigin.top -= pageLocation.top;
-    contextMenu.style.left = `${pageLocation.left}px`;
-    contextMenu.style.top = `${pageLocation.top}px`;
+    context_menu.style.left = `${pageLocation.left}px`;
+    context_menu.style.top = `${pageLocation.top}px`;
     menu.style.transformOrigin = `${transformOrigin.left}px ${transformOrigin.top}px`;
     document.body.addEventListener("keydown",catchContextMenuNavigation);
     var transitionDuration = parseInt(getElementStyle(menu,"transition-duration").split("s").join("") * 500);
     window.setTimeout(() => document.activeElement.blur(),transitionDuration);
   }
   function closeContextMenu(){
-    closeDropdown(contextMenu);
+    closeDropdown(context_menu);
     Editor.context_menu_previous.focus();
     Editor.context_menu_previous = null;
     document.body.removeEventListener("keydown",catchContextMenuNavigation);
   }
   function catchContextMenuNavigation(event){
     event.stopPropagation();
-    if (!contextMenu.classList.contains("active") || document.activeElement != document.body) return;
-    var navigable = getNavigableElements(contextMenu);
+    if (!context_menu.classList.contains("active") || document.activeElement != document.body) return;
+    var navigable = getNavigableElements(context_menu);
     if (event.key == "Tab") event.preventDefault();
     if (event.key == "ArrowUp"){
       event.preventDefault();
@@ -3161,22 +3065,22 @@
     if ((action == "undo" || action == "redo" || action == "paste") && element.parentElement.hasAttribute("data-numbered-container")) element.num_refreshLineCount();
   }
   function activateReplacer(){
-    Editor.query.file.textarea().num_changeValue(Editor.query.file.textarea().value.split(replacerFind.value).join(replacerReplace.value));
+    Editor.query.file.textarea().num_changeValue(Editor.query.file.textarea().value.split(replacer_find.value).join(replacer_replace.value));
     sourceChange = true;
     Editor.query.file.tab().setAttribute("data-unsaved",true);
     previewRefresh();
   }
   function flipReplacer(){
-    var findContent = replacerFind.value;
-    replacerFind.num_changeValue(replacerReplace.value);
-    replacerReplace.num_changeValue(findContent);
+    var findContent = replacer_find.value;
+    replacer_find.num_changeValue(replacer_replace.value);
+    replacer_replace.num_changeValue(findContent);
   }
   function clearReplacer(){
-    replacerFind.num_changeValue("");
-    replacerReplace.num_changeValue("");
+    replacer_find.num_changeValue("");
+    replacer_replace.num_changeValue("");
   }
   function pickerInputRefresh(){
-    var get = pickerInput.value.replace("#","");
+    var get = picker_input.value.replace("#","");
     if (!(get.length == 3 || get.length == 6)) return;
     Editor.picker_color = get;
     if (Editor.picker_color.length == 3){
@@ -3185,33 +3089,33 @@
     }
     if (Editor.picker_color.length == 6) Editor.picker_color = Editor.picker_color.match(/.{1,2}/g);
     Editor.picker_color.forEach((item,index) => Editor.picker_color[index] = parseInt(item,16));
-    redChannel.value = Editor.picker_color[0];
-    greenChannel.value = Editor.picker_color[1];
-    blueChannel.value = Editor.picker_color[2];
-    Editor.picker_color = `#${convertHex(redChannel.value)}${convertHex(greenChannel.value)}${convertHex(blueChannel.value)}`;
-    pickerPreview.style.background = Editor.picker_color;
+    red_channel.value = Editor.picker_color[0];
+    green_channel.value = Editor.picker_color[1];
+    blue_channel.value = Editor.picker_color[2];
+    Editor.picker_color = `#${convertHex(red_channel.value)}${convertHex(green_channel.value)}${convertHex(blue_channel.value)}`;
+    picker_preview.style.background = Editor.picker_color;
   }
   function channelRefresh(){
-    Editor.picker_color = `#${convertHex(redChannel.value)}${convertHex(greenChannel.value)}${convertHex(blueChannel.value)}`;
-    pickerPreview.style.background = Editor.picker_color;
-    pickerInput.value = Editor.picker_color;
+    Editor.picker_color = `#${convertHex(red_channel.value)}${convertHex(green_channel.value)}${convertHex(blue_channel.value)}`;
+    picker_preview.style.background = Editor.picker_color;
+    picker_input.value = Editor.picker_color;
     if (Editor.insert_color) textEdit("insert",Editor.picker_color);
   }
   function convertHex(channel){
     var hex = parseInt(channel).toString(16);
-    if (hex.length == 1) hex = 0 + hex;
+    if (hex.length == 1) hex = `0${hex}`;
     return hex;
   }
   function importColor(){
     Editor.insert_color = true;
-    if (!picker.classList.contains("active")) openCard(picker);
+    if (!picker.classList.contains("active")) openCard(picker_card);
     if (window.getSelection() == "") return;
-    pickerInput.value = window.getSelection();
-    pickerInput.focus();
+    picker_input.value = window.getSelection();
+    picker_input.focus();
     pickerInputRefresh();
   }
   function copyPicker(){
-    pickerInput.select();
+    picker_input.select();
     document.execCommand("copy");
   }
   function insertPicker(){
@@ -3226,18 +3130,18 @@
   }
   function activateFormatter(format){
     try {
-      formatterInput.num_changeValue(JSON.stringify(JSON.parse(formatterInput.value),false,format));
+      formatter_input.num_changeValue(JSON.stringify(JSON.parse(formatter_input.value),false,format));
     } catch (error){
       alert("Invalid JSON data.");
     }
   }
   function activateEncoder(encode){
-    if (componentSetting.checked){
-      if (encode) encoderInput.num_changeValue(encodeURIComponent(encoderInput.value));
-      if (!encode) encoderInput.num_changeValue(decodeURIComponent(encoderInput.value));
+    if (component_setting.checked){
+      if (encode) encoder_input.num_changeValue(encodeURIComponent(encoder_input.value));
+      if (!encode) encoder_input.num_changeValue(decodeURIComponent(encoder_input.value));
     } else {
-      if (encode) encoderInput.num_changeValue(encodeURI(encoderInput.value));
-      if (!encode) encoderInput.num_changeValue(decodeURI(encoderInput.value));
+      if (encode) encoder_input.num_changeValue(encodeURI(encoder_input.value));
+      if (!encode) encoder_input.num_changeValue(decodeURI(encoder_input.value));
     }
   }
   function insertTemplate(){
