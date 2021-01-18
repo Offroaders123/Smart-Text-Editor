@@ -66,6 +66,7 @@
     support: () => ({
       file_system: ("chooseFileSystemEntries" in window || "showOpenFilePicker" in window),
       file_handling: ("launchQueue" in window && "LaunchParams" in window),
+      editing_commands: (!Editor.environment().mozilla_browser),
       web_sharing: ("share" in navigator)
     }),
     query: (identifier = Editor.active_editor) => ({
@@ -457,7 +458,7 @@
     bottom: 0;
     z-index: 3;
   }
-  .card.tool {
+  .card.widget {
     position: absolute;
     right: 0;
     top: 0;
@@ -483,7 +484,7 @@
   .card .header .card-controls {
     display: flex;
   }
-  .card:not(.tool) .header .card-controls .control[data-control="minimize"] {
+  .card:not(.widget) .header .card-controls .control[data-control="minimize"] {
     display: none;
   }
   :root.macOS-device .card .header .card-controls .control svg {
@@ -772,7 +773,7 @@
       </div>
     </section>
   </section>
-  <section id="editing_tools_card" class="card tool action">
+  <section id="editing_tools_card" class="card widget action">
     <section class="main">
       <div class="content">
         <div class="options">
@@ -783,7 +784,7 @@
       </div>
     </section>
   </section>
-  <section id="replacer_card" class="card tool widget">
+  <section id="replacer_card" class="card widget">
     <section class="header">
       <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">Replace Text</span>
@@ -810,7 +811,7 @@
       </div>
     </section>
   </section>
-  <section id="picker_card" class="card tool widget">
+  <section id="picker_card" class="card widget">
     <section class="header">
       <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">Color Picker</span>
@@ -841,7 +842,7 @@
       </div>
     </section>
   </section>
-  <section id="formatter_card" class="card tool widget">
+  <section id="formatter_card" class="card widget">
     <section class="header">
       <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">JSON Formatter</span>
@@ -865,7 +866,7 @@
       </div>
     </section>
   </section>
-  <section id="encoder_card" class="card tool widget">
+  <section id="encoder_card" class="card widget">
     <section class="header">
       <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">URI Encoder</span>
@@ -916,781 +917,171 @@
   document.querySelectorAll("a[href]").forEach(anchor => {
     anchor.rel = "noopener";
     anchor.target = "_blank";
-    anchor.addEventListener("contextmenu",event => {
-      if (Editor.environment.mozilla_browser){
-        event.stopPropagation();
-        menus.forEach(menu => {
-          if (!menu.contains(event.target)) closeMenu(menu);
-        });
-      } else openContextMenu(event,"link");
+    attachContextMenu({
+      element: anchor,
+      type: "link"
     });
-    if (Editor.environment.mozilla_browser) return;
-    anchor.addEventListener("touchstart",event => {
-      if (event.touches.length != 1) return;
-      Editor.long_touch.timeout = window.setTimeout(() => openContextMenu(event,"link"),750);
-    });
-    anchor.addEventListener("touchmove",cancelLongTouch);
-    anchor.addEventListener("touchend",cancelLongTouch);
   });
   document.querySelectorAll("img:not([alt])").forEach(image => image.alt = "");
-  document.querySelectorAll("textarea").forEach(textarea => addInputCharacteristics(textarea));
-  document.querySelectorAll("input[type='text']").forEach(input => addInputCharacteristics(input));
+  document.querySelectorAll("input[type='text']").forEach(input => applyEditingBehavior(input));
+  document.querySelectorAll("textarea").forEach(textarea => applyEditingBehavior(textarea));
   var menus = document.querySelectorAll(".menu");
   menus.forEach(menu => {
-    var button = menu.querySelector("button"), menus = menu.querySelectorAll("ul"), submenus = menu.querySelectorAll("li > ul"), options = menu.querySelectorAll("li, a");
+    var opener = menu.querySelector(".opener"), lists = menu.querySelectorAll(".list"), listItems = menu.querySelectorAll(".list-item"), subLists = menu.querySelectorAll(".list-parent > .list");
     menu.addEventListener("click",event => event.stopPropagation());
     menu.addEventListener("keydown",event => {
-      if (!menu.classList.contains("active")) return;
-      if ((event.key == "Escape" || event.key == "Tab") && menu != context_menu){
-        event.preventDefault();
-        event.stopPropagation();
-        if (event.key == "Tab") return;
-        closeMenu(menu);
-        if (button) button.focus();
-      }
+      if (!menu.classList.contains("active") (event.key == "Escape" || event.key == "Shift" || event.key == "Tab") && !menu.classList.contains("context-menu")) return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.key == "Tab") return;
+      closeMenu(menu);
+      if (opener) opener.focus();
     });
-    if (button){
-      if (!menu.classList.contains("alternate")){
-        button.addEventListener("click",() => openMenu(menu));
-      } else {
-        button.addEventListener("contextmenu",() => openMenu(menu));
-        button.addEventListener("touchstart",() => Editor.long_touch.timeout = window.setTimeout(() => openMenu(menu),750));
-        button.addEventListener("touchmove",cancelLongTouch);
-        button.addEventListener("touchend",cancelLongTouch);
-      }
-      button.addEventListener("keydown",event => {
+    if (opener){
+      if (menu.classList.contains("alternate")){
+        attachContextMenu({
+          element: opener,
+          type: "alternate"
+        });
+      } else opener.addEventListener("click",() => openMenu(menu));
+      opener.addEventListener("keydown",event => {
         if (!menu.classList.contains("active")) return;
-        var navigable = getNavigableElements(menus[0],true);
-        if (event.key == "ArrowDown"){
-          event.preventDefault();
-          navigable[0].focus();
-        }
-        if (event.key == "ArrowUp"){
-          event.preventDefault();
-          navigable[navigable.length - 1].focus();
-        }
+        var navigable = getNavigableElements({
+          container: lists[0],
+          scoped: true
+        });
+        if (event.key == "ArrowDown") navigable[0].focus();
+        if (event.key == "ArrowUp") navigable[navigable.length - 1].focus();
       });
     }
-    menus.forEach(menu => {
-      menu.addEventListener("keydown",event => {
-        var navigable = getNavigableElements(menu,true);
-        if (event.key == "ArrowDown"){
-          if (document.activeElement == navigable[navigable.length - 1]){
-            event.preventDefault();
-            event.stopPropagation();
-            navigable[0].focus();
-          } else {
-            event.preventDefault();
-            event.stopPropagation();
-            navigable[navigable.indexOf(document.activeElement) + 1].focus();
-          }
-        }
-        if (event.key == "ArrowUp"){
-          if (document.activeElement == navigable[0]){
-            event.preventDefault();
-            event.stopPropagation();
-            navigable[navigable.length - 1].focus();
-          } else {
-            event.preventDefault();
-            event.stopPropagation();
-            navigable[navigable.indexOf(document.activeElement) - 1].focus();
-          }
-        }
-        if (event.key == "Tab") event.preventDefault();
+    listItems.forEach(listItem => {
+      var tagName = listItem.tagName.toLowerCase();
+      listItem.addEventListener("click",() => {
+        if (!listItem.matches(".list-parent")) return;
+        if (!menu.classList.contains("context-menu")){
+          closeMenu(menu);
+        } else closeContextMenu();
       });
-    });
-    submenus.forEach(submenu => {
-      var menuParent = submenu.parentElement;
-      menuParent.addEventListener("click",event => openSubmenu(event));
-      menuParent.addEventListener("keydown",event => {
-        if (event.key == "Enter" || event.key == " " || event.key == "ArrowRight") openSubmenu(event);
-        if (event.key == "ArrowLeft") closeSubmenu(event);
-      });
-      menuParent.addEventListener("mouseenter",() => menuParent.classList.add("active"));
-      function openSubmenu(event){
-        event.stopPropagation();
-        if (menuParent.classList.contains("active") && event.type == "click") return menuParent.classList.remove("active");
-        if (submenu.contains(document.activeElement)) return;
-        menuParent.classList.add("active");
-        if (event.type == "click") return;
-        var navigable = getNavigableElements(submenu,true);
-        window.setTimeout(() => navigable[0].focus(),50);
-      }
-      function closeSubmenu(event){
-        if (menuParent.classList.contains("active")) event.stopPropagation();
-        menuParent.focus();
-        menuParent.classList.remove("active");
-      }
-    });
-    options.forEach(option => {
-      option.addEventListener("click",() => {
-        if (option.querySelector(":scope > ul") != null) return;
-        if (menu == context_menu){
-          closeContextMenu();
-        } else closeMenu(menu);
-      });
-      option.addEventListener("keydown",event => {
-        if (option.querySelector(":scope > ul") != null) return;
+      listItem.addEventListener("keydown",event => {
+        if (!listItem.matches(".list-parent")) return;
         if (event.key == "Enter" || event.key == " "){
           event.preventDefault();
           event.stopPropagation();
-          option.click();
-          if (button) button.focus();
+          listItem.click();
+          if (opener) opener.focus();
         }
-        if (!menu.parentElement.classList.contains("select")) return;
+        if (!menu.closest(".select")) return;
         if (event.key == "Escape" || event.key == "Tab"){
           event.preventDefault();
           event.stopPropagation();
           closeMenu(menu);
-          button.focus();
+          opener.focus();
         }
       });
-      option.addEventListener("mouseenter",() => submenus.forEach(submenu => {
-        var menuParent = submenu.parentElement;
-        if (option != menuParent && menuParent.classList.contains("active") && !menuParent.contains(Editor.context_menu_previous) && !submenu.contains(option) && !submenu.contains(document.activeElement)) menuParent.classList.remove("active");
+      listItem.addEventListener("mouseenter",() => subLists.forEach(subList => {
+        var listParent = subList.closest(".list-parent");
+        if (listItem != listParent && listParent.classList.contains("active") && !listParent.contains(Editor.context_menu_previous) && !subList.contains(listItem) && !subList.contains(document.activeElement)) listParent.classList.remove("active");
       }));
-      if (option.tagName.toLowerCase() != "a") option.setAttribute("tabindex","0");
+      if (tagName != "a") listItem.setAttribute("tabindex","0");
+    });
+    subLists.forEach(subList => {
+      var listParent = subList.closest(".list-parent");
+      listParent.addEventListener("click",event => openSubList(event));
+      listParent.addEventListener("keydown",event => {
+        if (event.key == "Enter" || event.key == " " || event.key == "ArrowRight") openSubList(event);
+        if (event.key == "ArrowLeft") closeSubList(event);
+      });
+      listParent.addEventListener("mouseenter",() => listParent.classList.add("active"));
+      function openSubList(event){
+        event.stopPropagation();
+        if (listParent.classList.contains("active") && event.type == "click") return listParent.classList.remove("active");
+        if (subList.contains(document.activeElement)) return;
+        listParent.classList.add("active");
+        if (event.type == "click") return;
+        var navigable = getNavigableElements({
+          container: subList,
+          scoped: true
+        });
+        window.setTimeout(() => navigable[0].focus(),50);
+      }
+      function closeSubList(event){
+        if (listParent.classList.contains("active")) event.stopPropagation();
+        listParent.focus();
+        listParent.classList.remove("active");
+      }
     });
   });
   document.querySelectorAll(".checkbox").forEach(checkbox => {
+    var input = checkbox.querySelector("input[type='checkbox']");
     checkbox.addEventListener("click",() => input.click());
     checkbox.addEventListener("keydown",event => {
-      if (event.key != "Enter" && event.key != " ") return;
-      event.preventDefault();
-      input.click();
+      if (event.key == "Enter" || event.key == " ") input.click();
     });
     checkbox.setAttribute("tabindex","0");
-    checkbox.setAttribute("aria-label","Checkbox");
-    var input = checkbox.querySelector("input[type='checkbox']");
     input.addEventListener("click",event => event.stopPropagation());
   });
   var cards = document.querySelectorAll(".card");
   cards.forEach(card => {
-    var backButton = card.querySelector(".card-back");
-    if (backButton != null){
-      backButton.addEventListener("click",() => openCard(document.querySelector(`#${backButton.getAttribute("data-parent-card")}`),card.id));
-      backButton.setAttribute("aria-label","Back");
-    }
-    var minimizeButton = card.querySelector(".header .card-controls .control[data-control='minimize']");
-    if (minimizeButton != null){
-      minimizeButton.addEventListener("click",() => minimizeCard(card));
-      minimizeButton.addEventListener("keydown",event => {
-        if (event.key != "Enter") return;
-        event.preventDefault();
-        if (event.repeat) return;
-        minimizeButton.click();
-      });
-      minimizeButton.setAttribute("aria-label","Minimize");
-    }
-    var closeButton = card.querySelector(".header .card-controls .control[data-control='close']");
-    if (closeButton != null){
-      closeButton.addEventListener("click",() => closeCard(card));
-      closeButton.setAttribute("aria-label","Close");
-    }
-    if (!Editor.environment.macOS_device || !minimizeButton || !closeButton) return;
-    var header = card.querySelector(".header"), cardControls = card.querySelector(".header .card-controls");
-    cardControls.insertBefore(closeButton,minimizeButton);
-    header.insertBefore(cardControls,header.firstChild);
-    var navigable = getNavigableElements(card);
-    card.addEventListener("keydown",event => {
-      if (!card.classList.contains("dialog")) return;
-      if (event.key == "Tab"){
-        if (event.shiftKey){
-          if (document.activeElement == navigable[0]){
-            event.preventDefault();
-            navigable[navigable.length - 1].focus();
-          }
-        } else if (document.activeElement == navigable[navigable.length - 1]){
-          event.preventDefault();
-          navigable[0].focus();
-        }
-      }
+    if (!card.querySelector(".header .card-controls")) return;
+    var header = card.querySelector(".header"), back = header.querySelector(".card-back"), cardControls = header.querySelector(".card-controls"), minimize = cardControls.querySelector(".control[data-control='minimize']"), close = cardControls.querySelector(".control[data-control='close']");
+    back.addEventListener("click",() => openCard(document.querySelector(`#${back.getAttribute("data-parent-card")}`),card.id));
+    minimize.addEventListener("click",() => minimizeCard(card));
+    minimize.addEventListener("keydown",event => {
+      if (event.key != "Enter") return;
+      event.preventDefault();
+      if (event.repeat) return;
+      minimize.click();
     });
+    close.addEventListener("click",() => closeCard(card));
+    if (!Editor.environment().macOS_device) return;
+    cardControls.insertBefore(close,minimize);
+    header.insertBefore(cardControls,header.firstChild);
   });
-  picker_card.querySelectorAll("input[type='range']").forEach(pickerChannel => {
-    pickerChannel.addEventListener("input",channelRefresh);
-    pickerChannel.min = "0";
-    pickerChannel.max = "255";
+  picker_card.querySelectorAll("input[type='range']").forEach(channel => {
+    channel.addEventListener("input",refreshChannels);
+    channel.min = "0";
+    channel.max = "255";
   });
   window.addEventListener("load",() => {
-    if ("serviceWorker" in navigator && Editor.appearance().parent_window && window.location.protocol == "https:"){
-      navigator.serviceWorker.register("service-worker.js");
-      if (navigator.serviceWorker.controller){
-        navigator.serviceWorker.addEventListener("message",event => {
-          if (event.data.action == "load-files"){
-            var files = Array.from(event.data.files);
-            files.forEach(file => {
-              var reader = new FileReader();
-              reader.readAsText(file,"UTF-8");
-              reader.addEventListener("loadend",() => createFile(file.name,reader.result));
-            });
-          }
-          if (event.data.action == "clear-cache-success") openCard(clear_cache_success_card);
-        });
-        clear_cache_option.classList.remove("hidden");
-        clear_cache_button.classList.remove("hidden");
-      }
-    }
-  });
-  window.addEventListener("beforeinstallprompt",event => {
-    event.preventDefault();
-    Editor.install_prompt = event;
-    install_option.classList.remove("hidden");
-    install_button.classList.remove("hidden");
-  });
-  window.addEventListener("beforeunload",event => {
-    if (!Editor.appearance().parent_window || (files.querySelectorAll(".tab[data-unsaved]").length == 0)) return;
-    event.preventDefault();
-    event.returnValue = "";
-  });
-  window.addEventListener("resize",event => {
-    if (context_menu.classList.contains("active")) closeContextMenu();
-    if (Editor.view() != "preview"){
-      setFileTabVisibility(Editor.query().tab);
-      setFilesSectionOffset();
-    }
-    if (Editor.view() != "split" || !document.body.hasAttribute("data-scaling-offset")) return;
-    var currentWidth = window.innerWidth, currentHeight = window.innerHeight;
-    window.setTimeout(() => {
-      if ((Editor.orientation() == "horizontal" && window.innerWidth == currentWidth) || (Editor.orientation() == "vertical" && window.innerHeight == currentHeight)) return;
-      changeView("split");
-    },50);
-  });
-  window.addEventListener("orientationchange",refreshSafeAreaInsets);
-  window.addEventListener("blur",() => {
-    var activeMenus = document.querySelectorAll(".menu.active");
-    activeMenus.forEach(activeMenu => {
-      if (activeMenu == context_menu){
-        closeContextMenu();
-      } else closeMenu(activeMenu);
-    });
-  });
-  document.body.addEventListener("keydown",event => {
-    var pressed = key => (event.key.toLowerCase() == key.toLowerCase()), ctrl = (event.ctrlKey && !Editor.environment.apple_device), command = (event.metaKey && Editor.environment.apple_device), shift = (event.shiftKey || ((event.key.toUpperCase() == event.key) && (event.key + event.key == event.key * 2))), ctrlShift = (ctrl && shift), shiftCommand = (shift && command), ctrlCommand = (event.ctrlKey && command);
-    if (pressed("Escape")){
-      event.preventDefault();
-      if (event.repeat) return;
-      event.stopPropagation();
-      if (context_menu.classList.contains("active")) return closeContextMenu();
-      if (Editor.active_dialog) closeCard(Editor.active_dialog);
-    }
-    if ((ctrlShift || shiftCommand) && pressed("x")){
-      event.preventDefault();
-      if (event.repeat) return;
-      createFile();
-    }
-    if ((ctrlShift || shiftCommand) && pressed("d")){
-      event.preventDefault();
-      if (event.repeat) return;
-      closeFile(Editor.query().tab);
-    }
-    if ((ctrlShift || ctrlCommand) && (pressed("[") || pressed("{"))){
-      event.preventDefault();
-      if (event.repeat) return;
-      var activeTab = Editor.query().tab, tabs = Array.from(files.querySelectorAll(".tab")), newTab, withinEditor = (document.activeElement == Editor.query().textarea);
-      if (activeTab == tabs[0]){
-        newTab = tabs[tabs.length - 1];
-      } else newTab = tabs[tabs.indexOf(activeTab) - 1];
-      openFile(newTab);
-      if (withinEditor) Editor.query().textarea.focus();
-    }
-    if ((ctrlShift || ctrlCommand) && (pressed("]") || pressed("}"))){
-      event.preventDefault();
-      if (event.repeat) return;
-      var activeTab = Editor.query().tab, tabs = Array.from(files.querySelectorAll(".tab")), newTab, withinEditor = (document.activeElement == Editor.query().textarea);
-      if (activeTab == tabs[tabs.length - 1]){
-        newTab = tabs[0];
-      } else newTab = tabs[tabs.indexOf(activeTab) + 1];
-      openFile(newTab);
-      if (withinEditor) Editor.query().textarea.focus();
-    }
-    if ((ctrlShift || shiftCommand) && pressed("c")){
-      event.preventDefault();
-      if (event.repeat) return;
-      openEditorWindow();
-    }
-    if ((ctrl || command) && pressed("o")){
-      event.preventDefault();
-      if (event.repeat) return;
-      loadFiles();
-    }
-    if ((ctrl || command) && pressed("s")){
-      event.preventDefault();
-      if (event.repeat) return;
-      saveFile();
-    }/*
-    if ((ctrlShift || ctrlCommand) && (pressed("1") || pressed("!"))){
-      event.preventDefault();
-      if (event.repeat) return;
-      changeView("text");
-    }*/
-    if ((ctrlShift || ctrlCommand) && (pressed("2") || pressed("@"))){
-      event.preventDefault();
-      if (event.repeat) return;
-      changeView("code");
-    }
-    if ((ctrlShift || ctrlCommand) && (pressed("3") || pressed("#"))){
-      event.preventDefault();
-      if (event.repeat) return;
-      changeView("split");
-    }
-    if ((ctrlShift || ctrlCommand) && (pressed("4") || pressed("$"))){
-      event.preventDefault();
-      if (event.repeat) return;
-      changeView("preview");
-    }
-    if ((ctrlShift || ctrlCommand) && (pressed("5") || pressed("%"))){
-      event.preventDefault();
-      if (event.repeat) return;
-      changeOrientation();
-    }
-    if ((ctrlShift || ctrlCommand) && (pressed("6") || pressed("^"))){
-      event.preventDefault();
-      if (event.repeat) return;
-      openDisplay();
-    }
-    if ((ctrlShift || shiftCommand) && pressed("Enter")){
-      event.preventDefault();
-      if (event.repeat) return;
-      if (Editor.view() == "split" || Editor.view() == "preview") forceRefresh();
-    }
-    if ((ctrlShift || shiftCommand) && pressed("e")){
-      event.preventDefault();
-      if (event.repeat) return;
-      openCard(editing_tools_card);
-    }
-    if ((ctrlShift || shiftCommand) && pressed("f")){
-      event.preventDefault();
-      if (event.repeat) return;
-      openCard(replacer_card);
-    }
-    if ((ctrlShift || shiftCommand) && pressed("p")){
-      event.preventDefault();
-      if (event.repeat) return;
-      openCard(picker_card);
-    }
-    if ((ctrlShift || shiftCommand) && pressed("g")){
-      event.preventDefault();
-      if (event.repeat) return;
-      importColor();
-    }
-    if ((ctrlShift || shiftCommand) && pressed("r")){
-      event.preventDefault();
-      if (event.repeat) return;
-      openCard(formatter_card);
-    }
-    if ((ctrlShift || shiftCommand) && pressed("y")){
-      event.preventDefault();
-      if (event.repeat) return;
-      openCard(encoder_card);
-    }
-    if ((ctrlShift || shiftCommand) && pressed("h")){
-      event.preventDefault();
-      if (event.repeat) return;
-      confirmOverwrite(insertTemplate);
-    }
-    if ((ctrlShift || shiftCommand) && pressed("m")){
-      event.preventDefault();
-      if (!Editor.active_widget || event.repeat) return;
-      minimizeCard(Editor.active_widget);
-    }
-    if ((ctrlShift || shiftCommand) && (pressed(".") || pressed(">"))){
-      event.preventDefault();
-      if (event.repeat) return;
-      openCard(settings_card);
-    }
-  });
-  document.body.addEventListener("mousedown",event => {
-    if (event.button != 2) return;
-    event.preventDefault();
-    event.stopPropagation();
-  });
-  document.body.addEventListener("contextmenu",event => event.preventDefault());
-  document.body.addEventListener("drop",() => {
-    var activeMenus = document.querySelectorAll(".menu.active");
-    if (activeMenus == null) return;
-    activeMenus.forEach(activeMenu => {
-      if (activeMenu == context_menu){
-        closeContextMenu();
-      } else closeMenu(activeMenu);
-    });
-  });
-  document.body.addEventListener("dragend",() => document.querySelectorAll("textarea").forEach(textarea => textarea.num_refreshLineCount()));
-  var toolbar = document.querySelector("#header .menubar");
-  toolbar.querySelectorAll(".menu").forEach(menu => {
-    menu.addEventListener("mouseenter",() => {
-      if (toolbar.querySelectorAll(".menu:not(.alternate).active").length == 0 || menu.classList.contains("alternate") || menu.classList.contains("active")) return;
-      openMenu(menu);
-    });
-  });
-  files.addEventListener("dragover",event => {
-    event.preventDefault();
-    files.classList.add("drag");
-    event.dataTransfer.dropEffect = "copy";
-  });
-  main.addEventListener("scroll",event => {
-    main.scrollLeft = 0;
-    main.scrollTop = 0;
-  },{ passive: true });
-  files.addEventListener("dragleave",() => files.classList.remove("drag"));
-  files.addEventListener("drop",event => {
-    event.preventDefault();
-    files.classList.remove("drag");
-    Array.from(event.dataTransfer.items).forEach(async item => {
-      if (item.kind == "file"){
-        if (!Editor.support.file_system || !("getAsFileSystemHandle" in item)){
-          var file = item.getAsFile(), reader = new FileReader();
+    if (!("serviceWorker" in navigator) || !Editor.appearance().parent_window || window.location.protocol != "https:") return;
+    navigator.serviceWorker.register("service-worker.js");
+    if (!navigator.serviceWorker.controller) return;
+    navigator.serviceWorker.addEventListener("message",event => {
+      if (event.data.action == "load-files"){
+        var files = Array.from(event.data.files);
+        files.forEach(file => {
+          var reader = new FileReader();
           reader.readAsText(file,"UTF-8");
-          reader.addEventListener("loadend",() => createFile(file.name,reader.result));
-        } else {
-          var fileHandle = await item.getAsFileSystemHandle();
-          if (fileHandle.kind != "file") return;
-          var file = await fileHandle.getFile(), identifier = createFile(await file.name,await file.text());
-          Editor.file_handles[identifier] = await fileHandle;
-        }
-      } else if (item.kind == "string") createFile(undefined,event.dataTransfer.getData("text"));
-    });
-  });
-  scaler.addEventListener("touchstart",event => {
-    if (event.touches.length != 1) return;
-    toggleScaling();
-    document.addEventListener("touchmove",setScaling,{ passive: true });
-    document.addEventListener("touchend",disableScaling,{ passive: true });
-  },{ passive: true });
-  scaler.addEventListener("mousedown",() => {
-    toggleScaling();
-    document.addEventListener("mousemove",setScaling);
-    document.addEventListener("mouseup",disableScaling);
-  });
-  card_backdrop.addEventListener("click",() => closeCard(Editor.active_dialog));
-  theme_setting.addEventListener("input",() => {
-    theme_styles.innerText = theme_setting.value;
-    updateSetting("theme",theme_setting.value);
-  });
-  picker_input.addEventListener("input",() => {
-    pickerInputRefresh();
-    if (!Editor.insert_color) return;
-    textEdit("insert",Editor.picker_color);
-    picker_input.focus();
-  });
-  createFile();
-  if (Editor.support.file_handling && Editor.support.file_system){
-    window.launchQueue.setConsumer(launchParams => {
-      if (!launchParams.files.length) return;
-      var focusEditor;
-      if (document.activeElement == Editor.query().textarea) focusEditor = true;
-      closeFile(Editor.query().tab);
-      launchParams.files.forEach(async fileHandle => {
-        var file = await fileHandle.getFile(), identifier = createFile(await file.name,await file.text());
-        Editor.file_handles[identifier] = await fileHandle;
-      });
-      if (focusEditor) Editor.query().textarea.focus();
-    });
-  }
-  if (Editor.appearance().parent_window){
-    loadSettings("initial");
-    loadTheme();
-    window.setTimeout(() => document.documentElement.classList.remove("startup-fade"),50);
-    if (!Editor.environment.touch_device) Editor.query().textarea.focus();
-  }
-  if (Editor.environment.mozilla_browser){
-    undo_tool.classList.add("hidden");
-    redo_tool.classList.add("hidden");
-  }
-  refreshSafeAreaInsets();
-  pickerInputRefresh();
-  var queryParameters = new URLSearchParams(window.location.search);
-  if (queryParameters.get("template")){
-    confirmOverwrite(insertTemplate);
-    removeQueryParameters(["template"]);
-  }
-  if (queryParameters.get("settings")){
-    openCard(settings_card);
-    removeQueryParameters(["settings"]);
-  }
-  function createFile(name,value){
-    var identifier = Math.random(), tab = document.createElement("button"), container = document.createElement("div");
-    container.classList.add("editor");
-    container.setAttribute("data-identifier",identifier);
-    container.setAttribute("data-numbered-container",true);
-    var textarea = document.createElement("textarea");
-    textarea.addEventListener("input",() => {
-      sourceChange = true;
-      if (!tab.hasAttribute("data-unsaved")) tab.setAttribute("data-unsaved",true);
-      if (Editor.view() == "split" || Editor.view() == "preview") refreshPreview();
-    });
-    textarea.addEventListener("click",() => {
-      if (Editor.insert_color) Editor.insert_color = false;
-    });
-    container.appendChild(textarea);
-    workspace.appendChild(container);
-    if (!name) name = "Untitled.txt";
-    if (value) textarea.value = value;
-    textarea.selectionStart = 0;
-    textarea.selectionEnd = 0;
-    addInputCharacteristics(textarea);
-    tab.classList.add("tab");
-    tab.setAttribute("data-identifier",identifier);
-    var previewOption = document.createElement("li");
-    previewOption.setAttribute("data-identifier",identifier);
-    previewOption.innerText = name;
-    previewOption.addEventListener("click",() => {
-      Editor.preview_editor = identifier;
-      forceRefresh();
-    });
-    preview_files.appendChild(previewOption);
-    var fileName = document.createElement("span");
-    fileName.innerText = name;
-    fileName.setAttribute("data-file-name",true);
-    tab.appendChild(fileName);
-    var renameButton = document.createElement("button");
-    renameButton.innerHTML = "<svg><use href='#rename_icon'/></svg>";
-    renameButton.addEventListener("click",event => {
-      event.stopPropagation();
-      var newFileName = prompt(`Enter a new file name for "${fileName.innerText}"`,fileName.innerText);
-      if (!newFileName) return;
-      previewOption.innerText = newFileName;
-      fileName.innerText = newFileName;
-      if (tab == Editor.query().tab) titleRefresh(newFileName);
-    });
-    tab.appendChild(renameButton);
-    var closeButton = document.createElement("button");
-    closeButton.innerHTML = "<svg><use href='#close_icon'/></svg>";
-    closeButton.addEventListener("click",event => {
-      event.stopPropagation();
-      closeFile(tab);
-    });
-    tab.appendChild(closeButton);
-    files.appendChild(tab);
-    tab.addEventListener("click",() => {
-      if (!tab.classList.contains("active")) openFile(tab);
-    });
-    tab.addEventListener("dragover",event => {
-      event.preventDefault();
-      event.stopPropagation();
-      event.dataTransfer.dropEffect = "copy";
-      if (!tab.classList.contains("active")) openFile(tab);
-    });
-    tab.addEventListener("drop",event => {
-      event.preventDefault();
-      event.stopPropagation();
-    });
-    var withinEditor = (document.activeElement == Editor.query().textarea);
-    openFile(tab);
-    if (withinEditor) Editor.query().textarea.focus();
-    return identifier;
-  }
-  function openFile(tab){
-    var identifier = tab.getAttribute("data-identifier"), tabs = files.querySelectorAll(".tab");
-    tabs.forEach(tab => {
-      tab.classList.remove("active");
-    });
-    tab.classList.add("active");
-    workspace.querySelectorAll("[data-numbered-container].active").forEach(activeFile => activeFile.classList.remove("active"));
-    var container = workspace.querySelector(`[data-numbered-container][data-identifier="${identifier}"]`);
-    container.classList.add("active");
-    Editor.active_editor = identifier;
-    setFileTabVisibility(tab);
-    forceRefresh();
-    titleRefresh(tab.querySelector("[data-file-name]").innerText);
-  }
-  function closeFile(tab){
-    var identifier = tab.getAttribute("data-identifier");
-    if (tab.hasAttribute("data-unsaved")){
-      var ask = confirm(`Are you sure you would like to close "${Editor.query(identifier).name()}"?\nRecent changes have not yet been saved.`);
-      if (!ask) return;
-    }
-    var tabs = Array.from(files.querySelectorAll(".tab")), withinEditor = (document.activeElement == Editor.query().textarea);
-    if (tab == tabs[0] && tabs[1] && tab.classList.contains("active")) openFile(tabs[1]);
-    if (tab == tabs[tabs.length - 1] && tab != tabs[0] && tab.classList.contains("active")) openFile(tabs[tabs.length - 2]);
-    if (tab != tabs[0] && tab.classList.contains("active")) openFile(tabs[tabs.indexOf(tab) + 1]);
-    if (withinEditor) Editor.query().textarea.focus();
-    files.removeChild(tab);
-    var previewOption = preview_files.querySelector(`li[data-identifier="${identifier}"]`);
-    preview_files.removeChild(previewOption);
-    var container = workspace.querySelector(`[data-numbered-container][data-identifier="${identifier}"]`);
-    workspace.removeChild(container);
-    if (identifier == Editor.active_editor) Editor.active_editor = null;
-    if (Editor.file_handles[identifier]) delete Editor.file_handles[identifier];
-  }
-  function setFileTabVisibility(tab){
-    var obstructedLeft = (tab.offsetLeft <= files.scrollLeft), obstructedRight = (tab.offsetLeft + tab.clientWidth >= files.scrollLeft + files.clientWidth);
-    if (!obstructedLeft && !obstructedRight) return;
-    var spacingOffset = 0;
-    if (obstructedLeft){
-      if (!tab.previousElementSibling){
-        spacingOffset = parseInt(getElementStyle(files,"padding-left").replace(/px/g,""));
-      } else spacingOffset = parseInt(getElementStyle(tab,"margin-left").replace(/px/g,"") * 2);
-      files.scrollTo(tab.offsetLeft - spacingOffset,0);
-    }
-    if (obstructedRight){
-      if (tab.nextElementSibling){
-        spacingOffset = parseInt(getElementStyle(tab.nextElementSibling,"margin-left").replace(/px/g,"") * 2);
-      } else spacingOffset = parseInt(getElementStyle(tab,"::before","width").replace(/px/g,""));
-      files.scrollTo(tab.offsetLeft + tab.clientWidth + spacingOffset - files.clientWidth,0);
-    }
-  }
-  function setFilesSectionOffset(){
-    if (Editor.view() != "split" || Editor.orientation() != "horizontal" || !Editor.active_widget && !Editor.active_editing_tools) return;
-    var overflowOverlap, scalingOffset;
-    if (document.body.hasAttribute("data-scaling-offset")){
-      scalingOffset = parseInt(document.body.getAttribute("data-scaling-offset"));
-    } else scalingOffset = workspace.offsetWidth;
-    if (Editor.active_editing_tools) overflowOverlap = parseInt(getElementStyle(editing_tools,"width").replace(/px/g,"")) + parseInt(getElementStyle(editing_tools,"margin").replace(/px/g,"")) + scalingOffset > parseInt(getElementStyle(main,"width").replace(/px/g,""));
-    if (Editor.active_widget && !Editor.active_widget.classList.contains("minimize") && !Editor.active_editing_tools) overflowOverlap = parseInt(getElementStyle(Editor.active_widget,"width").replace(/px/g,"")) + parseInt(getElementStyle(Editor.active_widget,"margin").replace(/px/g,"")) + scalingOffset > parseInt(getElementStyle(main,"width").replace(/px/g,""));
-    if (overflowOverlap){
-      main.classList.add("files-offset");
-    } else main.classList.remove("files-offset");
-  }
-  function titleRefresh(value){
-    document.title = `${value} - Smart Text Editor`;
-  }
-  function installApp(){
-    Editor.install_prompt.prompt();
-    Editor.install_prompt.userChoice.then(result => {
-      if (result.outcome != "accepted") return;
-      install_option.classList.add("hidden");
-      install_button.classList.add("hidden");
-    });
-  }
-  function loadSettings(input){
-    if (!Editor.appearance().parent_window) return;
-    var savedView = Editor.storage.getItem("view");
-    if (savedView){
-      if (input == "initial") changeView(savedView);
-      updateSelect("view",savedView);
-    }
-    var savedOrientation = Editor.storage.getItem("orientation");
-    if (savedOrientation){
-      if (input == "initial") changeOrientation(savedOrientation);
-      updateSelect("orientation",savedOrientation);
-    }
-    var savedEditingTools = Editor.storage.getItem("editingTools");
-    if (savedEditingTools){
-      if (input == "initial"){
-        if (savedEditingTools == "true") openCard(editing_tools_card);
-      }
-      updateCheckbox("editing_tools",savedEditingTools);
-    }
-    var savedRefresh = Editor.storage.getItem("refresh");
-    if (savedRefresh){
-      Editor.refresh = savedRefresh;
-      if (Editor.refresh == "true") refreshPreview();
-      updateCheckbox("refresh",savedRefresh);
-    }
-  }
-  function resetSettings(){
-    var ask = confirm("Are you sure you want to reset all settings?\nThis cannot be undone.");
-    if (!ask) return;
-    closeCard(reset_card);
-    window.setTimeout(() => {
-      updateSelect("view","code");
-      updateSelect("orientation","horizontal");
-      updateSelect("editing_tools","no");
-      Editor.refresh = "true";
-      updateCheckbox("refresh","true");
-      resetTheme();
-      Editor.storage.clear();
-    },50);
-    openCard(reset_card);
-  }
-  function updateSetting(item,value){
-    Editor.storage.setItem(item,value);
-  }
-  function updateSelect(item,value){
-    updateSetting(item,value);
-    var select = document.querySelector(`#${item}_setting`);
-    select.innerHTML = select.innerHTML.replace(select.textContent,updateCapitalization(value));
-  }
-  function updateCheckbox(item,value){
-    var checkbox = document.querySelector(`#${item}_setting`);
-    if (value == undefined){
-      value = checkbox.checked;
-    } else {
-      if (value == "true") checkbox.checked = "true";
-      if (value == "false") checkbox.removeAttribute("checked");
-    }
-    updateSetting(item,value);
-  }
-  function updateCapitalization(value){
-    return value.charAt(0).toUpperCase() + value.slice(1);
-  }
-  function clearCache(){
-    var ask = confirm("Are you sure you want to clear all cache?\nThis site will no longer work offline.");
-    if (!ask) return;
-    navigator.serviceWorker.controller.postMessage({
-      action: "clear-cache"
-    });
-  }
-  function loadTheme(){
-    if (!Editor.appearance().parent_window) return;
-    var savedTheme = Editor.storage.getItem("theme");
-    if (savedTheme){
-      theme_styles.innerText = savedTheme;
-      theme_setting.num_changeValue(savedTheme);
-    }
-  }
-  function resetTheme(){
-    theme_styles.innerText = "";
-    theme_color.content = getElementStyle(document.documentElement,"--container-dark");
-    theme_setting.num_changeValue("");
-    Editor.storage.removeItem("theme");
-  }
-  function refreshSafeAreaInsets(){
-    document.body.classList.remove("camera-left");
-    document.body.classList.remove("camera-right");
-    var angle = window.orientation;
-    if (angle == 90) document.body.classList.add("camera-left");
-    if (angle == -90) document.body.classList.add("camera-right");
-  }
-  function addInputCharacteristics(input){
-    input.spellcheck = false;
-    input.autocomplete = "off";
-    input.autocapitalize = "off";
-    input.setAttribute("autocorrect","off");
-    if (input.tagName.toLowerCase() == "input"){
-      input.addEventListener("mousedown",event => {
-        if (event.button == "2") event.preventDefault();
-      });
-      input.addEventListener("contextmenu",event => {
-        if (Editor.environment.mozilla_browser){
-          event.stopPropagation();
-          menus.forEach(menu => closeMenu(menu));
-        } else openContextMenu(event,"editing");
-      });
-      if (!Editor.environment.mozilla_browser){
-        input.addEventListener("touchstart",event => {
-          if (event.touches.length != 1) return;
-          Editor.long_touch.timeout = window.setTimeout(() => openContextMenu(event,"editing"),750);
-          if (window.getSelection == "") return;
-          Editor.long_touch.selection = window.getSelection();
+          reader.addEventListener("loadend",() => createEditor({
+            name: file.name,
+            value: reader.result
+          }));
         });
-        input.addEventListener("touchmove",cancelLongTouch);
-        input.addEventListener("touchend",cancelLongTouch);
       }
+      if (event.data.action == "clear-cache-success") openCard(clear_cache_success_card);
+    });
+    clear_cache_option.classList.remove("hidden");
+    clear_cache_button.classList.remove("hidden");
+  });
+
+
+
+
+  function applyEditingBehavior(element){
+    var tagName = element.tagName.toLowerCase();
+    element.spellcheck = false;
+    element.autocomplete = "off";
+    element.autocapitalize = "off";
+    element.setAttribute("autocorrect","off");
+    if (tagName == "input"){
+      attachContextMenu({
+        element: element,
+        type: "editing"
+      });
     }
-    if (input.tagName.toLowerCase() == "textarea"){
-      var container = input.parentElement;
+    if (tagName == "textarea"){
+      var container = element.closest("[data-numbered-container]");
       container.num_establishContainer();
-      container.addEventListener("mousedown",event => {
-        if (event.button == "2") event.preventDefault();
-      });
-      container.addEventListener("contextmenu",event => {
-        if (Editor.environment.mozilla_browser){
-          event.stopPropagation();
-          menus.forEach(menu => closeMenu(menu));
-        } else openContextMenu(event,"editing");
-      });
-      if (!Editor.environment.mozilla_browser){
-        container.addEventListener("touchstart",event => {
-          if (event.touches.length != 1) return;
-          Editor.long_touch.timeout = window.setTimeout(() => openContextMenu(event,"editing"),750);
-          if (window.getSelection == "") return;
-          Editor.long_touch.selection = window.getSelection();
-        });
-        container.addEventListener("touchmove",cancelLongTouch);
-        container.addEventListener("touchend",cancelLongTouch);
-      }
       container.addEventListener("dragover",event => {
         container.classList.add("drag");
         event.dataTransfer.dropEffect = "copy";
@@ -1698,567 +1089,44 @@
       container.addEventListener("dragleave",() => container.classList.remove("drag"));
       container.addEventListener("drop",event => {
         container.classList.remove("drag");
-        if (Array.from(event.dataTransfer.items)[0].kind == "string") return window.setTimeout(() => input.num_refreshLineCount(),5);
-        event.preventDefault();
+        if (Array.from(event.dataTransfer.items)[0].kind == "string"){
+          window.setTimeout(() => element.num_refreshLineCount(),5);
+        } else preventDefault();
+      });
+      attachContextMenu({
+        element: container,
+        type: "editing"
       });
     }
   }
-  function addQueryParameters(queryEntries){
-    var queryParameters = new URLSearchParams(window.location.search);
-    queryEntries.forEach(queryEntry => queryParameters.set(queryEntry,true));
-    changeQueryParameters(queryParameters);
-  }
-  function removeQueryParameters(queryEntries){
-    var queryParameters = new URLSearchParams(window.location.search);
-    queryEntries.forEach(queryEntry => queryParameters.delete(queryEntry));
-    changeQueryParameters(queryParameters);
-  }
-  function changeQueryParameters(queryParameters){
-    var queryString = queryParameters.toString();
-    if (queryString) queryString = "?" + queryString;
-    var completeAddress = window.location.pathname + queryString;
-    history.pushState(null,"",completeAddress);
-  }
-  function changeView(newView){
-    if (document.body.hasAttribute("data-scaling-active")) return;
-    if (newView != "preview"){
-      var transitionDuration = parseInt(getElementStyle(workspace,"transition-duration").replace(/s/g,"") * 1000);
-      window.setTimeout(() => {
-        setFileTabVisibility(Editor.query().tab);
-        setFilesSectionOffset();
-      },transitionDuration);
-    }
-    document.body.setAttribute("data-view",newView);
-    removeScaling();
-    if (main.classList.contains("files-offset")) main.classList.remove("files-offset");
-    if (newView == "code"){
-      undo_tool.disabled = false;
-      redo_tool.disabled = false;
-      refresh_tool.disabled = true;
-    }
-    if (newView == "split"){
-      undo_tool.disabled = false;
-      redo_tool.disabled = false;
-      refresh_tool.disabled = false;
-    }
-    if (newView == "preview"){
-      undo_tool.disabled = true;
-      redo_tool.disabled = true;
-      refresh_tool.disabled = false;
-    }
-    refreshPreview();
-  }
-  function changeOrientation(newOrientation){
-    if (document.body.hasAttribute("data-scaling-active")) return;
-    if (!newOrientation){
-      if (Editor.orientation() == "horizontal"){
-        newOrientation = "vertical";
-      } else newOrientation = "horizontal";
-      var transitionDuration;
-      if (Editor.view() == "split" || Editor.view() == "preview"){
-        changeView("code");
-        transitionDuration = parseInt(getElementStyle(workspace,"transition-duration").replace(/s/g,"") * 1000);
-      } else transitionDuration = 0;
-      window.setTimeout(() => {
-        document.body.setAttribute("data-orientation",newOrientation);
-        window.setTimeout(() => changeView("split"),25);
-      },transitionDuration);
-    } else {
-      document.body.setAttribute("data-orientation",newOrientation);
-    }
-  }
-  function getNavigableElements(container,scope){
-    var navigable;
-    if (scope){
-      navigable = container.querySelectorAll(":scope > button:not([disabled]), :scope > textarea:not([disabled]), :scope > input:not([disabled]), :scope > select:not([disabled]), :scope > a[href]:not([disabled]), :scope > [tabindex]:not([tabindex='-1'])");
-    } else navigable = container.querySelectorAll("button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), a[href]:not([disabled]), [tabindex]:not([tabindex='-1'])");
-    return Array.from(navigable).filter(element => (getElementStyle(element,"display") != "none"));
-  }
-  function getElementStyle(element,pseudo,property){
-    if (!property){
-      property = pseudo;
-      pseudo = null;
-    }
-    return window.getComputedStyle(element,pseudo).getPropertyValue(property);
-  }
-  function confirmOverwrite(action,event){
-    if (Editor.query().tab.hasAttribute("data-unsaved")){
-      var ask = confirm("Changes you made may not be saved.");
-      if (!ask) return;
-      action(event);
-      closeCard(Editor.active_dialog);
-    } else {
-      action(event);
-      closeCard(Editor.active_dialog);
-    }
-  }
-  function openEditorWindow(){
-    var windowFeatures = "";
-    if (Editor.appearance().standalone || Editor.appearance().fullscreen) windowFeatures = "popup";
-    var newEditor = window.open(window.location.href,"_blank",windowFeatures);
-    if (Editor.appearance().fullscreen){
-      newEditor.resizeTo(window.screen.width * 2/3,window.screen.height * 2/3);
-      newEditor.moveTo(window.screen.width / 6,window.screen.height / 6);
-    } else if (Editor.appearance().standalone){
-      newEditor.resizeTo(window.outerWidth,window.outerHeight);
-      newEditor.moveTo(window.screenX,window.screenY);
-    }
-  }
-  async function loadFiles(){
-    if (!Editor.support.file_system){
-      var input = document.createElement("input");
-      input.type = "file";
-      input.multiple = true;
-      input.click();
-      input.addEventListener("change",() => {
-        var files = Array.from(input.files);
-        files.forEach(file => {
-          var reader = new FileReader();
-          reader.readAsText(file,"UTF-8");
-          reader.addEventListener("loadend",() => createFile(file.name,reader.result));
-        });
-        input.value = null;
-      });
-    } else {
-      var fileHandles;
-      if ("showOpenFilePicker" in window){
-        fileHandles = await window.showOpenFilePicker({
-          multiple: true
-        }).catch(error => {
-          if (error.message.toLowerCase().includes("abort")) return;
-        });
-      } else if ("chooseFileSystemEntries" in window){
-        fileHandles = await window.chooseFileSystemEntries({
-          type: "open-file",
-          multiple: true
-        }).catch(error => {
-          if (error.message.toLowerCase().includes("abort")) return;
-        });
-      }
-      if (fileHandles) fileHandles.forEach(async fileHandle => {
-        var file = await fileHandle.getFile(), identifier = createFile(await file.name,await file.text());
-        Editor.file_handles[identifier] = await fileHandle;
-      });
-    }
-  }
-  async function saveFile(extension){
-    if (!Editor.support.file_system || extension){
-      var blob = new Blob([Editor.query().textarea.value],{
-        type: "text/plain"
-      }), save = document.createElement("a");
-      save.href = window.URL.createObjectURL(blob);
-      if (!extension){
-        save.download = Editor.query().name();
-      } else save.download = `${Editor.query().name("name")}.${extension}`;
-      save.click();
-    } else {
-      var identifier = Editor.query().tab.getAttribute("data-identifier"), fileHandle;
-      if (!Editor.file_handles[identifier]){
-        if ("showOpenFilePicker" in window){
-          fileHandle = await window.showSaveFilePicker().catch(error => {
-            if (error.message.toLowerCase().includes("abort")) return;
-          });
-        } else if ("chooseFileSystemEntries" in window){
-          fileHandle = await window.chooseFileSystemEntries().catch(error => {
-            if (error.message.toLowerCase().includes("abort")) return;
-          });
-        }
-        if (!fileHandle) return;
-        Editor.file_handles[identifier] = await fileHandle;
-      } else fileHandle = Editor.file_handles[identifier];
-      var writable = await Editor.file_handles[identifier].createWritable().catch(error => alert(`"${Editor.query().name()}" could not be saved.`));
-      if (!writable) return;
-      await writable.write(Editor.query().textarea.value);
-      await writable.close();
-      var file = await fileHandle.getFile(), fileName = await file.name, tab = Editor.query(identifier).tab;
-      tab.querySelector("[data-file-name]").innerText = fileName;
-      if (tab == Editor.query().tab) titleRefresh(fileName);
-    }
-    Editor.query().tab.removeAttribute("data-unsaved");
-    forceRefresh();
-  }
-  function openDisplay(){
-    var windowFeatures = "";
-    if (Editor.appearance().standalone || Editor.appearance().fullscreen) windowFeatures = "popup";
-    var display = window.open("","_blank",windowFeatures);
-    if (Editor.appearance().standalone || Editor.appearance().fullscreen){
-      display.resizeTo(window.screen.width * 2/3,window.screen.height * 2/3);
-      display.moveTo(window.screen.width / 6,window.screen.height / 6);
-    }
-    display.document.open();
-    display.document.write(Editor.query().textarea.value);
-    display.document.close();
-  }
-  function textEdit(type,text){
-    var textarea = Editor.query().textarea, cursor = textarea.selectionStart;
-    textarea.focus();
-    if (type == "insert"){
-      textarea.setRangeText(text);
-      textarea.setSelectionRange(cursor,cursor + text.length);
-    }
-    if (type == "delete"){
-      textarea.setSelectionRange(cursor,cursor + text);
-      textarea.setRangeText("");
-    }
-    textarea.num_refreshLineCount();
-    sourceChange = true;
-    Editor.query().tab.setAttribute("data-unsaved",true);
-    refreshPreview();
-  }
-  function openCard(card,previous){
-    if (!card) return;
-    if (card.classList.contains("active")) return closeCard(card);
-    var cardType = card.classList[1];
-    if (cardType != "alert"){
-      var activeCards = document.querySelectorAll(".card.active");
-      activeCards.forEach(activeCard => {
-        var activeCardType = activeCard.classList[1];
-        if (activeCardType != cardType && activeCardType != "dialog") return;
-        activeCard.classList.remove("active");
-        if (!activeCard.classList.contains("minimize")) return;
-        var transitionDuration = parseInt(getElementStyle(activeCard,"transition-duration").replace(/s/g,"") * 1000);
-        window.setTimeout(() => minimizeCard(activeCard),transitionDuration);
-      });
-    }
-    card.classList.add("active");
-    if (cardType != ("alert" || "dialog")) card_backdrop.classList.remove("active");
-    if (cardType == "alert") window.setTimeout(() => closeCard(card),4000);
-    if (card == editing_tools_card) Editor.active_editing_tools = true;
-    if (cardType == "dialog"){
-      document.body.addEventListener("keydown",catchCardNavigation);
-      card_backdrop.classList.add("active");
-      if (!Editor.active_dialog && !Editor.dialog_previous){
-        var menuChild = (document.activeElement.closest(".menu"));
-        if (menuChild){
-          Editor.dialog_previous = document.activeElement.closest(".menu").querySelector("button");
-        } else Editor.dialog_previous = document.activeElement;
-      }
-      var activeMenus = document.querySelectorAll(".menu.active");
-      activeMenus.forEach(activeMenu => {
-        if (activeMenu == context_menu){
-          closeContextMenu();
-        } else closeMenu(activeMenu);
-      });
-      var transitionDuration = parseInt(getElementStyle(card,"transition-duration").replace(/s/g,"") * 500);
-      window.setTimeout(() => {
-        document.activeElement.blur();
-        var previousElement = card.querySelector(`[data-previous-card="${previous}"]`);
-        if (previousElement) previousElement.focus();
-      },transitionDuration);
-      Editor.active_dialog = card;
-    }
-    if (cardType == "widget") Editor.active_widget = card;
-    setFilesSectionOffset();
-  }
-  function closeCard(card){
-    if (!card) return;
-    var cardType = card.classList[1];
-    card.classList.remove("active");
-    if (card.classList.contains("minimize")){
-      var transitionDuration = parseInt(getElementStyle(card,"transition-duration").replace(/s/g,"") * 1000);
-      window.setTimeout(() => minimizeCard(card),transitionDuration);
-    }
-    if (cardType == "dialog"){
-      document.body.removeEventListener("keydown",catchCardNavigation);
-      card_backdrop.classList.remove("active");
-      Editor.active_dialog = false;
-      if (Editor.dialog_previous){
-        if (workspace.contains(Editor.dialog_previous) && getElementStyle(Editor.dialog_previous,"visibility") == "hidden"){
-          Editor.query().textarea.focus();
-        } else Editor.dialog_previous.focus();
-        Editor.dialog_previous = null;
-      }
-    }
-    if (card == editing_tools_card) Editor.active_editing_tools = false;
-    if (cardType == "widget") Editor.active_widget = false;
-    if (card == settings_card) loadSettings();
-    if (card == theme_card) loadTheme();
-    setFilesSectionOffset();
-  }
-  function minimizeCard(card){
-    card.classList.toggle("minimize");
-    var minimizeButton = card.querySelector(".header .card-controls .control[data-control='minimize']");
-    var minimizeButtonIcon = minimizeButton.querySelector("svg");
-    var minimizeButtonIconLink = minimizeButtonIcon.querySelector("use");
-    var transitionDuration = parseInt(getElementStyle(minimizeButtonIcon,"transition-duration").replace(/s/g,"") * 275);
-    if (!card.classList.contains("minimize")){
-      window.setTimeout(() => {
-        minimizeButton.setAttribute("aria-label","Minimize");
-        minimizeButtonIconLink.setAttribute("href","#minimize_icon");
-      },transitionDuration);
-    } else {
-      if (card.contains(document.activeElement) && document.activeElement != minimizeButton) minimizeButton.focus();
-      window.setTimeout(() => {
-        minimizeButton.setAttribute("aria-label","Maximize");
-        minimizeButtonIconLink.setAttribute("href","#arrow_icon");
-      },transitionDuration);
-    }
-    setFilesSectionOffset();
-  }
-  function catchCardNavigation(event){
-    if (!Editor.active_dialog || context_menu.classList.contains("active") || event.key != "Tab" || document.activeElement != document.body) return;
-    var navigable = getNavigableElements(Editor.active_dialog);
-    if (event.shiftKey){
-      event.preventDefault();
-      navigable[navigable.length - 1].focus();
-    } else {
-      event.preventDefault();
-      navigable[0].focus();
-    }
-  }
-  function openMenu(event,menu){
-    if (Editor.long_touch.timeout) Editor.long_touch.timeout = null;
-    if (Editor.long_touch.selection) Editor.long_touch.selection = null;
-    var currentMenu;
-    if (!menu){
-      currentMenu = event;
-    } else currentMenu = menu;
-    menus.forEach(menu => {
-      if (menu != currentMenu && !menu.contains(event.target)) closeMenu(menu);
+  function attachContextMenu(params = {}){
+    var element = params.element, type = params.type;
+    element.addEventListener("mousedown",event => {
+      if (event.button == "2") event.preventDefault();
     });
-    currentMenu.classList.toggle("active");
-    if (currentMenu.classList.contains("active")){
-      document.body.addEventListener("click",catchMenuExit);
-      if (currentMenu == context_menu) document.body.addEventListener("contextmenu",catchMenuExit);
-    } else {
-      document.body.removeEventListener("click",catchMenuExit);
-      if (currentMenu == context_menu) document.body.removeEventListener("contextmenu",catchMenuExit);
-    }
-    function catchMenuExit(){
-      if (currentMenu.contains(document.activeElement)) return;
-      closeMenu(currentMenu);
-      document.body.removeEventListener("click",catchMenuExit);
-      if (currentMenu == context_menu) document.body.removeEventListener("contextmenu",catchMenuExit);
-    }
-  }
-  function closeMenu(menu){
-    var submenus = menu.querySelectorAll("li > ul");
-    submenus.forEach(submenu => submenu.parentElement.classList.remove("active"));
-    menu.classList.remove("active");
-    if (menu != context_menu) return;
-    var menu = menu.querySelectorAll("ul")[0], transitionDuration = parseInt(getElementStyle(menu,"transition-duration").replace(/s/g,"") * 1000);
-    window.setTimeout(() => {
-      var types = ["window","link","editing"];
-      types.forEach(type => {
-        if (menu.classList.contains(type)) menu.classList.remove(type);
-      });
-    },transitionDuration);
-  }
-  function openContextMenu(event,type){
-    event.preventDefault();
-    event.stopPropagation();
-    if (Editor.long_touch.timeout) Editor.long_touch.timeout = null;
-    if (context_menu.classList.contains("active")){
-      closeContextMenu();
-      var menu = context_menu.querySelectorAll("ul")[0], transitionDuration = parseInt(getElementStyle(menu,"transition-duration").replace(/s/g,"") * 1000);
-      return window.setTimeout(() => openContextMenu(event,type),transitionDuration);
-    }
-    Editor.context_menu_previous = event.target;
-    openMenu(event,context_menu);
-    context_menu.classList.add(type);
-    var pageLocation = {}, transformOrigin = {};
-    if (Editor.environment.touch_device && event instanceof TouchEvent){
-      pageLocation.left = event.touches[0].pageX;
-      pageLocation.top = event.touches[0].pageY;
-    } else {
-      pageLocation.left = event.pageX;
-      pageLocation.top = event.pageY;
-    }
-    transformOrigin.left = pageLocation.left;
-    transformOrigin.top = pageLocation.top;
-    var menu = context_menu.querySelectorAll("ul")[0];
-    if (pageLocation.left + menu.offsetWidth > window.innerWidth) pageLocation.left = window.innerWidth - menu.offsetWidth;
-    if (pageLocation.top + menu.offsetHeight > window.innerHeight) pageLocation.top = window.innerHeight - menu.offsetHeight;
-    transformOrigin.left -= pageLocation.left;
-    transformOrigin.top -= pageLocation.top;
-    context_menu.style.left = `${pageLocation.left}px`;
-    context_menu.style.top = `${pageLocation.top}px`;
-    menu.style.transformOrigin = `${transformOrigin.left}px ${transformOrigin.top}px`;
-    document.body.addEventListener("keydown",catchContextMenuNavigation);
-    var transitionDuration = parseInt(getElementStyle(menu,"transition-duration").replace(/s/g,"") * 500);
-    window.setTimeout(() => document.activeElement.blur(),transitionDuration);
-  }
-  function closeContextMenu(){
-    closeMenu(context_menu);
-    Editor.context_menu_previous.focus();
-    Editor.context_menu_previous = null;
-    document.body.removeEventListener("keydown",catchContextMenuNavigation);
-  }
-  function catchContextMenuNavigation(event){
-    event.stopPropagation();
-    if (!context_menu.classList.contains("active") || document.activeElement != document.body) return;
-    var navigable = getNavigableElements(context_menu);
-    if (event.key == "Tab") event.preventDefault();
-    if (event.key == "ArrowUp"){
-      event.preventDefault();
-      navigable[navigable.length - 1].focus();
-    }
-    if (event.key == "ArrowDown"){
-      event.preventDefault();
-      navigable[0].focus();
+    element.addEventListener("contextmenu",event => {
+      if (!Editor.support().editing_commands){
+        event.stopPropagation();
+        menus.forEach(menu => closeMenu(menu));
+      } else openContextMenu(event,type);
+    });
+    if (!Editor.support().editing_commands) return;
+    element.addEventListener("touchstart",event => {
+      if (event.touches.length != 1) return;
+      Editor.long_touch.timeout = window.setTimeout(() => openContextMenu(event,type),750);
+      if (window.getSelection() != "") Editor.long_touch.selection = window.getSelection();
+    });
+    element.addEventListener("touchmove",cancelLongTouch);
+    element.addEventListener("touchend",cancelLongTouch);
+    function cancelLongTouch(){
+      if (Editor.long_touch.timeout){
+        window.clearTimeout(Editor.long_touch.timeout);
+        Editor.long_touch.timeout = null;
+      }
+      if (Editor.long_touch.selection) Editor.long_touch.selection = null;
     }
   }
-  function cancelLongTouch(){
-    if (Editor.long_touch.timeout) window.clearTimeout(Editor.long_touch.timeout);
-    if (Editor.long_touch.selection) Editor.long_touch.selection = null;
-  }
-  async function callCommand(element,action){
-    element.focus();
-    if (action == "paste"){
-      var clipboardText = await navigator.clipboard.readText().catch(error => alert("Clipboard text could not be read, please check site permissions for clipboard use."));
-      document.execCommand("insertText",false,await clipboardText);
-    } else document.execCommand(action);
-    if ((action == "undo" || action == "redo" || action == "paste") && element.parentElement.hasAttribute("data-numbered-container")) element.num_refreshLineCount();
-  }
-  function activateReplacer(){
-    Editor.query().textarea.num_changeValue(Editor.query().textarea.value.split(replacer_find.value).join(replacer_replace.value));
-    sourceChange = true;
-    Editor.query().tab.setAttribute("data-unsaved",true);
-    refreshPreview();
-  }
-  function flipReplacer(){
-    var findContent = replacer_find.value;
-    replacer_find.num_changeValue(replacer_replace.value);
-    replacer_replace.num_changeValue(findContent);
-  }
-  function clearReplacer(){
-    replacer_find.num_changeValue("");
-    replacer_replace.num_changeValue("");
-  }
-  function pickerInputRefresh(){
-    var get = picker_input.value.replace("#","");
-    if (!(get.length == 3 || get.length == 6)) return;
-    Editor.picker_color = get;
-    if (Editor.picker_color.length == 3){
-      Editor.picker_color = Editor.picker_color.match(/.{1}/g);
-      Editor.picker_color.forEach((item,index) => Editor.picker_color[index] = item + item);
-    }
-    if (Editor.picker_color.length == 6) Editor.picker_color = Editor.picker_color.match(/.{1,2}/g);
-    Editor.picker_color.forEach((item,index) => Editor.picker_color[index] = parseInt(item,16));
-    red_channel.value = Editor.picker_color[0];
-    green_channel.value = Editor.picker_color[1];
-    blue_channel.value = Editor.picker_color[2];
-    Editor.picker_color = `#${convertHex(red_channel.value)}${convertHex(green_channel.value)}${convertHex(blue_channel.value)}`;
-    picker_preview.style.background = Editor.picker_color;
-  }
-  function channelRefresh(){
-    Editor.picker_color = `#${convertHex(red_channel.value)}${convertHex(green_channel.value)}${convertHex(blue_channel.value)}`;
-    picker_preview.style.background = Editor.picker_color;
-    picker_input.value = Editor.picker_color;
-    if (Editor.insert_color) textEdit("insert",Editor.picker_color);
-  }
-  function convertHex(channel){
-    var hex = parseInt(channel).toString(16);
-    if (hex.length == 1) hex = `0${hex}`;
-    return hex;
-  }
-  function importColor(){
-    Editor.insert_color = true;
-    if (!picker.classList.contains("active")) openCard(picker_card);
-    if (window.getSelection() == "") return;
-    picker_input.value = window.getSelection();
-    picker_input.focus();
-    pickerInputRefresh();
-  }
-  function copyPicker(){
-    picker_input.select();
-    document.execCommand("copy");
-  }
-  function insertPicker(){
-    textEdit("insert",Editor.picker_color);
-    channelRefresh();
-    Editor.insert_color = true;
-  }
-  function deletePicker(){
-    var selectionCount = Editor.query().textarea.selectionEnd - Editor.query().textarea.selectionStart;
-    if (selectionCount) textEdit("delete",selectionCount);
-    Editor.insert_color = false;
-  }
-  function activateFormatter(format){
-    try {
-      formatter_input.num_changeValue(JSON.stringify(JSON.parse(formatter_input.value),false,format));
-    } catch (error){
-      alert("Invalid JSON data.");
-    }
-  }
-  function activateEncoder(encode){
-    if (component_setting.checked){
-      if (encode) encoder_input.num_changeValue(encodeURIComponent(encoder_input.value));
-      if (!encode) encoder_input.num_changeValue(decodeURIComponent(encoder_input.value));
-    } else {
-      if (encode) encoder_input.num_changeValue(encodeURI(encoder_input.value));
-      if (!encode) encoder_input.num_changeValue(decodeURI(encoder_input.value));
-    }
-  }
-  function insertTemplate(){
-    Editor.query().textarea.num_changeValue(decodeURI("%3C!DOCTYPE%20html%3E%0A%3Chtml%20lang=%22en-US%22%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E"));
-    sourceChange = true;
-    if (Editor.view() == "preview") changeView("split");
-  }
-  function forceRefresh(){
-    var currentSetting = Editor.refresh;
-    Editor.refresh = "true";
-    sourceChange = true;
-    preview.contentWindow.location.reload();
-    refreshPreview();
-    Editor.refresh = currentSetting;
-  }
-  function refreshPreview(){
-    if (Editor.refresh != "true" || !sourceChange) return;
-    preview.src = "about:blank";
-    preview.contentWindow.document.open();
-    var sourceEditor;
-    if (!Editor.preview_editor){
-      sourceEditor = Editor.query().textarea;
-    } else sourceEditor = Editor.query(Editor.preview_editor).textarea;
-    preview.contentWindow.document.write(sourceEditor.value);
-    preview.contentWindow.document.close();
-    sourceChange = false;
-  }
-  function toggleScaling(){
-    if (!document.body.hasAttribute("data-scaling-active")){
-      document.body.setAttribute("data-scaling-active",true);
-    } else document.body.removeAttribute("data-scaling-active");
-  }
-  function setScaling(event){
-    var scalingOffset, scalingRange = {};
-    if (Editor.environment.touch_device && event instanceof TouchEvent){
-      if (Editor.orientation() == "horizontal") scalingOffset = event.touches[0].pageX;
-      if (Editor.orientation() == "vertical") scalingOffset = event.touches[0].pageY - header.offsetHeight;
-    } else {
-      if (Editor.orientation() == "horizontal") scalingOffset = event.pageX;
-      if (Editor.orientation() == "vertical") scalingOffset = event.pageY - header.offsetHeight;
-    }
-    if (Editor.orientation() == "horizontal"){
-      scalingRange.minimum = 80;
-      scalingRange.maximum = window.innerWidth - 80;
-    }
-    if (Editor.orientation() == "vertical"){
-      scalingRange.minimum = files.offsetHeight + 80;
-      scalingRange.maximum = window.innerHeight - header.offsetHeight - 80;
-    }
-    if (scalingOffset < scalingRange.minimum) scalingOffset = scalingRange.minimum;
-    if (scalingOffset > scalingRange.maximum) scalingOffset = scalingRange.maximum;
-    document.body.setAttribute("data-scaling-offset",scalingOffset);
-    document.body.style.setProperty("--scaling-offset",`${scalingOffset}px`);
-    if (Editor.orientation() == "horizontal") setFilesSectionOffset();
-  }
-  function disableScaling(event){
-    if (Editor.environment.touch_device && event instanceof TouchEvent){
-      document.removeEventListener("touchmove",setScaling);
-      document.removeEventListener("touchend",disableScaling);
-      toggleScaling();
-    } else {
-      document.removeEventListener("mousemove",setScaling);
-      document.removeEventListener("mouseup",disableScaling);
-      toggleScaling();
-    }
-  }
-  function removeScaling(){
-    if (!document.body.hasAttribute("data-scaling-offset")) return;
-    document.body.removeAttribute("data-scaling-offset");
-    document.body.style.removeProperty("--scaling-offset");
-  }
+  function refreshChannels(){}
 </script>
 
 </body>
