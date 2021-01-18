@@ -115,7 +115,7 @@
   *, *::before, *::after {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+    box-sizing: border-box;transition: 0.5s;
   }
   :root {
   }
@@ -136,19 +136,26 @@
     user-select: none;
     -webkit-user-select: none;
   }
+  body[data-view="split"][data-orientation="horizontal"][data-scaling-active] {
+    cursor: col-resize;
+  }
+  body[data-view="split"][data-orientation="vertical"][data-scaling-active] {
+    cursor: row-resize;
+  }
   header {
     position: relative;
     display: flex;
   }
-  body.scaling-active header {
+  body[data-scaling-active] header {
     pointer-events: none;
   }
   header .app-region {
     margin: var(--app-region-margin);
+    margin-bottom: 0;
     --app-region-margin: 2px;
     position: absolute;
     width: calc(100% - var(--app-region-margin) * 2);
-    height: calc(100% - var(--app-region-margin) * 2);
+    height: calc(100% - var(--app-region-margin));
     z-index: -1;
     -webkit-app-region: drag;
   }
@@ -165,7 +172,7 @@
     height: 100%;
     display: flex;
   }
-  header .window-controls [data-control] {
+  header .window-controls .control {
     background: none;
     border: none;
     outline: none;
@@ -207,8 +214,9 @@
     width: 100%;
     height: 0%;
   }
-  body.scaling-active main .workspace {
+  body[data-scaling-active] main .workspace {
     pointer-events: none;
+    transition: none;
   }
   main .workspace .editor-tabs {
     flex-shrink: 0;
@@ -228,27 +236,31 @@
   }
   main .workspace-scaler {
     position: absolute;
-    background: gray;
     touch-action: none;
     z-index: 1;
   }
+  main .workspace-scaler:hover, body[data-scaling-active] main .workspace-scaler {
+    background-color: #444444;
+  }
   body[data-orientation="horizontal"] main .workspace-scaler {
     top: 0;
-    width: 12px;
+    width: 8px;
     height: 100%;
+    cursor: col-resize;
   }
   body[data-orientation="vertical"] main .workspace-scaler {
     left: 0;
     width: 100%;
-    height: 12px;
+    height: 8px;
+    cursor: row-resize;
   }
   body[data-view="code"][data-orientation="horizontal"] main .workspace-scaler {
-    left: 0;
-    transform: translateX(-100%);
+    left: 100%;
+    transform: translateX(0);
   }
   body[data-view="code"][data-orientation="vertical"] main .workspace-scaler {
-    top: 0;
-    transform: translateY(-100%);
+    top: 100%;
+    transform: translateY(0);
   }
   body[data-view="split"][data-orientation="horizontal"] main .workspace-scaler {
     left: 50%;
@@ -265,12 +277,15 @@
     top: var(--scaling-offset);
   }
   body[data-view="preview"][data-orientation="horizontal"] main .workspace-scaler {
-    left: 100%;
-    transform: translateX(0);
+    left: 0;
+    transform: translateX(-100%);
   }
   body[data-view="preview"][data-orientation="vertical"] main .workspace-scaler {
-    top: 100%;
-    transform: translateY(0);
+    top: 0;
+    transform: translateY(-100%);
+  }
+  body[data-scaling-active] main .workspace-scaler {
+    transition: none;
   }
   main .workspace-preview {
     position: absolute;
@@ -307,8 +322,9 @@
     width: 100%;
     height: 100%;
   }
-  body.scaling-active main .workspace-preview {
+  body[data-scaling-active] main .workspace-preview {
     pointer-events: none;
+    transition: none;
   }
   [data-numbered-container], input[type="text"] {
     font-size: 13px;
@@ -467,13 +483,13 @@
   .card .header .card-controls {
     display: flex;
   }
-  .card:not(.tool) .header .card-controls [data-control="minimize"] {
+  .card:not(.tool) .header .card-controls .control[data-control="minimize"] {
     display: none;
   }
-  :root.macOS-device .card .header .card-controls [data-control] svg {
+  :root.macOS-device .card .header .card-controls .control svg {
     fill: transparent;
   }
-  :root.macOS-device .card .header .card-controls:hover [data-control] svg {
+  :root.macOS-device .card .header .card-controls:hover .control svg {
     fill: unset;
   }
   .card .main {
@@ -644,12 +660,12 @@
     </div>
   </section>
   <section class="window-controls">
-    <button data-control="minimize">&mdash;</button>
-    <button data-control="maximize">
+    <button class="control" data-control="minimize">&mdash;</button>
+    <button class="control" data-control="maximize">
       <span data-icon="maximize">&#9744;</span>
       <!--span data-icon="restore">&#10064;</span-->
     </button>
-    <button data-control="close">&#10005;</button>
+    <button class="control" data-control="close">&#10005;</button>
   </section>
 </header>
 
@@ -665,8 +681,8 @@
       <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">Settings</span>
       <section class="card-controls">
-        <button data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
-        <button data-control="close"><svg><use href="#close_icon"/></svg></button>
+        <button class="control" data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
+        <button class="control" data-control="close"><svg><use href="#close_icon"/></svg></button>
       </section>
     </section>
     <section class="main">
@@ -717,8 +733,8 @@
       <button class="card-back" data-parent-card="settings_card"><svg><use href="#back_icon"/></svg></button>
       <span class="title">Theme</span>
       <section class="card-controls">
-        <button data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
-        <button data-control="close"><svg><use href="#close_icon"/></svg></button>
+        <button class="control" data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
+        <button class="control" data-control="close"><svg><use href="#close_icon"/></svg></button>
       </section>
     </section>
     <section class="main">
@@ -772,8 +788,8 @@
       <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">Replace Text</span>
       <section class="card-controls">
-        <button data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
-        <button data-control="close"><svg><use href="#close_icon"/></svg></button>
+        <button class="control" data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
+        <button class="control" data-control="close"><svg><use href="#close_icon"/></svg></button>
       </section>
     </section>
     <section class="main">
@@ -799,8 +815,8 @@
       <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">Color Picker</span>
       <section class="card-controls">
-        <button data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
-        <button data-control="close"><svg><use href="#close_icon"/></svg></button>
+        <button class="control" data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
+        <button class="control" data-control="close"><svg><use href="#close_icon"/></svg></button>
       </section>
     </section>
     <section class="main">
@@ -830,8 +846,8 @@
       <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">JSON Formatter</span>
       <section class="card-controls">
-        <button data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
-        <button data-control="close"><svg><use href="#close_icon"/></svg></button>
+        <button class="control" data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
+        <button class="control" data-control="close"><svg><use href="#close_icon"/></svg></button>
       </section>
     </section>
     <section class="main">
@@ -854,8 +870,8 @@
       <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">URI Encoder</span>
       <section class="card-controls">
-        <button data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
-        <button data-control="close"><svg><use href="#close_icon"/></svg></button>
+        <button class="control" data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
+        <button class="control" data-control="close"><svg><use href="#close_icon"/></svg></button>
       </section>
     </section>
     <section class="main">
@@ -917,9 +933,7 @@
     anchor.addEventListener("touchend",cancelLongTouch);
   });
   document.querySelectorAll("img:not([alt])").forEach(image => image.alt = "");
-  document.querySelectorAll("textarea").forEach(textarea => {
-    addInputCharacteristics(textarea);
-  });
+  document.querySelectorAll("textarea").forEach(textarea => addInputCharacteristics(textarea));
   document.querySelectorAll("input[type='text']").forEach(input => addInputCharacteristics(input));
   var menus = document.querySelectorAll(".menu");
   menus.forEach(menu => {
@@ -1057,7 +1071,7 @@
       backButton.addEventListener("click",() => openCard(document.querySelector(`#${backButton.getAttribute("data-parent-card")}`),card.id));
       backButton.setAttribute("aria-label","Back");
     }
-    var minimizeButton = card.querySelector(".header .card-controls [data-control='minimize']");
+    var minimizeButton = card.querySelector(".header .card-controls .control[data-control='minimize']");
     if (minimizeButton != null){
       minimizeButton.addEventListener("click",() => minimizeCard(card));
       minimizeButton.addEventListener("keydown",event => {
@@ -1068,7 +1082,7 @@
       });
       minimizeButton.setAttribute("aria-label","Minimize");
     }
-    var closeButton = card.querySelector(".header .card-controls [data-control='close']");
+    var closeButton = card.querySelector(".header .card-controls .control[data-control='close']");
     if (closeButton != null){
       closeButton.addEventListener("click",() => closeCard(card));
       closeButton.setAttribute("aria-label","Close");
@@ -1706,7 +1720,7 @@
     history.pushState(null,"",completeAddress);
   }
   function changeView(newView){
-    if (document.body.classList.contains("scaling-active")) return;
+    if (document.body.hasAttribute("data-scaling-active")) return;
     if (newView != "preview"){
       var transitionDuration = parseInt(getElementStyle(workspace,"transition-duration").replace(/s/g,"") * 1000);
       window.setTimeout(() => {
@@ -1735,7 +1749,7 @@
     refreshPreview();
   }
   function changeOrientation(newOrientation){
-    if (document.body.classList.contains("scaling-active")) return;
+    if (document.body.hasAttribute("data-scaling-active")) return;
     if (!newOrientation){
       if (Editor.orientation() == "horizontal"){
         newOrientation = "vertical";
@@ -1963,7 +1977,7 @@
   }
   function minimizeCard(card){
     card.classList.toggle("minimize");
-    var minimizeButton = card.querySelector(".header .card-controls [data-control='minimize']");
+    var minimizeButton = card.querySelector(".header .card-controls .control[data-control='minimize']");
     var minimizeButtonIcon = minimizeButton.querySelector("svg");
     var minimizeButtonIconLink = minimizeButtonIcon.querySelector("use");
     var transitionDuration = parseInt(getElementStyle(minimizeButtonIcon,"transition-duration").replace(/s/g,"") * 275);
@@ -2202,7 +2216,9 @@
     sourceChange = false;
   }
   function toggleScaling(){
-    document.body.classList.toggle("scaling-active");
+    if (!document.body.hasAttribute("data-scaling-active")){
+      document.body.setAttribute("data-scaling-active",true);
+    } else document.body.removeAttribute("data-scaling-active");
   }
   function setScaling(event){
     var scalingOffset, scalingRange = {};
