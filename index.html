@@ -85,6 +85,7 @@
     }),
     view: () => document.body.getAttribute("data-view"),
     orientation: () => document.body.getAttribute("data-orientation"),
+    unsaved_work: () => (!Editor.appearance().parent_window || (files.querySelectorAll(".tab[data-unsaved]").length == 0)),
     preapproved_extensions: ["txt","html","css","js","php","json","webmanifest","xml","yaml","yml","dist","config","ini","md","markdown","mcmeta","lang","properties","uidx","material","h","fragment","vertex","fxh","hlsl","ihlsl","svg"],
     active_editor: null,
     preview_editor: null,
@@ -585,9 +586,9 @@
     <div class="menu">
       <button class="opener">File</button>
       <ul class="list">
-        <li class="list-item" onclick="createFile();">New File<span class="info shortcut ctrl-shift shift-command">X</span></li>
-        <li class="list-item" onclick="openEditorWindow();">New Window<span class="info shortcut ctrl-shift shift-command">C</span></li>
-        <li class="list-item" onclick="loadFiles();">Open<span class="info shortcut ctrl command">O</span></li>
+        <li class="list-item" onclick="createEditor();">New File<span class="info shortcut ctrl-shift shift-command">X</span></li>
+        <li class="list-item" onclick="createWindow();">New Window<span class="info shortcut ctrl-shift shift-command">C</span></li>
+        <li class="list-item" onclick="openFiles();">Open<span class="info shortcut ctrl command">O</span></li>
         <li class="list-item" onclick="saveFile();">Save<span class="info shortcut ctrl command">S</span></li>
         <li class="list-item list-parent">Save As...<svg class="info"><use href="#arrow_icon"/></svg>
           <ul class="list">
@@ -612,11 +613,11 @@
     <div class="menu">
       <button class="opener">View</button>
       <ul class="list">
-        <li class="list-item" onclick="changeView('code');">Code<span class="info shortcut ctrl-shift ctrl-command">2</span></li>
-        <li class="list-item" onclick="changeView('split');">Split<span class="info shortcut ctrl-shift ctrl-command">3</span></li>
-        <li class="list-item" onclick="changeView('preview');">Preview<span class="info shortcut ctrl-shift ctrl-command">4</span></li>
-        <li class="list-item" onclick="changeOrientation();">Orientation<span class="info shortcut ctrl-shift ctrl-command">5</span></li>
-        <li class="list-item" onclick="openDisplay();">Display<span class="info shortcut ctrl-shift ctrl-command">6</span></li>
+        <li class="list-item" onclick="setView('code');">Code<span class="info shortcut ctrl-shift ctrl-command">1</span></li>
+        <li class="list-item" onclick="setView('split');">Split<span class="info shortcut ctrl-shift ctrl-command">2</span></li>
+        <li class="list-item" onclick="setView('preview');">Preview<span class="info shortcut ctrl-shift ctrl-command">3</span></li>
+        <li class="list-item" onclick="setOrientation();">Orientation<span class="info shortcut ctrl-shift ctrl-command">4</span></li>
+        <li class="list-item" onclick="openDisplay();">Display<span class="info shortcut ctrl-shift ctrl-command">5</span></li>
       </ul>
     </div>
     <div class="menu">
@@ -1047,7 +1048,7 @@
     navigator.serviceWorker.register("service-worker.js");
     if (!navigator.serviceWorker.controller) return;
     navigator.serviceWorker.addEventListener("message",event => {
-      if (event.data.action == "load-files"){
+      if (event.data.action == "open-files"){
         var files = Array.from(event.data.files);
         files.forEach(file => {
           var reader = new FileReader();
@@ -1062,6 +1063,157 @@
     });
     clear_cache_option.classList.remove("hidden");
     clear_cache_button.classList.remove("hidden");
+  });
+  window.addEventListener("beforeinstallprompt",event => {
+    event.preventDefault();
+    Editor.install_prompt = event;
+    install_option.classList.remove("hidden");
+    install_button.classList.remove("hidden");
+  });
+  window.addEventListener("beforeunload",event => {
+    if (Editor.unsaved_work()) return;
+    event.preventDefault();
+    event.returnValue = "";
+  });
+  window.addEventListener("resize",event => {
+    if (context_menu.classList.contains("active")) closeContextMenu();
+    if (Editor.view() != "preview") setEditorTabsVisibility(Editor.query().tab);
+    if (Editor.view() != "split" || !document.body.hasAttribute("data-scaling-offset")) return;
+    var previousWidth = window.innerWidth, previousHeight = window.innerHeight;
+    window.setTimeout(() => {
+      if ((Editor.orientation() == "horizontal" && window.innerWidth != previousWidth) || (Editor.orientation() == "vertical" && window.innerHeight != previousHeight)) setView("split");
+    },100);
+  });
+  //window.addEventListener("orientationchange",refreshScreenSafeArea);
+  window.addEventListener("blur",() => {
+    menus.forEach(menu => {
+      if (!menu.classList.contains("active")) return;
+      if (!menu.classList.contains("context-menu")){
+        closeMenu(menu);
+      } else closeContextMenu();
+    });
+  });
+  document.body.addEventListener("keydown",event => {
+    var pressed = key => (event.key.toLowerCase() == key.toLowerCase()), control = (event.ctrlKey && !Editor.environment().apple_device), command = (event.metaKey && Editor.environment().apple_device), shift = (event.shiftKey || ((event.key.toUpperCase() == event.key) && (event.key + event.key == event.key * 2))), controlShift = (control && shift), shiftCommand = (shift && command), controlCommand = (event.ctrlKey && command);
+    if (pressed("Escape")){
+      event.preventDefault();
+      if (event.repeat) return;
+      if (context_menu.classList.contains("active")) return closeContextMenu();
+      if (Editor.active_dialog) closeCard(Editor.active_dialog);
+    }
+    if ((controlShift || shiftCommand) && pressed("x")){
+      event.preventDefault();
+      if (event.repeat) return;
+      createEditor();
+    }
+    if ((controlShift || shiftCommand) && pressed("d")){
+      event.preventDefault();
+      if (event.repeat) return;
+      closeEditor(Editor.active_editor);
+    }
+    if ((controlShift || controlCommand) && (pressed("[") || pressed("{"))){
+      event.preventDefault();
+      if (event.repeat) return;
+      openNextEditor();
+    }
+    if ((controlShift || controlCommand) && (pressed("]") || pressed("}"))){
+      event.preventDefault();
+      if (event.repeat) return;
+      openPreviousEditor();
+    }
+    if ((controlShift || shiftCommand) && pressed("c")){
+      event.preventDefault();
+      if (event.repeat) return;
+      createWindow();
+    }
+    if ((control || command) && pressed("o")){
+      event.preventDefault();
+      if (event.repeat) return;
+      openFiles();
+    }
+    if ((control || command) && pressed("s")){
+      event.preventDefault();
+      if (event.repeat) return;
+      saveFile();
+    }
+    if ((controlShift || controlCommand) && (pressed("1") || pressed("!"))){
+      event.preventDefault();
+      if (event.repeat) return;
+      setView("code");
+    }
+    if ((controlShift || controlCommand) && (pressed("2") || pressed("@"))){
+      event.preventDefault();
+      if (event.repeat) return;
+      setView("split");
+    }
+    if ((controlShift || controlCommand) && (pressed("3") || pressed("#"))){
+      event.preventDefault();
+      if (event.repeat) return;
+      setView("preview");
+    }
+    if ((controlShift || controlCommand) && (pressed("4") || pressed("$"))){
+      event.preventDefault();
+      if (event.repeat) return;
+      setOrientation();
+    }
+    if ((controlShift || controlCommand) && (pressed("5") || pressed("%"))){
+      event.preventDefault();
+      if (event.repeat) return;
+      openDisplay();
+    }
+    if ((controlShift || shiftCommand) && pressed("Enter")){
+      event.preventDefault();
+      if (event.repeat) return;
+      if (Editor.view() != "code") refreshPreview({
+        force: true
+      });
+    }
+    if ((controlShift || shiftCommand) && pressed("e")){
+      event.preventDefault();
+      if (event.repeat) return;
+      openCard(editing_tools_card);
+    }
+    if ((controlShift || shiftCommand) && pressed("f")){
+      event.preventDefault();
+      if (event.repeat) return;
+      openCard(replacer_card);
+    }
+    if ((controlShift || shiftCommand) && pressed("p")){
+      event.preventDefault();
+      if (event.repeat) return;
+      openCard(picker_card);
+    }/*
+    if ((controlShift || shiftCommand) && pressed("g")){
+      event.preventDefault();
+      if (event.repeat) return;
+      importColor();
+    }*/
+    if ((controlShift || shiftCommand) && pressed("r")){
+      event.preventDefault();
+      if (event.repeat) return;
+      openCard(formatter_card);
+    }
+    if ((controlShift || shiftCommand) && pressed("y")){
+      event.preventDefault();
+      if (event.repeat) return;
+      openCard(encoder_card);
+    }
+    if ((controlShift || shiftCommand) && pressed("h")){
+      event.preventDefault();
+      if (event.repeat) return;
+      insertMarkupTemplate();
+      //confirmOverwrite(insertTemplate);
+    }
+    if ((controlShift || shiftCommand) && pressed("m")){
+      event.preventDefault();
+      if (event.repeat || !Editor.active_widget) return;
+      minimizeCard(Editor.active_widget);
+    }
+    if ((controlShift || shiftCommand) && (pressed(".") || pressed(">"))){
+      event.preventDefault();
+      if (event.repeat) return;
+      openCard(settings_card);
+    }
   });
 
 
@@ -1125,7 +1277,17 @@
       }
       if (Editor.long_touch.selection) Editor.long_touch.selection = null;
     }
-  }
+  }/*
+  function sendShortcutAction(params = {}){
+    if (!params.key) return;
+    var appleDevice = (Editor.environment().apple_device), control = ((params.control && !appleDevice) || (params.controlShift && !appleDevice) || (params.controlCommand && appleDevice)), command = ((params.command && appleDevice) || (params.shiftCommand && appleDevice) || (params.controlCommand && appleDevice)), shift = (params.shift || (params.controlShift && !appleDevice) || (params.shiftCommand && appleDevice)), key = params.key.toString().toLowerCase();
+    document.body.dispatchEvent(new KeyboardEvent("keydown",{
+      ctrlKey: control,
+      metaKey: command,
+      shiftKey: shift,
+      key: key
+    }));
+  }*/
   function refreshChannels(){}
 </script>
 
