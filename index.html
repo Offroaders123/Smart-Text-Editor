@@ -86,6 +86,7 @@
     }),
     view: () => document.body.getAttribute("data-view"),
     orientation: () => document.body.getAttribute("data-orientation"),
+    active_scaling: () => (document.body.hasAttribute("data-scaling-active")),
     unsaved_work: () => (!Editor.appearance().parent_window || (workspace_tabs.querySelectorAll(".tab[data-editor-unsaved]").length == 0)),
     preapproved_extensions: ["txt","html","css","js","php","json","webmanifest","xml","yaml","yml","dist","config","ini","md","markdown","mcmeta","lang","properties","uidx","material","h","fragment","vertex","fxh","hlsl","ihlsl","svg"],
     active_editor: null,
@@ -118,7 +119,7 @@
   *, *::before, *::after {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;//transition: 0.5s;
+    box-sizing: border-box;transition: 0.5s linear;
   }
   :root {
   }
@@ -135,14 +136,14 @@
     display: flex;
     flex-direction: column;
     font-family: sans-serif;
-    overflow: auto;
+    overflow: auto;//overflow: hidden;
     user-select: none;
     -webkit-user-select: none;
   }
-  body[data-view="split"][data-orientation="horizontal"][data-scaling-active] {
+  body.split.horizontal[data-scaling-active] {
     cursor: col-resize;
   }
-  body[data-view="split"][data-orientation="vertical"][data-scaling-active] {
+  body.split.vertical[data-scaling-active] {
     cursor: row-resize;
   }
   header {
@@ -183,6 +184,7 @@
   main {
     position: relative;
     flex-grow: 1;
+    //overflow: hidden;
   }
   main .workspace {
     position: absolute;
@@ -191,29 +193,29 @@
     display: flex;
     flex-direction: column;
   }
-  body[data-view="code"] main .workspace {
+  body.code main .workspace {
     width: 100%;
     height: 100%;
   }
-  body[data-view="split"][data-orientation="horizontal"] main .workspace {
+  body.split.horizontal main .workspace {
     width: 50%;
     height: 100%;
   }
-  body[data-view="split"][data-orientation="vertical"] main .workspace {
+  body.split.vertical main .workspace {
     width: 100%;
     height: 50%;
   }
-  body[data-view="split"][data-orientation="horizontal"][data-scaling-offset] main .workspace {
+  body.split.horizontal[data-scaling-offset] main .workspace {
     width: var(--scaling-offset);
   }
-  body[data-view="split"][data-orientation="vertical"][data-scaling-offset] main .workspace {
+  body.split.vertical[data-scaling-offset] main .workspace {
     height: var(--scaling-offset);
   }
-  body[data-view="preview"][data-orientation="horizontal"] main .workspace {
+  body.preview.horizontal main .workspace {
     width: 0%;
     height: 100%;
   }
-  body[data-view="preview"][data-orientation="vertical"] main .workspace {
+  body.preview.vertical main .workspace {
     width: 100%;
     height: 0%;
   }
@@ -234,6 +236,7 @@
   main .workspace .workspace-tabs .tab.active {background: lightblue;
   }
   main .workspace .workspace-editors {
+    position: relative;
     width: 100%;
     height: 100%;
   }
@@ -247,55 +250,49 @@
     visibility: visible;
     z-index: 1;
   }
-  main .scaler {
+  main .scaler {background: #555;
     position: absolute;
     touch-action: none;
     z-index: 1;
   }
   main .scaler:hover, body[data-scaling-active] main .scaler {
-    background-color: #444444;
+    //background-color: #555;
   }
-  body[data-orientation="horizontal"] main .scaler {background: #555;
+  body.horizontal main .scaler {
     top: 0;
     width: 8px;
     height: 100%;
     cursor: col-resize;
   }
-  body[data-orientation="vertical"] main .scaler {
+  body.vertical main .scaler {
     left: 0;
     width: 100%;
     height: 8px;
     cursor: row-resize;
   }
-  body[data-view="code"][data-orientation="horizontal"] main .scaler {
+  body.code.horizontal main .scaler {
     left: 100%;
-    transform: translateX(0);
   }
-  body[data-view="code"][data-orientation="vertical"] main .scaler {
+  body.code.vertical main .scaler {
     top: 100%;
-    transform: translateY(0);
   }
-  body[data-view="split"][data-orientation="horizontal"] main .scaler {
-    left: 50%;
-    transform: translateX(-50%);
+  body.split.horizontal main .scaler {
+    left: calc(50% - 4px);
   }
-  body[data-view="split"][data-orientation="vertical"] main .scaler {
-    top: 50%;
-    transform: translateY(-50%);
+  body.split.vertical main .scaler {
+    top: calc(50% - 4px);
   }
-  body[data-view="split"][data-orientation="horizontal"][data-scaling-offset] main .scaler {
-    left: var(--scaling-offset);
+  body.split.horizontal[data-scaling-offset] main .scaler {
+    left: calc(var(--scaling-offset) - 4px);
   }
-  body[data-view="split"][data-orientation="vertical"][data-scaling-offset] main .scaler {
-    top: var(--scaling-offset);
+  body.split.vertical[data-scaling-offset] main .scaler {
+    top: calc(var(--scaling-offset) - 4px);
   }
-  body[data-view="preview"][data-orientation="horizontal"] main .scaler {
-    left: 0;
-    transform: translateX(-100%);
+  body.preview.horizontal main .scaler {
+    left: -8px;
   }
-  body[data-view="preview"][data-orientation="vertical"] main .scaler {
-    top: 0;
-    transform: translateY(-100%);
+  body.preview.vertical main .scaler {
+    top: -8px;
   }
   body[data-scaling-active] main .scaler {
     transition: none;
@@ -309,29 +306,29 @@
     background: #ffffff;
     border: none;background: lightgray;
   }
-  body[data-view="code"][data-orientation="horizontal"] main .preview {
+  body.code.horizontal main .preview {
     width: 0%;
     height: 100%;
   }
-  body[data-view="code"][data-orientation="vertical"] main .preview {
+  body.code.vertical main .preview {
     width: 100%;
     height: 0%;
   }
-  body[data-view="split"][data-orientation="horizontal"] main .preview {
+  body.split.horizontal main .preview {
     width: 50%;
     height: 100%;
   }
-  body[data-view="split"][data-orientation="vertical"] main .preview {
+  body.split.vertical main .preview {
     width: 100%;
     height: 50%;
   }
-  body[data-view="split"][data-orientation="horizontal"][data-scaling-offset] main .preview {
+  body.split.horizontal[data-scaling-offset] main .preview {
     width: calc(100% - var(--scaling-offset));
   }
-  body[data-view="split"][data-orientation="vertical"][data-scaling-offset] main .preview {
+  body.split.vertical[data-scaling-offset] main .preview {
     height: calc(100% - var(--scaling-offset));
   }
-  body[data-view="preview"] main .preview {
+  body.preview main .preview {
     width: 100%;
     height: 100%;
   }
@@ -545,7 +542,7 @@
 
 </head>
 
-<body data-view="code" data-orientation="horizontal">
+<body class="code horizontal" data-view="code" data-orientation="horizontal">
 
 <svg id="symbol_definitions">
   <symbol id="arrow_icon" viewBox="0 0 512 512">
@@ -1278,12 +1275,13 @@
     });
   });
   scaler.addEventListener("touchstart",event => {
-    if (event.touches.length != 1) return;
+    if (Editor.view() != "split" || event.touches.length != 1) return;
     document.body.setAttribute("data-scaling-active",true);
     document.addEventListener("touchmove",setScaling,{ passive: true });
     document.addEventListener("touchend",disableScaling,{ passive: true });
   },{ passive: true });
   scaler.addEventListener("mousedown",() => {
+    if (Editor.view() != "split") return;
     document.body.setAttribute("data-scaling-active",true);
     document.addEventListener("mousemove",setScaling);
     document.addEventListener("mouseup",disableScaling);
@@ -1408,6 +1406,75 @@
     preview_editors.removeChild(previewOption);
     if (Editor.file_handles[identifier]) delete Editor.file_handles[identifier];
   }
+  function setView(view){
+    if (Editor.active_scaling()) return;
+    document.body.classList.remove(Editor.view());
+    document.body.setAttribute("data-view",view);
+    document.body.classList.add(Editor.view());
+    //removeScaling();
+    if (view == "code") setEditingToolVisibility({
+      undo: true,
+      redo: true,
+      refresh: false
+    });
+    if (view == "split") setEditingToolVisibility({
+      undo: true,
+      redo: true,
+      refresh: true
+    });
+    if (view == "preview") setEditingToolVisibility({
+      undo: false,
+      redo: false,
+      refresh: true
+    });
+    refreshPreview();
+    function setEditingToolVisibility(params = {}){
+      undo_tool.disabled = !params.undo;
+      redo_tool.disabled = !params.redo;
+      refresh_tool.disabled = !params.refresh;
+    }
+  }
+  function setOrientation(orientation){
+    if (Editor.active_scaling()) return;
+    var param = (orientation), transitionDuration = ((Editor.view() != "split") ? 0 : parseInt(getElementStyle({
+      element: workspace,
+      property: "transition-duration"
+    }).replace(/s/g,"") * 1000));
+    if (!param && Editor.view() == "split") setView("code");
+    if (!param && Editor.orientation() == "horizontal") orientation = "vertical";
+    if (!param && Editor.orientation() == "vertical") orientation = "horizontal";
+    window.setTimeout(() => {
+    setTransitionDurations(false);
+    document.body.classList.remove(Editor.orientation());
+    document.body.setAttribute("data-orientation",orientation);
+    document.body.classList.add(Editor.orientation());
+    workspace.offsetHeight;
+    scaler.offsetHeight;
+    preview.offsetHeight;
+    setTransitionDurations(true);
+    if (!param) setView("split");
+    },transitionDuration);
+    function setTransitionDurations(value){
+      if (value == true) {
+        workspace.style.removeProperty("transition-duration");
+        scaler.style.removeProperty("transition-duration");
+        preview.style.removeProperty("transition-duration");
+      }
+      if (value == false){
+        workspace.style.transitionDuration = "0s";
+        scaler.style.transitionDuration = "0s";
+        preview.style.transitionDuration = "0s";
+      }
+    }
+  }
+  function getElementStyle(params = { pseudo: null }){
+    var element = params.element, pseudo = params.pseudo, property = params.property;
+    return window.getComputedStyle(element,pseudo).getPropertyValue(property);
+  }
+
+
+
+
 
 
 
