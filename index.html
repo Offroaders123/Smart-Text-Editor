@@ -70,22 +70,27 @@
       web_sharing: ("share" in navigator)
     }),
     query: (identifier = Editor.active_editor) => ({
-      tab: (workspace_tabs.querySelector(`.tab[data-editor-id="${identifier}"]`)),
-      container: (workspace_editors.querySelector(`[data-numbered-container][data-editor-id="${identifier}"]`)),
-      textarea: (workspace_editors.querySelector(`[data-numbered-container][data-editor-id="${identifier}"] textarea`)),
-      name: section => {
-        if (document.querySelectorAll(`[data-editor-id="${identifier}"]`).length == 0 && identifier != Editor.active_editor) return null;
+      tab: workspace_tabs.querySelector(`.tab[data-editor-id="${identifier}"]`),
+      container: workspace_editors.querySelector(`.editor[data-editor-id="${identifier}"]`),
+      textarea: workspace_editors.querySelector(`.editor[data-editor-id="${identifier}"] textarea`),
+      getName: section => {
+        if ((document.querySelectorAll(`[data-editor-id="${identifier}"]`).length == 0) && (identifier != Editor.active_editor)) return null;
         var name = workspace_tabs.querySelector(`.tab[data-editor-id="${identifier}"]`).innerText;
-        if (!section) return name;
-        if (section == "name"){
+        if (!section || (!name.includes(".") && section == "base")) return name;
+        if (section == "base"){
           name = name.split(".");
           name.pop();
           return name.join(".");
-        } else if (section == "extension") return name.split(".").pop();
+        }
+        if (section == "extension"){
+          if (!name.includes(".")) return "";
+          return name.split(".").pop();
+        }
       }
     }),
     view: () => document.body.getAttribute("data-view"),
     orientation: () => document.body.getAttribute("data-orientation"),
+    active_orienting: () => (document.body.hasAttribute("data-orienting-active")),
     active_scaling: () => (document.body.hasAttribute("data-scaling-active")),
     unsaved_work: () => (!Editor.appearance().parent_window || (workspace_tabs.querySelectorAll(".tab[data-editor-unsaved]").length == 0)),
     preapproved_extensions: ["txt","html","css","js","php","json","webmanifest","xml","yaml","yml","dist","config","ini","md","markdown","mcmeta","lang","properties","uidx","material","h","fragment","vertex","fxh","hlsl","ihlsl","svg"],
@@ -95,9 +100,9 @@
     storage: window.localStorage,
     refresh: "true",
     active_editing_tools: false,
-    active_dialog: false,
+    active_dialog: null,
     dialog_previous: null,
-    active_widget: false,
+    active_widget: null,
     context_menu_previous: null,
     long_touch: {
       timeout: null,
@@ -107,19 +112,19 @@
     insert_color: false,
     install_prompt: null
   };
-  var sourceChange = false;
+  /*var sourceChange = false;
   if (Editor.appearance().parent_window) document.documentElement.classList.add("startup-fade");
-  if (Editor.environment.touch_device) document.documentElement.classList.add("touch-device");
-  if (Editor.environment.apple_device) document.documentElement.classList.add("apple-device");
-  if (Editor.environment.macOS_device) document.documentElement.classList.add("macOS-device");
-  if (Editor.support.web_sharing) document.documentElement.classList.add("web-sharing");
+  if (Editor.environment().touch_device) document.documentElement.classList.add("touch-device");
+  if (Editor.environment().apple_device) document.documentElement.classList.add("apple-device");
+  if (Editor.environment().macOS_device) document.documentElement.classList.add("macOS-device");
+  if (Editor.support().web_sharing) document.documentElement.classList.add("web-sharing");*/
 </script>
 
-<style>svg, img { width: 16px; height: 16px; } #context_menu { display: none; }
-  *, *::before, *::after {
+<style>svg, img { width: 16px; height: 16px; }
+  *, *::before, *::after {//transition: 0.5s linear;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;transition: 0.5s linear;
+    box-sizing: border-box;
   }
   :root {
   }
@@ -135,7 +140,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    font-family: sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Tahoma", sans-serif;
     overflow: auto;//overflow: hidden;
     user-select: none;
     -webkit-user-select: none;
@@ -246,9 +251,11 @@
     height: 100%;
     visibility: hidden;
   }
+  main .workspace .editor:not(.active) {
+    z-index: -1;
+  }
   main .workspace .editor.active {
     visibility: visible;
-    z-index: 1;
   }
   main .scaler {background: #555;
     position: absolute;
@@ -335,6 +342,9 @@
   body[data-scaling-active] main .preview {
     pointer-events: none;
     transition: none;
+  }
+  button {
+    font-family: inherit;
   }
   [data-numbered-container], input[type="text"] {
     font-size: 13px;
@@ -484,7 +494,7 @@
     display: flex;
     align-items: center;
   }
-  .card .header .card-back:not([data-parent-card]) {
+  .card .header .card-back:not([data-card-parent]) {
     display: none;
   }
   .card .header .title {
@@ -630,8 +640,8 @@
     </div>
     <div class="menu">
       <button class="opener">Preview</button>
-      <ul id="preview_editors" class="list">
-        <li class="list-item" onclick="Editor.preview_editor = null; forceRefresh();">Active Editor</li>
+      <ul id="preview_options" class="list">
+        <li class="list-item" onclick="Editor.preview_editor = null; refreshPreview({ force: true });">Active Editor</li>
       </ul>
     </div>
     <div class="menu">
@@ -639,7 +649,7 @@
       <ul class="list">
         <li class="list-item" onclick="openCard(editing_tools_card);">Editing Tools<span class="info shortcut ctrl-shift shift-command">E</span></li>
         <li class="list-item" onclick="openCard(replacer_card);">Replace Text<span class="info shortcut ctrl-shift shift-command">F</span></li>
-        <li class="list-item" onclick="openCard(picker_card);">Color Picker<span class="info shortcut ctrl-shift shift-command">P</span></li>
+        <li class="list-item" onclick="openCard(picker_card);">Color Picker<span class="info shortcut ctrl-shift shift-command">K</span></li>
         <li class="list-item" onclick="openCard(formatter_card);">JSON Formatter<span class="info shortcut ctrl-shift shift-command">R</span></li>
         <li class="list-item" onclick="openCard(encoder_card);">URI Encoder<span class="info shortcut ctrl-shift shift-command">Y</span></li>
         <li class="list-item" onclick="confirmOverwrite(insertTemplate);">Import HTML Template<span class="info shortcut ctrl-shift shift-command">H</span></li>
@@ -687,7 +697,7 @@
   <section id="scaler" class="scaler"></section>
   <iframe id="preview" class="preview" src="about:blank"></iframe>
   <section id="card_backdrop" class="card-backdrop"></section>
-  <section id="settings_card" class="card dialog">
+  <section id="settings_card" class="card dialog" data-card="dialog">
     <section class="header">
       <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">Settings</span>
@@ -731,7 +741,7 @@
       </div>
       <div class="options">
         <button id="install_button" class="hidden" onclick="installApp();"><img src="resources/icon.svg">Install</button>
-        <button id="theme_button" onclick="openCard(theme_card);" data-previous-card="theme_card"><svg><use href="#arrow_icon"/></svg></button>
+        <button id="theme_button" onclick="openCard(theme_card);" data-card-previous="theme_card"><svg><use href="#arrow_icon"/></svg></button>
       </div>
       <div class="options">
         <button id="clear_cache_button" class="warning hidden" onclick="clearCache();">Clear Cache</button>
@@ -739,9 +749,9 @@
       </div>
     </section>
   </section>
-  <section id="theme_card" class="card dialog">
+  <section id="theme_card" class="card dialog" data-card="dialog">
     <section class="header">
-      <button class="card-back" data-parent-card="settings_card"><svg><use href="#back_icon"/></svg></button>
+      <button class="card-back" data-card-parent="settings_card"><svg><use href="#back_icon"/></svg></button>
       <span class="title">Theme</span>
       <section class="card-controls">
         <button class="control" data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
@@ -761,7 +771,7 @@
       </div>
     </section>
   </section>
-  <section id="reset_card" class="card alert">
+  <section id="reset_card" class="card alert" data-card="alert">
     <section class="header">
       <img class="icon" src="resources/settings.svg">
       <span class="title">Reset Settings</span>
@@ -772,7 +782,7 @@
       </div>
     </section>
   </section>
-  <section id="clear_cache_success_card" class="card alert">
+  <section id="clear_cache_success_card" class="card alert" data-card="alert">
     <section class="header">
       <img class="icon" src="resources/template.svg">
       <span class="title">Cleared Cache</span>
@@ -783,7 +793,7 @@
       </div>
     </section>
   </section>
-  <section id="editing_tools_card" class="card widget action">
+  <section id="editing_tools_card" class="card widget" data-card="widget">
     <section class="main">
       <div class="content">
         <div class="options">
@@ -794,7 +804,7 @@
       </div>
     </section>
   </section>
-  <section id="replacer_card" class="card widget">
+  <section id="replacer_card" class="card widget" data-card="widget">
     <section class="header">
       <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">Replace Text</span>
@@ -821,7 +831,7 @@
       </div>
     </section>
   </section>
-  <section id="picker_card" class="card widget">
+  <section id="picker_card" class="card widget" data-card="widget">
     <section class="header">
       <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">Color Picker</span>
@@ -852,7 +862,7 @@
       </div>
     </section>
   </section>
-  <section id="formatter_card" class="card widget">
+  <section id="formatter_card" class="card widget" data-card="widget">
     <section class="header">
       <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">JSON Formatter</span>
@@ -876,7 +886,7 @@
       </div>
     </section>
   </section>
-  <section id="encoder_card" class="card widget">
+  <section id="encoder_card" class="card widget" data-card="widget">
     <section class="header">
       <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">URI Encoder</span>
@@ -948,12 +958,15 @@
       if (opener) opener.focus();
     });
     if (opener){
-      if (menu.classList.contains("alternate")){
+      if (!menu.classList.contains("alternate")){
+        opener.addEventListener("mousedown",() => openMenu(menu));
+        opener.addEventListener("touchstart",() => openMenu(menu));
+      } else {
         attachContextMenu({
           element: opener,
           type: "alternate"
         });
-      } else opener.addEventListener("click",() => openMenu(menu));
+      }
       opener.addEventListener("keydown",event => {
         if (!menu.classList.contains("active")) return;
         var navigable = getNavigableElements({
@@ -965,7 +978,7 @@
       });
     }
     listItems.forEach(listItem => {
-      var tagName = listItem.tagName.toLowerCase();
+      var type = listItem.tagName.toLowerCase();
       listItem.addEventListener("click",() => {
         if (!listItem.matches(".list-parent")) return;
         if (!menu.classList.contains("context-menu")){
@@ -992,7 +1005,7 @@
         var listParent = subList.closest(".list-parent");
         if (listItem != listParent && listParent.classList.contains("active") && !listParent.contains(Editor.context_menu_previous) && !subList.contains(listItem) && !subList.contains(document.activeElement)) listParent.classList.remove("active");
       }));
-      if (tagName != "a") listItem.setAttribute("tabindex","0");
+      if (type != "a") listItem.setAttribute("tabindex","0");
     });
     subLists.forEach(subList => {
       var listParent = subList.closest(".list-parent");
@@ -1001,7 +1014,9 @@
         if (event.key == "Enter" || event.key == " " || event.key == "ArrowRight") openSubList(event);
         if (event.key == "ArrowLeft") closeSubList(event);
       });
-      listParent.addEventListener("mouseenter",() => listParent.classList.add("active"));
+      listParent.addEventListener("mouseenter",() => {
+        if (!listParent.classList.contains("active")) listParent.classList.add("active");
+      });
       function openSubList(event){
         event.stopPropagation();
         if (listParent.classList.contains("active") && event.type == "click") return listParent.classList.remove("active");
@@ -1034,7 +1049,7 @@
   cards.forEach(card => {
     if (!card.querySelector(".header .card-controls")) return;
     var header = card.querySelector(".header"), back = header.querySelector(".card-back"), cardControls = header.querySelector(".card-controls"), minimize = cardControls.querySelector(".control[data-control='minimize']"), close = cardControls.querySelector(".control[data-control='close']");
-    back.addEventListener("click",() => openCard(document.querySelector(`#${back.getAttribute("data-parent-card")}`),card.id));
+    back.addEventListener("click",() => openCard(document.querySelector(`#${back.getAttribute("data-card-parent")}`),card));
     minimize.addEventListener("click",() => minimizeCard(card));
     minimize.addEventListener("keydown",event => {
       if (event.key != "Enter") return;
@@ -1187,7 +1202,7 @@
       if (event.repeat) return;
       openCard(replacer_card);
     }
-    if ((controlShift || shiftCommand) && pressed("p")){
+    if ((controlShift || shiftCommand) && pressed("k")){
       event.preventDefault();
       if (event.repeat) return;
       openCard(picker_card);
@@ -1255,7 +1270,7 @@
     workspace_tabs.classList.add("drag");
     event.dataTransfer.dropEffect = "copy";
   });
-  workspace_tabs.addEventListener("dragleave",() => files.classList.remove("drag"));
+  workspace_tabs.addEventListener("dragleave",() => workspace_tabs.classList.remove("drag"));
   workspace_tabs.addEventListener("drop",event => {
     event.preventDefault();
     workspace_tabs.classList.remove("drag");
@@ -1264,15 +1279,29 @@
         if (!Editor.support.file_system || !("getAsFileSystemHandle" in item)){
           var file = item.getAsFile(), reader = new FileReader();
           reader.readAsText(file,"UTF-8");
-          reader.addEventListener("loadend",() => createFile(file.name,reader.result));
+          reader.addEventListener("loadend",() => createEditor({
+            name: file.name,
+            value: reader.result
+          }));
         } else {
-          var fileHandle = await item.getAsFileSystemHandle();
-          if (fileHandle.kind != "file") return;
-          var file = await fileHandle.getFile(), identifier = createFile(await file.name,await file.text());
-          Editor.file_handles[identifier] = await fileHandle;
+          var handle = await item.getAsFileSystemHandle();
+          if (handle.kind != "file") return;
+          var file = await handle.getFile(), identifier = createEditor({
+            name: await file.name,
+            value: await file.text()
+          });
+          Editor.file_handles[identifier] = await handle;
         }
-      } else if (item.kind == "string") createFile(undefined,event.dataTransfer.getData("text"));
+      } else if (item.kind == "string") createEditor({
+        value: event.dataTransfer.getData("text")
+      });
     });
+  });
+  scaler.addEventListener("mousedown",() => {
+    if (Editor.view() != "split") return;
+    document.body.setAttribute("data-scaling-active",true);
+    document.addEventListener("mousemove",setScaling);
+    document.addEventListener("mouseup",disableScaling);
   });
   scaler.addEventListener("touchstart",event => {
     if (Editor.view() != "split" || event.touches.length != 1) return;
@@ -1280,24 +1309,18 @@
     document.addEventListener("touchmove",setScaling,{ passive: true });
     document.addEventListener("touchend",disableScaling,{ passive: true });
   },{ passive: true });
-  scaler.addEventListener("mousedown",() => {
-    if (Editor.view() != "split") return;
-    document.body.setAttribute("data-scaling-active",true);
-    document.addEventListener("mousemove",setScaling);
-    document.addEventListener("mouseup",disableScaling);
-  });
   card_backdrop.addEventListener("click",() => closeCard(Editor.active_dialog));
 
   createEditor();
   if (Editor.support().file_handling && Editor.support().file_system){
     window.launchQueue.setConsumer(params => {
       closeEditor();
-      params.files.forEach(async fileHandle => {
-        var file = await fileHandle.getFile(), identifier = createEditor({
+      params.files.forEach(async handle => {
+        var file = await handle.getFile(), identifier = createEditor({
           name: await file.name,
           value: await file.text()
         });
-        Editor.file_handles[identifier] = await fileHandle;
+        Editor.file_handles[identifier] = await handle;
       });
       if (!Editor.environment().touch_device) Editor.query().textarea.focus();
     });
@@ -1318,8 +1341,8 @@
     openCard(settings_card);
     removeQueryParameters(["settings"]);
   }*/
-  function createEditor(params = { name: "Untitled.txt", value: "", open: true }){
-    var name = params.name, value = params.value, open = params.open, identifier = Math.random().toString(), tab = document.createElement("button"), tabName = document.createElement("span"), tabRename = document.createElement("button"), tabClose = document.createElement("button"), container = document.createElement("div"), textarea = document.createElement("textarea"), previewOption = document.createElement("li");
+  function createEditor({ name = "Untitled.txt", value = "", open = true } = {}){
+    var identifier = Math.random().toString(), tab = document.createElement("button"), editorName = document.createElement("span"), editorRename = document.createElement("button"), editorClose = document.createElement("button"), container = document.createElement("div"), textarea = document.createElement("textarea"), previewOption = document.createElement("li");
     tab.classList.add("tab");
     tab.setAttribute("data-editor-id",identifier);
     tab.addEventListener("click",() => {
@@ -1335,19 +1358,17 @@
       event.preventDefault();
       event.stopPropagation();
     });
-    tabName.setAttribute("data-editor-name",name);
-    tabName.innerText = name;
-    tabRename.innerHTML = "<svg><use href='#rename_icon'/></svg>";
-    tabRename.addEventListener("click",event => {
+    editorName.setAttribute("data-editor-name",name);
+    editorName.innerText = name;
+    editorRename.innerHTML = "<svg><use href='#rename_icon'/></svg>";
+    editorRename.addEventListener("click",event => {
       event.stopPropagation();
-      var newTabName = prompt(`Enter a new file name for "${tabName.innerText}"`,tabName.innerText);
-      if (!newTabName) return;
-      tabName.innerText = newTabName;
-      previewOption.innerText = newTabName;
-      if (tab == Editor.query().tab) refreshTitle(newTabName);
+      renameEditor({
+        identifier: identifier
+      });
     });
-    tabClose.innerHTML = "<svg><use href='#close_icon'/></svg>";
-    tabClose.addEventListener("click",event => {
+    editorClose.innerHTML = "<svg><use href='#close_icon'/></svg>";
+    editorClose.addEventListener("click",event => {
       event.stopPropagation();
       closeEditor(identifier);
     });
@@ -1361,6 +1382,7 @@
       if (!tab.hasAttribute("data-editor-unsaved")) tab.setAttribute("data-editor-unsaved",true);
       if (Editor.view() != "code") refreshPreview();
     });
+    previewOption.classList.add("list-item");
     previewOption.setAttribute("data-editor-id",identifier);
     previewOption.innerText = name;
     previewOption.addEventListener("click",() => {
@@ -1369,19 +1391,20 @@
         force: true
       });
     });
-    tab.appendChild(tabName);
-    tab.appendChild(tabRename);
-    tab.appendChild(tabClose);
+    tab.appendChild(editorName);
+    tab.appendChild(editorRename);
+    tab.appendChild(editorClose);
     workspace_tabs.appendChild(tab);
     container.appendChild(textarea);
     workspace_editors.appendChild(container);
-    preview_editors.appendChild(previewOption);
+    preview_options.appendChild(previewOption);
     applyEditingBehavior(textarea);
     if (open) openEditor(identifier);
     return identifier;
   }
   function openEditor(identifier){
-    var editor = Editor.query(identifier), tab = editor.tab, container = editor.container, name = editor.name();
+    if (!identifier) return;
+    var { tab, container, getName } = Editor.query(identifier);
     if (Editor.query().tab) Editor.query().tab.classList.remove("active");
     if (Editor.query().container) Editor.query().container.classList.remove("active");
     tab.classList.add("active");
@@ -1389,13 +1412,12 @@
     Editor.active_editor = identifier;
     setEditorTabsVisibility(Editor.query().tab);
     refreshPreview();
-    refreshTitle(name);
+    setTitle(getName());
   }
-  function closeEditor(identifier){
-    var editor = Editor.query(identifier), tab = editor.tab, container = editor.container, name = editor.name(), previewOption = preview_editors.querySelector(`li[data-editor-id="${identifier}"]`), active = (tab.classList.contains("active")), focused = (document.activeElement == Editor.query(identifier).textarea), editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab"));
+  function closeEditor({ identifier = Editor.active_editor } = {}){
+    var { tab, container, textarea, getName } = Editor.query(identifier), previewOption = preview_options.querySelector(`.list-item[data-editor-id="${identifier}"]`), active = (tab.classList.contains("active")), focused = (document.activeElement == textarea), editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab"));
     if (tab.hasAttribute("data-editor-unsaved")){
-      var ask = confirm(`Are you sure you would like to close "${name}"?\nRecent changes have not yet been saved.`);
-      if (!ask) return;
+      if (!confirm(`Are you sure you would like to close "${getName()}"?\nRecent changes have not yet been saved.`)) return;
     }
     if (tab == editorTabs[0] && editorTabs[1] && tab.classList.contains("active")) openEditor(editorTabs[1].getAttribute("data-editor-id"));
     if (tab == editorTabs[editorTabs.length - 1] && tab != editorTabs[0] && tab.classList.contains("active")) openEditor(editorTabs[editorTabs.length - 2].getAttribute("data-editor-id"));
@@ -1403,8 +1425,16 @@
     if (focused) Editor.query().textarea.focus();
     workspace_tabs.removeChild(tab);
     workspace_editors.removeChild(container);
-    preview_editors.removeChild(previewOption);
+    preview_options.removeChild(previewOption);
     if (Editor.file_handles[identifier]) delete Editor.file_handles[identifier];
+  }
+  function renameEditor({ name, identifier = Editor.active_editor } = {}){
+    var { tab, getName } = Editor.query(identifier), editorName = tab.querySelector("[data-editor-name]"), previewOption = preview_options.querySelector(`.list-item[data-editor-id="${identifier}"]`), currentName = getName(), base = getName("base"), extension = getName("extension"), rename = (name) ? name : prompt(`Enter a new file name for "${currentName}"`,currentName);
+    if (!rename) return;
+    if (!rename.includes(".")) rename = `${rename}.${extension}`;
+    editorName.innerText = rename;
+    previewOption.innerText = rename;
+    if (tab == Editor.query().tab) setTitle(rename);
   }
   function setView(view){
     if (Editor.active_scaling()) return;
@@ -1428,10 +1458,10 @@
       refresh: true
     });
     refreshPreview();
-    function setEditingToolVisibility(params = {}){
-      undo_tool.disabled = !params.undo;
-      redo_tool.disabled = !params.redo;
-      refresh_tool.disabled = !params.refresh;
+    function setEditingToolVisibility({ undo, redo, refresh } = {}){
+      undo_tool.disabled = !undo;
+      redo_tool.disabled = !redo;
+      refresh_tool.disabled = !refresh;
     }
   }
   function setOrientation(orientation){
@@ -1467,30 +1497,277 @@
       }
     }
   }
-  function getElementStyle(params = { pseudo: null }){
-    var element = params.element, pseudo = params.pseudo, property = params.property;
-    return window.getComputedStyle(element,pseudo).getPropertyValue(property);
+  function openCard(card,previous){
+    if (card.classList.contains("active") && !card.hasAttribute("data-alert-timeout")) return closeCard(card);
+    var type = card.getAttribute("data-card");
+    if (type != "alert"){
+      cards.forEach(openCard => {
+        if (!openCard.classList.contains("active")) return;
+        var openType = openCard.getAttribute("data-card");
+        if (openType != "dialog" && openType != type) return;
+        openCard.classList.remove("active");
+        if (!openCard.classList.contains("minimize")) return;
+        var transitionDuration = parseInt(getElementStyle({
+          element: openCard,
+          property: "transition-duration"
+        }).replace(/s/g,"") * 1000);
+        window.setTimeout(() => minimizeCard(openCard),transitionDuration);
+      });
+    }
+    card.classList.add("active");
+    if (type == "widget") card_backdrop.classList.remove("active");
+    if (type == "alert"){
+      var timeoutIdentifier = Math.random().toString();
+      card.setAttribute("data-alert-timeout",timeoutIdentifier);
+      window.setTimeout(() => {
+        if (card.getAttribute("data-alert-timeout") != timeoutIdentifier) return;
+        card.removeAttribute("data-alert-timeout");
+        closeCard(card);
+      },4000);
+    }
+    if (card == editing_tools_card) Editor.active_editing_tools = true;
+    if (type == "dialog"){
+      card_backdrop.classList.add("active");
+      if (!Editor.active_dialog && !Editor.dialog_previous){
+        var menuItem = (document.activeElement.closest(".menu")), contextMenuItem = (document.activeElement.closest(".context-menu"));
+        if (!menuItem && !contextMenuItem){
+          Editor.dialog_previous = document.activeElement;
+        } else if (menuItem){
+          Editor.dialog_previous = document.activeElement.closest(".menu").querySelector(".opener");
+        } else if (contextMenuItem) Editor.dialog_previous = Editor.context_menu_previous;
+      }
+      menus.forEach(menu => {
+        if (!menu.classList.contains("active")) return;
+        if (!menu.classList.contains("context-menu")){
+          closeMenu(menu);
+        } else closeContextMenu();
+      });
+      var transitionDuration = parseInt(getElementStyle({
+        element: card,
+        property: "transition-duration"
+      }).replace(/s/g,"") * 500);
+      window.setTimeout(() => {
+        document.activeElement.blur();
+        if (previous) card.querySelector(`[data-card-previous="${previous.id}"]`).focus();
+      },transitionDuration);
+      Editor.active_dialog = card;
+    }
+    if (type == "widget") Editor.active_widget = card;
+  }
+  function closeCard(card){
+    var type = card.getAttribute("data-card");
+    card.classList.remove("active");
+    if (card.classList.contains("minimize")){
+      var transitionDuration = parseInt(getElementStyle({
+        element: card,
+        property: "transition-duration"
+      }).replace(/s/g,"") * 1000);
+      window.setTimeout(() => minimizeCard(card),transitionDuration);
+    }
+    if (type == "dialog"){
+      card_backdrop.classList.remove("active");
+      Editor.active_dialog = null;
+      if (Editor.dialog_previous){
+        var hidden = (getElementStyle({
+          element: Editor.dialog_previous,
+          property: "visibility"
+        }) == "hidden");
+        if (!workspace_editors.contains(Editor.dialog_previous) && !hidden){
+          Editor.dialog_previous.focus();
+        } else Editor.query().textarea.focus();
+        Editor.dialog_previous = null;
+      }
+    }
+    if (card == editing_tools_card) Editor.active_editing_tools = false;
+    if (type == "widget") Editor.active_widget = null;
+  }
+  function minimizeCard(card){
+    var minimize = card.querySelector(".header .card-controls .control[data-control='minimize']");
+    card.classList.toggle("minimize");
+    if (card.classList.contains("minimize") && card.contains(document.activeElement) && document.activeElement != minimize) minimize.focus();
+  }
+  function createWindow(){
+    var features = (Editor.appearance().standalone || Editor.appearance().fullscreen) ? "popup" : "", win = window.open(window.location.href,"_blank",features);
+    if (Editor.appearance().fullscreen){
+      win.resizeTo(window.screen.width * 2/3,window.screen.height * 2/3);
+      win.moveTo(window.screen.width / 6,window.screen.height / 6);
+    } else if (Editor.appearance().standalone){
+      win.resizeTo(window.outerWidth,window.outerHeight);
+      win.moveTo(window.screenX,window.screenY);
+    }
+  }
+  async function openFiles(){
+    if (!Editor.support().file_system){
+      var input = document.createElement("input");
+      input.type = "file";
+      input.multiple = true;
+      input.click();
+      input.addEventListener("change",() => {
+        var files = Array.from(input.files);
+        files.forEach(file => {
+          var reader = new FileReader();
+          reader.readAsText(file,"UTF-8");
+          reader.addEventListener("loadend",() => createEditor({
+            name: file.name,
+            value: reader.result
+          }));
+        });
+        input.value = null;
+      });
+    } else {
+      var handles;
+      if ("showOpenFilePicker" in window){
+        handles = await window.showOpenFilePicker({
+          multiple: true
+        }).catch(error => {
+          if (error.message.toLowerCase().includes("abort")) return;
+        });
+      } else if ("chooseFileSystemEntries" in window){
+        handles = await window.chooseFileSystemEntries({
+          type: "open-file",
+          multiple: true
+        }).catch(error => {
+          if (error.message.toLowerCase().includes("abort")) return;
+        });
+      }
+      if (handles) handles.forEach(async handle => {
+        var file = await handle.getFile(), identifier = createEditor({
+          name: await file.name,
+          value: await file.text()
+        });
+        Editor.file_handles[identifier] = await handle;
+      });
+    }
+  }
+  async function saveFile(extension){
+    if (extension || !Editor.support().file_system){
+      if (!extension) extension = Editor.query().getName("extension");
+      var anchor = document.createElement("a"), blob = window.URL.createObjectURL(new Blob([Editor.query().textarea.value],{
+        type: "text/plain"
+      }));
+      anchor.href = blob;
+      anchor.download = `${Editor.query().getName("base")}.${extension}`;
+      anchor.click();
+      window.URL.revokeObjectURL(blob);
+    } else {
+      var identifier = Editor.active_editor, handle;
+      if (!Editor.file_handles[identifier]){
+        if ("showOpenFilePicker" in window){
+          handle = await window.showSaveFilePicker().catch(error => {
+            if (error.message.toLowerCase().includes("abort")) return;
+          });
+        } else if ("chooseFileSystemEntries" in window){
+          handle = await window.chooseFileSystemEntries({
+            type: "save-file"
+          }).catch(error => {
+            if (error.message.toLowerCase().includes("abort")) return;
+          });
+        }
+        if (!handle) return;
+        Editor.file_handles[identifier] = await handle;
+      } else handle = Editor.file_handles[identifier];
+      var stream = await Editor.file_handles[identifier].createWritable().catch(error => {
+        alert(`"${Editor.query().getName()}" could not be saved.`);
+        if (error.toString().toLowerCase().includes("not allowed")) return;
+      });
+      if (!stream) return;
+      await stream.write(Editor.query().textarea.value);
+      await stream.close();
+      var currentName = Editor.query().getName(), file = await handle.getFile(), rename = await file.name;
+      if (currentName != rename) renameEditor({
+        name: rename
+      });
+    }
+    Editor.query().tab.removeAttribute("data-editor-unsaved");
+    refreshPreview({
+      force: true
+    });
+  }
+  function openMenu(menu){
+    if (menu.classList.contains("active")) return closeMenu(menu);
+    menus.forEach(menu => {
+      if (menu.classList.contains("active")) closeMenu(menu);
+    });
+    menu.classList.add("active");
+    document.body.addEventListener("mousedown",catchMenuExit);
+    document.body.addEventListener("touchend",catchMenuExit);
+    function catchMenuExit(event){
+      if (menu.contains(event.target)) return;
+      document.body.removeEventListener("mousedown",this);
+      document.body.removeEventListener("touchend",this);
+      closeMenu(menu);
+    }
   }
 
 
+  function closeMenu(menu){
+    var listParents = menu.querySelectorAll(".list-parent");
+    menu.classList.remove("active");
+    listParents.forEach(listParent => {
+      if (!listParent.classList.contains("active")) return;
+      listParent.classList.remove("active");
+    });
+  }
 
 
+/*
+  function openMenu(event,menu){
+    if (Editor.long_touch.timeout) Editor.long_touch.timeout = null;
+    if (Editor.long_touch.selection) Editor.long_touch.selection = null;
+    var currentMenu;
+    if (!menu){
+      currentMenu = event;
+    } else currentMenu = menu;
+    menus.forEach(menu => {
+      if (menu != currentMenu && !menu.contains(event.target)) closeMenu(menu);
+    });
+    currentMenu.classList.toggle("active");
+    if (currentMenu.classList.contains("active")){
+      document.body.addEventListener("click",catchMenuExit);
+      if (currentMenu == context_menu) document.body.addEventListener("contextmenu",catchMenuExit);
+    } else {
+      document.body.removeEventListener("click",catchMenuExit);
+      if (currentMenu == context_menu) document.body.removeEventListener("contextmenu",catchMenuExit);
+    }
+    function catchMenuExit(){
+      if (currentMenu.contains(document.activeElement)) return;
+      closeMenu(currentMenu);
+      document.body.removeEventListener("click",catchMenuExit);
+      if (currentMenu == context_menu) document.body.removeEventListener("contextmenu",catchMenuExit);
+    }
+  }
+  function closeMenu(menu){
+    var submenus = menu.querySelectorAll("li > ul");
+    submenus.forEach(submenu => submenu.parentElement.classList.remove("active"));
+    menu.classList.remove("active");
+    if (menu != context_menu) return;
+    var menu = menu.querySelectorAll("ul")[0], transitionDuration = parseInt(getElementStyle(menu,"transition-duration").replace(/s/g,"") * 1000);
+    window.setTimeout(() => {
+      var types = ["window","link","editing"];
+      types.forEach(type => {
+        if (menu.classList.contains(type)) menu.classList.remove(type);
+      });
+    },transitionDuration);
+  }
+*/
 
 
-
+  function getElementStyle({ element, pseudo = null, property } = {}){
+    return window.getComputedStyle(element,pseudo).getPropertyValue(property);
+  }
   function applyEditingBehavior(element){
-    var tagName = element.tagName.toLowerCase();
+    var type = element.tagName.toLowerCase();
     element.spellcheck = false;
     element.autocomplete = "off";
     element.autocapitalize = "off";
     element.setAttribute("autocorrect","off");
-    if (tagName == "input"){
+    if (type == "input"){
       attachContextMenu({
         element: element,
         type: "editing"
       });
     }
-    if (tagName == "textarea"){
+    if (type == "textarea"){
       var container = element.closest("[data-numbered-container]");
       container.num_establishContainer();
       container.addEventListener("dragover",event => {
@@ -1510,8 +1787,7 @@
       });
     }
   }
-  function attachContextMenu(params = {}){
-    var element = params.element, type = params.type;
+  function attachContextMenu({ element, type } = {}){
     element.addEventListener("mousedown",event => {
       if (event.button == "2") event.preventDefault();
     });
@@ -1537,9 +1813,10 @@
       if (Editor.long_touch.selection) Editor.long_touch.selection = null;
     }
   }/*
-  function sendShortcutAction(params = {}){
-    if (!params.key) return;
-    var appleDevice = (Editor.environment().apple_device), control = ((params.control && !appleDevice) || (params.controlShift && !appleDevice) || (params.controlCommand && appleDevice)), command = ((params.command && appleDevice) || (params.shiftCommand && appleDevice) || (params.controlCommand && appleDevice)), shift = (params.shift || (params.controlShift && !appleDevice) || (params.shiftCommand && appleDevice)), key = params.key.toString().toLowerCase();
+  function sendShortcutAction({ control, command, shift, controlShift, shiftCommand, controlCommand, key } = {}){
+    if (!key) return;
+    var appleDevice = (Editor.environment().apple_device);
+    control = ((control && !appleDevice) || (controlShift && !appleDevice) || (controlCommand && appleDevice)), command = ((command && appleDevice) || (shiftCommand && appleDevice) || (controlCommand && appleDevice)), shift = (shift || (controlShift && !appleDevice) || (shiftCommand && appleDevice)), key = key.toString().toLowerCase();
     document.body.dispatchEvent(new KeyboardEvent("keydown",{
       ctrlKey: control,
       metaKey: command,
@@ -1549,7 +1826,9 @@
   }*/
   function setEditorTabsVisibility(){}
   function refreshPreview(){}
-  function refreshTitle(){}
+  function setTitle(name){
+    document.title = `${name} - Smart Text Editor`;
+  }
   function refreshChannels(){}
 </script>
 
