@@ -112,12 +112,12 @@
     insert_color: false,
     install_prompt: null
   };
-  /*var sourceChange = false;
-  if (Editor.appearance().parent_window) document.documentElement.classList.add("startup-fade");
-  if (Editor.environment().touch_device) document.documentElement.classList.add("touch-device");
+  //var sourceChange = false;
+  //if (Editor.appearance().parent_window) document.documentElement.classList.add("startup-fade");
+  //if (Editor.environment().touch_device) document.documentElement.classList.add("touch-device");
   if (Editor.environment().apple_device) document.documentElement.classList.add("apple-device");
   if (Editor.environment().macOS_device) document.documentElement.classList.add("macOS-device");
-  if (Editor.support().web_sharing) document.documentElement.classList.add("web-sharing");*/
+  //if (Editor.support().web_sharing) document.documentElement.classList.add("web-sharing");
 </script>
 
 <style>
@@ -141,6 +141,7 @@
     display: flex;
     flex-direction: column;
     color: hsl(0,0%,80%);
+    font-size: 13.3px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Tahoma", "Roboto", sans-serif;
     overflow: hidden;
     user-select: none;
@@ -224,6 +225,9 @@
   main {
     position: relative;
     flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     overflow: hidden;
   }
   main .workspace {
@@ -379,6 +383,7 @@
   }
   button {
     color: inherit;
+    font-size: inherit;
     font-family: inherit;
   }
   a {
@@ -387,32 +392,53 @@
   }
   [data-numbered-container], input[type="text"] {
     font-size: 13px;
-    color: hsl(0,0%,95%);
+    color: hsl(0,0%,90%);
     font-family: "Cousine", monospace;
-    background: hsl(0,0%,15%);
+    background: hsl(0,0%,16%);
     border: none;
     outline: none;
   }
   [data-numbered-container] {
     position: relative;
   }
-  input[type="text"] {
-    border-radius: 0;
-    -webkit-appearance: none;
-  }
-  [data-numbered-container] ol, [data-numbered-container] textarea, input[type="text"] {
-    padding: 8px;
-    line-height: normal;
-  }
   [data-numbered-container] ol {
+    padding: 8px 16px;
     color: inherit;
     background: transparent;
+    border: none;
+    line-height: normal;
     opacity: 0.55;
   }
   [data-numbered-container] textarea {
+    padding: 8px;
+    line-height: normal;
     resize: none;
     scrollbar-width: inherit;
     scrollbar-color: inherit;
+  }
+  input[type="text"] {
+    padding: 8px;
+    border-radius: 0;
+    line-height: normal;
+    -webkit-appearance: none;
+  }
+  ::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+  }
+  ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner {
+    background: none;
+  }
+  ::-webkit-scrollbar-thumb {
+    width: 36px;
+    height: 36px;
+    background: hsl(0,0%,50%);
+    background-clip: content-box;
+    border: 4px solid transparent;
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(0,0%,60%);
   }
   .tab {
     display: flex;
@@ -465,6 +491,10 @@
     z-index: 1;
     list-style: none;
   }
+  :root.apple-device .menu .list {
+    --list-padding-x: 5px;
+    border-color: #ffffff20;
+  }
   .menu:not(.context-menu) > .list {
     border-top: none;
     border-top-left-radius: 0;
@@ -481,6 +511,10 @@
     --list-item-border: 1px;
     outline: none;
     white-space: nowrap;
+  }
+  :root.apple-device .menu .list-item {
+    --list-item-padding-x: 8px;
+    border-radius: calc(var(--list-padding-y) - var(--list-border));
   }
   .menu .list-item:is(:hover,:focus-visible) {
     background: #ffffff20;
@@ -522,6 +556,9 @@
   .menu .list .list {
     left: calc(100% + var(--list-padding-x) + var(--list-border) + var(--list-item-border));
     top: calc(calc(var(--list-padding-y) + var(--list-border) + var(--list-item-border)) * -1);
+  }
+  :root.apple-device .menu .list .list {
+    left: calc(100% + var(--list-item-border));
   }
   .menu.active > .list, .menu .list-parent.active > .list {
     visibility: visible;
@@ -587,8 +624,13 @@
     flex-direction: column;
     background: hsl(0,0%,11%);
     border: 1px solid #00000020;
+    border-radius: 8px;
     box-shadow: 1px 2px 4px #00000020;
     visibility: hidden;
+    overflow: hidden;
+  }
+  :root.apple-device .card {
+    border-color: #ffffff30;
   }
   .card.active {
     visibility: visible;
@@ -606,35 +648,109 @@
     z-index: 1;
   }
   .card.dialog {
-    position: fixed;
-    left: 50%;
-    top: 50%;
+    position: absolute;
     z-index: 2;
-    transform: translate(-50%,-50%);
   }
   .card .header {
     display: flex;
     align-items: center;
+    background: #ffffff08;
+  }
+  :root.apple-device .card .header {
+    border-bottom: 1px solid #000000;
+  }
+  .card .header .card-back {
+    display: flex;
+    background: none;
+    border: none;
+    outline: none;
+  }
+  :root:not(.macOS-device) .card .header .card-back {
+    padding: 8px 12px;
   }
   .card .header .card-back:not([data-card-parent]) {
     display: none;
   }
+  .card .header .card-back:is(:hover,:focus-visible) {
+    background: #ffffff20;
+  }
+  .card .header .card-back svg {
+    width: 13px;
+    aspect-ratio: 1/1;
+    fill: currentColor;
+  }
+  :root.macOS-device .card .header .card-back svg {
+    width: 24px;
+  }
   .card .header .title {
     margin: 0 auto;
+    font-size: 15px;
   }
   .card .header .card-controls {
     display: flex;
   }
+  :root.macOS-device .card .header .card-controls {
+    margin: 8px;
+    padding: 4px;
+    gap: 8px;
+  }
+  .card .header .card-controls .control {
+    display: flex;
+    background: var(--control-background);
+    border: none;
+    outline: none;
+  }
+  :root:not(.macOS-device) .card .header .card-controls .control {
+    padding: 8px 12px;
+    --control-background: none;
+  }
+  :root:not(.macOS-device) .card .header .card-controls .control:is(:hover,:focus-visible) {
+    --control-background: #ffffff20;
+  }
+  :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:hover {
+    --control-background: #e81123;
+  }
+  :root.macOS-device .card .header .card-controls .control {
+    padding: 3px;
+    border-radius: 50%;
+  }
+  :root.macOS-device .card .header .card-controls .control[data-control="minimize"] {
+    --control-background: #fcbb40;
+  }
+  :root.macOS-device .card .header .card-controls .control[data-control="minimize"]:hover:active {
+    --control-background: #fee867;
+  }
+  :root.macOS-device .card .header .card-controls .control[data-control="close"] {
+    --control-background: #fc605c;
+  }
+  :root.macOS-device .card .header .card-controls .control[data-control="close"]:hover:active {
+    --control-background: #fd8e87;
+  }
   .card:not(.widget) .header .card-controls .control[data-control="minimize"] {
     display: none;
   }
-  :root.macOS-device .card .header .card-controls .control svg {
-    fill: transparent;
+  .card .header .card-controls .control svg {
+    fill: var(--control-fill);
   }
-  :root.macOS-device .card .header .card-controls:hover .control svg {
-    fill: unset;
+  :root:not(.macOS-device) .card .header .card-controls .control svg {
+    width: 13px;
+    aspect-ratio: 1/1;
+    --control-fill: currentColor;
+  }
+  :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:hover svg {
+    --control-fill: #ffffff;
+  }
+  :root.macOS-device .card .header .card-controls .control svg {
+    width: 6px;
+    aspect-ratio: 1/1;
+    --control-fill: transparent;
+    mix-blend-mode: luminosity;
+  }
+  :root.macOS-device .card .header .card-controls:is(:hover,:active) .control svg {
+    --control-fill: #202020bf;
   }
   .card .main {
+    padding: 12px;
     display: flex;
     flex-direction: column;
   }
@@ -670,7 +786,7 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background: hsl(0,0%,0%,0.25);
+    background: hsl(0,0%,0%,0.2);
     visibility: hidden;
     z-index: 2;
   }
