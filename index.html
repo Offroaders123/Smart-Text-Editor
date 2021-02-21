@@ -161,7 +161,6 @@
     gap: 8px;
     align-items: center;
     background: hsl(0,0%,13%);
-    z-index: 2;
   }
   :root.apple-device header {
     border-bottom: 1px solid #000000;
@@ -190,6 +189,7 @@
   header .menubar {
     height: 100%;
     display: flex;
+    z-index: 2;
     -webkit-app-region: no-drag;
   }
   header .menubar .menu .opener {
@@ -198,7 +198,7 @@
     border: none;
     outline: none;
   }
-  header .menubar .menu .opener:is(:hover,:focus-visible), header .menubar .menu.active .opener {
+  header .menubar .menu .opener:where(:hover,:focus-visible), header .menubar .menu.active .opener {
     background: #ffffff20;
   }
   header .window-controls {
@@ -206,25 +206,38 @@
     height: 100%;
     flex-shrink: 0;
     display: flex;
+    font-size: 10px;
+    font-family: "Segoe MDL2 Assets";
+    z-index: 3;
     -webkit-app-region: no-drag;
   }
   header .window-controls .control {
-    padding: 8px 16px;
+    width: 46px;
+    height: 32px;
     background: none;
     border: none;
     outline: none;
-    transition: 50ms linear;
+    transition: 100ms linear;
     transition-property: color, background;
   }
-  header .window-controls .control:is(:hover,:focus-visible) {
+  header .window-controls .control:where(:hover,:focus-visible) {
+    color: #ffffff;
     background: #ffffff20;
+  }
+  header .window-controls .control:active {
+    transition: none;
+  }
+  header .window-controls .control:hover:active {
+    background: #ffffff40;
   }
   header .window-controls .control[data-control="maximize"] [data-icon]:not(.active) {
     //display: none;
   }
-  header .window-controls .control[data-control="close"]:is(:hover,:focus-visible) {
-    color: #ffffff;
+  header .window-controls .control[data-control="close"]:where(:hover,:focus-visible) {
     background: #e81123;
+  }
+  header .window-controls .control[data-control="close"]:hover:active {
+    background: #94141e;
   }
   main {
     position: relative;
@@ -281,7 +294,7 @@
   main .workspace .workspace-tabs::-webkit-scrollbar {
     display: none;
   }
-  main .workspace .workspace-tabs .tab:is(:focus-visible,.active) {
+  main .workspace .workspace-tabs .tab:where(:focus-visible,.active) {
   }
   main .workspace .workspace-editors {
     position: relative;
@@ -520,7 +533,7 @@
     --list-item-padding-x: 8px;
     border-radius: calc(var(--list-padding-y) - var(--list-border));
   }
-  .menu .list-item:is(:hover,:focus-visible) {
+  .menu .list-item:where(:hover,:focus-visible) {
     background: hsl(213,94%,43%,0.75);
   }
   .menu .list-item:focus-visible {
@@ -553,13 +566,13 @@
     aspect-ratio: 1/1;
     fill: currentColor;
   }
-  .menu .list-item:not(.list-parent):is(:hover,:focus-visible) .info {
+  .menu .list-item:not(.list-parent):where(:hover,:focus-visible) .info {
     opacity: 1;
   }
   .menu .list-parent.active {
     background: hsl(213,94%,43%,0.75);
   }
-  .menu .list-parent:is(:hover,:focus-visible,.active) > svg.info {
+  .menu .list-parent:where(:hover,:focus-visible,.active) > svg.info {
     opacity: 1;
   }
   .menu .list .list {
@@ -604,7 +617,7 @@
     border-radius: 4px;
     outline: none;
   }
-  .select .menu .opener:is(:hover,:focus-visible), .select .menu.active .opener {
+  .select .menu .opener:where(:hover,:focus-visible), .select .menu.active .opener {
     background: hsl(0,0%,30%);
   }
   .select .menu .opener:focus-visible {
@@ -643,7 +656,7 @@
     margin-right: 4px;
     padding: var(--check-padding);
     --check-padding: 2px;
-    width: calc(16px + var( --check-padding) + var(--check-border-width));
+    width: calc(14px + var( --check-padding) + var(--check-border-width));
     aspect-ratio: 1/1;
     fill: transparent;
     border: var(--check-border-width) solid currentColor;
@@ -708,7 +721,7 @@
   .card .header .card-back:not([data-card-parent]) {
     display: none;
   }
-  .card .header .card-back:is(:hover,:focus-visible) {
+  .card .header .card-back:where(:hover,:focus-visible) {
     background: #ffffff20;
   }
   .card .header .card-back svg {
@@ -738,7 +751,7 @@
     padding: 8px;
     --control-background: none;
   }
-  :root:not(.macOS-device) .card .header .card-controls .control:is(:hover,:focus-visible) {
+  :root:not(.macOS-device) .card .header .card-controls .control:where(:hover,:focus-visible) {
     --control-background: #ffffff20;
   }
   :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:hover {
@@ -779,7 +792,7 @@
     color: transparent;
     mix-blend-mode: luminosity;
   }
-  :root.macOS-device .card .header .card-controls:is(:hover,:active) .control svg {
+  :root.macOS-device .card .header .card-controls:where(:hover,:active) .control svg {
     color: #202020bf;
   }
   .card .main {
@@ -964,12 +977,12 @@
     </div>
   </section>
   <section class="window-controls">
-    <button class="control" data-control="minimize" title="Minimize">&mdash;</button>
+    <button class="control" data-control="minimize" title="Minimize">&#xE921;</button>
     <button class="control" data-control="maximize" title="Maximize">
-      <span data-icon="maximize">&#9744;</span>
-      <!--span data-icon="restore">&#10064;</span-->
+      <span data-icon="maximize">&#xE922;</span>
+      <!--span data-icon="restore">&#xE923;</span-->
     </button>
-    <button class="control" data-control="close" title="Close">&#10005;</button>
+    <button class="control" data-control="close" title="Close">&#xE8BB;</button>
   </section>
 </header>
 
@@ -1388,12 +1401,23 @@
     if (!Editor.environment().macOS_device) return;
     cardControls.insertBefore(close,minimize);
     header.insertBefore(cardControls,header.firstChild);
-  });/*
+  });
+  document.querySelectorAll("header .window-controls .control").forEach(control => {/*
+    var controlType = control.getAttribute("data-control");
+    if (controlType == "minimize") control.addEventListener("click",() => window.mainProcess.minimize());
+    if (controlType == "maximize") control.addEventListener("click",() => {
+      if (!window.mainProcess.isMaximized()){
+        window.mainProcess.maximize();
+      } else window.mainProcess.unmaximize();
+    });
+    if (controlType == "close") control.addEventListener("click",() => window.mainProcess.close());*/
+    control.setAttribute("tabindex","-1");
+  });
   picker_card.querySelectorAll("input[type='range']").forEach(channel => {
     channel.addEventListener("input",refreshChannels);
     channel.min = "0";
     channel.max = "255";
-  });*/
+  });
   window.addEventListener("load",() => {
     if (!("serviceWorker" in navigator) || !Editor.appearance().parent_window || window.location.protocol != "https:") return;
     navigator.serviceWorker.register("service-worker.js");
@@ -1435,7 +1459,6 @@
       if ((Editor.orientation() == "horizontal" && window.innerWidth != previousWidth) || (Editor.orientation() == "vertical" && window.innerHeight != previousHeight)) setView("split");
     },100);
   });
-  //window.addEventListener("orientationchange",refreshScreenSafeArea);
   window.addEventListener("blur",() => {
     if (Editor.appearance().parent_window) menus.forEach(menu => {
       if (menu.classList.contains("active")) closeMenu(menu);
@@ -1650,8 +1673,7 @@
     undo_tool.classList.add("hidden");
     redo_tool.classList.add("hidden");
   }
-  /*refreshScreenSafeArea();
-  refreshPickerInput();
+  //refreshPickerInput();
   var queryParameters = new URLSearchParams(window.location.search);
   if (queryParameters.get("template")){
     confirmOverwrite(insertTemplate);
@@ -1660,7 +1682,7 @@
   if (queryParameters.get("settings")){
     openCard(settings_card);
     removeQueryParameters(["settings"]);
-  }*/
+  }
   function createEditor({ name = "Untitled.txt", value = "", open = true } = {}){
     var identifier = Math.random().toString(), tab = document.createElement("button"), editorName = document.createElement("span"), editorRename = document.createElement("button"), editorClose = document.createElement("button"), container = document.createElement("div"), textarea = document.createElement("textarea"), previewOption = document.createElement("li");
     tab.classList.add("tab");
@@ -2213,11 +2235,19 @@
     }
   }
   function attachContextMenu({ element, type } = {}){
+    element.addEventListener("keydown",event => {
+      if (event.repeat) return;
+      if (!event.shiftKey || event.key != " ") return;
+      event.preventDefault();
+      element.dispatchEvent(new MouseEvent("contextmenu"));
+    });
     element.addEventListener("mousedown",event => {
       if (event.button == "2") event.preventDefault();
     });
     element.addEventListener("contextmenu",event => {
-      if (Editor.support().editing_commands){
+      if (type == "alternate"){
+        openMenu(element.closest(".menu"));
+      } else if (Editor.support().editing_commands){
         openMenu(context_menu,type);
       } else {
         menus.forEach(menu => closeMenu(menu));
