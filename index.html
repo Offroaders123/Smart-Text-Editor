@@ -61,6 +61,7 @@
       touch_device: ("ontouchstart" in window),
       apple_device: (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform)),
       macOS_device: (/(Mac)/i.test(navigator.platform) && navigator.standalone == undefined),
+      electron_container: ("mainProcess" in window),
       mozilla_browser: (CSS.supports("-moz-appearance: none"))
     }),
     support: () => ({
@@ -75,7 +76,7 @@
       textarea: workspace_editors.querySelector(`.editor[data-editor-id="${identifier}"] textarea`),
       getName: section => {
         if ((document.querySelectorAll(`[data-editor-id="${identifier}"]`).length == 0) && (identifier != Editor.active_editor)) return null;
-        var name = workspace_tabs.querySelector(`.tab[data-editor-id="${identifier}"]`).innerText;
+        var name = workspace_tabs.querySelector(`.tab[data-editor-id="${identifier}"] [data-editor-name]`).innerText;
         if (!section || (!name.includes(".") && section == "base")) return name;
         if (section == "base"){
           name = name.split(".");
@@ -97,6 +98,7 @@
     active_editor: null,
     preview_editor: null,
     file_handles: {},
+    child_windows: [],
     storage: window.localStorage,
     refresh: "true",
     active_editing_tools: false,
@@ -117,6 +119,7 @@
   //if (Editor.environment().touch_device) document.documentElement.classList.add("touch-device");
   if (Editor.environment().apple_device) document.documentElement.classList.add("apple-device");
   if (Editor.environment().macOS_device) document.documentElement.classList.add("macOS-device");
+  if (Editor.environment().electron_container) document.documentElement.classList.add("electron-container");
   //if (Editor.support().web_sharing) document.documentElement.classList.add("web-sharing");
 </script>
 
@@ -147,6 +150,7 @@
     overflow: hidden;
     user-select: none;
     -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
   }
   body.split.horizontal[data-scaling-active] {
     cursor: col-resize;
@@ -160,7 +164,7 @@
     display: flex;
     gap: 8px;
     align-items: center;
-    background: hsl(0,0%,13%);
+    background: hsl(0,0%,14%);
   }
   :root.apple-device header {
     border-bottom: 1px solid #000000;
@@ -211,6 +215,9 @@
     z-index: 3;
     -webkit-app-region: no-drag;
   }
+  :root:not(.electron-container) header .window-controls {
+    visibility: hidden;
+  }
   header .window-controls .control {
     width: 46px;
     height: 32px;
@@ -231,7 +238,7 @@
     background: #ffffff40;
   }
   header .window-controls .control[data-control="maximize"] [data-icon]:not(.active) {
-    //display: none;
+    display: none;
   }
   header .window-controls .control[data-control="close"]:where(:hover,:focus-visible) {
     background: #e81123;
@@ -253,6 +260,7 @@
     top: 0;
     display: flex;
     flex-direction: column;
+    --workspace-background: hsl(0,0%,11%);
   }
   body.code main .workspace {
     width: 100%;
@@ -284,9 +292,11 @@
     pointer-events: none;
     transition: none;
   }
-  main .workspace .workspace-tabs {min-height: 27px;
+  main .workspace .workspace-tabs {
+    padding: 0 8px;
     flex-shrink: 0;
     display: flex;
+    gap: 6px;
     overflow-x: auto;
     scroll-behavior: smooth;
     scrollbar-width: none;
@@ -294,17 +304,47 @@
   main .workspace .workspace-tabs::-webkit-scrollbar {
     display: none;
   }
-  main .workspace .workspace-tabs .tab:where(:focus-visible,.active) {
+  main .workspace .workspace-tabs .tab {
+    margin-top: 6px;
+    padding: calc(6px - var(--tab-border-width));
+    padding-left: calc(10px - var(--tab-border-width));
+    gap: 6px;
+    font-size: 12px;
+    background: none;
+    outline: none;
+  }
+  main .workspace .workspace-tabs .tab:focus-visible {
+    border-bottom-color: #ffffff80;
+  }
+  main .workspace .workspace-tabs .tab.active {
+    background: var(--workspace-background);
+  }
+  main .workspace .workspace-tabs .tab[data-editor-unsaved] {
+    font-style: italic;
+  }
+  main .workspace .workspace-tabs .tab[data-editor-unsaved] [data-editor-name]::after {
+    content: "*";
+    margin-left: 0.5ch;
+    font-size: 13px;
+    font-style: normal;
+    line-height: 12px;
   }
   main .workspace .workspace-editors {
     position: relative;
     width: 100%;
     height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  main .workspace .workspace-editors:empty::before {
+    content: "No Editors Open";
   }
   main .workspace .editor {
     position: absolute;
     width: 100%;
     height: 100%;
+    background: var(--workspace-background);
     visibility: hidden;
   }
   main .workspace .editor:not(.active) {
@@ -462,17 +502,30 @@
     justify-content: center;
     align-items: center;
     background: none;
-    border: none;
-    border-radius: 6px;
+    border: var(--tab-border-width) solid transparent;
+    --tab-border-width: 1px;
+    border-radius: calc(6px + var(--tab-border-width));
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+    overflow: hidden;
   }
   .tab .option {
+    margin: calc(var(--option-border-width) * -1);
+    padding: 4px;
+    display: flex;
+    align-items: center;
     background: none;
-    border: none;
+    background-clip: padding-box;
+    border: var(--option-border-width) solid transparent;
+    --option-border-width: 4px;
+    border-radius: calc(4px + var(--option-border-width));
+    outline: none;
+  }
+  .tab .option:is(:hover,:focus-visible) {
+    background-color: #ffffff20;
   }
   .tab .option svg {
-    width: 12px;
+    width: 8px;
     aspect-ratio: 1/1;
     fill: currentColor;
   }
@@ -500,7 +553,7 @@
     top: 100%;
     font-size: 13px;
     background: hsl(0,0%,16%);
-    border: var(--list-border) solid #00000020;
+    border: var(--list-border) solid #00000030;
     --list-border: 1px;
     border-radius: calc(var(--list-padding-y) + var(--list-border));
     box-shadow: 1px 2px 4px #00000080;
@@ -542,6 +595,9 @@
   .menu .list-item.hidden {
     display: none;
   }
+  .menu.context-menu.window > .list .list-item:not(.window), .menu.context-menu.editor-tab > .list .list-item:not(.editor-tab), .menu.context-menu.link > .list .list-item:not(.link), .menu.context-menu.editing > .list .list-item:not(.editing), :root:not(.web-sharing) .menu.context-menu > .list .list-item.web-sharing, :root.web-sharing .menu.context-menu > .list .list-item.web-sharing-alt {
+    display: none;
+  }
   .menu .list-item > img {
     margin-right: 8px;
     width: 16px;
@@ -574,6 +630,15 @@
   }
   .menu .list-parent:where(:hover,:focus-visible,.active) > svg.info {
     opacity: 1;
+  }
+  .menu .list hr {
+    margin: calc(var(--list-padding-y) * 0.5) var(--list-padding-y);
+    border: none;
+    border-top: 1px solid currentColor;
+    opacity: 0.45;
+  }
+  .menu .list hr:last-child {
+    display: none;
   }
   .menu .list .list {
     left: calc(100% + var(--list-padding-x) + var(--list-border) + var(--list-item-border));
@@ -656,12 +721,12 @@
     margin-right: 4px;
     padding: var(--check-padding);
     --check-padding: 2px;
-    width: calc(14px + var( --check-padding) + var(--check-border-width));
+    width: calc(14px + var(--check-padding) + var(--check-border-width));
     aspect-ratio: 1/1;
     fill: transparent;
     border: var(--check-border-width) solid currentColor;
     --check-border-width: 2px;
-    border-radius: calc(2px + var( --check-padding) + var( --check-border-width));
+    border-radius: calc(2px + var(--check-padding) + var(--check-border-width));
   }
   .checkbox input[type="checkbox"]:checked + label .check {
     fill: currentColor;
@@ -670,7 +735,7 @@
     display: flex;
     flex-direction: column;
     background: hsl(0,0%,13%);
-    border: 1px solid #00000020;
+    border: 1px solid #00000030;
     border-radius: 4px;
     box-shadow: 1px 2px 4px #00000020;
     visibility: hidden;
@@ -904,6 +969,7 @@
         <li class="list-item" onclick="createEditor();">New Editor<span class="info shortcut ctrl-shift shift-command">X</span></li>
         <li class="list-item" onclick="createWindow();">New Window<span class="info shortcut ctrl-shift shift-command">C</span></li>
         <li class="list-item" onclick="openFiles();">Open<span class="info shortcut ctrl command">O</span></li>
+        <li class="list-item" onclick="window.setTimeout(renameEditor,10);">Rename<span class="info shortcut ctrl-shift shift-command">R</span></li>
         <li class="list-item" onclick="saveFile();">Save<span class="info shortcut ctrl command">S</span></li>
         <li class="list-item list-parent">Save As...<svg class="info"><use href="#arrow_icon"/></svg>
           <ul class="list">
@@ -932,13 +998,14 @@
         <li class="list-item" onclick="setView('split');">Split<span class="info shortcut ctrl-shift ctrl-command">2</span></li>
         <li class="list-item" onclick="setView('preview');">Preview<span class="info shortcut ctrl-shift ctrl-command">3</span></li>
         <li class="list-item" onclick="setOrientation();">Orientation<span class="info shortcut ctrl-shift ctrl-command">4</span></li>
-        <li class="list-item" onclick="openDisplay();">Display<span class="info shortcut ctrl-shift ctrl-command">5</span></li>
+        <li class="list-item" onclick="createDisplay();">Display<span class="info shortcut ctrl-shift ctrl-command">5</span></li>
       </ul>
     </div>
     <div class="menu">
       <button class="opener">Preview</button>
       <ul id="preview_options" class="list">
         <li class="list-item" onclick="Editor.preview_editor = null; refreshPreview({ force: true });">Active Editor</li>
+        <hr>
       </ul>
     </div>
     <div class="menu">
@@ -947,7 +1014,7 @@
         <li class="list-item" onclick="openCard(editing_tools_card);">Editing Tools<span class="info shortcut ctrl-shift shift-command">E</span></li>
         <li class="list-item" onclick="openCard(replacer_card);">Replace Text<span class="info shortcut ctrl-shift shift-command">F</span></li>
         <li class="list-item" onclick="openCard(picker_card);">Color Picker<span class="info shortcut ctrl-shift shift-command">K</span></li>
-        <li class="list-item" onclick="openCard(formatter_card);">JSON Formatter<span class="info shortcut ctrl-shift shift-command">R</span></li>
+        <li class="list-item" onclick="openCard(formatter_card);">JSON Formatter<span class="info shortcut ctrl-shift shift-command">G</span></li>
         <li class="list-item" onclick="openCard(encoder_card);">URI Encoder<span class="info shortcut ctrl-shift shift-command">Y</span></li>
         <li class="list-item" onclick="confirmOverwrite(insertTemplate);">Import HTML Template<span class="info shortcut ctrl-shift shift-command">H</span></li>
         <li class="list-item list-parent">Online Resources...<svg class="info"><use href="#arrow_icon"/></svg>
@@ -980,7 +1047,7 @@
     <button class="control" data-control="minimize" title="Minimize">&#xE921;</button>
     <button class="control" data-control="maximize" title="Maximize">
       <span data-icon="maximize">&#xE922;</span>
-      <!--span data-icon="restore">&#xE923;</span-->
+      <span data-icon="restore">&#xE923;</span>
     </button>
     <button class="control" data-control="close" title="Close">&#xE8BB;</button>
   </section>
@@ -1216,6 +1283,8 @@
   <section id="context_menu" class="menu context-menu">
     <ul class="list">
       <li class="list-item window" onclick="window.location.reload();">Reload<span class="info shortcut ctrl command">R</span></li>
+      <li class="list-item editor-tab" onclick="window.setTimeout(() => renameEditor({ identifier: Editor.context_menu_previous.closest('[data-editor-id]').getAttribute('data-editor-id') }),10);">Rename<span class="info shortcut ctrl-shift shift-command">R</span></li>
+      <li class="list-item editor-tab" onclick="">Set Preview Source<span class="info shortcut ctrl-shift shift-command">P</span></li>
       <li class="list-item link" onclick="Editor.context_menu_previous.click();">Open in New Tab</li>
       <li class="list-item web-sharing link" onclick="navigator.share({ url: Editor.context_menu_previous.href });">Share Link</li>
       <li class="list-item web-sharing-alt link" onclick="navigator.clipboard.writeText(Editor.context_menu_previous.href).catch(error => alert('Clipboard could not be written to, please check site permissions for clipboard use.'));">Copy Link</li>
@@ -1225,12 +1294,22 @@
       <li class="list-item editing" onclick="callCommand(Editor.context_menu_previous,'copy');">Copy<span class="info shortcut ctrl command">C</span></li>
       <li class="list-item editing" onclick="callCommand(Editor.context_menu_previous,'paste');">Paste<span class="info shortcut ctrl command">V</span></li>
       <li class="list-item editing" onclick="Editor.context_menu_previous.select();">Select All<span class="info shortcut ctrl command">A</span></li>
-      <li class="list-item web-sharing editing" onclick="navigator.share({ text: Editor.context_menu_touch.selection });">Share Text</li>
     </ul>
   </section>
 </main>
 
 <script>
+  document.querySelectorAll("header .window-controls .control").forEach(control => {/*
+    var controlType = control.getAttribute("data-control");
+    if (controlType == "minimize") control.addEventListener("click",() => window.mainProcess.minimize());
+    if (controlType == "maximize") control.addEventListener("click",() => {
+      if (!window.mainProcess.isMaximized()){
+        window.mainProcess.maximize();
+      } else window.mainProcess.unmaximize();
+    });
+    if (controlType == "close") control.addEventListener("click",() => window.mainProcess.close());*/
+    control.setAttribute("tabindex","-1");
+  });
   document.querySelectorAll("a[href]").forEach(anchor => {
     anchor.rel = "noopener";
     anchor.target = "_blank";
@@ -1402,17 +1481,6 @@
     cardControls.insertBefore(close,minimize);
     header.insertBefore(cardControls,header.firstChild);
   });
-  document.querySelectorAll("header .window-controls .control").forEach(control => {/*
-    var controlType = control.getAttribute("data-control");
-    if (controlType == "minimize") control.addEventListener("click",() => window.mainProcess.minimize());
-    if (controlType == "maximize") control.addEventListener("click",() => {
-      if (!window.mainProcess.isMaximized()){
-        window.mainProcess.maximize();
-      } else window.mainProcess.unmaximize();
-    });
-    if (controlType == "close") control.addEventListener("click",() => window.mainProcess.close());*/
-    control.setAttribute("tabindex","-1");
-  });
   picker_card.querySelectorAll("input[type='range']").forEach(channel => {
     channel.addEventListener("input",refreshChannels);
     channel.min = "0";
@@ -1450,6 +1518,7 @@
     event.preventDefault();
     event.returnValue = "";
   });
+  window.addEventListener("unload",() => Editor.child_windows.forEach(win => win.close()));
   window.addEventListener("resize",event => {
     if (context_menu.classList.contains("active")) closeMenu(context_menu);
     if (Editor.view() != "preview") setEditorTabsVisibility(Editor.query().tab);
@@ -1480,7 +1549,7 @@
     if ((controlShift || shiftCommand) && pressed("d")){
       event.preventDefault();
       if (event.repeat) return;
-      closeEditor(Editor.active_editor);
+      closeEditor();
     }
     if ((controlShift || controlCommand) && (pressed("[") || pressed("{"))){
       event.preventDefault();
@@ -1501,6 +1570,11 @@
       event.preventDefault();
       if (event.repeat) return;
       openFiles();
+    }
+    if ((controlShift || shiftCommand) && pressed("r")){
+      event.preventDefault();
+      if (event.repeat) return;
+      renameEditor();
     }
     if ((control || command) && pressed("s")){
       event.preventDefault();
@@ -1530,7 +1604,7 @@
     if ((controlShift || controlCommand) && (pressed("5") || pressed("%"))){
       event.preventDefault();
       if (event.repeat) return;
-      openDisplay();
+      createDisplay();
     }
     if ((controlShift || shiftCommand) && pressed("Enter")){
       event.preventDefault();
@@ -1553,13 +1627,8 @@
       event.preventDefault();
       if (event.repeat) return;
       openCard(picker_card);
-    }/*
+    }
     if ((controlShift || shiftCommand) && pressed("g")){
-      event.preventDefault();
-      if (event.repeat) return;
-      importColor();
-    }*/
-    if ((controlShift || shiftCommand) && pressed("r")){
       event.preventDefault();
       if (event.repeat) return;
       openCard(formatter_card);
@@ -1684,7 +1753,7 @@
     removeQueryParameters(["settings"]);
   }
   function createEditor({ name = "Untitled.txt", value = "", open = true } = {}){
-    var identifier = Math.random().toString(), tab = document.createElement("button"), editorName = document.createElement("span"), editorRename = document.createElement("button"), editorClose = document.createElement("button"), container = document.createElement("div"), textarea = document.createElement("textarea"), previewOption = document.createElement("li");
+    var identifier = Math.random().toString(), tab = document.createElement("button"), editorName = document.createElement("span"), editorClose = document.createElement("button"), container = document.createElement("div"), textarea = document.createElement("textarea"), previewOption = document.createElement("li");
     tab.classList.add("tab");
     tab.setAttribute("data-editor-id",identifier);
     tab.addEventListener("click",() => {
@@ -1702,19 +1771,12 @@
     });
     editorName.setAttribute("data-editor-name",name);
     editorName.innerText = name;
-    editorRename.classList.add("option");
-    editorRename.innerHTML = "<svg><use href='#rename_icon'/></svg>";
-    editorRename.addEventListener("click",event => {
-      event.stopPropagation();
-      renameEditor({
-        identifier: identifier
-      });
-    });
     editorClose.classList.add("option");
+    editorClose.setAttribute("tabindex","-1");
     editorClose.innerHTML = "<svg><use href='#close_icon'/></svg>";
     editorClose.addEventListener("click",event => {
       event.stopPropagation();
-      closeEditor(identifier);
+      closeEditor({ identifier });
     });
     container.classList.add("editor");
     container.setAttribute("data-editor-id",identifier);
@@ -1737,12 +1799,15 @@
       });
     });
     tab.appendChild(editorName);
-    tab.appendChild(editorRename);
     tab.appendChild(editorClose);
     workspace_tabs.appendChild(tab);
     container.appendChild(textarea);
     workspace_editors.appendChild(container);
     preview_options.appendChild(previewOption);
+    attachContextMenu({
+      element: tab,
+      type: "editor-tab"
+    });
     applyEditingBehavior(textarea);
     if (open) openEditor(identifier);
     return identifier;
@@ -1928,6 +1993,8 @@
     card.classList.toggle("minimize");
     if (card.classList.contains("minimize") && card.contains(document.activeElement) && document.activeElement != minimize) minimize.focus();
   }
+
+
   function createWindow(){
     var features = (Editor.appearance().standalone || Editor.appearance().fullscreen) ? "popup" : "", win = window.open(window.location.href,"_blank",features);
     if (Editor.appearance().fullscreen){
@@ -1984,11 +2051,11 @@
   async function saveFile(extension){
     if (extension || !Editor.support().file_system){
       if (!extension) extension = Editor.query().getName("extension");
-      var anchor = document.createElement("a"), blob = window.URL.createObjectURL(new Blob([Editor.query().textarea.value]));
-      anchor.href = blob;
+      var anchor = document.createElement("a"), link = window.URL.createObjectURL(new Blob([Editor.query().textarea.value]));
+      anchor.href = link;
       anchor.download = `${Editor.query().getName("base")}.${extension}`;
       anchor.click();
-      window.URL.revokeObjectURL(blob);
+      window.URL.revokeObjectURL(link);
     } else {
       var identifier = Editor.active_editor, handle;
       if (!Editor.file_handles[identifier]){
@@ -2023,6 +2090,58 @@
       force: true
     });
   }
+
+  function createDisplay(){
+    var width = window.screen.availWidth * 2/3,
+        height = window.screen.availHeight * 2/3,
+        left = window.screen.availWidth / 2 + window.screen.availLeft - width / 2,
+        top = window.screen.availHeight / 2 + window.screen.availTop - height / 2,
+        features = (Editor.appearance().standalone || Editor.appearance().fullscreen) ? "popup" : "",
+        link = window.URL.createObjectURL(new Blob([Editor.query().textarea.value],{
+          type: `text/${Editor.query().getName("extension")}`
+        })),
+        win = window.open(link,"_blank",features);
+    window.URL.revokeObjectURL(link);
+    win.moveTo(left,top);
+    win.resizeTo(width,height);
+    Editor.child_windows.push(win);
+    window.setTimeout(() => {
+      if (!win.document.title) win.document.title = Editor.query().getName();
+    },20);
+  }
+
+/*
+  function openDisplay(){
+    var windowFeatures = "";
+    if (Editor.appearance().standalone || Editor.appearance().fullscreen) windowFeatures = "popup";
+    var display = window.open("","_blank",windowFeatures);
+    if (Editor.appearance().standalone || Editor.appearance().fullscreen){
+      display.resizeTo(window.screen.width * 2/3,window.screen.height * 2/3);
+      display.moveTo(window.screen.width / 6,window.screen.height / 6);
+    }
+    display.document.open();
+    display.document.write(Editor.query().textarea.value);
+    display.document.close();
+  }
+*/
+
+/*
+  function createWindow(){
+    var width = window.screen.availWidth * 2/3,
+        height = window.screen.availHeight * 2/3,
+        left = window.screen.availWidth / 2 + window.screen.availLeft - width / 2,
+        top = window.screen.availHeight / 2 + window.screen.availTop - height / 2,
+        link = window.URL.createObjectURL(new Blob([``],{
+          type: "text/html"
+        })),
+        win = window.open(link,"_blank","popup");
+    window.URL.revokeObjectURL(link);
+    win.moveTo(left,top);
+    win.resizeTo(width,height);
+    Editor.child_windows.push(win);
+  }
+*/
+
 
   function openMenu(menu,type){
     if (menu.classList.contains("active")) return closeMenu(menu);
@@ -2059,7 +2178,7 @@
       location.left = event.touches[0].pageX;
       location.top = event.touches[0].pageY;
     }
-    if (location.left + list.offsetWidth > window.innerWidth) location.left -= list.offsetWidth;
+    if (location.left + list.offsetWidth > window.innerWidth) location.left = window.innerWidth - list.offsetWidth;
     if (location.top + list.offsetHeight > window.innerHeight) location.top -= list.offsetHeight;
     menu.style.left = `${location.left}px`;
     menu.style.top = `${location.top}px`;
@@ -2078,7 +2197,16 @@
     });
     if (opener && opener != document.activeElement) opener.focus();
     if (!menu.classList.contains("context-menu")) return;
-    
+    var transitionDuration = parseInt(getElementStyle({
+      element: menu,
+      property: "transition-duration"
+    }).replace(/s/g,"") * 1000);
+    window.setTimeout(() => {
+      var types = ["window","editor-tab","link","editing"];
+      types.forEach(type => {
+        if (menu.classList.contains(type)) menu.classList.remove(type);
+      });
+    },transitionDuration);
   }
   function catchMenuNavigation(){
   }
@@ -2188,17 +2316,6 @@
       property: "display"
     }) != "none"));
   }
-
-/*
-  function getNavigableElements(container,scope){
-    var navigable;
-    if (scope){
-      navigable = container.querySelectorAll(":scope > button:not([disabled]), :scope > textarea:not([disabled]), :scope > input:not([disabled]), :scope > select:not([disabled]), :scope > a[href]:not([disabled]), :scope > [tabindex]:not([tabindex='-1'])");
-    } else navigable = container.querySelectorAll("button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), a[href]:not([disabled]), [tabindex]:not([tabindex='-1'])");
-    return Array.from(navigable).filter(element => (getElementStyle(element,"display") != "none"));
-  }
-*/
-
   function getElementStyle({ element, pseudo = null, property } = {}){
     return window.getComputedStyle(element,pseudo).getPropertyValue(property);
   }
@@ -2253,10 +2370,9 @@
         menus.forEach(menu => closeMenu(menu));
       }
     });
-    if (!Editor.support().editing_commands) return;
     element.addEventListener("touchstart",event => {
       if (event.touches.length != 1) return;
-      Editor.context_menu_touch.timeout = window.setTimeout(() => openMenu(context_menu,type),750);
+      Editor.context_menu_touch.timeout = window.setTimeout(() => element.dispatchEvent(new MouseEvent("contextmenu")),750);
       if (window.getSelection() != "") Editor.context_menu_touch.selection = window.getSelection();
     });
     element.addEventListener("touchmove",negateContextMenu);
