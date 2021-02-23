@@ -14,7 +14,7 @@
 <meta property="og:image" content="resources/share-1200.png">
 <meta property="og:url" content="https://offroaders123.github.io/Smart-Text-Editor/">
 <meta name="twitter:card" content="summary_large_image">
-<meta id="theme_color" name="theme-color" content="#191919">
+<meta id="theme_color" name="theme-color" content="hsl(0,0%,14%)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Smart Text Editor">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -145,7 +145,7 @@
     flex-direction: column;
     color: hsl(0,0%,85%);
     font-size: 13.3px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Tahoma", "Roboto", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
     background: #121212;
     overflow: hidden;
     user-select: none;
@@ -169,6 +169,9 @@
   :root.apple-device header {
     border-bottom: 1px solid #000000;
   }
+  :root.macOS-device.electron-container header {
+    padding-left: 68px;
+  }
   body[data-scaling-active] header {
     pointer-events: none;
   }
@@ -189,6 +192,9 @@
     width: 16px;
     aspect-ratio: 1/1;
     display: flex;
+  }
+  :root.macOS-device.electron-container header .app-icon {
+    display: none;
   }
   header .menubar {
     height: 100%;
@@ -215,7 +221,7 @@
     z-index: 3;
     -webkit-app-region: no-drag;
   }
-  :root:not(.electron-container) header .window-controls {
+  :root:where(.macOS-device,:not(.electron-container)) header .window-controls {
     visibility: hidden;
   }
   header .window-controls .control {
@@ -245,6 +251,9 @@
   }
   header .window-controls .control[data-control="close"]:hover:active {
     background: #94141e;
+  }
+  :root.macOS-device.electron-container header .window-controls .control {
+    height: 28px;
   }
   main {
     position: relative;
@@ -293,21 +302,26 @@
     transition: none;
   }
   main .workspace .workspace-tabs {
-    padding: 0 8px;
+    padding: 0 6px;
     flex-shrink: 0;
     display: flex;
-    gap: 6px;
+    gap: 3px;
     overflow-x: auto;
     scroll-behavior: smooth;
     scrollbar-width: none;
+  }
+  :root.apple-device main .workspace .workspace-tabs {
+    box-shadow: 0 -1px 0 inset #ffffff20, 0 -1px 0 inset var(--workspace-background);
   }
   main .workspace .workspace-tabs::-webkit-scrollbar {
     display: none;
   }
   main .workspace .workspace-tabs .tab {
-    margin-top: 6px;
+    margin-top: 3px;
     padding: calc(6px - var(--tab-border-width));
     padding-left: calc(10px - var(--tab-border-width));
+    padding-bottom: calc(7px - var(--tab-border-width));
+    flex-shrink: 0;
     gap: 6px;
     font-size: 12px;
     background: none;
@@ -318,6 +332,11 @@
   }
   main .workspace .workspace-tabs .tab.active {
     background: var(--workspace-background);
+  }
+  :root.apple-device main .workspace .workspace-tabs .tab.active {
+    border-left-color: #ffffff20;
+    border-top-color: #ffffff20;
+    border-right-color: #ffffff20;
   }
   main .workspace .workspace-tabs .tab[data-editor-unsaved] {
     font-style: italic;
@@ -337,7 +356,7 @@
     justify-content: center;
     align-items: center;
   }
-  main .workspace .workspace-editors:empty::before {
+  :root:not(.startup-fade) main .workspace .workspace-editors:empty::before {
     content: "No Editors Open";
   }
   main .workspace .editor {
@@ -802,7 +821,7 @@
     display: flex;
   }
   :root.macOS-device .card .header .card-controls {
-    margin: 8px;
+    margin: 4px;
     padding: 4px;
     gap: 8px;
   }
@@ -2109,43 +2128,9 @@
       if (!win.document.title) win.document.title = Editor.query().getName();
     },20);
   }
-
-/*
-  function openDisplay(){
-    var windowFeatures = "";
-    if (Editor.appearance().standalone || Editor.appearance().fullscreen) windowFeatures = "popup";
-    var display = window.open("","_blank",windowFeatures);
-    if (Editor.appearance().standalone || Editor.appearance().fullscreen){
-      display.resizeTo(window.screen.width * 2/3,window.screen.height * 2/3);
-      display.moveTo(window.screen.width / 6,window.screen.height / 6);
-    }
-    display.document.open();
-    display.document.write(Editor.query().textarea.value);
-    display.document.close();
-  }
-*/
-
-/*
-  function createWindow(){
-    var width = window.screen.availWidth * 2/3,
-        height = window.screen.availHeight * 2/3,
-        left = window.screen.availWidth / 2 + window.screen.availLeft - width / 2,
-        top = window.screen.availHeight / 2 + window.screen.availTop - height / 2,
-        link = window.URL.createObjectURL(new Blob([``],{
-          type: "text/html"
-        })),
-        win = window.open(link,"_blank","popup");
-    window.URL.revokeObjectURL(link);
-    win.moveTo(left,top);
-    win.resizeTo(width,height);
-    Editor.child_windows.push(win);
-  }
-*/
-
-
   function openMenu(menu,type){
     if (menu.classList.contains("active")) return closeMenu(menu);
-    var opener = menu.querySelector(".opener");
+    var opener = menu.querySelector(".opener"), list = menu.querySelectorAll(".list")[0];
     menus.forEach(menu => {
       if (menu.classList.contains("active")) closeMenu(menu);
     });
@@ -2155,13 +2140,13 @@
     document.body.addEventListener("touchend",catchMenuExit);
     function catchMenuExit(){
       if (menu.contains(event.target)) return;
-      document.body.removeEventListener("mousedown",this);
-      document.body.removeEventListener("touchend",this);
-      closeMenu(menu);
+      document.body.removeEventListener("mousedown",catchMenuExit);
+      document.body.removeEventListener("touchend",catchMenuExit);
+      if (event.button != "2") closeMenu(menu);
     }/* -- Select value should be focused when opened --
     if (menu.closest(".select")){
       var navigable = getNavigableElements({
-        container: menu.querySelectorAll(".list")[0],
+        container: list,
         scope: true
       });
       window.setTimeout(() => navigable[0].focus(),20);
@@ -2170,7 +2155,7 @@
     if (Editor.context_menu_touch.timeout) Editor.context_menu_touch.timeout = null;
     Editor.context_menu_previous = event.target;
     menu.classList.add(type);
-    var location = {}, list = menu.querySelectorAll(".list")[0];
+    var location = {};
     if (!Editor.environment.touch_device && !(event instanceof TouchEvent)){
       location.left = event.pageX;
       location.top = event.pageY;
@@ -2184,21 +2169,22 @@
     menu.style.top = `${location.top}px`;
     //document.body.addEventListener("keydown",catchMenuNavigation);
     var transitionDuration = parseInt(getElementStyle({
-      element: menu,
+      element: list,
       property: "transition-duration"
     }).replace(/s/g,"") * 500);
     window.setTimeout(() => document.activeElement.blur(),transitionDuration);
   }
   function closeMenu(menu){
-    var opener = menu.querySelector(".opener"), listParents = menu.querySelectorAll(".list-parent");
+    var opener = menu.querySelector(".opener"), list = menu.querySelectorAll(".list")[0], listParents = menu.querySelectorAll(".list-parent");
     menu.classList.remove("active");
     listParents.forEach(listParent => {
       if (listParent.classList.contains("active")) listParent.classList.remove("active");
     });
     if (opener && opener != document.activeElement) opener.focus();
     if (!menu.classList.contains("context-menu")) return;
-    var transitionDuration = parseInt(getElementStyle({
-      element: menu,
+    Editor.context_menu_previous.focus();
+    var types = ["window","editor-tab","link","editing"], transitionDuration = parseInt(getElementStyle({
+      element: list,
       property: "transition-duration"
     }).replace(/s/g,"") * 1000);
     window.setTimeout(() => {
@@ -2210,103 +2196,6 @@
   }
   function catchMenuNavigation(){
   }
-
-
-
-/*
-  function catchContextMenuNavigation(event){
-    event.stopPropagation();
-    if (!context_menu.classList.contains("active") || document.activeElement != document.body) return;
-    var navigable = getNavigableElements(context_menu);
-    if (event.key == "Tab") event.preventDefault();
-    if (event.key == "ArrowUp"){
-      event.preventDefault();
-      navigable[navigable.length - 1].focus();
-    }
-    if (event.key == "ArrowDown"){
-      event.preventDefault();
-      navigable[0].focus();
-    }
-  }
-  function openContextMenu(event,type){
-    event.preventDefault();
-    event.stopPropagation();
-    if (Editor.long_touch.timeout) Editor.long_touch.timeout = null;
-    if (context_menu.classList.contains("active")){
-      closeContextMenu();
-      var menu = context_menu.querySelectorAll("ul")[0], transitionDuration = parseInt(getElementStyle(menu,"transition-duration").replace(/s/g,"") * 1000);
-      return window.setTimeout(() => openContextMenu(event,type),transitionDuration);
-    }
-    Editor.context_menu_previous = event.target;
-    openMenu(event,context_menu);
-    context_menu.classList.add(type);
-    var pageLocation = {}, transformOrigin = {};
-    if (Editor.environment.touch_device && event instanceof TouchEvent){
-      pageLocation.left = event.touches[0].pageX;
-      pageLocation.top = event.touches[0].pageY;
-    } else {
-      pageLocation.left = event.pageX;
-      pageLocation.top = event.pageY;
-    }
-    transformOrigin.left = pageLocation.left;
-    transformOrigin.top = pageLocation.top;
-    var menu = context_menu.querySelectorAll("ul")[0];
-    if (pageLocation.left + menu.offsetWidth > window.innerWidth) pageLocation.left = window.innerWidth - menu.offsetWidth;
-    if (pageLocation.top + menu.offsetHeight > window.innerHeight) pageLocation.top = window.innerHeight - menu.offsetHeight;
-    transformOrigin.left -= pageLocation.left;
-    transformOrigin.top -= pageLocation.top;
-    context_menu.style.left = `${pageLocation.left}px`;
-    context_menu.style.top = `${pageLocation.top}px`;
-    menu.style.transformOrigin = `${transformOrigin.left}px ${transformOrigin.top}px`;
-    document.body.addEventListener("keydown",catchContextMenuNavigation);
-    var transitionDuration = parseInt(getElementStyle(menu,"transition-duration").replace(/s/g,"") * 500);
-    window.setTimeout(() => document.activeElement.blur(),transitionDuration);
-  }
-  function closeContextMenu(){
-    closeMenu(context_menu);
-    Editor.context_menu_previous.focus();
-    Editor.context_menu_previous = null;
-    document.body.removeEventListener("keydown",catchContextMenuNavigation);
-  }
-  function openMenu(event,menu){
-    if (Editor.long_touch.timeout) Editor.long_touch.timeout = null;
-    if (Editor.long_touch.selection) Editor.long_touch.selection = null;
-    var currentMenu;
-    if (!menu){
-      currentMenu = event;
-    } else currentMenu = menu;
-    menus.forEach(menu => {
-      if (menu != currentMenu && !menu.contains(event.target)) closeMenu(menu);
-    });
-    currentMenu.classList.toggle("active");
-    if (currentMenu.classList.contains("active")){
-      document.body.addEventListener("click",catchMenuExit);
-      if (currentMenu == context_menu) document.body.addEventListener("contextmenu",catchMenuExit);
-    } else {
-      document.body.removeEventListener("click",catchMenuExit);
-      if (currentMenu == context_menu) document.body.removeEventListener("contextmenu",catchMenuExit);
-    }
-    function catchMenuExit(){
-      if (currentMenu.contains(document.activeElement)) return;
-      closeMenu(currentMenu);
-      document.body.removeEventListener("click",catchMenuExit);
-      if (currentMenu == context_menu) document.body.removeEventListener("contextmenu",catchMenuExit);
-    }
-  }
-  function closeMenu(menu){
-    var submenus = menu.querySelectorAll("li > ul");
-    submenus.forEach(submenu => submenu.parentElement.classList.remove("active"));
-    menu.classList.remove("active");
-    if (menu != context_menu) return;
-    var menu = menu.querySelectorAll("ul")[0], transitionDuration = parseInt(getElementStyle(menu,"transition-duration").replace(/s/g,"") * 1000);
-    window.setTimeout(() => {
-      var types = ["window","link","editing"];
-      types.forEach(type => {
-        if (menu.classList.contains(type)) menu.classList.remove(type);
-      });
-    },transitionDuration);
-  }
-*/
 
   function getNavigableElements({ container, scope = false } = {}){
     scope = (scope) ? "" : ":scope > ";
