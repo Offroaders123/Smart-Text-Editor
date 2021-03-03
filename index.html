@@ -14,7 +14,7 @@
 <meta property="og:image" content="resources/share-1200.png">
 <meta property="og:url" content="https://offroaders123.github.io/Smart-Text-Editor/">
 <meta name="twitter:card" content="summary_large_image">
-<meta id="theme_color" name="theme-color" content="hsl(0,0%,14%)">
+<meta id="theme_color" name="theme-color" content="hsl(0,0%,16%)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Smart Text Editor">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -44,7 +44,8 @@
 <link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="resources/startup-ipadpro3-portrait.png">
 <link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="resources/startup-ipadpro2-landscape.png">
 <link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="resources/startup-ipadpro2-portrait.png">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cousine&family=Noto+Sans&family=Rubik&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cousine&family=Rubik&display=swap">
 <link rel="stylesheet" href="https://offroaders123.github.io/Numbered-Textarea-Plugin/styles.css">
 <script src="https://offroaders123.github.io/Numbered-Textarea-Plugin/script.js"></script>
 
@@ -152,6 +153,8 @@
     overflow: hidden;
     user-select: none;
     -webkit-user-select: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
   }
   body.split.horizontal[data-scaling-active] {
@@ -166,7 +169,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: hsl(0,0%,14%);
+    background: hsl(0,0%,16%);
     border-bottom: 1px solid #00000040;
   }
   :root.apple-device header {
@@ -474,13 +477,14 @@
     text-decoration: none;
   }
   [data-numbered-container], input[type="text"] {
-    font-size: 13px;
     color: #e8e8e8;
     caret-color: currentColor;
-    font-family: "Cousine", monospace;
+    font-size: 13px;
+    font-family: ui-monospace, "Menlo", "Cousine", monospace;
     background: hsl(0,0%,11%);
     border: none;
     outline: none;
+    line-height: 1.3;
   }
   [data-numbered-container] {
     position: relative;
@@ -490,12 +494,12 @@
     color: inherit;
     background: transparent;
     border: none;
-    line-height: normal;
+    line-height: inherit;
     opacity: 0.55;
   }
   [data-numbered-container] textarea {
     padding: 8px;
-    line-height: normal;
+    line-height: inherit;
     resize: none;
     scrollbar-width: inherit;
     scrollbar-color: inherit;
@@ -586,7 +590,7 @@
     left: 0;
     top: 100%;
     font-size: 13px;
-    background: hsl(0,0%,17%);
+    background: hsl(0,0%,19%);
     border: var(--list-border) solid #00000030;
     --list-border: 1px;
     border-radius: calc(var(--list-padding-y) + var(--list-border));
@@ -647,7 +651,7 @@
     margin-left: auto;
     padding-left: 8px;
     font-size: 12px;
-    opacity: 0.45;
+    opacity: 0.55;
     pointer-events: none;
   }
   .menu .list-item svg.info {
@@ -669,7 +673,7 @@
     margin: calc(var(--list-padding-y) * 0.5) var(--list-padding-y);
     border: none;
     border-top: 1px solid currentColor;
-    opacity: 0.45;
+    opacity: 0.55;
   }
   .menu .list hr:last-child {
     display: none;
