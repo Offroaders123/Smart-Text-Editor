@@ -59,7 +59,7 @@
     environment: {
       touch_device: ("ontouchstart" in window),
       apple_device: (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform)),
-      macOS_device: (/(Mac)/i.test(navigator.platform) && navigator.standalone == undefined),
+      macOS_device: /*(/(Mac)/i.test(navigator.platform) && navigator.standalone == undefined)*/true,
       mozilla_browser: (CSS.supports("-moz-appearance: none"))
     },
     support: {
@@ -82,7 +82,7 @@
         }
       }
     },
-    preapproved_extensions: ["txt","html","css","js","php","json","webmanifest","xml","yaml","yml","dist","config","ini","md","markdown","mcmeta","lang","properties","material","h","fragment","vertex","fxh","hlsl","ihlsl","svg"],
+    preapproved_extensions: ["txt","html","css","js","php","json","webmanifest","xml","yaml","yml","dist","config","ini","md","markdown","mcmeta","lang","properties","uidx","material","h","fragment","vertex","fxh","hlsl","ihlsl","svg"],
     active_editor: null,
     preview_editor: null,
     file_handles: {},
@@ -104,7 +104,7 @@
     install_prompt: null
   };
   var sourceChange = false;
-  if (Editor.appearance.parent_window != undefined) document.documentElement.classList.add("startup-fade");
+  if (Editor.appearance.parent_window) document.documentElement.classList.add("startup-fade");
   if (Editor.environment.touch_device) document.documentElement.classList.add("touch-device");
   if (Editor.environment.apple_device) document.documentElement.classList.add("apple-device");
   if (Editor.environment.macOS_device) document.documentElement.classList.add("macOS-device");
@@ -121,15 +121,15 @@
   }
   :root {
     --main: hsl(0,0%,7.1%);
-
+  
     --font-family-interface: -apple-system, BlinkMacSystemFont, "Rubik", sans-serif;
     --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Noto Sans", sans-serif;
     --font-family-monospace: "Cousine", monospace;
-
+  
     --container-dark: hsl(0,0%,10%);
     --container-medium: hsl(0,0%,12%);
     --container-medium-active: #1144bdbf;
-
+  
     --text-dark: #000000;
     --text-dark-contrast: hsl(0,0%,20%);
     --text-medium: hsl(0,0%,70%);
@@ -138,53 +138,59 @@
     --text-light: #ffffff;
     --text-hover: #ffffff;
     --text-info: #ffcd00;
-
+  
     --border-radius-small: min(0.625vw, 2.5px);
     --border-radius-medium: min(1.25vw, 5px);
     --border-radius-large: min(2.5vw, 10px);
-    //--edge-highlight: #ffffff20;
     --edge-highlight: transparent;
+    --stoplight-icon-fill: #00000080;
+    --stoplight-red-fill: #fc605c;
+    --stoplight-red-border: #df4845;
+    --stoplight-yellow-fill: #fcbb40;
+    --stoplight-yellow-border: #dfa034;
+    --stoplight-green-fill: #34c749;
+    --stoplight-green-border: #26aa34;
     --box-shadow: #000000bf;
     --outline-width: min(0.25vw, 1px);
     --outline-dark: var(--text-dark-contrast);
     --outline-medium: var(--text-medium-contrast);
-
+  
     --transition-slow: 0.4s;
     --transition-medium: 0.2s;
     --transition-fast: 0.1s;
     --transition-delay: 0.4s;
-
+  
     --selection-color: #000000;
     --selection-background: #b4d5ffbf;
     --selection-background-inactive: #ccccccbf;
-
+  
     --scrollbar: hsl(0,0%,50%);
     --scrollbar-hover: hsl(0,0%,60%);
-
+  
     --drag-background: hsl(240,100%,50%,10%);
     --drag-border: hsl(240,100%,50%,50%);
-
+  
     --button: hsl(0,0%,22.5%);
     --button-hover: hsl(0,0%,30%);
     --button-warning-hover: #bb2222;
-
+  
     --tab: hsl(0,0%,15.3%);
     --tab-hover: hsl(0,0%,21.6%);
     --tab-button-dark: #ffffff3a;
     --tab-button-light: #0000004a;
-
+  
     --textarea-code-color: var(--text-light);
     --textarea-dark: hsl(0,0%,12.2%);
     --textarea-medium: hsl(0,0%,14.5%);
     --textarea-light: #eae2d1;
-
+  
     --range-thumb: var(--button);
     --range-thumb-hover: var(--button-hover);
     --range-track: hsl(0,0%,12.5%);
     --range-track-hover: hsl(0,0%,18.8%);
-
+  
     --card-backdrop: #19191960;
-
+  
     --startup-fade-background: #191919;
     --startup-fade-opacity: 0;
     --startup-fade-pointer-events: none;
@@ -212,6 +218,9 @@
       --transition-medium: 0s;
       --transition-fast: 0s
     }
+  }
+  :root.macOS-device {
+    --edge-highlight: #ffffff20;
   }
   html {
     position: fixed;
@@ -397,10 +406,40 @@
   }
   button.nav {
     padding: min(0.5vw, 2px);
+    width: min(4.5vw, 18px);
+    height: min(4.5vw, 18px);
     box-shadow: 0 0 0 var(--outline-width) var(--focus-border);
+  }
+  :root.macOS-device button.nav:not(.back) {
+    padding: 3px;
+    width: 12px;
+    height: 12px;
+    background: var(--stoplight-fill);
+    border-radius: 6px;
+    box-shadow: 0 0 0 var(--outline-width) var(--stoplight-border) inset, 0 0 0 var(--outline-width) var(--focus-border);
   }
   button.nav + * {
     margin-left: min(1vw, 4px);
+  }
+  :root.macOS-device button.nav:not(.back) + * {
+    margin-left: 8px;
+  }
+  :root.macOS-device button.nav:not(.back) > svg {
+    fill: transparent;
+  }
+  :root.macOS-device button.nav:not(.back):hover > svg, :root.macOS-device button.nav:not(.back):focus > svg {
+    fill: var(--stoplight-icon-fill);
+  }
+  button.nav.minimize {
+    --stoplight-fill: var(--stoplight-yellow-fill);
+    --stoplight-border: var(--stoplight-yellow-border);
+  }
+  button.nav.close {
+    --stoplight-fill: var(--stoplight-red-fill);
+    --stoplight-border: var(--stoplight-red-border);
+  }
+  button.nav.back:not([data-parent-card]), .card:not(.widget) button.nav.minimize {
+    display: none;
   }
   button.nav.minimize > svg {
     transition: fill var(--transition-fast), transform var(--transition-medium);
@@ -1023,10 +1062,6 @@
   .card .header .icon {
     margin-right: min(3vw, 10px);
   }
-  .card button.nav {
-    width: min(4.5vw, 18px);
-    height: min(4.5vw, 18px);
-  }
   .card.widget button.nav.minimize {
     //right: min(4.75vw, 24px);
     transition: right var(--transition-medium);
@@ -1093,7 +1128,7 @@
   .card:not(.action) .options button {
     min-width: min(12vw, 75px);
   }
-  #symbols {
+  #symbol_definitions {
     position: absolute;
     pointer-events: none;
   }
@@ -1115,30 +1150,31 @@
     pointer-events: none;
     transition: none;
   }
-  #header .menubar {
+  #header .menu-bar {
     display: flex;
     align-items: center;
   }
-  #header .menubar .dropdown {
+  #header .menu-bar .dropdown {
     -webkit-app-region: no-drag;
   }
-  #header .menubar .dropdown button {
+  #header .menu-bar .dropdown button {
     padding: min(1vw, 8px);
     min-width: unset;
     color: var(--text-medium-contrast);
+    font-size: min(2.75vw, 13px);
     background: none;
     border-radius: 0;
     box-shadow: none;
     transition: none;
   }
-  #header .menubar .dropdown button:hover, #header .menubar .dropdown.active button {
+  #header .menu-bar .dropdown button:hover, #header .menu-bar .dropdown.active button {
     background: var(--tab-hover);
   }
-  #header .menubar .dropdown > ul {
+  #header .menu-bar .dropdown > ul {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
   }
-  #header .title {
+  #header .app-icon {
     //position: absolute;
     //left: 50%;
     display: flex;
@@ -1147,13 +1183,13 @@
     //transform: translateX(-50%);
     //transition: transform var(--transition-slow);
   }
-  #header .title img {
+  #header .app-icon img {
     margin: 0 min(1.5vw, 10px);
     width: min(4vw, 16px);
     height: min(4vw, 16px);
     flex-shrink: 0;
   }/*
-  #header .title span {
+  #header .app-icon span {
     margin-left: 5px;
     font-size: min(4vw, 16px);
     white-space: nowrap;
@@ -1162,10 +1198,10 @@
     transition-property: margin-left, visibility, opacity, transform;
   }
   @media (max-width: 900px) {
-    #header .title {
+    #header .app-icon {
       transform: translateX(calc(min(2.75vw, 12px) * -1));
     }
-    #header .title span {
+    #header .app-icon span {
       margin-left: 0;
       visibility: hidden;
       opacity: 0;
@@ -1178,6 +1214,12 @@
     background: var(--main);
     overflow: hidden;
   }
+  #main.horizontal.resize {
+    cursor: col-resize;
+  }
+  #main.vertical.resize {
+    cursor: row-resize;
+  }
   #main.text [data-numbered-container], #main.text input[type="text"] {
     font-family: var(--font-family-sans-serif);
   }
@@ -1185,12 +1227,6 @@
     font-family: var(--font-family-monospace);
     color: var(--textarea-code-color);
     caret-color: var(--textarea-code-color);
-  }
-  #main.horizontal.resize {
-    cursor: col-resize;
-  }
-  #main.vertical.resize {
-    cursor: row-resize;
   }
   #workspace {
     position: absolute;
@@ -1230,7 +1266,7 @@
     --size: 100%;
   }
   #workspace.split {
-    --size: calc(50% - 8px);
+    --size: 50%;
   }
   #workspace.preview {
     --size: 0;
@@ -1374,15 +1410,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background: var(--button);
     touch-action: none;
-    transition: var(--transition-slow), background var(--transition-fast);
-  }
-  #scaler.active, #scaler:hover {
-    background: var(--button-hover);
+    z-index: 1;
+    transition: var(--transition-slow);
   }
   #scaler.active {
-    transition: background var(--transition-fast);
+    transition: none;
   }
   #scaler.text, #scaler.code {
     --axis: 0;
@@ -1414,27 +1447,6 @@
     cursor: row-resize;
     --rotate: 0deg;
   }
-  #scaler .handle {
-    padding: min(0.75vw, 3px);
-    font-size: min(2.75vw, 12px);
-    background: var(--button);
-    border-radius: var(--border-radius-medium);
-    box-shadow: 0 0 min(1.5vw, 6px) var(--box-shadow);
-    visibility: hidden;
-    opacity: 0;
-    z-index: 1;
-    transform: scale(0.25) rotate(var(--rotate));
-    transition: var(--transition-fast) ease-in;
-    transition-property: color, background, visibility, opacity, transform;
-  }
-  #scaler:hover .handle, #scaler.active .handle {
-    color: var(--text-hover);
-    background: var(--button-hover);
-    visibility: visible;
-    opacity: 1;
-    transform: scale(1) rotate(var(--rotate));
-    transition-timing-function: ease-out;
-  }
   #preview {
     position: absolute;
     right: 0;
@@ -1449,7 +1461,7 @@
     opacity: 0;
   }
   #preview.split {
-    --size: calc(50% - 8px);
+    --size: 50%;
   }
   #preview.preview {
     --size: 100%;
@@ -1541,7 +1553,7 @@
 
 <body>
 
-<svg id="symbols">
+<svg id="symbol_definitions">
   <symbol id="arrow" viewBox="0 0 512 512">
     <path d="m112.66 0 286.68 256-286.68 256z"/>
   </symbol>
@@ -1597,10 +1609,10 @@
 </svg>
 
 <header id="header">
-  <section class="title">
+  <section class="app-icon">
     <img src="resources/icon.svg">
   </section>
-  <section class="menubar">
+  <section class="menu-bar">
     <div class="dropdown">
       <button>File</button>
       <ul>
@@ -1689,17 +1701,17 @@
   <section id="workspace" class="text horizontal">
     <section id="files"></section>
   </section>
-  <section id="scaler" class="text horizontal">
-    <div class="handle">▲<br>▼</div>
-  </section>
+  <section id="scaler" class="text horizontal"></section>
   <iframe id="preview" class="text horizontal" src="about:blank"></iframe>
   <section id="card_backdrop"></section>
   <section id="settings_card" class="card modal">
-    <div class="header">
+    <section class="header">
+      <button class="nav back"><svg><use href="#back"/></svg></button>
       <span class="title">Settings</span>
+      <button class="nav minimize"><svg><use href="#minimize"/></svg></button>
       <button class="nav close"><svg><use href="#close"/></svg></button>
-    </div>
-    <div class="main">
+    </section>
+    <section class="main">
       <div class="content">
         <div class="item list start">
           <div class="select">
@@ -1741,15 +1753,16 @@
         <button id="clear_cache_button" class="warning hidden" onclick="clearCache();">Clear Cache</button>
         <button class="warning" onclick="resetSettings();">Reset Settings</button>
       </div>
-    </div>
+    </section>
   </section>
   <section id="theme_card" class="card modal">
-    <div class="header">
+    <section class="header">
       <button class="nav back" data-parent-card="settings_card"><svg><use href="#back"/></svg></button>
       <span class="title">Theme</span>
+      <button class="nav minimize"><svg><use href="#minimize"/></svg></button>
       <button class="nav close"><svg><use href="#close"/></svg></button>
-    </div>
-    <div class="main">
+    </section>
+    <section class="main">
       <div class="content">
         <div class="item list expand">
           <div data-numbered-container>
@@ -1760,32 +1773,32 @@
       <div class="options">
         <button onclick="resetTheme();">Reset Theme</button>
       </div>
-    </div>
+    </section>
   </section>
   <section id="reset_card" class="card notification">
-    <div class="header">
+    <section class="header">
       <img class="icon" src="resources/settings.svg">
       <span class="title">Reset Settings</span>
-    </div>
-    <div class="main">
+    </section>
+    <section class="main">
       <div class="content">
         <div class="item">Your settings have been reset!</div>
       </div>
-    </div>
+    </section>
   </section>
   <section id="clear_cache_success_card" class="card notification">
-    <div class="header">
+    <section class="header">
       <img class="icon" src="resources/template.svg">
       <span class="title">Cleared Cache</span>
-    </div>
-    <div class="main">
+    </section>
+    <section class="main">
       <div class="content">
         <div class="item">Successfully cleared offline cache!</div>
       </div>
-    </div>
+    </section>
   </section>
   <section id="editing_tools_card" class="card action">
-    <div class="main">
+    <section class="main">
       <div class="content">
         <div class="options">
           <button id="undo_tool" onclick="callCommand(Editor.query.file.textarea(),'undo'); this.focus();"><svg><use href="#undo"/></svg></button>
@@ -1793,15 +1806,16 @@
           <button id="refresh_tool" onclick="forceRefresh();" disabled><svg><use href="#refresh"/></svg></button>
         </div>
       </div>
-    </div>
+    </section>
   </section>
   <section id="replacer_card" class="card widget">
-    <div class="header">
+    <section class="header">
+      <button class="nav back"><svg><use href="#back"/></svg></button>
       <span class="title">Replace Text</span>
       <button class="nav minimize"><svg><use href="#minimize"/></svg></button>
       <button class="nav close"><svg><use href="#close"/></svg></button>
-    </div>
-    <div class="main">
+    </section>
+    <section class="main">
       <div class="content">
         <div class="item list expand">
           <div data-numbered-container>
@@ -1817,15 +1831,16 @@
         <button onclick="flipReplacer();">Flip</button>
         <button onclick="clearReplacer();">Clear</button>
       </div>
-    </div>
+    </section>
   </section>
   <section id="picker_card" class="card widget">
-    <div class="header">
+    <section class="header">
+      <button class="nav back"><svg><use href="#back"/></svg></button>
       <span class="title">Color Picker</span>
       <button class="nav minimize"><svg><use href="#minimize"/></svg></button>
       <button class="nav close"><svg><use href="#close"/></svg></button>
-    </div>
-    <div class="main">
+    </section>
+    <section class="main">
       <div class="content">
         <div class="item list">
           <div id="picker_preview"></div>
@@ -1845,15 +1860,16 @@
         <button onclick="insertPicker();">Insert</button>
         <button onclick="deletePicker();">Delete</button>
       </div>
-    </div>
+    </section>
   </section>
   <section id="formatter_card" class="card widget">
-    <div class="header">
+    <section class="header">
+      <button class="nav back"><svg><use href="#back"/></svg></button>
       <span class="title">JSON Formatter</span>
       <button class="nav minimize"><svg><use href="#minimize"/></svg></button>
       <button class="nav close"><svg><use href="#close"/></svg></button>
-    </div>
-    <div class="main">
+    </section>
+    <section class="main">
       <div class="content">
         <div class="item expand">
           <div class="expand" data-numbered-container>
@@ -1866,15 +1882,16 @@
         <button onclick="activateFormatter('');">Collapse</button>
         <button onclick="formatter_input.num_changeValue('');">Clear</button>
       </div>
-    </div>
+    </section>
   </section>
   <section id="encoder_card" class="card widget">
-    <div class="header">
+    <section class="header">
+      <button class="nav back"><svg><use href="#back"/></svg></button>
       <span class="title">URI Encoder</span>
       <button class="nav minimize"><svg><use href="#minimize"/></svg></button>
       <button class="nav close"><svg><use href="#close"/></svg></button>
-    </div>
-    <div class="main">
+    </section>
+    <section class="main">
       <div class="content">
         <div class="item expand">
           <div class="expand" data-numbered-container>
@@ -1893,7 +1910,7 @@
           <label for="component_setting"><svg><use href="#check"/></svg>Enable URI Component</label>
         </div>
       </div>
-    </div>
+    </section>
   </section>
   <section id="context_menu" class="dropdown context-menu">
     <ul>
@@ -2093,6 +2110,10 @@
       closeButton.addEventListener("click",() => closeCard(closeButton.parentElement.parentElement));
       closeButton.setAttribute("aria-label","Close");
     }
+    if (!Editor.environment.macOS_device || !minimizeButton || !closeButton) return;
+    var controlsBox = minimizeButton.parentElement;
+    controlsBox.insertBefore(minimizeButton,controlsBox.firstChild);
+    controlsBox.insertBefore(closeButton,controlsBox.firstChild);
     var navigable = getNavigableElements(card);
     card.addEventListener("keydown",event => {
       if (!card.classList.contains("modal")) return;
@@ -2318,7 +2339,7 @@
     });
   });
   document.body.addEventListener("dragend",() => document.querySelectorAll("textarea").forEach(textarea => textarea.num_refreshLineCount()));
-  var toolbar = document.querySelector("#header .menubar");
+  var toolbar = document.querySelector("#header .menu-bar");
   toolbar.querySelectorAll(".dropdown").forEach(dropdown => {
     dropdown.addEventListener("mouseenter",() => {
       if (toolbar.querySelectorAll(".dropdown:not(.alternate).active").length == 0 || dropdown.classList.contains("alternate") || dropdown.classList.contains("active")) return;
@@ -2386,11 +2407,11 @@
       });
     });
   }
-  if (Editor.appearance.parent_window != undefined){
+  if (Editor.appearance.parent_window){
     loadSettings("initial");
     loadTheme();
     window.setTimeout(() => document.documentElement.classList.remove("startup-fade"),50);
-    //if (!Editor.environment.touch_device) Editor.query.file.textarea().focus();
+    if (!Editor.environment.touch_device) Editor.query.file.textarea().focus();
   }
   if (Editor.environment.mozilla_browser){
     undo_tool.classList.add("hidden");
@@ -2557,7 +2578,7 @@
     });
   }
   function loadSettings(input){
-    //if (!Editor.appearance.parent_window) return;
+    if (!Editor.appearance.parent_window) return;
     var savedView = Editor.storage.getItem("view");
     if (savedView){
       if (input == "initial") changeView(savedView);
@@ -3276,15 +3297,15 @@
     if (scalingOffset > scalingRange.maximum) scalingOffset = scalingRange.maximum;
     main.setAttribute("data-scaling-offset",scalingOffset);
     if (Editor.orientation == "horizontal"){
-      workspace.style.width = `calc(${scalingOffset}px - 8px)`;
+      workspace.style.width = `${scalingOffset}px`;
       scaler.style.right = `calc(100% - ${scalingOffset}px - 8px)`;
-      preview.style.width = `calc(100% - ${scalingOffset}px - 8px)`;
+      preview.style.width = `calc(100% - ${scalingOffset}px)`;
       setFilesSectionOffset();
     }
     if (Editor.orientation == "vertical"){
-      workspace.style.height = `calc(${scalingOffset}px - 8px)`;
+      workspace.style.height = `calc(${scalingOffset}px)`;
       scaler.style.bottom = `calc(100% - ${scalingOffset}px - 8px)`;
-      preview.style.height = `calc(100% - ${scalingOffset}px - 8px)`;
+      preview.style.height = `calc(100% - ${scalingOffset}px)`;
     }
   }
   function removeScaling(event){
