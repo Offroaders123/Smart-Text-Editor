@@ -27,7 +27,7 @@
     {
       "action": "https://offroaders123.github.io/Smart-Text-Editor/",
       "accept": {
-        "text/*": [".txt",".html",".css",".js",".php",".json",".webmanifest",".xml",".yaml",".yml",".dist",".ini",".md",".markdown",".mcmeta",".lang",".properties",".h",".fragment",".vertex",".fxh",".hlsl",".ihlsl"],
+        "text/*": [".txt",".html",".css",".js",".php",".json",".webmanifest",".xml",".yaml",".yml",".dist",".config",".ini",".md",".markdown",".mcmeta",".lang",".properties",".uidx",".material",".h",".fragment",".vertex",".fxh",".hlsl",".ihlsl"],
         "image/svg+xml": [".svg"]
       }
     }
@@ -40,7 +40,7 @@
       "files": [
         {
           "name": "media",
-          "accept": ["text/*",".txt",".html",".css",".js",".php",".json",".webmanifest",".xml",".yaml",".yml",".dist",".ini",".md",".markdown",".mcmeta",".lang",".properties",".h",".fragment",".vertex",".fxh",".hlsl",".ihlsl","image/svg+xml",".svg"]
+          "accept": ["text/*",".txt",".html",".css",".js",".php",".json",".webmanifest",".xml",".yaml",".yml",".dist",".config",".ini",".md",".markdown",".mcmeta",".lang",".properties",".material",".h",".fragment",".vertex",".fxh",".hlsl",".ihlsl","image/svg+xml",".svg"]
         }
       ]
     }
