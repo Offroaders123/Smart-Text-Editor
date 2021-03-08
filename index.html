@@ -1083,38 +1083,6 @@
       });
     }
   });
-
-  function openMenu(menu,type){
-    if (menu.classList.contains("active")) return closeMenu(menu);
-    var opener = menu.querySelector(".opener");
-    menus.forEach(menu => {
-      if (menu.classList.contains("active")) closeMenu(menu);
-    });
-    menu.classList.add("active");
-    if (document.activeElement != opener && opener) opener.focus();
-    document.body.addEventListener("mousedown",catchMenuExit);
-    document.body.addEventListener("touchend",catchMenuExit);
-    function catchMenuExit(){
-      if (menu.contains(event.target)) return;
-      document.body.removeEventListener("mousedown",this);
-      document.body.removeEventListener("touchend",this);
-      closeMenu(menu);
-    }
-    if (!menu.classList.contains("context-menu")) return;
-    menu.style.left = `${event.pageX}px`;
-    menu.style.top = `${event.pageY}px`;
-  }
-  function closeMenu(menu){
-    var opener = menu.querySelector(".opener"), listParents = menu.querySelectorAll(".list-parent");
-    menu.classList.remove("active");
-    listParents.forEach(listParent => {
-      if (listParent.classList.contains("active")) listParent.classList.remove("active");
-    });
-    if (opener && opener != document.activeElement) opener.focus();
-    if (!menu.classList.contains("context-menu")) return;
-    
-  }
-
   document.querySelectorAll(".checkbox").forEach(checkbox => {
     var input = checkbox.querySelector("input[type='checkbox']");
     checkbox.addEventListener("click",() => input.click());
@@ -1752,8 +1720,75 @@
     });
   }
 
+  function openMenu(menu,type){
+    if (menu.classList.contains("active")) return closeMenu(menu);
+    var opener = menu.querySelector(".opener");
+    menus.forEach(menu => {
+      if (menu.classList.contains("active")) closeMenu(menu);
+    });
+    menu.classList.add("active");
+    if (document.activeElement != opener && opener) opener.focus();
+    document.body.addEventListener("mousedown",catchMenuExit);
+    document.body.addEventListener("touchend",catchMenuExit);
+    function catchMenuExit(){
+      if (menu.contains(event.target)) return;
+      document.body.removeEventListener("mousedown",this);
+      document.body.removeEventListener("touchend",this);
+      closeMenu(menu);
+    }
+    if (!menu.classList.contains("context-menu")) return;
+    if (Editor.context_menu_touch.timeout) Editor.context_menu_touch.timeout = null;
+    Editor.context_menu_previous = event.target;
+    menu.classList.add(type);
+    var location = {}, list = menu.querySelectorAll(".list")[0];
+    if (!Editor.environment.touch_device && !(event instanceof TouchEvent)){
+      location.left = event.pageX;
+      location.top = event.pageY;
+    } else {
+      location.left = event.touches[0].pageX;
+      location.top = event.touches[0].pageY;
+    }
+    if (location.left + list.offsetWidth > window.innerWidth) location.left -= list.offsetWidth;
+    if (location.top + list.offsetHeight > window.innerHeight) location.top -= list.offsetHeight;
+    menu.style.left = `${location.left}px`;
+    menu.style.top = `${location.top}px`;
+    //document.body.addEventListener("keydown",catchMenuNavigation);
+    var transitionDuration = parseInt(getElementStyle({
+      element: menu,
+      property: "transition-duration"
+    }).replace(/s/g,"") * 500);
+    window.setTimeout(() => document.activeElement.blur(),transitionDuration);
+  }
+  function closeMenu(menu){
+    var opener = menu.querySelector(".opener"), listParents = menu.querySelectorAll(".list-parent");
+    menu.classList.remove("active");
+    listParents.forEach(listParent => {
+      if (listParent.classList.contains("active")) listParent.classList.remove("active");
+    });
+    if (opener && opener != document.activeElement) opener.focus();
+    if (!menu.classList.contains("context-menu")) return;
+    
+  }
+  function catchMenuNavigation(){
+  }
+
+
 
 /*
+  function catchContextMenuNavigation(event){
+    event.stopPropagation();
+    if (!context_menu.classList.contains("active") || document.activeElement != document.body) return;
+    var navigable = getNavigableElements(context_menu);
+    if (event.key == "Tab") event.preventDefault();
+    if (event.key == "ArrowUp"){
+      event.preventDefault();
+      navigable[navigable.length - 1].focus();
+    }
+    if (event.key == "ArrowDown"){
+      event.preventDefault();
+      navigable[0].focus();
+    }
+  }
   function openContextMenu(event,type){
     event.preventDefault();
     event.stopPropagation();
