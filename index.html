@@ -5,7 +5,7 @@
 
 <title>Smart Text Editor</title>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="author" content="Brandon Bennett">
 <meta name="description" content="The text editor that requires only a browser and a keyboard!">
 <meta name="google-site-verification" content="_LrfHy7pIualH1TolkQ5b3Po0dtjYrx-QQsiXelwx20">
@@ -52,7 +52,7 @@
   window.Editor = {
     appearance: () => {
       var parent_window = (window.self == window.top),
-          standalone = (window.matchMedia("(display-mode: standalone)").matches || "standalone" in navigator || !window.menubar.visible),
+          standalone = (window.matchMedia("(display-mode: standalone)").matches || navigator.standalone || !window.menubar.visible),
           hidden_chrome = (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight),
           fullscreen = (window.matchMedia("(display-mode: fullscreen)").matches || (!window.screenY && !window.screenTop && hidden_chrome) || (!window.screenY && !window.screenTop && standalone));
       return { parent_window, standalone, hidden_chrome, fullscreen };
@@ -106,21 +106,17 @@
     dialog_previous: null,
     active_widget: null,
     context_menu_previous: null,
-    context_menu_touch: {
-      timeout: null,
-      selection: null
-    },
+    context_menu_timeout: null,
     picker_color: null,
     insert_color: false,
     install_prompt: null
   };
-  //var sourceChange = false;
   //if (Editor.appearance().parent_window) document.documentElement.classList.add("startup-fade");
-  //if (Editor.environment().touch_device) document.documentElement.classList.add("touch-device");
+  if (Editor.environment().touch_device) document.documentElement.classList.add("touch-device");
   if (Editor.environment().apple_device) document.documentElement.classList.add("apple-device");
   if (Editor.environment().macOS_device) document.documentElement.classList.add("macOS-device");
   if (Editor.environment().electron_container) document.documentElement.classList.add("electron-container");
-  //if (Editor.support().web_sharing) document.documentElement.classList.add("web-sharing");
+  if (Editor.support().web_sharing) document.documentElement.classList.add("web-sharing");
 </script>
 
 <style>
@@ -130,6 +126,12 @@
     box-sizing: border-box;
   }
   :root {
+    --selection-color: #0a0a0a;
+    --selection-background: #b4d5ffbf;
+    --selection-background-inactive: #ccccccbf;
+  }
+  :root:-moz-window-inactive {
+    --selection-background: var(--selection-background-inactive);
   }
   html {
     position: fixed;
@@ -162,15 +164,18 @@
     padding-left: 8px;
     position: relative;
     display: flex;
-    gap: 8px;
     align-items: center;
+    gap: 8px;
     background: hsl(0,0%,14%);
+    border-bottom: 1px solid #00000040;
   }
   :root.apple-device header {
-    border-bottom: 1px solid #000000;
+    border-color: #000000;
   }
   :root.macOS-device.electron-container header {
+    padding-top: 1px;
     padding-left: 68px;
+    padding-right: 1px;
   }
   body[data-scaling-active] header {
     pointer-events: none;
@@ -253,7 +258,7 @@
     background: #94141e;
   }
   :root.macOS-device.electron-container header .window-controls .control {
-    height: 28px;
+    height: 27px;
   }
   main {
     position: relative;
@@ -269,7 +274,11 @@
     top: 0;
     display: flex;
     flex-direction: column;
-    --workspace-background: hsl(0,0%,11%);
+    --workspace-background: hsl(0,0%,12%);
+    --workspace-accent: #ffffff10;
+  }
+  :root.apple-device main .workspace {
+    --workspace-accent: #ffffff20;
   }
   body.code main .workspace {
     width: 100%;
@@ -306,12 +315,10 @@
     flex-shrink: 0;
     display: flex;
     gap: 3px;
+    box-shadow: 0 -1px 0 inset var(--workspace-accent), 0 -1px 0 inset var(--workspace-background);
     overflow-x: auto;
     scroll-behavior: smooth;
     scrollbar-width: none;
-  }
-  :root.apple-device main .workspace .workspace-tabs {
-    box-shadow: 0 -1px 0 inset #ffffff20, 0 -1px 0 inset var(--workspace-background);
   }
   main .workspace .workspace-tabs::-webkit-scrollbar {
     display: none;
@@ -323,6 +330,7 @@
     padding-bottom: calc(7px - var(--tab-border-width));
     flex-shrink: 0;
     gap: 6px;
+    color: #aaaaaa;
     font-size: 12px;
     background: none;
     outline: none;
@@ -331,12 +339,11 @@
     border-bottom-color: #ffffff80;
   }
   main .workspace .workspace-tabs .tab.active {
+    color: #e8e8e8;
     background: var(--workspace-background);
-  }
-  :root.apple-device main .workspace .workspace-tabs .tab.active {
-    border-left-color: #ffffff20;
-    border-top-color: #ffffff20;
-    border-right-color: #ffffff20;
+    border-left-color: var(--workspace-accent);
+    border-top-color: var(--workspace-accent);
+    border-right-color: var(--workspace-accent);
   }
   main .workspace .workspace-tabs .tab[data-editor-unsaved] {
     font-style: italic;
@@ -468,7 +475,8 @@
   }
   [data-numbered-container], input[type="text"] {
     font-size: 13px;
-    color: hsl(0,0%,83%);
+    color: #e8e8e8;
+    caret-color: currentColor;
     font-family: "Cousine", monospace;
     background: hsl(0,0%,11%);
     border: none;
@@ -497,6 +505,13 @@
     border-radius: 0;
     line-height: normal;
     -webkit-appearance: none;
+  }
+  ::selection {
+    color: var(--selection-color);
+    background: var(--selection-background);
+  }
+  ::selection:window-inactive {
+    background: var(--selection-background-inactive);
   }
   ::-webkit-scrollbar {
     width: 16px;
@@ -571,7 +586,7 @@
     left: 0;
     top: 100%;
     font-size: 13px;
-    background: hsl(0,0%,16%);
+    background: hsl(0,0%,17%);
     border: var(--list-border) solid #00000030;
     --list-border: 1px;
     border-radius: calc(var(--list-padding-y) + var(--list-border));
@@ -596,6 +611,7 @@
     position: relative;
     display: flex;
     align-items: center;
+    gap: 8px;
     border: var(--list-item-border) solid transparent;
     --list-item-border: 1px;
     outline: none;
@@ -612,13 +628,12 @@
     border-color: #c0c0c0;
   }
   .menu .list-item.hidden {
-    display: none;
+    //display: none;
   }
   .menu.context-menu.window > .list .list-item:not(.window), .menu.context-menu.editor-tab > .list .list-item:not(.editor-tab), .menu.context-menu.link > .list .list-item:not(.link), .menu.context-menu.editing > .list .list-item:not(.editing), :root:not(.web-sharing) .menu.context-menu > .list .list-item.web-sharing, :root.web-sharing .menu.context-menu > .list .list-item.web-sharing-alt {
     display: none;
   }
   .menu .list-item > img {
-    margin-right: 8px;
     width: 16px;
     aspect-ratio: 1/1;
   }
@@ -630,7 +645,7 @@
   }
   .menu .list-item .info {
     margin-left: auto;
-    padding-left: 16px;
+    padding-left: 8px;
     font-size: 12px;
     opacity: 0.45;
     pointer-events: none;
@@ -722,10 +737,22 @@
     min-width: 100%;
   }
   .checkbox {
+    margin: calc(var(--checkbox-padding) * -1);
+    padding: var(--checkbox-padding);
+    --checkbox-padding: 3px;
     display: flex;
     justify-content: center;
     align-items: center;
+    border: var(--checkbox-border) solid transparent;
+    --checkbox-border: 1px;
+    border-radius: calc(var(--checkbox-padding) * 2);
     outline: none;
+  }
+  .checkbox:active {
+    opacity: 0.75;
+  }
+  .checkbox:focus-visible {
+    border-color: currentColor;
   }
   .checkbox input[type="checkbox"] {
     display: none;
@@ -745,7 +772,7 @@
     fill: transparent;
     border: var(--check-border-width) solid currentColor;
     --check-border-width: 2px;
-    border-radius: calc(2px + var(--check-padding) + var(--check-border-width));
+    border-radius: calc(1px + var(--check-padding) + var(--check-border-width));
   }
   .checkbox input[type="checkbox"]:checked + label .check {
     fill: currentColor;
@@ -786,7 +813,7 @@
   .card .header {
     display: flex;
     align-items: center;
-    background: #ffffff10;
+    background: #ffffff14;
   }
   :root.apple-device .card .header {
     border-bottom: 1px solid #000000;
@@ -815,13 +842,16 @@
   }
   .card .header .title {
     margin: 0 auto;
-    font-size: 14px;
+  }
+  :root.macOS-device .card .header .title {
+    margin-left: 16px;
+    font-weight: bold;
   }
   .card .header .card-controls {
     display: flex;
   }
   :root.macOS-device .card .header .card-controls {
-    margin: 4px;
+    margin: 8px;
     padding: 4px;
     gap: 8px;
   }
@@ -878,38 +908,88 @@
   }
   :root.macOS-device .card .header .card-controls:where(:hover,:active) .control svg {
     color: #202020bf;
+  }/*
+  .card .header .option {
+    margin-right: 8px;
+    padding: 2px 4px;
+    font-size: 11px;
+    background: none;
+    border: 1px solid #ffffff40;
+    border-radius: 4px;
+    outline: none;
   }
+  .card .header .option:where(:active,:focus-visible) {
+    background: #ffffff20;
+  }*/
   .card .main {
     padding: 12px;
     display: flex;
     flex-direction: column;
+    gap: 12px;
   }
   .card .main .content {
     display: flex;
     justify-content: space-around;
   }
   .card .main .content .item {
-    gap: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 8px;
+  }
+  .card .main .content .item.start {
+    align-items: flex-start;
   }
   .card .options {
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 8px;
   }
   .card .options button {
-    padding: 4px 6px;
+    padding: 3px 8px;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: hsl(0,0%,20%);
+    gap: 8px;
+    background: hsl(0,0%,22%);
     border: 1px solid transparent;
+    border-radius: 4px;
+    outline: none;
   }
-  .card .options button > svg {
+  .card .options button:where(:active,:focus-visible) {
+    background: hsl(0,0%,28%);
+  }
+  .card .options button:focus-visible {
+    border-color: currentColor;
+  }
+  .card .options button.hidden {
+    //display: none;
+  }
+  .card .options button > img {
     width: 16px;
     aspect-ratio: 1/1;
+  }
+  .card .options button > svg {
+    width: 12px;
+    aspect-ratio: 1/1;
+    fill: currentColor;
+  }
+  .card [data-numbered-container] {
+    width: 32ch;
+    height: 16ch;
+    background: #ffffff0c;
+    border: 1px solid #00000080;
+    border-radius: 6px;
+  }
+  .card [data-numbered-container] ol {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .card input[type="text"] {
+    background: #ffffff0c;
+    border: 1px solid #00000080;
+    border-radius: 6px;
   }
   .card-backdrop {
     position: fixed;
@@ -926,6 +1006,12 @@
   }
   #symbol_definitions {
     display: none;
+  }
+  #install_button + button::before {
+    content: "Theme";
+  }
+  #install_button.hidden + button::before {
+    content: "Customize Theme";
   }
 </style>
 
@@ -1031,10 +1117,10 @@
       <button class="opener">Tools</button>
       <ul class="list">
         <li class="list-item" onclick="openCard(editing_tools_card);">Editing Tools<span class="info shortcut ctrl-shift shift-command">E</span></li>
-        <li class="list-item" onclick="openCard(replacer_card);">Replace Text<span class="info shortcut ctrl-shift shift-command">F</span></li>
-        <li class="list-item" onclick="openCard(picker_card);">Color Picker<span class="info shortcut ctrl-shift shift-command">K</span></li>
-        <li class="list-item" onclick="openCard(formatter_card);">JSON Formatter<span class="info shortcut ctrl-shift shift-command">G</span></li>
-        <li class="list-item" onclick="openCard(encoder_card);">URI Encoder<span class="info shortcut ctrl-shift shift-command">Y</span></li>
+        <li class="list-item" onclick="openCard(replace_text_card);">Replace Text<span class="info shortcut ctrl-shift shift-command">F</span></li>
+        <li class="list-item" onclick="openCard(color_picker_card);">Color Picker<span class="info shortcut ctrl-shift shift-command">K</span></li>
+        <li class="list-item" onclick="openCard(json_formatter_card);">JSON Formatter<span class="info shortcut ctrl-shift shift-command">G</span></li>
+        <li class="list-item" onclick="openCard(uri_encoder_card);">URI Encoder<span class="info shortcut ctrl-shift shift-command">Y</span></li>
         <li class="list-item" onclick="confirmOverwrite(insertTemplate);">Import HTML Template<span class="info shortcut ctrl-shift shift-command">H</span></li>
         <li class="list-item list-parent">Online Resources...<svg class="info"><use href="#arrow_icon"/></svg>
           <ul class="list">
@@ -1154,7 +1240,7 @@
       </div>
     </section>
   </section>
-  <section id="reset_card" class="card alert" data-card="alert">
+  <section id="reset_settings_card" class="card alert" data-card="alert">
     <section class="header">
       <img class="icon" src="resources/settings.svg">
       <span class="title">Reset Settings</span>
@@ -1165,7 +1251,7 @@
       </div>
     </section>
   </section>
-  <section id="clear_cache_success_card" class="card alert" data-card="alert">
+  <section id="cleared_cache_card" class="card alert" data-card="alert">
     <section class="header">
       <img class="icon" src="resources/template.svg">
       <span class="title">Cleared Cache</span>
@@ -1187,7 +1273,7 @@
       </div>
     </section>
   </section>
-  <section id="replacer_card" class="card widget" data-card="widget">
+  <section id="replace_text_card" class="card widget" data-card="widget">
     <section class="header">
       <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">Replace Text</span>
@@ -1214,7 +1300,7 @@
       </div>
     </section>
   </section>
-  <section id="picker_card" class="card widget" data-card="widget">
+  <section id="color_picker_card" class="card widget" data-card="widget">
     <section class="header">
       <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">Color Picker</span>
@@ -1245,7 +1331,7 @@
       </div>
     </section>
   </section>
-  <section id="formatter_card" class="card widget" data-card="widget">
+  <section id="json_formatter_card" class="card widget" data-card="widget">
     <section class="header">
       <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">JSON Formatter</span>
@@ -1269,7 +1355,7 @@
       </div>
     </section>
   </section>
-  <section id="encoder_card" class="card widget" data-card="widget">
+  <section id="uri_encoder_card" class="card widget" data-card="widget">
     <section class="header">
       <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">URI Encoder</span>
@@ -1500,7 +1586,7 @@
     cardControls.insertBefore(close,minimize);
     header.insertBefore(cardControls,header.firstChild);
   });
-  picker_card.querySelectorAll("input[type='range']").forEach(channel => {
+  color_picker_card.querySelectorAll("input[type='range']").forEach(channel => {
     channel.addEventListener("input",refreshChannels);
     channel.min = "0";
     channel.max = "255";
@@ -1521,7 +1607,7 @@
           }));
         });
       }
-      if (event.data.action == "clear-cache-success") openCard(clear_cache_success_card);
+      if (event.data.action == "clear-cache-success") openCard(cleared_cache_card);
     });
     clear_cache_option.classList.remove("hidden");
     clear_cache_button.classList.remove("hidden");
@@ -1640,22 +1726,22 @@
     if ((controlShift || shiftCommand) && pressed("f")){
       event.preventDefault();
       if (event.repeat) return;
-      openCard(replacer_card);
+      openCard(replace_text_card);
     }
     if ((controlShift || shiftCommand) && pressed("k")){
       event.preventDefault();
       if (event.repeat) return;
-      openCard(picker_card);
+      openCard(color_picker_card);
     }
     if ((controlShift || shiftCommand) && pressed("g")){
       event.preventDefault();
       if (event.repeat) return;
-      openCard(formatter_card);
+      openCard(json_formatter_card);
     }
     if ((controlShift || shiftCommand) && pressed("y")){
       event.preventDefault();
       if (event.repeat) return;
-      openCard(encoder_card);
+      openCard(uri_encoder_card);
     }
     if ((controlShift || shiftCommand) && pressed("h")){
       event.preventDefault();
@@ -2152,7 +2238,7 @@
       window.setTimeout(() => navigable[0].focus(),20);
     }*/
     if (!menu.classList.contains("context-menu")) return;
-    if (Editor.context_menu_touch.timeout) Editor.context_menu_touch.timeout = null;
+    if (Editor.context_menu_timeout) Editor.context_menu_timeout = null;
     Editor.context_menu_previous = event.target;
     menu.classList.add(type);
     var location = {};
@@ -2260,18 +2346,14 @@
       }
     });
     element.addEventListener("touchstart",event => {
-      if (event.touches.length != 1) return;
-      Editor.context_menu_touch.timeout = window.setTimeout(() => element.dispatchEvent(new MouseEvent("contextmenu")),750);
-      if (window.getSelection() != "") Editor.context_menu_touch.selection = window.getSelection();
+      if (event.touches.length == 1) Editor.context_menu_timeout = window.setTimeout(() => element.dispatchEvent(new MouseEvent("contextmenu")),750);
     });
     element.addEventListener("touchmove",negateContextMenu);
     element.addEventListener("touchend",negateContextMenu);
     function negateContextMenu(){
-      if (Editor.context_menu_touch.timeout){
-        window.clearTimeout(Editor.context_menu_touch.timeout);
-        Editor.context_menu_touch.timeout = null;
-      }
-      if (Editor.context_menu_touch.selection) Editor.context_menu_touch.selection = null;
+      if (!Editor.context_menu_timeout) return;
+      window.clearTimeout(Editor.context_menu_timeout);
+      Editor.context_menu_timeout = null;
     }
   }/*
   function sendShortcutAction({ control, command, shift, controlShift, shiftCommand, controlCommand, key } = {}){
