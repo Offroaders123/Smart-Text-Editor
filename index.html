@@ -120,8 +120,8 @@
   if (Editor.support().web_sharing) document.documentElement.classList.add("web-sharing");*/
 </script>
 
-<style>svg, img { width: 16px; height: 16px; }
-  *, *::before, *::after {//transition: 0.5s linear;
+<style>
+  *, *::before, *::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -134,14 +134,15 @@
     height: 100%;
     overflow: hidden;
   }
-  body {
+  body {background: black;
     position: relative;
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Tahoma", sans-serif;
-    overflow: auto;//overflow: hidden;
+    color: hsl(0,0%,80%);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Tahoma", "Roboto", sans-serif;
+    overflow: hidden;
     user-select: none;
     -webkit-user-select: none;
   }
@@ -152,8 +153,13 @@
     cursor: row-resize;
   }
   header {
+    padding-left: 8px;
     position: relative;
     display: flex;
+    gap: 8px;
+    align-items: center;
+    background: hsl(0,0%,12%);
+    z-index: 2;
   }
   body[data-scaling-active] header {
     pointer-events: none;
@@ -163,33 +169,62 @@
     margin-bottom: 0;
     --app-region-margin: 2px;
     position: absolute;
+    left: 0;
+    top: 0;
     width: calc(100% - var(--app-region-margin) * 2);
     height: calc(100% - var(--app-region-margin));
     z-index: -1;
     -webkit-app-region: drag;
   }
-  header .menubar {
+  header .app-icon {
+    flex-shrink: 0;
+    width: 16px;
+    aspect-ratio: 1/1;
     display: flex;
   }
-  header .menubar .menu .opener {
-    background: none;
-    border: none;
-    //outline: none;
-  }
-  header .window-controls {
-    margin-left: auto;
+  header .menubar {
     height: 100%;
     display: flex;
+    -webkit-app-region: no-drag;
   }
-  header .window-controls .control {
+  header .menubar .menu .opener {
+    padding: 0 8px;
     background: none;
     border: none;
     outline: none;
   }
+  header .menubar .menu .opener:is(:hover,:focus-visible), header .menubar .menu.active .opener {
+    background: #ffffff20;
+  }
+  header .window-controls {
+    margin-left: auto;
+    height: 100%;
+    flex-shrink: 0;
+    display: flex;
+    -webkit-app-region: no-drag;
+  }
+  header .window-controls .control {
+    padding: 8px 16px;
+    background: none;
+    border: none;
+    outline: none;
+    transition: 50ms linear;
+    transition-property: color, background;
+  }
+  header .window-controls .control:is(:hover,:focus-visible) {
+    background: #ffffff20;
+  }
+  header .window-controls .control[data-control="maximize"] [data-icon]:not(.active) {
+    //display: none;
+  }
+  header .window-controls .control[data-control="close"]:is(:hover,:focus-visible) {
+    color: #ffffff;
+    background: #e81123;
+  }
   main {
     position: relative;
     flex-grow: 1;
-    //overflow: hidden;
+    overflow: hidden;
   }
   main .workspace {
     position: absolute;
@@ -238,14 +273,14 @@
   main .workspace .workspace-tabs::-webkit-scrollbar {
     display: none;
   }
-  main .workspace .workspace-tabs .tab.active {background: lightblue;
+  main .workspace .workspace-tabs .tab:is(:focus-visible,.active) {
   }
   main .workspace .workspace-editors {
     position: relative;
     width: 100%;
     height: 100%;
   }
-  main .workspace .editor {color: white;background: #333;
+  main .workspace .editor {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -257,13 +292,12 @@
   main .workspace .editor.active {
     visibility: visible;
   }
-  main .scaler {background: #555;
+  main .scaler {
     position: absolute;
     touch-action: none;
     z-index: 1;
   }
   main .scaler:hover, body[data-scaling-active] main .scaler {
-    //background-color: #555;
   }
   body.horizontal main .scaler {
     top: 0;
@@ -311,7 +345,7 @@
     width: 100%;
     height: 50%;
     background: #ffffff;
-    border: none;background: lightgray;
+    border: none;
   }
   body.code.horizontal main .preview {
     width: 0%;
@@ -344,11 +378,18 @@
     transition: none;
   }
   button {
+    color: inherit;
     font-family: inherit;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
   }
   [data-numbered-container], input[type="text"] {
     font-size: 13px;
-    font-family: monospace;
+    color: hsl(0,0%,95%);
+    font-family: "Cousine", monospace;
+    background: hsl(0,0%,15%);
     border: none;
     outline: none;
   }
@@ -377,8 +418,20 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 2px solid gray;
-    border-radius: 6px 6px 0 0;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  .tab .option {
+    background: none;
+    border: none;
+  }
+  .tab .option svg {
+    width: 12px;
+    aspect-ratio: 1/1;
+    fill: currentColor;
   }
   .menu {
     position: relative;
@@ -395,30 +448,80 @@
     justify-content: center;
     align-items: center;
   }
-  .menu .list {background: gray;
+  .menu .list {
+    padding: var(--list-padding-y) var(--list-padding-x);
+    --list-padding-x: 0px;
+    --list-padding-y: 5px;
     position: absolute;
     left: 0;
     top: 100%;
+    font-size: 13px;
+    background: hsl(0,0%,14%);
+    border: var(--list-border) solid #ffffff20;border-color: #00000020;
+    --list-border: 1px;
+    border-radius: calc(var(--list-padding-y) + var(--list-border));
+    box-shadow: 1px 2px 4px #00000080;
     visibility: hidden;
     z-index: 1;
     list-style: none;
   }
+  .menu:not(.context-menu) > .list {
+    border-top: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
   .menu .list-item {
+    padding: calc(var(--list-item-padding-y) - var(--list-item-border)) calc(var(--list-item-padding-x) - var(--list-item-border));
+    --list-item-padding-x: 12px;
+    --list-item-padding-y: 3px;
     position: relative;
     display: flex;
     align-items: center;
+    border: var(--list-item-border) solid transparent;
+    --list-item-border: 1px;
+    outline: none;
     white-space: nowrap;
+  }
+  .menu .list-item:is(:hover,:focus-visible) {
+    background: #ffffff20;
+  }
+  .menu .list-item:focus-visible {
+    border-color: cyan;
   }
   .menu .list-item.hidden {
     display: none;
   }
+  .menu .list-item > img {
+    padding-right: 8px;
+    box-sizing: content-box;
+    width: 16px;
+    aspect-ratio: 1/1;
+  }
+  .menu .list-item > img.invert {
+    filter: invert() hue-rotate(180deg);
+  }
   .menu .list-item .info {
     margin-left: auto;
+    padding-left: 16px;
+    font-size: 12px;
+    opacity: 0.45;
     pointer-events: none;
   }
+  .menu .list-item svg.info {
+    box-sizing: content-box;
+    width: 12px;
+    aspect-ratio: 1/1;
+    fill: currentColor;
+  }
+  .menu .list-parent.active {
+    background: #ffffff20;
+  }
+  .menu .list-parent:is(:hover,:focus-visible,.active) > svg.info {
+    opacity: 1;
+  }
   .menu .list .list {
-    left: 100%;
-    top: 0;
+    left: calc(100% + var(--list-padding-x) + var(--list-border) + var(--list-item-border));
+    top: calc(calc(var(--list-padding-y) + var(--list-border) + var(--list-item-border)) * -1);
   }
   .menu.active > .list, .menu .list-parent.active > .list {
     visibility: visible;
@@ -448,6 +551,16 @@
   }
   .select .menu .opener {
     justify-content: space-between;
+    background: hsl(0,0%,22%);
+    border: none;
+    outline: none;
+  }
+  .select .menu .opener svg {
+    margin-left: 12px;
+    width: 12px;
+    aspect-ratio: 1/1;
+    fill: currentColor;
+    transform: rotate(90deg);
   }
   .checkbox {
     display: flex;
@@ -472,7 +585,9 @@
   .card {
     display: flex;
     flex-direction: column;
-    background: gray;
+    background: hsl(0,0%,11%);
+    border: 1px solid #00000020;
+    box-shadow: 1px 2px 4px #00000020;
     visibility: hidden;
   }
   .card.active {
@@ -537,13 +652,25 @@
     justify-content: center;
     align-items: center;
   }
+  .card .options button {
+    padding: 4px 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: hsl(0,0%,20%);
+    border: 1px solid transparent;
+  }
+  .card .options button > svg {
+    width: 16px;
+    aspect-ratio: 1/1;
+  }
   .card-backdrop {
     position: fixed;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background: #00000040;
+    background: hsl(0,0%,0%,0.25);
     visibility: hidden;
     z-index: 2;
   }
@@ -687,12 +814,12 @@
     </div>
   </section>
   <section class="window-controls">
-    <button class="control" data-control="minimize">&mdash;</button>
-    <button class="control" data-control="maximize">
+    <button class="control" data-control="minimize" title="Minimize">&mdash;</button>
+    <button class="control" data-control="maximize" title="Maximize">
       <span data-icon="maximize">&#9744;</span>
       <!--span data-icon="restore">&#10064;</span-->
     </button>
-    <button class="control" data-control="close">&#10005;</button>
+    <button class="control" data-control="close" title="Close">&#10005;</button>
   </section>
 </header>
 
@@ -1156,9 +1283,11 @@
     },100);
   });
   //window.addEventListener("orientationchange",refreshScreenSafeArea);
-  window.addEventListener("blur",() => menus.forEach(menu => {
-    if (menu.classList.contains("active")) closeMenu(menu);
-  }));
+  window.addEventListener("blur",() => {
+    if (Editor.appearance().parent_window) menus.forEach(menu => {
+      if (menu.classList.contains("active")) closeMenu(menu);
+    });
+  });
   document.body.addEventListener("keydown",event => {
     var pressed = key => (event.key.toLowerCase() == key.toLowerCase()), control = (event.ctrlKey && !Editor.environment().apple_device), command = (event.metaKey && Editor.environment().apple_device), shift = (event.shiftKey || ((event.key.toUpperCase() == event.key) && (event.key + event.key == event.key * 2))), controlShift = (control && shift), shiftCommand = (shift && command), controlCommand = (event.ctrlKey && command);
     if (pressed("Escape")){
@@ -1398,6 +1527,7 @@
     });
     editorName.setAttribute("data-editor-name",name);
     editorName.innerText = name;
+    editorRename.classList.add("option");
     editorRename.innerHTML = "<svg><use href='#rename_icon'/></svg>";
     editorRename.addEventListener("click",event => {
       event.stopPropagation();
@@ -1405,6 +1535,7 @@
         identifier: identifier
       });
     });
+    editorClose.classList.add("option");
     editorClose.innerHTML = "<svg><use href='#close_icon'/></svg>";
     editorClose.addEventListener("click",event => {
       event.stopPropagation();
