@@ -134,15 +134,16 @@
     height: 100%;
     overflow: hidden;
   }
-  body {background: black;
+  body {
     position: relative;
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
-    color: hsl(0,0%,80%);
+    color: hsl(0,0%,85%);
     font-size: 13.3px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Tahoma", "Roboto", sans-serif;
+    background: #121212;
     overflow: hidden;
     user-select: none;
     -webkit-user-select: none;
@@ -159,8 +160,11 @@
     display: flex;
     gap: 8px;
     align-items: center;
-    background: hsl(0,0%,12%);
+    background: hsl(0,0%,13%);
     z-index: 2;
+  }
+  :root.apple-device header {
+    border-bottom: 1px solid #000000;
   }
   body[data-scaling-active] header {
     pointer-events: none;
@@ -392,9 +396,9 @@
   }
   [data-numbered-container], input[type="text"] {
     font-size: 13px;
-    color: hsl(0,0%,90%);
+    color: hsl(0,0%,83%);
     font-family: "Cousine", monospace;
-    background: hsl(0,0%,16%);
+    background: hsl(0,0%,11%);
     border: none;
     outline: none;
   }
@@ -482,8 +486,8 @@
     left: 0;
     top: 100%;
     font-size: 13px;
-    background: hsl(0,0%,14%);
-    border: var(--list-border) solid #ffffff20;border-color: #00000020;
+    background: hsl(0,0%,16%);
+    border: var(--list-border) solid #00000020;
     --list-border: 1px;
     border-radius: calc(var(--list-padding-y) + var(--list-border));
     box-shadow: 1px 2px 4px #00000080;
@@ -493,7 +497,7 @@
   }
   :root.apple-device .menu .list {
     --list-padding-x: 5px;
-    border-color: #ffffff20;
+    border-color: #ffffff30;
   }
   .menu:not(.context-menu) > .list {
     border-top: none;
@@ -517,22 +521,24 @@
     border-radius: calc(var(--list-padding-y) - var(--list-border));
   }
   .menu .list-item:is(:hover,:focus-visible) {
-    background: #ffffff20;
+    background: hsl(213,94%,43%,0.75);
   }
   .menu .list-item:focus-visible {
-    border-color: cyan;
+    border-color: #c0c0c0;
   }
   .menu .list-item.hidden {
     display: none;
   }
   .menu .list-item > img {
-    padding-right: 8px;
-    box-sizing: content-box;
+    margin-right: 8px;
     width: 16px;
     aspect-ratio: 1/1;
   }
   .menu .list-item > img.invert {
     filter: invert() hue-rotate(180deg);
+  }
+  .menu .list-item > img.rounded {
+    border-radius: 3px;
   }
   .menu .list-item .info {
     margin-left: auto;
@@ -547,8 +553,11 @@
     aspect-ratio: 1/1;
     fill: currentColor;
   }
+  .menu .list-item:not(.list-parent):is(:hover,:focus-visible) .info {
+    opacity: 1;
+  }
   .menu .list-parent.active {
-    background: #ffffff20;
+    background: hsl(213,94%,43%,0.75);
   }
   .menu .list-parent:is(:hover,:focus-visible,.active) > svg.info {
     opacity: 1;
@@ -583,26 +592,43 @@
     justify-content: center;
   }
   .select label {
+    margin-right: 4px;
     display: flex;
     align-items: center;
   }
   .select .menu .opener {
+    padding: 2px 8px;
     justify-content: space-between;
     background: hsl(0,0%,22%);
-    border: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
     outline: none;
   }
+  .select .menu .opener:is(:hover,:focus-visible), .select .menu.active .opener {
+    background: hsl(0,0%,30%);
+  }
+  .select .menu .opener:focus-visible {
+    border-color: #c0c0c0;
+  }
+  .select .menu.active .opener {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
   .select .menu .opener svg {
-    margin-left: 12px;
-    width: 12px;
+    margin-left: 10px;
+    width: 10px;
     aspect-ratio: 1/1;
     fill: currentColor;
-    transform: rotate(90deg);
+    transform: rotate(270deg);
+  }
+  .select .menu > .list {
+    min-width: 100%;
   }
   .checkbox {
     display: flex;
     justify-content: center;
     align-items: center;
+    outline: none;
   }
   .checkbox input[type="checkbox"] {
     display: none;
@@ -614,23 +640,32 @@
     pointer-events: none;
   }
   .checkbox label .check {
+    margin-right: 4px;
+    padding: var(--check-padding);
+    --check-padding: 2px;
+    width: calc(16px + var( --check-padding) + var(--check-border-width));
+    aspect-ratio: 1/1;
     fill: transparent;
+    border: var(--check-border-width) solid currentColor;
+    --check-border-width: 2px;
+    border-radius: calc(2px + var( --check-padding) + var( --check-border-width));
   }
   .checkbox input[type="checkbox"]:checked + label .check {
-    fill: unset;
+    fill: currentColor;
   }
   .card {
     display: flex;
     flex-direction: column;
-    background: hsl(0,0%,11%);
+    background: hsl(0,0%,13%);
     border: 1px solid #00000020;
-    border-radius: 8px;
+    border-radius: 4px;
     box-shadow: 1px 2px 4px #00000020;
     visibility: hidden;
     overflow: hidden;
   }
   :root.apple-device .card {
     border-color: #ffffff30;
+    border-radius: 8px;
   }
   .card.active {
     visibility: visible;
@@ -654,19 +689,21 @@
   .card .header {
     display: flex;
     align-items: center;
-    background: #ffffff08;
+    background: #ffffff10;
   }
   :root.apple-device .card .header {
     border-bottom: 1px solid #000000;
   }
   .card .header .card-back {
+    padding: 8px;
     display: flex;
     background: none;
     border: none;
     outline: none;
   }
-  :root:not(.macOS-device) .card .header .card-back {
-    padding: 8px 12px;
+  :root.macOS-device .card .header .card-back {
+    padding: 4px;
+    border-radius: 4px;
   }
   .card .header .card-back:not([data-card-parent]) {
     display: none;
@@ -675,16 +712,13 @@
     background: #ffffff20;
   }
   .card .header .card-back svg {
-    width: 13px;
+    width: 12px;
     aspect-ratio: 1/1;
     fill: currentColor;
   }
-  :root.macOS-device .card .header .card-back svg {
-    width: 24px;
-  }
   .card .header .title {
     margin: 0 auto;
-    font-size: 15px;
+    font-size: 14px;
   }
   .card .header .card-controls {
     display: flex;
@@ -701,7 +735,7 @@
     outline: none;
   }
   :root:not(.macOS-device) .card .header .card-controls .control {
-    padding: 8px 12px;
+    padding: 8px;
     --control-background: none;
   }
   :root:not(.macOS-device) .card .header .card-controls .control:is(:hover,:focus-visible) {
@@ -730,24 +764,23 @@
     display: none;
   }
   .card .header .card-controls .control svg {
-    fill: var(--control-fill);
+    fill: currentColor;
   }
   :root:not(.macOS-device) .card .header .card-controls .control svg {
-    width: 13px;
+    width: 12px;
     aspect-ratio: 1/1;
-    --control-fill: currentColor;
   }
   :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:hover svg {
-    --control-fill: #ffffff;
+    color: #ffffff;
   }
   :root.macOS-device .card .header .card-controls .control svg {
     width: 6px;
     aspect-ratio: 1/1;
-    --control-fill: transparent;
+    color: transparent;
     mix-blend-mode: luminosity;
   }
   :root.macOS-device .card .header .card-controls:is(:hover,:active) .control svg {
-    --control-fill: #202020bf;
+    color: #202020bf;
   }
   .card .main {
     padding: 12px;
@@ -759,6 +792,7 @@
     justify-content: space-around;
   }
   .card .main .content .item {
+    gap: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -854,7 +888,7 @@
     <div class="menu">
       <button class="opener">File</button>
       <ul class="list">
-        <li class="list-item" onclick="createEditor();">New File<span class="info shortcut ctrl-shift shift-command">X</span></li>
+        <li class="list-item" onclick="createEditor();">New Editor<span class="info shortcut ctrl-shift shift-command">X</span></li>
         <li class="list-item" onclick="createWindow();">New Window<span class="info shortcut ctrl-shift shift-command">C</span></li>
         <li class="list-item" onclick="openFiles();">Open<span class="info shortcut ctrl command">O</span></li>
         <li class="list-item" onclick="saveFile();">Save<span class="info shortcut ctrl command">S</span></li>
@@ -865,13 +899,13 @@
             <li class="list-item" onclick="saveFile('css');">CSS<span class="info">.css</span></li>
             <li class="list-item" onclick="saveFile('js');">JavaScript<span class="info">.js</span></li>
             <li class="list-item" onclick="saveFile('json');">JSON<span class="info">.json</span></li>
+            <li class="list-item" onclick="saveFile('svg');">SVG<span class="info">.svg</span></li>
             <li class="list-item list-parent">More...<svg class="info"><use href="#arrow_icon"/></svg>
               <ul class="list">
                 <li class="list-item" onclick="saveFile('webmanifest');">Web Manifest<span class="info">.webmanifest</span></li>
                 <li class="list-item" onclick="saveFile('md');">Markdown<span class="info">.md</span></li>
                 <li class="list-item" onclick="saveFile('mcmeta');">MCMETA<span class="info">.mcmeta</span></li>
                 <li class="list-item" onclick="saveFile('xml');">XML<span class="info">.xml</span></li>
-                <li class="list-item" onclick="saveFile('svg');">SVG<span class="info">.svg</span></li>
               </ul>
             </li>
           </ul>
@@ -962,7 +996,7 @@
           <div class="select">
             <label for="view_setting">Default View:</label>
             <div class="menu">
-              <button id="view_setting" class="opener">Code<svg><use href="#arrow_icon"/></svg></button>
+              <button id="view_setting" class="opener">Code<svg><use href="#back_icon"/></svg></button>
               <ul class="list">
                 <li class="list-item" onclick="updateSelect('view','code');">Code</li>
                 <li class="list-item" onclick="updateSelect('view','split');">Split</li>
@@ -972,7 +1006,7 @@
           <div class="select">
             <label for="orientation_setting">Default Orientation:</label>
             <div class="menu">
-              <button id="orientation_setting" class="opener">Horizontal<svg><use href="#arrow_icon"/></svg></button>
+              <button id="orientation_setting" class="opener">Horizontal<svg><use href="#back_icon"/></svg></button>
               <ul class="list">
                 <li class="list-item" onclick="updateSelect('orientation','horizontal');">Horizontal</li>
                 <li class="list-item" onclick="updateSelect('orientation','vertical');">Vertical</li>
@@ -1192,7 +1226,10 @@
       type: "link"
     });
   });
-  document.querySelectorAll("img:not([alt])").forEach(image => image.alt = "");
+  document.querySelectorAll("img").forEach(image => {
+    if (!image.alt) image.alt = "";
+    image.draggable = false;
+  });
   document.querySelectorAll("input[type='text']").forEach(input => applyEditingBehavior(input));
   document.querySelectorAll("textarea").forEach(textarea => applyEditingBehavior(textarea));
   var menus = document.querySelectorAll(".menu");
@@ -1925,9 +1962,7 @@
   async function saveFile(extension){
     if (extension || !Editor.support().file_system){
       if (!extension) extension = Editor.query().getName("extension");
-      var anchor = document.createElement("a"), blob = window.URL.createObjectURL(new Blob([Editor.query().textarea.value],{
-        type: "text/plain"
-      }));
+      var anchor = document.createElement("a"), blob = window.URL.createObjectURL(new Blob([Editor.query().textarea.value]));
       anchor.href = blob;
       anchor.download = `${Editor.query().getName("base")}.${extension}`;
       anchor.click();
@@ -1974,7 +2009,7 @@
       if (menu.classList.contains("active")) closeMenu(menu);
     });
     menu.classList.add("active");
-    if (document.activeElement != opener && opener) opener.focus();
+    if (opener && document.activeElement != opener) opener.focus();
     document.body.addEventListener("mousedown",catchMenuExit);
     document.body.addEventListener("touchend",catchMenuExit);
     function catchMenuExit(){
@@ -1982,7 +2017,14 @@
       document.body.removeEventListener("mousedown",this);
       document.body.removeEventListener("touchend",this);
       closeMenu(menu);
-    }
+    }/* -- Select value should be focused when opened --
+    if (menu.closest(".select")){
+      var navigable = getNavigableElements({
+        container: menu.querySelectorAll(".list")[0],
+        scope: true
+      });
+      window.setTimeout(() => navigable[0].focus(),20);
+    }*/
     if (!menu.classList.contains("context-menu")) return;
     if (Editor.context_menu_touch.timeout) Editor.context_menu_touch.timeout = null;
     Editor.context_menu_previous = event.target;
