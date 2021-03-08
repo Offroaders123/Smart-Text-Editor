@@ -59,7 +59,7 @@
     environment: {
       touch_device: ("ontouchstart" in window),
       apple_device: (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform)),
-      macOS_device: /*(/(Mac)/i.test(navigator.platform) && navigator.standalone == undefined)*/true,
+      macOS_device: (/(Mac)/i.test(navigator.platform) && navigator.standalone == undefined),
       mozilla_browser: (CSS.supports("-moz-appearance: none"))
     },
     support: {
@@ -70,7 +70,7 @@
     query: {
       file: {
         textarea: (identifier = Editor.active_editor) => workspace.querySelector(`[data-numbered-container][data-identifier="${identifier}"] textarea`),
-        tab: (identifier = Editor.active_editor) => files.querySelector(`button.tab[data-identifier="${identifier}"]`),
+        tab: (identifier = Editor.active_editor) => files.querySelector(`.tab[data-identifier="${identifier}"]`),
         name: (data = { identifier: Editor.active_editor }) => {
           var name = Editor.query.file.tab(data.identifier).innerText;
           if (!data.base) return name;
@@ -87,12 +87,12 @@
     preview_editor: null,
     file_handles: {},
     storage: window.localStorage,
-    view: "text",
+    view: "code",
     orientation: "horizontal",
     refresh: "true",
     active_editing_tools: false,
-    active_modal: false,
-    modal_previous: null,
+    active_dialog: false,
+    dialog_previous: null,
     active_widget: false,
     context_menu_previous: null,
     long_touch: {
@@ -111,122 +111,18 @@
   if (Editor.support.web_sharing) document.documentElement.classList.add("web-sharing");
 </script>
 
-<style>
+<style>svg, img { width: 16px; height: 16px; } #context_menu { display: none; }
   *, *::before, *::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: var(--font-family-interface);
-    -webkit-tap-highlight-color: transparent;
   }
   :root {
-    --main: hsl(0,0%,7.1%);
-  
-    --font-family-interface: -apple-system, BlinkMacSystemFont, "Rubik", sans-serif;
-    --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Noto Sans", sans-serif;
-    --font-family-monospace: "Cousine", monospace;
-  
-    --container-dark: hsl(0,0%,10%);
-    --container-medium: hsl(0,0%,12%);
-    --container-medium-active: #1144bdbf;
-  
-    --text-dark: #000000;
-    --text-dark-contrast: hsl(0,0%,20%);
-    --text-medium: hsl(0,0%,70%);
-    --text-medium-contrast: hsl(0,0%,80%);
-    --text-medium-additional: hsl(0,0%,100%,30%);
-    --text-light: #ffffff;
-    --text-hover: #ffffff;
-    --text-info: #ffcd00;
-  
-    --border-radius-small: min(0.625vw, 2.5px);
-    --border-radius-medium: min(1.25vw, 5px);
-    --border-radius-large: min(2.5vw, 10px);
-    --edge-highlight: transparent;
-    --stoplight-icon-fill: #00000080;
-    --stoplight-red-fill: #fc605c;
-    --stoplight-red-border: #df4845;
-    --stoplight-yellow-fill: #fcbb40;
-    --stoplight-yellow-border: #dfa034;
-    --stoplight-green-fill: #34c749;
-    --stoplight-green-border: #26aa34;
-    --box-shadow: #000000bf;
-    --outline-width: min(0.25vw, 1px);
-    --outline-dark: var(--text-dark-contrast);
-    --outline-medium: var(--text-medium-contrast);
-  
-    --transition-slow: 0.4s;
-    --transition-medium: 0.2s;
-    --transition-fast: 0.1s;
-    --transition-delay: 0.4s;
-  
-    --selection-color: #000000;
-    --selection-background: #b4d5ffbf;
-    --selection-background-inactive: #ccccccbf;
-  
-    --scrollbar: hsl(0,0%,50%);
-    --scrollbar-hover: hsl(0,0%,60%);
-  
-    --drag-background: hsl(240,100%,50%,10%);
-    --drag-border: hsl(240,100%,50%,50%);
-  
-    --button: hsl(0,0%,22.5%);
-    --button-hover: hsl(0,0%,30%);
-    --button-warning-hover: #bb2222;
-  
-    --tab: hsl(0,0%,15.3%);
-    --tab-hover: hsl(0,0%,21.6%);
-    --tab-button-dark: #ffffff3a;
-    --tab-button-light: #0000004a;
-  
-    --textarea-code-color: var(--text-light);
-    --textarea-dark: hsl(0,0%,12.2%);
-    --textarea-medium: hsl(0,0%,14.5%);
-    --textarea-light: #eae2d1;
-  
-    --range-thumb: var(--button);
-    --range-thumb-hover: var(--button-hover);
-    --range-track: hsl(0,0%,12.5%);
-    --range-track-hover: hsl(0,0%,18.8%);
-  
-    --card-backdrop: #19191960;
-  
-    --startup-fade-background: #191919;
-    --startup-fade-opacity: 0;
-    --startup-fade-pointer-events: none;
-  }
-  @supports (-webkit-backdrop-filter: blur(16px)) {
-    :root {
-      --container-medium: hsl(0,0%,11.4%,80%);
-    }
-  }
-  :root:-moz-window-inactive {
-    --selection-background: var(--selection-background-inactive);
-  }
-  :root.reduced-motion, :root.startup-fade {
-    --transition-slow: 0s;
-    --transition-medium: 0s;
-    --transition-fast: 0s
-  }
-  :root.startup-fade {
-    --startup-fade-opacity: 1;
-    --startup-fade-pointer-events: all;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    :root {
-      --transition-slow: 0s;
-      --transition-medium: 0s;
-      --transition-fast: 0s
-    }
-  }
-  :root.macOS-device {
-    --edge-highlight: #ffffff20;
   }
   html {
     position: fixed;
     width: 100%;
     height: 100%;
-    background: var(--container-dark);
     overflow: hidden;
   }
   body {
@@ -235,223 +131,157 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    color: var(--text-medium);
-    overflow: hidden;
+    font-family: sans-serif;
+    overflow: auto;
     user-select: none;
     -webkit-user-select: none;
   }
-  body::after {
-    content: "";
-    position: absolute;
-    width: 100%;
+  header {
+    display: flex;
+    -webkit-app-region: drag;
+  }
+  body.scaling-active header {
+    pointer-events: none;
+  }
+  header .menubar {
+    display: flex;
+    -webkit-app-region: no-drag;
+  }
+  header .menubar .menu .opener {
+    background: none;
+    border: none;
+    outline: none;
+  }
+  header .window-controls {
+    margin-left: auto;
     height: 100%;
-    background: var(--startup-fade-background);
-    opacity: var(--startup-fade-opacity);
-    pointer-events: var(--startup-fade-pointer-events);
-    z-index: 3;
-    transition: opacity 0.25s;
-  }
-  body.camera-left #header {
-    padding-left: calc(env(safe-area-inset-left) + min(1.5vw, 12px));
-    padding-right: calc(env(safe-area-inset-bottom) + min(1.5vw, 12px));
-  }
-  body.camera-right #header {
-    padding-left: calc(env(safe-area-inset-bottom) + min(1.5vw, 12px));
-    padding-right: calc(env(safe-area-inset-right) + min(1.5vw, 12px));
-  }
-  body.camera-left #workspace [data-numbered-container] {
-    padding-left: env(safe-area-inset-left);
-  }
-  body.camera-left #files {
-    padding-left: calc(env(safe-area-inset-left) + min(1.5vw, 12px));
-  }
-  body.camera-left #preview.preview {
-    border-left-width: env(safe-area-inset-left);
-  }
-  body.camera-right #workspace [data-numbered-container] {
-    padding-right: env(safe-area-inset-right);
-  }
-  body.camera-right #preview {
-    border-right-width: env(safe-area-inset-right);
-  }
-  body.camera-right .card.notification, body.camera-right .card.action, body.camera-right .card.widget {
-    right: env(safe-area-inset-right);
-  }
-  span.info {
     display: flex;
-    align-items: center;
-    color: var(--text-info);
+    -webkit-app-region: no-drag;
   }
-  span.info::before {
-    content: "\26A0";
-    margin-right: min(1.25vw, 5px);
-    font-size: 150%;
-  }
-  img, a {
-    -webkit-touch-callout: none;
-  }
-  a {
-    color: inherit;
-    font-size: min(2vw, 14.5px);
-    border-radius: var(--border-radius-small);
-    box-shadow: 0 0 0 var(--outline-width) var(--focus-border);
-    --focus-border: transparent;
-    text-decoration-color: transparent;
-    outline: none;
-    transition: var(--transition-fast);
-    transition-property: color, text-decoration-color;
-  }
-  a:hover, a:focus {
-    color: var(--text-hover);
-    text-decoration-color: var(--text-hover);
-  }
-  a:focus {
-    --focus-border: var(--outline-medium);
-  }
-  button {
-    padding: min(0.5vw, 2px) min(1vw, 8px);
-    min-width: min(8vw, 75px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: var(--text-medium);
-    font-size: min(2.5vw, 14.5px);
-    background: var(--button);
-    border: none;
-    border-radius: var(--border-radius-medium);
-    box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow), 0 0 0 var(--outline-width) var(--focus-border) inset;
-    --focus-border: transparent;
-    outline: none;
-    transition: var(--transition-fast);
-    transition-property: color, background, opacity;
-  }
-  button.menu > svg, .dropdown > button > svg {
-    margin-left: min(2vw, 8px);
-  }
-  button.menu > svg, .dropdown svg {
-    width: min(2.75vw, 12px);
-    height: min(2.75vw, 12px);
-  }
-  button:hover, button:focus, .dropdown.active > button, .select:hover .dropdown > button {
-    color: var(--text-hover);
-    background: var(--button-hover);
-  }
-  button:focus {
-    --focus-border: var(--outline-medium);
-  }
-  button::-moz-focus-inner {
-    border: none;
-  }
-  button.warning:hover, button.warning:focus {
-    background: var(--button-warning-hover);
-  }
-  button.tab {
-    padding: min(1.5vw, 6px);
-    padding-left: min(3vw, 12px);
+  main {
     position: relative;
-    min-width: unset;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: var(--text-medium-contrast);
-    font-size: min(3vw, 12px);
-    background: var(--tab);
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+    flex-grow: 1;
   }
-  button.tab:hover, button.tab:focus, button.tab:focus-within, button.tab.active {
-    color: var(--text-hover);
-    background: var(--tab-hover);
-  }
-  button.tab::after, [data-numbered-container]::after, #files::after {
-    content: "";
+  main .workspace {
     position: absolute;
     left: 0;
     top: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  body[data-view="code"] main .workspace {
     width: 100%;
     height: 100%;
-    border-radius: inherit;
+  }
+  body[data-view="split"][data-orientation="horizontal"] main .workspace {
+    width: 50%;
+    height: 100%;
+  }
+  body[data-view="split"][data-orientation="vertical"] main .workspace {
+    width: 100%;
+    height: 50%;
+  }
+  body[data-view="preview"][data-orientation="horizontal"] main .workspace {
+    width: 0%;
+    height: 100%;
+  }
+  body[data-view="preview"][data-orientation="vertical"] main .workspace {
+    width: 100%;
+    height: 0%;
+  }
+  body.scaling-active main .workspace {
     pointer-events: none;
-    transition: var(--transition-medium);
-    transition-property: background, box-shadow;
   }
-  [data-numbered-container].drag::after, #files.drag::after {
-    background: var(--drag-background);
-    box-shadow: 0 0 min(1vw, 4px) min(0.75vw, 6px) var(--drag-border) inset;
+  main .workspace .editor-tabs {
+    flex-shrink: 0;
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
   }
-  button > svg {
-    fill: var(--text-medium);
-    transition: fill var(--transition-fast);
+  main .workspace .editor-tabs::-webkit-scrollbar {
+    display: none;
   }
-  button.tab > button, button.nav {
-    min-width: unset;
-    background: none;
+  main .workspace .editor {
+    height: 0;
   }
-  button.tab > button {
-    margin-left: min(1vw, 4px);
-    padding: min(0.75vw, 3px);
-    width: min(4vw, 16px);
-    height: min(4vw, 16px);
-    box-shadow: none;
+  main .workspace .editor.active {
+    height: 100%;
   }
-  button.tab > button:first-of-type {
-    margin-left: min(3vw, 12px);
+  main .workspace-scaler {
+    position: absolute;
+    background: gray;
+    touch-action: none;
+    z-index: 1;
   }
-  button.tab > button:hover, button.tab > button:focus {
-    background: var(--tab-button-dark);
+  body[data-orientation="horizontal"] main .workspace-scaler {
+    top: 0;
+    width: 12px;
+    height: 100%;
   }
-  button.nav > svg, button.tab > button > svg {
+  body[data-orientation="vertical"] main .workspace-scaler {
+    left: 0;
+    width: 100%;
+    height: 12px;
+  }
+  body[data-view="code"][data-orientation="horizontal"] main .workspace-scaler {
+    left: 0;
+    transform: translateX(-100%);
+  }
+  body[data-view="split"][data-orientation="horizontal"] main .workspace-scaler {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  body[data-view="preview"][data-orientation="horizontal"] main .workspace-scaler {
+    left: 100%;
+    transform: translateX(0);
+  }
+  body[data-view="code"][data-orientation="vertical"] main .workspace-scaler {
+    top: 0;
+    transform: translateY(-100%);
+  }
+  body[data-view="split"][data-orientation="vertical"] main .workspace-scaler {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  body[data-view="preview"][data-orientation="vertical"] main .workspace-scaler {
+    top: 100%;
+    transform: translateY(0);
+  }
+  main .workspace-preview {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 50%;
+    background: #ffffff;
+    border: none;background: lightgray;
+  }
+  body[data-view="code"][data-orientation="horizontal"] main .workspace-preview {
+    width: 0%;
+    height: 100%;
+  }
+  body[data-view="code"][data-orientation="vertical"] main .workspace-preview {
+    width: 100%;
+    height: 0%;
+  }
+  body[data-view="split"][data-orientation="horizontal"] main .workspace-preview {
+    width: 50%;
+    height: 100%;
+  }
+  body[data-view="split"][data-orientation="vertical"] main .workspace-preview {
+    width: 100%;
+    height: 50%;
+  }
+  body[data-view="preview"] main .workspace-preview {
     width: 100%;
     height: 100%;
   }
-  button.nav {
-    padding: min(0.5vw, 2px);
-    width: min(4.5vw, 18px);
-    height: min(4.5vw, 18px);
-    box-shadow: 0 0 0 var(--outline-width) var(--focus-border);
-  }
-  :root.macOS-device button.nav:not(.back) {
-    padding: 3px;
-    width: 12px;
-    height: 12px;
-    background: var(--stoplight-fill);
-    border-radius: 6px;
-    box-shadow: 0 0 0 var(--outline-width) var(--stoplight-border) inset, 0 0 0 var(--outline-width) var(--focus-border);
-  }
-  button.nav + * {
-    margin-left: min(1vw, 4px);
-  }
-  :root.macOS-device button.nav:not(.back) + * {
-    margin-left: 8px;
-  }
-  :root.macOS-device button.nav:not(.back) > svg {
-    fill: transparent;
-  }
-  :root.macOS-device button.nav:not(.back):hover > svg, :root.macOS-device button.nav:not(.back):focus > svg {
-    fill: var(--stoplight-icon-fill);
-  }
-  button.nav.minimize {
-    --stoplight-fill: var(--stoplight-yellow-fill);
-    --stoplight-border: var(--stoplight-yellow-border);
-  }
-  button.nav.close {
-    --stoplight-fill: var(--stoplight-red-fill);
-    --stoplight-border: var(--stoplight-red-border);
-  }
-  button.nav.back:not([data-parent-card]), .card:not(.widget) button.nav.minimize {
-    display: none;
-  }
-  button.nav.minimize > svg {
-    transition: fill var(--transition-fast), transform var(--transition-medium);
-  }
-  button:hover > svg, button:focus > svg, button.tab:hover > button > svg, button.tab:focus > button > svg, button.tab:focus-within > button > svg, .dropdown:hover button > svg, .dropdown:focus-within button > svg, .dropdown.active button > svg, .dropdown li:hover > svg, .dropdown li:focus > svg, .dropdown li:focus-within > svg, .dropdown li.active > svg {
-    fill: var(--text-hover);
-  }
-  button.hidden, .dropdown li.hidden, .card .options.hidden {
-    display: none;
+  body.scaling-active main .workspace-preview {
+    pointer-events: none;
   }
   [data-numbered-container], input[type="text"] {
-    font-family: unset;
+    font-family: monospace;
     font-size: 13px;
     border: none;
     outline: none;
@@ -472,118 +302,56 @@
     background: transparent;
     opacity: 0.55;
   }
-  [data-numbered-container] textarea, input[type="text"] {
-    transition: var(--transition-slow);
-    transition-property: caret-color, scrollbar-color;
-  }
   [data-numbered-container] textarea {
     resize: none;
     scrollbar-width: inherit;
     scrollbar-color: inherit;
   }
-  input[type="range"] {
-    padding: min(3vw, 12px) min(0.75vw, 3px);
-    width: min(25vw, 130px);
-    height: min(5vw, 20px);
-    background: none;
-    border-radius: var(--border-radius-medium);
-    box-shadow: 0 0 0 var(--outline-width) var(--focus-border) inset;
-    --focus-border: transparent;
-    outline: none;
-    -webkit-appearance: none;
+  .tab {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid gray;
+    border-radius: 6px 6px 0 0;
   }
-  input[type="range"]:focus {
-    --focus-border: var(--outline-medium);
+  .menu {
+    position: relative;
+    display: flex;
   }
-  input[type="range"]::-webkit-slider-thumb {
-    margin-top: calc(min(1.75vw, 7px) * -1);
-    width: min(2.75vw, 12px);
-    height: min(5vw, 20px);
-    background: var(--range-thumb);
-    border: none;
-    border-radius: var(--border-radius-medium);
-    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow);
-    transition: background var(--transition-fast);
-    -webkit-appearance: none;
+  .menu .opener {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
-  input[type="range"]:hover::-webkit-slider-thumb, input[type="range"]:focus::-webkit-slider-thumb {
-    background: var(--range-thumb-hover);
+  .menu .list {background: gray;
+    position: absolute;
+    left: 0;
+    top: 100%;
+    visibility: hidden;
+    z-index: 1;
+    list-style: none;
   }
-  input[type="range"]::-webkit-slider-runnable-track {
-    height: min(1.5vw, 6px);
-    background: var(--range-track);
-    border-radius: var(--border-radius-medium);
-    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow);
-    transition: background var(--transition-fast);
+  .menu .list-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
   }
-  input[type="range"]:hover::-webkit-slider-runnable-track, input[type="range"]:focus::-webkit-slider-runnable-track {
-    background: var(--range-track-hover);
+  .menu .list-item .info {
+    margin-left: auto;
   }
-  input[type="range"]::-moz-range-thumb {
-    margin-top: calc(min(1.75vw, 7px) * -1);
-    width: min(2.75vw, 12px);
-    height: min(5vw, 20px);
-    background: var(--range-thumb);
-    border: none;
-    border-radius: var(--border-radius-medium);
-    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow);
-    transition: background var(--transition-fast);
+  .menu .list .list {
+    left: 100%;
+    top: 0;
   }
-  input[type="range"]:hover::-moz-range-thumb, input[type="range"]:focus::-moz-range-thumb {
-    background: var(--range-thumb-hover);
-  }
-  input[type="range"]::-moz-range-track {
-    height: min(1.5vw, 6px);
-    background: var(--range-track);
-    border-radius: var(--border-radius-medium);
-    box-shadow: 0 min(0.5vw, 2px) min(2vw, 8px) var(--box-shadow);
-    transition: background var(--transition-fast);
-  }
-  input[type="range"]:hover::-moz-range-track, input[type="range"]:focus::-moz-range-track {
-    background: var(--range-track-hover);
-  }
-  :disabled {
-    opacity: 0.5;
-    pointer-events: none;
-  }
-  ::placeholder {
-    color: inherit;
-    opacity: 0.55;
-    white-space: pre-wrap;
-  }
-  ::selection {
-    color: var(--selection-color);
-    background: var(--selection-background);
-  }
-  ::selection:window-inactive {
-    background: var(--selection-background-inactive);
-  }
-  ::-webkit-scrollbar {
-    width: min(4vw, 16px);
-    height: min(4vw, 16px);
-  }
-  ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner {
-    background: none;
-  }
-  ::-webkit-scrollbar-thumb {
-    width: min(9vw, 36px);
-    height: min(9vw, 36px);
-    background: var(--scrollbar);
-    background-clip: content-box;
-    border: min(1vw, 4px) solid transparent;
-    border-radius: var(--border-radius-large);
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: var(--scrollbar-hover);
+  .menu.active > .list, .menu .list-parent.active > .list {
+    visibility: visible;
   }
   :root:not(.apple-device) .shortcut.ctrl::before {
     content: "Ctrl + ";
   }
   :root:not(.apple-device) .shortcut.ctrl-shift::before {
     content: "Ctrl + Shift + ";
-  }
-  :root.apple-device .shortcut {
-    font-size: min(3vw, 12px);
   }
   :root.apple-device .shortcut.command::before {
     content: "\2318";
@@ -594,956 +362,120 @@
   :root.apple-device .shortcut.ctrl-command::before {
     content: "\2303\2318";
   }
-  .buffering {
-    animation: rotate 2s infinite linear;
-    animation-play-state: paused;
-  }
-  .buffering.active {
-    animation-play-state: running;
-  }
-  @keyframes rotate {
-    from {
-      transform: rotate(-360deg);
-    }
-  }
-  .dropdown {
-    position: relative;
-    display: flex;
-  }
-  .dropdown.context-menu {
-    position: fixed;
-    left: 0;
-    top: 0;
-    z-index: 2;
-  }
-  .dropdown > button > svg {
-    transform: rotate(90deg);
-  }
-  .dropdown ul {
-    padding: min(1.25vw, 5px);
-    position: absolute;
-    left: 0;
-    top: 100%;
-    min-width: min(35vw, 155px);
-    background: var(--container-medium);
-    border-radius: var(--border-radius-large);
-    box-shadow: 0 0 0 min(0.25vw, 1px) var(--edge-highlight) inset, 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow);
-    z-index: 1;
-    visibility: hidden;
-    opacity: 0;
-    pointer-events: none;
-    list-style: none;
-    scrollbar-color: var(--scrollbar) var(--container-medium);
-    transform: scaleY(var(--scale));
-    --scale: 0.15;
-    transform-origin: center top;/*
-    transition: var(--transition-fast) ease-in;
-    transition-property: visibility, opacity, transform;*/
-  }
-  @supports (-webkit-backdrop-filter: blur(16px)) {
-    .dropdown ul {
-      -webkit-backdrop-filter: blur(16px);
-    }
-  }
-  .dropdown.context-menu ul {
-    transform: scale(var(--scale));
-    transform-origin: left top;
-  }
-  .dropdown.context-menu.window > ul li:not(.window), .dropdown.context-menu.link > ul li:not(.link), .dropdown.context-menu.editing > ul li:not(.editing), :root:not(.web-sharing) .dropdown.context-menu > ul li.web-sharing, :root.web-sharing .dropdown.context-menu > ul li.web-sharing-alt {
-    display: none;
-  }
-  .dropdown li, .dropdown a {
-    padding: min(1.25vw, 5px) min(2.5vw, 10px);
-    position: relative;
-    display: flex;
-    align-items: center;
-    color: var(--text-medium-contrast);
-    font-size: min(2.75vw, 12.5px);
-    border-radius: var(--border-radius-medium);
-    /*box-shadow: 0 0 0 var(--outline-width) var(--focus-border) inset;
-    --focus-border: transparent;*/box-shadow: none;
-    outline: none;
-    white-space: nowrap;/*
-    transition: var(--transition-fast);
-    transition-property: color, background;*/
-  }
-  .dropdown li {
-    justify-content: space-between;
-  }
-  .dropdown a {
-    transition: none;
-  }
-  .dropdown li > span {
-    margin-left: min(4vw, 16px);
-    color: var(--text-medium-additional);
-    font-size: min(2.5vw, 11px);
-  }
-  .dropdown li:hover > span, .dropdown li:focus > span, .dropdown li:focus-within > span, .dropdown li.active > span, .dropdown a:hover > span, .dropdown a:focus > span {
-    color: inherit;
-  }
-  .dropdown li > svg {
-    fill: var(--text-medium-additional);/*
-    transition: var(--transition-fast);
-    transition-property: fill, transform;*/
-  }
-  .dropdown li > img, .dropdown a > img {
-    margin-right: min(1.75vw, 8px);
-    width: min(4vw, 16px);
-    height: min(4vw, 16px);
-  }
-  .dropdown li > img.rounded, .dropdown a > img.rounded {
-    border-radius: var(--border-radius-small);
-  }
-  .dropdown li > img.invert, .dropdown a > img.invert {
-    filter: invert() hue-rotate(180deg);
-  }
-  .dropdown li:hover, .dropdown li:focus, .dropdown li:focus-within, .dropdown li.active, .dropdown a:hover, .dropdown a:focus {
-    color: var(--text-hover);
-    background: var(--container-medium-active);
-  }/*
-  .dropdown li:focus, .dropdown a:focus {
-    --focus-border: var(--outline-medium);
-  }*/
-  .dropdown ul ul {
-    margin-top: calc(min(1.25vw, 5px) * -1);
-    position: absolute;
-    left: 100%;
-    top: 0;
-    transform: scale(var(--scale));
-    transform-origin: left top;
-  }
-  @media (max-width: 550px), (max-height: 515px) {
-    .dropdown li > svg {
-      transform: rotate(90deg);
-    }
-    .dropdown ul ul {
-      margin-top: 0;
-      padding: 0;
-      min-width: 100%;
-      max-width: 100%;
-      max-height: min(24vh, 60px);
-      left: 0;
-      top: 100%;
-      box-shadow: none;
-      transform: scaleY(0);
-      transform-origin: center top;
-      overflow-y: auto;
-    }
-    .dropdown ul ul ul {
-      border-radius: 0;
-    }
-  }
-  @media (max-height: 300px) {
-    .dropdown ul {
-      max-height: 55vh;
-      overflow-y: auto;
-    }
-    .dropdown ul ul {
-      max-height: unset;
-      border-radius: 0;
-      overflow-y: unset;
-    }
-  }
-  .dropdown.active > ul, .dropdown.active li.active > ul {
-    visibility: visible;
-    opacity: 1;
-    pointer-events: all;
-    transform: scale(1);
-    transition-timing-function: ease-out;
-  }
-  :root.touch-device .dropdown.context-menu.active > ul {
-    transition: var(--transition-medium) ease-out;
-  }
   .select {
-    margin: min(0.75vw, 3px);
     display: flex;
     justify-content: center;
-    transition: color var(--transition-fast);
-  }
-  .select:hover, .select:focus-within {
-    color: var(--text-hover);
   }
   .select label {
-    padding-right: min(1vw, 4px);
     display: flex;
     align-items: center;
   }
-  .select button {
-    padding: min(0.5vw, 2px) min(1.5vw, 10px);
+  .select .menu .opener {
     justify-content: space-between;
   }
-  .select ul {
-    min-width: 100%;
-  }
   .checkbox {
-    padding: min(1vw, 4px);
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: var(--border-radius-medium);
-    box-shadow: 0 0 0 var(--outline-width) var(--focus-border) inset;
-    --focus-border: transparent;
-    outline: none;
-  }
-  .checkbox:focus {
-    --focus-border: var(--outline-medium);
   }
   .checkbox input[type="checkbox"] {
     display: none;
   }
   .checkbox label {
-    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: min(2.5vw, 14.5px);
     pointer-events: none;
-    transition: color var(--transition-fast);
   }
-  .checkbox label::before {
-    content: "";
-    margin-right: min(1vw, 4px);
-    padding: min(0.25vw, 1px);
-    width: min(3.35vw, 18px);
-    height: min(3.35vw, 18px);
-    background: var(--range-track);
-    border: min(0.35vw, 2px) solid var(--text-medium);
-    border-radius: var(--border-radius-medium);
-    box-shadow: 0 min(0.75vw, 3px) min(1vw, 4px) calc(min(0.5vw, 2px) * -1) var(--box-shadow);
-    transition: var(--transition-fast);
-    transition-property: background, border-color;
-  }
-  .checkbox:hover label, .checkbox:focus label {
-    color: var(--text-hover);
-  }
-  .checkbox:hover label::before, .checkbox:focus label::before {
-    background: var(--range-track-hover);
-    border-color: var(--text-hover);
-  }
-  .checkbox label > svg {
-    padding: min(0.55vw, 3px);
-    position: absolute;
-    left: 0;
-    width: min(3.35vw, 18px);
-    height: min(3.35vw, 18px);
+  .checkbox label .check {
     fill: transparent;
-    border-radius: var(--border-radius-medium);
-    transform: rotate(-45deg) scale(0);
-    transform-origin: 45% 65%;
-    transition: var(--transition-fast) ease-in;
-    transition-property: fill, transform;
   }
-  .checkbox input[type="checkbox"]:checked + label > svg {
-    fill: var(--text-medium);
-    transform: rotate(0deg) scale(1);
-    transition-timing-function: ease-out;
-  }
-  .checkbox:hover input[type="checkbox"]:checked + label > svg, .checkbox:focus input[type="checkbox"]:checked + label > svg {
-    fill: var(--text-hover);
-  }
-  [data-tooltip] {
-    position: relative;
-  }
-  [data-tooltip]::before, [data-tooltip]::after {
-    position: absolute;
-    left: 50%;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 1;
-    transform: translateX(-50%) scale(var(--scale));
-    --scale: 0.85;
-    transition: var(--transition-fast) ease-in;
-    transition-property: opacity, transform;
-  }
-  [data-tooltip]::before {
-    content: attr(data-tooltip);
-    padding: min(2vw, 8px);
-    bottom: calc(100% + min(3vw, 12px));
-    min-width: min(12vw, 48px);
-    max-width: 100%;
-    color: var(--text-hover);
-    font-size: min(2.75vw, 12px);
-    background: var(--container-medium-active);
-    border-radius: var(--border-radius-large);
-    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow);
-    text-align: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transform-origin: center bottom;
-  }
-  [data-tooltip]::after {
-    content: "";
-    top: calc(min(3vw, 12px) * -1);
-    border: min(3vw, 12px) solid transparent;
-    border-top-color: var(--container-medium-active);
-    filter: drop-shadow(0 min(0.5vw, 2px) min(0.25vw, 1px) var(--box-shadow));
-    transform-origin: center top;
-  }
-  [data-tooltip]:hover::before, [data-tooltip]:hover::after, [data-tooltip]:focus::before, [data-tooltip]:focus::after, [data-tooltip]:focus-within::before, [data-tooltip]:focus-within::after {
-    opacity: 1;
-    --scale: 1;
-    transition-timing-function: ease-out;
+  .checkbox input[type="checkbox"]:checked + label .check {
+    fill: unset;
   }
   .card {
     display: flex;
     flex-direction: column;
-    background: var(--container-dark);
-    box-shadow: 0 0 0 min(0.25vw, 1px) var(--edge-highlight) inset, 0 min(0.75vw, 3px) min(1.5vw, 6px) var(--box-shadow);
-    white-space: nowrap;
+    background: gray;
     visibility: hidden;
-    pointer-events: none;
-    overflow-y: hidden;
-    scrollbar-color: var(--scrollbar) var(--container-dark);
-    transition: var(--transition-medium);
-    transition-property: top, max-height, visibility, opacity, transform;
   }
-  .card.modal, .card.action, .card.widget {
-    opacity: 0;
+  .card.active {
+    visibility: visible;
   }
-  .card.modal {
+  .card.alert {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: 3;
+  }
+  .card.tool {
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 1;
+  }
+  .card.dialog {
     position: fixed;
     left: 50%;
     top: 50%;
-    max-height: calc(95% - min(4.5vw, 24px));
-    border-radius: var(--border-radius-large);
     z-index: 2;
-    transform: translate(-50%,-50%) scale(var(--scale));
-    --scale: 0.15;
-  }
-  .card.notification, .card.action, .card.widget {
-    position: absolute;
-    right: 0;
-    max-height: calc(100% - min(12vw, 58px));
-    border-radius: var(--border-radius-large);
-  }
-  .card.notification, .card.widget {
-    min-width: min(50vw, 250px);
-  }
-  .card.notification {
-    margin: min(4vw, 20px);
-    bottom: 0;
-    z-index: 3;
-    transform: translateX(calc(100% + min(8vw, 40px)));
-  }
-  .card.action, .card.widget {
-    margin: min(2.5vw, 14px);
-    top: min(7.5vw, 34px);
-    z-index: 1;
-    transform: scaleY(var(--scale));
-    --scale: 0.15;
-    transform-origin: center top;
-  }
-  .card.action {
-    flex-direction: row;
-  }
-  .card.action > *:not(.hidden) + * {
-    margin-left: min(3vw, 12px);
-  }
-  .card.action button {
-    padding: min(2.25vw, 10px) min(2vw, 8px);
-    min-width: unset;
-  }
-  .card.action button > svg {
-    width: min(3vw, 12px);
-    height: min(3vw, 12px);
-  }
-  .card.action.active ~ .card.widget {
-    max-height: calc(100% - min(12vw, 58px) - min(13.5vw, 68px));
-    transform: translateY(min(13.5vw, 68px)) scaleY(var(--scale));
-  }
-  #main.split.horizontal:not(.files-offset) .card.action, #main.split.horizontal:not(.files-offset) .card.widget, #main.preview .card.action, #main.preview .card.widget {
-    top: 0;
-  }
-  #main.split.horizontal:not(.files-offset) .card.widget:not(.minimize), #main.preview .card.widget:not(.minimize) {
-    max-height: calc(100% - min(4.5vw, 24px));
-  }
-  #main.split.horizontal:not(.files-offset) .card.action.active ~ .card.widget:not(.minimize), #main.preview .card.action.active ~ .card.widget:not(.minimize) {
-    max-height: calc(100% - min(4.5vw, 24px) - min(13.5vw, 68px));
-  }
-  .card.action.active ~ .card.widget.active {
-    transform: translateY(min(13.5vw, 68px)) scaleY(1);
-  }
-  .card.active, #card_backdrop.active {
-    visibility: visible;
-    pointer-events: all;
-  }
-  .card.active, #card_backdrop.active {
-    opacity: 1;
-  }
-  .card.modal.active {
-    transform: translate(-50%,-50%) scale(1);
-  }
-  .card.notification.active {
-    animation: pop var(--transition-medium) var(--transition-delay);
-    transform: translateX(0);
-  }
-  @keyframes pop {
-    50% {
-      transform: scale(1.1);
-    }
-  }
-  .card.action.active, .card.widget.active {
-    transform: scaleY(1);
-  }
-  .card.widget.minimize {
-    max-height: min(8.5vw, 42px);
-    transform: translateX(calc(100% - min(3.5vw, 18px) - min(2.5vw, 14px))) scaleY(0);
-  }
-  .card.widget.minimize.active {
-    transform: translateX(calc(100% - min(3.5vw, 18px) - min(2.5vw, 14px))) scaleY(1);
-  }
-  .card.action.active ~ .card.widget.minimize {
-    max-height: min(8.5vw, 42px);
-    transform: translate(calc(100% - min(3.5vw, 18px) - min(2.5vw, 14px)),min(13.5vw, 68px)) scaleY(0);
-  }
-  .card.action.active ~ .card.widget.minimize.active {
-    transform: translate(calc(100% - min(3.5vw, 18px) - min(2.5vw, 14px)),min(13.5vw, 68px)) scaleY(1);
-  }
-  .card [data-numbered-container], .card input[type="text"] {
-    color: var(--text-light);
-    caret-color: var(--text-light);
-    background: var(--textarea-medium);
-    border-radius: var(--border-radius-medium);
-    transition: color var(--transition-slow);
-  }
-  .card [data-numbered-container] {
-    position: relative;
-    max-width: 50vw;
-    height: min(35vw, 85px);
-    scrollbar-color: var(--scrollbar) var(--textarea-medium);
-  }
-  .card [data-numbered-container]::before, .card input[type="text"] {
-    box-shadow: 0 2px 4px var(--box-shadow) inset;
-  }
-  .card [data-numbered-container]::before {
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 1;
-  }
-  .card [data-numbered-container].expand {
-    height: 150px;
-  }
-  .card .icon {
-    width: min(5vw, 24px);
-    height: min(5vw, 24px);
-  }
-  .card > :not(.main):not(.content) {
-    flex-shrink: 0;
+    transform: translate(-50%,-50%);
   }
   .card .header {
-    padding: min(1.25vw, 7px);
-    position: relative;
-    width: 100%;
     display: flex;
-    justify-content: flex-end;
     align-items: center;
-    //background: var(--edge-highlight);
-    box-shadow: 0 calc(min(0.25vw, 1px) * -1) 0 var(--edge-highlight) inset;
   }
-  .card .main {
-    padding: min(2.5vw, 14px);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-  .card.widget .header > :not(.minimize), .card.widget .content, .card.widget .options {
-    transition: var(--transition-medium);
-    transition-property: visibility, opacity;
+  .card .header .card-back:not([data-parent-card]) {
+    display: none;
   }
   .card .header .title {
-    margin-left: auto;
-    margin-right: auto;
-    font-size: min(4vw, 16px);
+    margin: 0 auto;
   }
-  .card .header .icon {
-    margin-right: min(3vw, 10px);
+  .card .header .card-controls {
+    display: flex;
   }
-  .card.widget button.nav.minimize {
-    //right: min(4.75vw, 24px);
-    transition: right var(--transition-medium);
+  .card:not(.tool) .header .card-controls [data-control="minimize"] {
+    display: none;
   }
-  .card.widget.minimize button.nav.minimize {
-    //right: calc(100% - min(3.5vw, 18px));
+  :root.macOS-device .card .header .card-controls [data-control] svg {
+    fill: transparent;
   }
-  .card.widget.minimize button.nav.minimize > svg {
-    transform: scaleX(-1);
+  :root.macOS-device .card .header .card-controls:hover [data-control] svg {
+    fill: unset;
   }
-  .card.widget.minimize .header > :not(.minimize), .card.widget.minimize .content, .card.widget.minimize .options {
-    visibility: hidden;
-    opacity: 0;
+  .card .main {
+    display: flex;
+    flex-direction: column;
   }
-  .card.modal .main > *:not(.header) + * {
-    margin-top: min(2.5vw, 14px);
-  }
-  .card .content {
-    width: 100%;
+  .card .main .content {
     display: flex;
     justify-content: space-around;
-    scrollbar-width: inherit;
-    scrollbar-color: inherit;
   }
-  .card .content:not(.no-collapse) {
-    overflow-y: auto;
-  }
-  .card.modal .content span {
-    font-size: min(2.5vw, 14.5px);
-  }
-  .card .content .item {
-    margin: auto 0;
+  .card .main .content .item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-size: min(3vw, 14.5px);
-  }
-  .card .content .item + * {
-    margin-left: min(2.5vw, 14px);
-  }
-  .card .content .item.list > * {
-    display: flex;
-    justify-content: center;
-  }
-  .card .content .item.list > * + *:not(label):not([type="range"]), .card .content .item.list > *:not(label):not([type="range"]) + label {
-    margin-top: min(2.5vw, 14px);
-  }
-  .card .content .item.list.start {
-    align-items: flex-start;
-  }
-  .card .content .item.expand, .card .content .item.expand > *:not(label) {
-    width: 100%;
   }
   .card .options {
     display: flex;
     justify-content: center;
-  }
-  .card.notification .options, .card.widget .options {
-    margin-top: min(2.5vw, 14px);
-  }
-  .card .options > *:not(.hidden) + * {
-    margin-left: min(2.5vw, 14px);
-  }
-  .card:not(.action) .options button {
-    min-width: min(12vw, 75px);
-  }
-  #symbol_definitions {
-    position: absolute;
-    pointer-events: none;
-  }
-  #header {
-    position: relative;
-    display: flex;
-    //justify-content: space-between;
-    align-items: center;
-    background: var(--container-dark);
-    z-index: 2;
-    -webkit-app-region: drag;
-  }
-  @media (display-mode: standalone) {
-    #header {
-      padding-top: env(safe-area-inset-top);
-    }
-  }
-  #header.resize, #workspace.resize, #preview.resize {
-    pointer-events: none;
-    transition: none;
-  }
-  #header .menu-bar {
-    display: flex;
     align-items: center;
   }
-  #header .menu-bar .dropdown {
-    -webkit-app-region: no-drag;
-  }
-  #header .menu-bar .dropdown button {
-    padding: min(1vw, 8px);
-    min-width: unset;
-    color: var(--text-medium-contrast);
-    font-size: min(2.75vw, 13px);
-    background: none;
-    border-radius: 0;
-    box-shadow: none;
-    transition: none;
-  }
-  #header .menu-bar .dropdown button:hover, #header .menu-bar .dropdown.active button {
-    background: var(--tab-hover);
-  }
-  #header .menu-bar .dropdown > ul {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-  }
-  #header .app-icon {
-    //position: absolute;
-    //left: 50%;
-    display: flex;
-    //justify-content: center;
-    //align-items: center;
-    //transform: translateX(-50%);
-    //transition: transform var(--transition-slow);
-  }
-  #header .app-icon img {
-    margin: 0 min(1.5vw, 10px);
-    width: min(4vw, 16px);
-    height: min(4vw, 16px);
-    flex-shrink: 0;
-  }/*
-  #header .app-icon span {
-    margin-left: 5px;
-    font-size: min(4vw, 16px);
-    white-space: nowrap;
-    transform-origin: left center;
-    transition: var(--transition-slow);
-    transition-property: margin-left, visibility, opacity, transform;
-  }
-  @media (max-width: 900px) {
-    #header .app-icon {
-      transform: translateX(calc(min(2.75vw, 12px) * -1));
-    }
-    #header .app-icon span {
-      margin-left: 0;
-      visibility: hidden;
-      opacity: 0;
-      transform: scale(0);
-    }
-  }*/
-  #main {
-    position: relative;
-    flex: 1;
-    background: var(--main);
-    overflow: hidden;
-  }
-  #main.horizontal.resize {
-    cursor: col-resize;
-  }
-  #main.vertical.resize {
-    cursor: row-resize;
-  }
-  #main.text [data-numbered-container], #main.text input[type="text"] {
-    font-family: var(--font-family-sans-serif);
-  }
-  #main:not(.text) [data-numbered-container], #main:not(.text) input[type="text"] {
-    font-family: var(--font-family-monospace);
-    color: var(--textarea-code-color);
-    caret-color: var(--textarea-code-color);
-  }
-  #workspace {
-    position: absolute;
-    left: 0;
-    top: 0;
-    display: flex;
-    flex-direction: column;
-    transition: var(--transition-slow);
-  }
-  #workspace::before, #workspace::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    transition: box-shadow var(--transition-slow);
-  }
-  #workspace::before {
-    box-shadow: 0 9px min(1.5vw, 6px) -8px var(--box-shadow) inset;
-    z-index: 1;
-  }
-  #workspace::after {
-    z-index: 1;
-  }
-  #workspace.text {
-    --size: 100%;
-    color: var(--text-dark);
-    background: var(--textarea-light);
-  }
-  #workspace.code, #workspace.split, #workspace.preview {
-    color: var(--text-light);
-    background: var(--textarea-dark);
-  }
-  #workspace.code {
-    --size: 100%;
-  }
-  #workspace.split {
-    --size: 50%;
-  }
-  #workspace.preview {
-    --size: 0;
-    visibility: hidden;
-    opacity: 0;
-  }
-  #workspace.horizontal, #preview.horizontal {
-    width: var(--size);
-    height: 100%;
-  }
-  #workspace.vertical, #preview.vertical {
-    width: 100%;
-    height: var(--size);
-  }
-  #workspace.split.horizontal::after, #workspace.preview.horizontal::after {
-    box-shadow: -9px 0 min(1.5vw, 6px) -8px var(--box-shadow) inset;
-  }
-  #workspace.split.vertical::after, #workspace.preview.vertical::after {
-    box-shadow: 0 -9px min(1.5vw, 6px) -8px var(--box-shadow) inset;
-  }
-  #workspace [data-numbered-container] {
-    height: 0;
-    background: none;
-    visibility: hidden;
-    opacity: 0;
-    transition: var(--transition-slow);
-    transition-property: padding, color;
-  }
-  #workspace.text [data-numbered-container] {
-    scrollbar-color: var(--scrollbar) var(--textarea-light);
-  }
-  #workspace:not(.text) [data-numbered-container] {
-    scrollbar-color: var(--scrollbar) var(--textarea-dark);
-  }
-  #workspace [data-numbered-container].active {
-    height: 100%;
-    visibility: visible;
-    opacity: 1;
-  }
-  #workspace [data-numbered-container] ol {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-  #workspace [data-numbered-container] textarea::-webkit-scrollbar {
-    width: min(4.5vw, 18px);
-    height: min(4.5vw, 18px);
-  }
-  #workspace [data-numbered-container] textarea::-webkit-scrollbar-thumb {
-    border-width: min(1.25vw, 5px);
-  }
-  #workspace.text [data-numbered-container] textarea {
-    caret-color: var(--text-dark);
-    white-space: pre-wrap;
-  }
-  #files {
-    padding-left: min(1.5vw, 12px);
-    padding-top: min(0.75vw, 6px);
-    position: relative;
-    flex-shrink: 0;
-    display: flex;
-    background: var(--main);
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    scrollbar-width: none;
-  }
-  #files::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    box-shadow: 0 calc(min(0.25vw, 1px) * -1) var(--edge-highlight) inset, 0 calc(min(0.25vw, 1px) * -1) var(--textarea-dark) inset, 0 -9px min(1.5vw, 6px) -8px var(--box-shadow) inset;
-    pointer-events: none;
-    z-index: 1;
-  }
-  #files::-webkit-scrollbar {
-    display: none;
-  }
-  #files > * {
-    flex-shrink: 0;
-  }
-  #files > *:last-child::before {
-    content: "";
-    position: absolute;
-    left: 100%;
-    top: 0;
-    width: min(1.5vw, 12px);
-    height: 100%;
-    pointer-events: none;
-  }
-  #files > * + * {
-    margin-left: min(2vw, 8px);
-  }
-  #files button.tab.active {
-    box-shadow: 0 0 0 min(0.25vw, 1px) var(--edge-highlight), 0 0 0 min(0.25vw, 1px) var(--textarea-dark);
-    z-index: 1;
-  }
-  #files button.tab > [data-file-name] {
-    display: flex;
-    align-items: center;
-  }
-  #files button.tab[data-unsaved] {
-    padding-left: min(2vw, 8px);
-  }
-  #files button.tab[data-unsaved] > [data-file-name] {
-    font-style: italic;
-  }
-  #files button.tab[data-unsaved] > [data-file-name]::before {
-    content: "*";
-    margin-right: min(0.5vw, 2px);
-    font-size: 125%;
-    font-style: normal;
-    line-height: min(4vw, 16px);
-  }
-  #workspace.text #files button.tab.active {
-    color: var(--text-dark);
-    background: var(--textarea-light);
-  }
-  #workspace.text #files button.tab.active:focus {
-    --focus-border: var(--outline-dark);
-  }
-  #workspace.text #files button.tab.active > button:hover, #workspace.text #files button.tab.active > button:focus {
-    background: var(--tab-button-light);
-  }
-  #workspace.text #files button.tab.active > button > svg {
-    fill: var(--text-dark);
-  }
-  #workspace:not(.text) #files button.tab.active > button > svg {
-    fill: var(--text-light);
-  }
-  #workspace:not(.text) #files button.tab.active {
-    color: var(--text-light);
-    background: var(--textarea-dark);
-  }
-  #files button.tab.active.fade, #files button.tab.active.fade > button > svg {
-    transition-duration: var(--transition-slow);
-  }
-  #scaler {
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    touch-action: none;
-    z-index: 1;
-    transition: var(--transition-slow);
-  }
-  #scaler.active {
-    transition: none;
-  }
-  #scaler.text, #scaler.code {
-    --axis: 0;
-    --size: 0;
-    visibility: hidden;
-    opacity: 0;
-  }
-  #scaler.split {
-    --axis: calc(50% - 8px);
-    --size: 16px;
-  }
-  #scaler.preview {
-    --axis: 100%;
-    --size: 0;
-    visibility: hidden;
-    opacity: 0;
-  }
-  #scaler.horizontal {
-    right: var(--axis);
-    width: var(--size);
-    height: 100%;
-    cursor: col-resize;
-    --rotate: 90deg;
-  }
-  #scaler.vertical {
-    bottom: var(--axis);
-    width: 100%;
-    height: var(--size);
-    cursor: row-resize;
-    --rotate: 0deg;
-  }
-  #preview {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    background: #ffffff;
-    border: 0 solid var(--container-medium);
-    transition: var(--transition-slow);
-  }
-  #preview.text, #preview.code {
-    --size: 0;
-    visibility: hidden;
-    opacity: 0;
-  }
-  #preview.split {
-    --size: 50%;
-  }
-  #preview.preview {
-    --size: 100%;
-  }
-  #card_backdrop {
+  .card-backdrop {
     position: fixed;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background: var(--card-backdrop);
+    background: #00000040;
     visibility: hidden;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 2;
-    transition: var(--transition-medium);
-    transition-property: visibility, opacity;
-  }
-  #install_option > img, #install_button > img {
-    margin-right: min(2vw, 8px);
-    width: min(4.5vw, 20px);
-    height: min(4.5vw, 20px);
-  }
-  #install_option {
-    justify-content: flex-start;
-  }
-  #install_button + button::before {
-    content: "Theme";
-  }
-  #install_button.hidden + button::before {
-    content: "Customize Theme";
-  }
-  #theme_button {
-    padding: min(1.5vw, 6px) min(1vw, 8px);
-  }
-  #theme_setting {
-    color: var(--textarea-code-color);
-  }
-  #picker_preview {
-    min-width: min(20vw, 86px);
-    min-height: min(20vw, 86px);
-    border-radius: var(--border-radius-medium);
-    box-shadow: 0 min(0.5vw, 2px) min(1vw, 4px) var(--box-shadow) inset;
-  }
-  #picker_input {
-    width: min(20vw, 86px);
-  }
-  #red_channel {
-    --range-thumb-hover: #bb2222;
-    --range-track-hover: #660000;
-  }
-  #green_channel {
-    --range-thumb-hover: #22bb22;
-    --range-track-hover: #006600;
-  }
-  #blue_channel {
-    --range-thumb-hover: #2222bb;
-    --range-track-hover: #000066;
-  }
-  #loading {
-    margin: min(2.5vw, 14px);
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    visibility: hidden;
-    opacity: 0;
     z-index: 2;
   }
-  #loading.active {
+  .card-backdrop.active {
     visibility: visible;
-    opacity: 1;
   }
-  #loading > svg {
-    width: 15vmin;
-    height: 15vmin;
-    transition: fill var(--transition-slow);
-  }
-  #main.text #loading > svg {
-    fill: var(--text-dark);
-  }
-  #main:not(.text) #loading > svg {
-    fill: var(--text-light);
+  #symbol_definitions {
+    display: none;
   }
 </style>
 
@@ -1551,60 +483,46 @@
 
 </head>
 
-<body>
+<body data-view="code" data-orientation="horizontal">
 
 <svg id="symbol_definitions">
-  <symbol id="arrow" viewBox="0 0 512 512">
+  <symbol id="arrow_icon" viewBox="0 0 512 512">
     <path d="m112.66 0 286.68 256-286.68 256z"/>
   </symbol>
-  <symbol id="check" viewBox="0 0 512 512">
+  <symbol id="check_icon" viewBox="0 0 512 512">
     <path d="m63.346 191.15 192.72 192.72-63.402 63.402-192.72-192.72z"/>
     <path d="m129.5 383.87 319.15-319.15 63.402 63.402-319.15 319.15z"/>
   </symbol>
-  <symbol id="back" viewBox="0 0 512 512">
+  <symbol id="back_icon" viewBox="0 0 512 512">
     <path d="m160.8 191.81 254.36 254.36-64 64-254.36-254.36z"/>
     <path d="m96.833 255.86 254.36-254.36 64 64-254.36 254.36z"/>
   </symbol>
-  <symbol id="minimize" viewBox="0 0 512 512">
+  <symbol id="minimize_icon" viewBox="0 0 512 512">
     <path d="m30.33 211.17h451.34v89.669h-451.34z"/>
   </symbol>
-  <symbol id="close" viewBox="0 0 512 512">
+  <symbol id="close_icon" viewBox="0 0 512 512">
     <path d="m1.5795 65.78 64.201-64.201 190.22 190.22 190.22-190.22 64.201 64.201-190.22 190.22 190.22 190.22-64.201 64.201-190.22-190.22-190.22 190.22-64.201-64.201 190.22-190.22z"/>
   </symbol>
-  <symbol id="rename" viewBox="0 0 512 512">
+  <symbol id="rename_icon" viewBox="0 0 512 512">
     <path d="m-0.0618 512.07v-128.63l128.63 128.63z"/>
     <path d="m383.21 0.052969 128.72 128.72-88.63 88.63-128.72-128.72z"/>
     <path d="m252.59 130.63 128.72 128.72-210.68 210.68-128.72-128.72z"/>
   </symbol>
-  <symbol id="undo" viewBox="0 0 512 512">
+  <symbol id="undo_icon" viewBox="0 0 512 512">
     <path d="m133.64 437.65-133.64-133.64h267.28z"/>
     <path d="m512 249c-0.72363-111.33-91.271-201.16-202.61-200.98-111.33 0.17137-201.61 90.272-201.99 201.61l52.695 0.18028c0.28168-82.334 67.039-148.97 149.37-149.09 82.334-0.12673 149.3 66.299 149.83 148.63z"/>
     <path d="m107.4 246.77h52.472v57.48h-52.472z"/>
     <path d="m459.53 246.77h52.472v190.87h-52.472z"/>
   </symbol>
-  <symbol id="redo" viewBox="0 0 512 512">
+  <symbol id="redo_icon" viewBox="0 0 512 512">
     <path d="m378.36 437.65 133.64-133.64h-267.28z"/>
     <path d="m0.0044544 249c0.72363-111.33 91.271-201.16 202.61-200.98 111.33 0.17137 201.61 90.272 201.99 201.61l-52.695 0.18028c-0.28168-82.334-67.039-148.97-149.37-149.09-82.334-0.12673-149.3 66.299-149.83 148.63z"/>
     <path d="m404.6 246.77h-52.472v57.48h52.472z"/>
     <path d="m52.473 246.77h-52.472v190.87h52.472z"/>
   </symbol>
-  <symbol id="refresh" viewBox="0 0 512 512">
+  <symbol id="refresh_icon" viewBox="0 0 512 512">
     <path d="m510.27 285.75c-13.893 118.73-108.1 212.04-226.96 224.79-118.86 12.751-230.71-58.451-269.47-171.53-38.761-113.08 5.8941-237.93 107.58-300.78 101.68-62.846 233.32-46.955 317.13 38.282l-37.067 36.446c-66.79-67.929-171.7-80.593-252.74-30.508-81.036 50.084-116.62 149.58-85.733 239.7 30.89 90.117 120.03 146.86 214.75 136.7 94.721-10.161 169.8-84.522 180.87-179.14z"/>
     <path d="m512 189.01v-189.01l-188.98 189.01z"/>
-  </symbol>
-  <symbol id="buffering" viewBox="0 0 512 512">
-    <path d="m229.78 8.7403c0-4.8272 3.9132-8.7403 8.7403-8.7403h34.96c2.3181 0 4.5412 0.92085 6.1804 2.56 1.6391 1.6391 2.56 3.8623 2.56 6.1803v88.126c0 4.8272-3.9132 8.7403-8.7403 8.7403h-34.96c-4.8272 0-8.7403-3.9132-8.7403-8.7403z"/>
-    <path d="m356.92 28.764c2.4126-4.1803 7.7575-5.6138 11.938-3.2016l30.278 17.47c2.0076 1.1583 3.4727 3.0667 4.0731 5.3053 0.60034 2.2386 0.28674 4.624-0.87186 6.6314l-44.051 76.326c-2.4126 4.1803-7.7575 5.6138-11.938 3.2016l-30.278-17.47c-4.1806-2.4121-5.6139-7.7564-3.2013-11.937z" opacity="0.083"/>
-    <path d="m457.03 109.66c4.1804-2.4126 9.5246-0.97937 11.937 3.2013l17.47 30.278c1.1584 2.0076 1.4718 4.3932 0.87137 6.6321-0.60043 2.2388-2.0655 4.1475-4.073 5.3061l-76.326 44.051c-4.1804 2.4126-9.5246 0.97937-11.937-3.2013l-17.47-30.278c-2.4121-4.1806-0.9787-9.5255 3.2017-11.938z" opacity="0.16"/>
-    <path d="m503.26 229.78c4.8271 0 8.7403 3.9132 8.7403 8.7403v34.96c0 2.3181-0.92087 4.5412-2.56 6.1804-1.6391 1.6391-3.8622 2.56-6.1803 2.56h-88.126c-4.8271 0-8.7403-3.9132-8.7403-8.7403v-34.96c0-4.8272 3.9132-8.7403 8.7403-8.7403z" opacity="0.25"/>
-    <path d="m483.25 356.93c4.1806 2.4151 5.6119 7.7619 3.1969 11.943l-17.491 30.278c-1.1597 2.0076-3.0695 3.4723-5.3091 4.0718-2.2396 0.59955-4.6257 0.28482-6.6333-0.87494l-76.294-44.073c-4.1806-2.4151-5.6119-7.7619-3.1969-11.943l17.491-30.278c2.415-4.1806 7.7618-5.6119 11.942-3.1969z" opacity="0.33"/>
-    <path d="m402.34 457.03c2.4126 4.1804 0.97937 9.5246-3.2013 11.937l-30.278 17.47c-2.0076 1.1584-4.3932 1.4718-6.6321 0.87137-2.2388-0.60043-4.1475-2.0655-5.3061-4.073l-44.051-76.326c-2.4126-4.1804-0.97937-9.5246 3.2013-11.937l30.278-17.47c4.1806-2.4121 9.5255-0.9787 11.938 3.2017z" opacity="0.42"/>
-    <path d="m229.78 503.26c0 4.8271 3.9132 8.7403 8.7403 8.7403h34.96c2.3181 0 4.5412-0.92087 6.1804-2.56 1.6391-1.6391 2.56-3.8622 2.56-6.1803v-88.126c0-4.8271-3.9132-8.7403-8.7403-8.7403h-34.96c-4.8272 0-8.7403 3.9132-8.7403 8.7403z" opacity="0.5"/>
-    <path d="m109.66 457.03c-2.4126 4.1804-0.97936 9.5246 3.2013 11.937l30.278 17.47c2.0076 1.1584 4.3932 1.4718 6.6321 0.87137 2.2388-0.60043 4.1475-2.0655 5.3061-4.073l44.051-76.326c2.4126-4.1804 0.97937-9.5246-3.2013-11.937l-30.278-17.47c-4.1806-2.4121-9.5255-0.9787-11.938 3.2017z" opacity="0.58"/>
-    <path d="m28.765 356.92c-4.1803 2.4126-5.6138 7.7575-3.2016 11.938l17.47 30.278c1.1583 2.0076 3.0667 3.4727 5.3053 4.0731 2.2386 0.60034 4.624 0.28674 6.6314-0.87186l76.326-44.051c4.1803-2.4126 5.6138-7.7575 3.2016-11.938l-17.47-30.278c-2.4121-4.1806-7.7564-5.6139-11.937-3.2013z" opacity="0.66"/>
-    <path d="m8.7403 282.22c-4.8272 0-8.7403-3.9132-8.7403-8.7403v-34.96c0-2.3181 0.92085-4.5412 2.56-6.1804 1.6391-1.6391 3.8623-2.56 6.1803-2.56h88.126c4.8272 0 8.7403 3.9132 8.7403 8.7403v34.96c0 4.8271-3.9132 8.7403-8.7403 8.7403z" opacity="0.75"/>
-    <path d="m54.982 109.67c-4.1806-2.4151-9.5274-0.98376-11.942 3.1969l-17.491 30.278c-1.1597 2.0076-1.4745 4.3937-0.87492 6.6334 0.59953 2.2397 2.0642 4.1494 4.0718 5.3092l76.294 44.073c4.1806 2.415 9.5274 0.98376 11.942-3.1969l17.491-30.278c2.415-4.1806 0.98373-9.5275-3.1969-11.943z" opacity="0.83"/>
-    <path d="m155.08 28.764c-2.4126-4.1803-7.7575-5.6138-11.938-3.2016l-30.278 17.47c-2.0076 1.1583-3.4727 3.0667-4.0731 5.3053-0.60036 2.2386-0.28674 4.624 0.87183 6.6314l44.051 76.326c2.4126 4.1803 7.7575 5.6138 11.938 3.2016l30.278-17.47c4.1806-2.4121 5.6139-7.7564 3.2013-11.937z" opacity="0.91"/>
   </symbol>
 </svg>
 
@@ -1612,142 +530,147 @@
   <section class="app-icon">
     <img src="resources/icon.svg">
   </section>
-  <section class="menu-bar">
-    <div class="dropdown">
-      <button>File</button>
-      <ul>
-        <li onclick="createFile();">New File<span class="shortcut ctrl-shift shift-command">X</span></li>
-        <li onclick="openEditorWindow();">New Window<span class="shortcut ctrl-shift shift-command">C</span></li>
-        <li onclick="loadFiles();">Open<span class="shortcut ctrl command">O</span></li>
-        <li onclick="saveFile();">Save<span class="shortcut ctrl command">S</span></li>
-        <li>Save As...
-          <svg><use href="#arrow"/></svg>
-          <ul>
-            <li onclick="saveFile('txt');">Plain Text<span>.txt</span></li>
-            <li onclick="saveFile('html');">HTML<span>.html</span></li>
-            <li onclick="saveFile('css');">CSS<span>.css</span></li>
-            <li onclick="saveFile('js');">JavaScript<span>.js</span></li>
-            <li onclick="saveFile('json');">JSON<span>.json</span></li>
-            <li>More...
-              <svg><use href="#arrow"/></svg>
-              <ul>
-                <li onclick="saveFile('webmanifest');">Web Manifest<span>.webmanifest</span></li>
-                <li onclick="saveFile('md');">Markdown<span>.md</span></li>
-                <li onclick="saveFile('mcmeta');">MCMETA<span>.mcmeta</span></li>
-                <li onclick="saveFile('xml');">XML<span>.xml</span></li>
-                <li onclick="saveFile('svg');">SVG<span>.svg</span></li>
+  <section class="menubar">
+    <div class="menu">
+      <button class="opener">File</button>
+      <ul class="list">
+        <li class="list-item" onclick="createFile();">New File<span class="info shortcut ctrl-shift shift-command">X</span></li>
+        <li class="list-item" onclick="openEditorWindow();">New Window<span class="info shortcut ctrl-shift shift-command">C</span></li>
+        <li class="list-item" onclick="loadFiles();">Open<span class="info shortcut ctrl command">O</span></li>
+        <li class="list-item" onclick="saveFile();">Save<span class="info shortcut ctrl command">S</span></li>
+        <li class="list-item list-parent">Save As...<svg class="info"><use href="#arrow_icon"/></svg>
+          <ul class="list">
+            <li class="list-item" onclick="saveFile('txt');">Plain Text<span class="info">.txt</span></li>
+            <li class="list-item" onclick="saveFile('html');">HTML<span class="info">.html</span></li>
+            <li class="list-item" onclick="saveFile('css');">CSS<span class="info">.css</span></li>
+            <li class="list-item" onclick="saveFile('js');">JavaScript<span class="info">.js</span></li>
+            <li class="list-item" onclick="saveFile('json');">JSON<span class="info">.json</span></li>
+            <li class="list-item list-parent">More...<svg class="info"><use href="#arrow_icon"/></svg>
+              <ul class="list">
+                <li class="list-item" onclick="saveFile('webmanifest');">Web Manifest<span class="info">.webmanifest</span></li>
+                <li class="list-item" onclick="saveFile('md');">Markdown<span class="info">.md</span></li>
+                <li class="list-item" onclick="saveFile('mcmeta');">MCMETA<span class="info">.mcmeta</span></li>
+                <li class="list-item" onclick="saveFile('xml');">XML<span class="info">.xml</span></li>
+                <li class="list-item" onclick="saveFile('svg');">SVG<span class="info">.svg</span></li>
               </ul>
             </li>
           </ul>
         </li>
       </ul>
     </div>
-    <div class="dropdown">
-      <button>View</button>
-      <ul>
-        <li onclick="changeView('text');">Text<span class="shortcut ctrl-shift ctrl-command">1</span></li>
-        <li onclick="changeView('code');">Code<span class="shortcut ctrl-shift ctrl-command">2</span></li>
-        <li onclick="changeView('split');">Split<span class="shortcut ctrl-shift ctrl-command">3</span></li>
-        <li onclick="changeView('preview');">Preview<span class="shortcut ctrl-shift ctrl-command">4</span></li>
-        <li onclick="changeOrientation();">Orientation<span class="shortcut ctrl-shift ctrl-command">5</span></li>
-        <li onclick="openDisplay();">Display<span class="shortcut ctrl-shift ctrl-command">6</span></li>
+    <div class="menu">
+      <button class="opener">View</button>
+      <ul class="list">
+        <li class="list-item" onclick="changeView('code');">Code<span class="info shortcut ctrl-shift ctrl-command">2</span></li>
+        <li class="list-item" onclick="changeView('split');">Split<span class="info shortcut ctrl-shift ctrl-command">3</span></li>
+        <li class="list-item" onclick="changeView('preview');">Preview<span class="info shortcut ctrl-shift ctrl-command">4</span></li>
+        <li class="list-item" onclick="changeOrientation();">Orientation<span class="info shortcut ctrl-shift ctrl-command">5</span></li>
+        <li class="list-item" onclick="openDisplay();">Display<span class="info shortcut ctrl-shift ctrl-command">6</span></li>
       </ul>
     </div>
-    <div class="dropdown">
-      <button>Preview</button>
-      <ul id="preview_files">
-        <li onclick="Editor.preview_editor = null; forceRefresh();">Active Editor</li>
+    <div class="menu">
+      <button class="opener">Preview</button>
+      <ul id="preview_files" class="list">
+        <li class="list-item" onclick="Editor.preview_editor = null; forceRefresh();">Active Editor</li>
       </ul>
     </div>
-    <div class="dropdown">
-      <button>Tools</button>
-      <ul>
-        <li onclick="openCard(editing_tools_card);">Editing Tools<span class="shortcut ctrl-shift shift-command">E</span></li>
-        <li onclick="openCard(replacer_card);">Replace Text<span class="shortcut ctrl-shift shift-command">F</span></li>
-        <li onclick="openCard(picker_card);">Color Picker<span class="shortcut ctrl-shift shift-command">P</span></li>
-        <li onclick="openCard(formatter_card);">JSON Formatter<span class="shortcut ctrl-shift shift-command">R</span></li>
-        <li onclick="openCard(encoder_card);">URI Encoder<span class="shortcut ctrl-shift shift-command">Y</span></li>
-        <li onclick="confirmOverwrite(insertTemplate);">Import HTML Template<span class="shortcut ctrl-shift shift-command">H</span></li>
-        <li>Online Resources...
-          <svg><use href="#arrow"/></svg>
-          <ul>
-            <a href="https://webformatter.com"><img src="resources/web-formatter.svg">Code Formatter</a>
-            <a href="https://www.sharedrop.io"><img class="invert" src="resources/sharedrop.svg">File Transferer</a>
-            <a href="https://www.diffchecker.com/"><img src="resources/diffchecker.svg">Difference Finder</a>
-            <a href="https://caniuse.com/"><img src="resources/caniuse.svg">Compatibility Checker</a>
-            <a href="https://web.dev/measure/"><img src="resources/webdev.svg">Performance Tester</a>
-            <a href="https://realfavicongenerator.net/"><img class="rounded" src="resources/real-favicon-generator.svg">Favicon Generator</a>
-            <a href="https://appsco.pe/developer/splash-screens/"><img class="invert" src="resources/appscope.svg">Splash Generator</a>
-            <a href="https://www.svgminify.com/"><img src="resources/svgminify.svg">SVG Simplifier</a>
-            <a href="https://www.uuidgenerator.net/"><img src="resources/online-uuid-generator.svg">UUID Generator</a>
-            <a href="https://cryptii.com/"><img src="resources/cryptii.svg">Text Encryptor</a>
+    <div class="menu">
+      <button class="opener">Tools</button>
+      <ul class="list">
+        <li class="list-item" onclick="openCard(editing_tools_card);">Editing Tools<span class="info shortcut ctrl-shift shift-command">E</span></li>
+        <li class="list-item" onclick="openCard(replacer_card);">Replace Text<span class="info shortcut ctrl-shift shift-command">F</span></li>
+        <li class="list-item" onclick="openCard(picker_card);">Color Picker<span class="info shortcut ctrl-shift shift-command">P</span></li>
+        <li class="list-item" onclick="openCard(formatter_card);">JSON Formatter<span class="info shortcut ctrl-shift shift-command">R</span></li>
+        <li class="list-item" onclick="openCard(encoder_card);">URI Encoder<span class="info shortcut ctrl-shift shift-command">Y</span></li>
+        <li class="list-item" onclick="confirmOverwrite(insertTemplate);">Import HTML Template<span class="info shortcut ctrl-shift shift-command">H</span></li>
+        <li class="list-item list-parent">Online Resources...<svg class="info"><use href="#arrow_icon"/></svg>
+          <ul class="list">
+            <a class="list-item" href="https://webformatter.com"><img src="resources/web-formatter.svg">Code Formatter</a>
+            <a class="list-item" href="https://www.sharedrop.io"><img class="invert" src="resources/sharedrop.svg">File Transferer</a>
+            <a class="list-item" href="https://www.diffchecker.com/"><img src="resources/diffchecker.svg">Difference Finder</a>
+            <a class="list-item" href="https://caniuse.com/"><img src="resources/caniuse.svg">Compatibility Checker</a>
+            <a class="list-item" href="https://web.dev/measure/"><img src="resources/webdev.svg">Performance Tester</a>
+            <a class="list-item" href="https://realfavicongenerator.net/"><img class="rounded" src="resources/real-favicon-generator.svg">Favicon Generator</a>
+            <a class="list-item" href="https://appsco.pe/developer/splash-screens/"><img class="invert" src="resources/appscope.svg">Splash Generator</a>
+            <a class="list-item" href="https://www.svgminify.com/"><img src="resources/svgminify.svg">SVG Simplifier</a>
+            <a class="list-item" href="https://www.uuidgenerator.net/"><img src="resources/online-uuid-generator.svg">UUID Generator</a>
+            <a class="list-item" href="https://cryptii.com/"><img src="resources/cryptii.svg">Text Encryptor</a>
           </ul>
         </li>
       </ul>
     </div>
-    <div class="dropdown alternate">
-      <button onclick="openCard(settings_card);">Settings</button>
-      <ul>
-        <li id="install_option" class="hidden" onclick="installApp();"><img src="resources/icon.svg">Install</button>
-        <li onclick="openCard(theme_card); Editor.modal_previous = this.closest('.dropdown').querySelector('button');">Theme Settings</li>
-        <li id="clear_cache_option" class="hidden" onclick="clearCache();">Clear Cache</li>
-        <li onclick="resetSettings();">Reset Settings</li>
+    <div class="menu alternate">
+      <button class="opener" onclick="openCard(settings_card);">Settings</button>
+      <ul class="list">
+        <li id="install_option" class="list-item hidden" onclick="installApp();"><img src="resources/icon.svg">Install</button>
+        <li class="list-item" onclick="openCard(theme_card); Editor.dialog_previous = this.closest('.menu').querySelector('button');">Theme Settings</li>
+        <li class="list-item" id="clear_cache_option" class="hidden" onclick="clearCache();">Clear Cache</li>
+        <li class="list-item" onclick="resetSettings();">Reset Settings</li>
       </ul>
     </div>
   </section>
+  <section class="window-controls">
+    <button data-control="minimize">&mdash;</button>
+    <button data-control="maximize">
+      <span data-icon="maximize">&#9744;</span>
+      <!--span data-icon="restore">&#10064;</span-->
+    </button>
+    <button data-control="close">&#10005;</button>
+  </section>
 </header>
 
-<main id="main" class="text horizontal">
-  <section id="workspace" class="text horizontal">
-    <section id="files"></section>
+<main id="main">
+  <section id="workspace" class="workspace">
+    <section id="files" class="editor-tabs"></section>
   </section>
-  <section id="scaler" class="text horizontal"></section>
-  <iframe id="preview" class="text horizontal" src="about:blank"></iframe>
-  <section id="card_backdrop"></section>
-  <section id="settings_card" class="card modal">
+  <section id="scaler" class="workspace-scaler"></section>
+  <iframe id="preview" class="workspace-preview" src="about:blank"></iframe>
+  <section id="card_backdrop" class="card-backdrop"></section>
+  <section id="settings_card" class="card dialog">
     <section class="header">
-      <button class="nav back"><svg><use href="#back"/></svg></button>
+      <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">Settings</span>
-      <button class="nav minimize"><svg><use href="#minimize"/></svg></button>
-      <button class="nav close"><svg><use href="#close"/></svg></button>
+      <section class="card-controls">
+        <button data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
+        <button data-control="close"><svg><use href="#close_icon"/></svg></button>
+      </section>
     </section>
     <section class="main">
       <div class="content">
         <div class="item list start">
           <div class="select">
             <label for="view_setting">Default View:</label>
-            <div class="dropdown">
-              <button id="view_setting">Text<svg><use href="#arrow"/></svg></button>
-              <ul>
-                <li onclick="updateSelect('view','text');">Text</li>
-                <li onclick="updateSelect('view','code');">Code</li>
-                <li onclick="updateSelect('view','split');">Split</li>
+            <div class="menu">
+              <button id="view_setting" class="opener">Code<svg><use href="#arrow_icon"/></svg></button>
+              <ul class="list">
+                <li class="list-item" onclick="updateSelect('view','code');">Code</li>
+                <li class="list-item" onclick="updateSelect('view','split');">Split</li>
               </ul>
             </div>
           </div>
           <div class="select">
             <label for="orientation_setting">Default Orientation:</label>
-            <div class="dropdown">
-              <button id="orientation_setting">Horizontal<svg><use href="#arrow"/></svg></button>
-              <ul>
-                <li onclick="updateSelect('orientation','horizontal');">Horizontal</li>
-                <li onclick="updateSelect('orientation','vertical');">Vertical</li>
+            <div class="menu">
+              <button id="orientation_setting" class="opener">Horizontal<svg><use href="#arrow_icon"/></svg></button>
+              <ul class="list">
+                <li class="list-item" onclick="updateSelect('orientation','horizontal');">Horizontal</li>
+                <li class="list-item" onclick="updateSelect('orientation','vertical');">Vertical</li>
               </ul>
             </div>
           </div>
           <div class="checkbox">
             <input id="refresh_setting" type="checkbox" oninput="updateCheckbox('refresh');" checked>
-            <label for="refresh_setting"><svg><use href="#check"/></svg>Automatically Refresh Preview</label>
+            <label for="refresh_setting"><svg class="check"><use href="#check_icon"/></svg>Automatically Refresh Preview</label>
           </div>
           <div class="checkbox">
             <input id="editing_tools_setting" type="checkbox" oninput="updateCheckbox('editing_tools');">
-            <label for="editing_tools_setting"><svg><use href="#check"/></svg>Open Editing Tools</label>
+            <label for="editing_tools_setting"><svg class="check"><use href="#check_icon"/></svg>Open Editing Tools</label>
           </div>
         </div>
       </div>
       <div class="options">
         <button id="install_button" class="hidden" onclick="installApp();"><img src="resources/icon.svg">Install</button>
-        <button id="theme_button" class="menu" onclick="openCard(theme_card);" data-previous-card="theme_card"><svg><use href="#arrow"/></svg></button>
+        <button id="theme_button" onclick="openCard(theme_card);" data-previous-card="theme_card"><svg><use href="#arrow_icon"/></svg></button>
       </div>
       <div class="options">
         <button id="clear_cache_button" class="warning hidden" onclick="clearCache();">Clear Cache</button>
@@ -1755,12 +678,14 @@
       </div>
     </section>
   </section>
-  <section id="theme_card" class="card modal">
+  <section id="theme_card" class="card dialog">
     <section class="header">
-      <button class="nav back" data-parent-card="settings_card"><svg><use href="#back"/></svg></button>
+      <button class="card-back" data-parent-card="settings_card"><svg><use href="#back_icon"/></svg></button>
       <span class="title">Theme</span>
-      <button class="nav minimize"><svg><use href="#minimize"/></svg></button>
-      <button class="nav close"><svg><use href="#close"/></svg></button>
+      <section class="card-controls">
+        <button data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
+        <button data-control="close"><svg><use href="#close_icon"/></svg></button>
+      </section>
     </section>
     <section class="main">
       <div class="content">
@@ -1775,7 +700,7 @@
       </div>
     </section>
   </section>
-  <section id="reset_card" class="card notification">
+  <section id="reset_card" class="card alert">
     <section class="header">
       <img class="icon" src="resources/settings.svg">
       <span class="title">Reset Settings</span>
@@ -1786,7 +711,7 @@
       </div>
     </section>
   </section>
-  <section id="clear_cache_success_card" class="card notification">
+  <section id="clear_cache_success_card" class="card alert">
     <section class="header">
       <img class="icon" src="resources/template.svg">
       <span class="title">Cleared Cache</span>
@@ -1797,23 +722,25 @@
       </div>
     </section>
   </section>
-  <section id="editing_tools_card" class="card action">
+  <section id="editing_tools_card" class="card tool action">
     <section class="main">
       <div class="content">
         <div class="options">
-          <button id="undo_tool" onclick="callCommand(Editor.query.file.textarea(),'undo'); this.focus();"><svg><use href="#undo"/></svg></button>
-          <button id="redo_tool" onclick="callCommand(Editor.query.file.textarea(),'redo'); this.focus();"><svg><use href="#redo"/></svg></button>
-          <button id="refresh_tool" onclick="forceRefresh();" disabled><svg><use href="#refresh"/></svg></button>
+          <button id="undo_tool" onclick="callCommand(Editor.query.file.textarea(),'undo'); this.focus();"><svg><use href="#undo_icon"/></svg></button>
+          <button id="redo_tool" onclick="callCommand(Editor.query.file.textarea(),'redo'); this.focus();"><svg><use href="#redo_icon"/></svg></button>
+          <button id="refresh_tool" onclick="forceRefresh();" disabled><svg><use href="#refresh_icon"/></svg></button>
         </div>
       </div>
     </section>
   </section>
-  <section id="replacer_card" class="card widget">
+  <section id="replacer_card" class="card tool widget">
     <section class="header">
-      <button class="nav back"><svg><use href="#back"/></svg></button>
+      <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">Replace Text</span>
-      <button class="nav minimize"><svg><use href="#minimize"/></svg></button>
-      <button class="nav close"><svg><use href="#close"/></svg></button>
+      <section class="card-controls">
+        <button data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
+        <button data-control="close"><svg><use href="#close_icon"/></svg></button>
+      </section>
     </section>
     <section class="main">
       <div class="content">
@@ -1833,12 +760,14 @@
       </div>
     </section>
   </section>
-  <section id="picker_card" class="card widget">
+  <section id="picker_card" class="card tool widget">
     <section class="header">
-      <button class="nav back"><svg><use href="#back"/></svg></button>
+      <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">Color Picker</span>
-      <button class="nav minimize"><svg><use href="#minimize"/></svg></button>
-      <button class="nav close"><svg><use href="#close"/></svg></button>
+      <section class="card-controls">
+        <button data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
+        <button data-control="close"><svg><use href="#close_icon"/></svg></button>
+      </section>
     </section>
     <section class="main">
       <div class="content">
@@ -1862,12 +791,14 @@
       </div>
     </section>
   </section>
-  <section id="formatter_card" class="card widget">
+  <section id="formatter_card" class="card tool widget">
     <section class="header">
-      <button class="nav back"><svg><use href="#back"/></svg></button>
+      <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">JSON Formatter</span>
-      <button class="nav minimize"><svg><use href="#minimize"/></svg></button>
-      <button class="nav close"><svg><use href="#close"/></svg></button>
+      <section class="card-controls">
+        <button data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
+        <button data-control="close"><svg><use href="#close_icon"/></svg></button>
+      </section>
     </section>
     <section class="main">
       <div class="content">
@@ -1884,12 +815,14 @@
       </div>
     </section>
   </section>
-  <section id="encoder_card" class="card widget">
+  <section id="encoder_card" class="card tool widget">
     <section class="header">
-      <button class="nav back"><svg><use href="#back"/></svg></button>
+      <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">URI Encoder</span>
-      <button class="nav minimize"><svg><use href="#minimize"/></svg></button>
-      <button class="nav close"><svg><use href="#close"/></svg></button>
+      <section class="card-controls">
+        <button data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
+        <button data-control="close"><svg><use href="#close_icon"/></svg></button>
+      </section>
     </section>
     <section class="main">
       <div class="content">
@@ -1907,28 +840,25 @@
       <div class="options">
         <div class="checkbox">
           <input id="component_setting" type="checkbox">
-          <label for="component_setting"><svg><use href="#check"/></svg>Enable URI Component</label>
+          <label for="component_setting"><svg class="check"><use href="#check_icon"/></svg>Enable URI Component</label>
         </div>
       </div>
     </section>
   </section>
-  <section id="context_menu" class="dropdown context-menu">
-    <ul>
-      <li class="window" onclick="window.location.reload();">Reload<span class="shortcut ctrl command">R</span></li>
-      <li class="link" onclick="Editor.context_menu_previous.click();">Open in New Tab</li>
-      <li class="web-sharing link" onclick="navigator.share({ url: Editor.context_menu_previous.href });">Share Link</li>
-      <li class="web-sharing-alt link" onclick="navigator.clipboard.writeText(Editor.context_menu_previous.href).catch(error => alert('Clipboard could not be written to, please check site permissions for clipboard use.'));">Copy Link</li>
-      <li class="editing" onclick="callCommand(Editor.context_menu_previous,'undo');">Undo<span class="shortcut ctrl command">Z</span></li>
-      <li class="editing" onclick="callCommand(Editor.context_menu_previous,'redo');">Redo<span class="shortcut ctrl-shift shift-command">Z</span></li>
-      <li class="editing" onclick="callCommand(Editor.context_menu_previous,'cut');">Cut<span class="shortcut ctrl command">X</span></li>
-      <li class="editing" onclick="callCommand(Editor.context_menu_previous,'copy');">Copy<span class="shortcut ctrl command">C</span></li>
-      <li class="editing" onclick="callCommand(Editor.context_menu_previous,'paste');">Paste<span class="shortcut ctrl command">V</span></li>
-      <li class="editing" onclick="Editor.context_menu_previous.select();">Select All<span class="shortcut ctrl command">A</span></li>
-      <li class="web-sharing editing" onclick="navigator.share({ text: Editor.long_touch.selection });">Share Text</li>
+  <section id="context_menu" class="menu context-menu">
+    <ul class="list">
+      <li class="list-item window" onclick="window.location.reload();">Reload<span class="info shortcut ctrl command">R</span></li>
+      <li class="list-item link" onclick="Editor.context_menu_previous.click();">Open in New Tab</li>
+      <li class="list-item web-sharing link" onclick="navigator.share({ url: Editor.context_menu_previous.href });">Share Link</li>
+      <li class="list-item web-sharing-alt link" onclick="navigator.clipboard.writeText(Editor.context_menu_previous.href).catch(error => alert('Clipboard could not be written to, please check site permissions for clipboard use.'));">Copy Link</li>
+      <li class="list-item editing" onclick="callCommand(Editor.context_menu_previous,'undo');">Undo<span class="info shortcut ctrl command">Z</span></li>
+      <li class="list-item editing" onclick="callCommand(Editor.context_menu_previous,'redo');">Redo<span class="info shortcut ctrl-shift shift-command">Z</span></li>
+      <li class="list-item editing" onclick="callCommand(Editor.context_menu_previous,'cut');">Cut<span class="info shortcut ctrl command">X</span></li>
+      <li class="list-item editing" onclick="callCommand(Editor.context_menu_previous,'copy');">Copy<span class="info shortcut ctrl command">C</span></li>
+      <li class="list-item editing" onclick="callCommand(Editor.context_menu_previous,'paste');">Paste<span class="info shortcut ctrl command">V</span></li>
+      <li class="list-item editing" onclick="Editor.context_menu_previous.select();">Select All<span class="info shortcut ctrl command">A</span></li>
+      <li class="list-item web-sharing editing" onclick="navigator.share({ text: Editor.long_touch.selection });">Share Text</li>
     </ul>
-  </section>
-  <section id="loading">
-    <svg class="buffering"><use href="#buffering"/></svg>
   </section>
 </main>
 
@@ -1939,8 +869,8 @@
     anchor.addEventListener("contextmenu",event => {
       if (Editor.environment.mozilla_browser){
         event.stopPropagation();
-        dropdowns.forEach(dropdown => {
-          if (!dropdown.contains(event.target)) closeDropdown(dropdown);
+        menus.forEach(menu => {
+          if (!menu.contains(event.target)) closeMenu(menu);
         });
       } else openContextMenu(event,"link");
     });
@@ -1955,34 +885,33 @@
   document.querySelectorAll("img:not([alt])").forEach(image => image.alt = "");
   document.querySelectorAll("textarea").forEach(textarea => {
     addInputCharacteristics(textarea);
-    textarea.num_disableLineCount();
   });
   document.querySelectorAll("input[type='text']").forEach(input => addInputCharacteristics(input));
-  var dropdowns = document.querySelectorAll(".dropdown");
-  dropdowns.forEach(dropdown => {
-    var button = dropdown.querySelector("button"), menus = dropdown.querySelectorAll("ul"), submenus = dropdown.querySelectorAll("li > ul"), options = dropdown.querySelectorAll("li, a");
-    dropdown.addEventListener("click",event => event.stopPropagation());
-    dropdown.addEventListener("keydown",event => {
-      if (!dropdown.classList.contains("active")) return;
-      if ((event.key == "Escape" || event.key == "Tab") && dropdown != context_menu){
+  var menus = document.querySelectorAll(".menu");
+  menus.forEach(menu => {
+    var button = menu.querySelector("button"), menus = menu.querySelectorAll("ul"), submenus = menu.querySelectorAll("li > ul"), options = menu.querySelectorAll("li, a");
+    menu.addEventListener("click",event => event.stopPropagation());
+    menu.addEventListener("keydown",event => {
+      if (!menu.classList.contains("active")) return;
+      if ((event.key == "Escape" || event.key == "Tab") && menu != context_menu){
         event.preventDefault();
         event.stopPropagation();
         if (event.key == "Tab") return;
-        closeDropdown(dropdown);
+        closeMenu(menu);
         if (button) button.focus();
       }
     });
     if (button){
-      if (!dropdown.classList.contains("alternate")){
-        button.addEventListener("click",() => openDropdown(dropdown));
+      if (!menu.classList.contains("alternate")){
+        button.addEventListener("click",() => openMenu(menu));
       } else {
-        button.addEventListener("contextmenu",() => openDropdown(dropdown));
-        button.addEventListener("touchstart",() => Editor.long_touch.timeout = window.setTimeout(() => openDropdown(dropdown),750));
+        button.addEventListener("contextmenu",() => openMenu(menu));
+        button.addEventListener("touchstart",() => Editor.long_touch.timeout = window.setTimeout(() => openMenu(menu),750));
         button.addEventListener("touchmove",cancelLongTouch);
         button.addEventListener("touchend",cancelLongTouch);
       }
       button.addEventListener("keydown",event => {
-        if (!dropdown.classList.contains("active")) return;
+        if (!menu.classList.contains("active")) return;
         var navigable = getNavigableElements(menus[0],true);
         if (event.key == "ArrowDown"){
           event.preventDefault();
@@ -2048,9 +977,9 @@
     options.forEach(option => {
       option.addEventListener("click",() => {
         if (option.querySelector(":scope > ul") != null) return;
-        if (dropdown == context_menu){
+        if (menu == context_menu){
           closeContextMenu();
-        } else closeDropdown(dropdown);
+        } else closeMenu(menu);
       });
       option.addEventListener("keydown",event => {
         if (option.querySelector(":scope > ul") != null) return;
@@ -2060,11 +989,11 @@
           option.click();
           if (button) button.focus();
         }
-        if (!dropdown.parentElement.classList.contains("select")) return;
+        if (!menu.parentElement.classList.contains("select")) return;
         if (event.key == "Escape" || event.key == "Tab"){
           event.preventDefault();
           event.stopPropagation();
-          closeDropdown(dropdown);
+          closeMenu(menu);
           button.focus();
         }
       });
@@ -2089,12 +1018,12 @@
   });
   var cards = document.querySelectorAll(".card");
   cards.forEach(card => {
-    var backButton = card.querySelector("button.nav.back");
+    var backButton = card.querySelector(".card-back");
     if (backButton != null){
       backButton.addEventListener("click",() => openCard(document.querySelector(`#${backButton.getAttribute("data-parent-card")}`),card.id));
       backButton.setAttribute("aria-label","Back");
     }
-    var minimizeButton = card.querySelector("button.nav.minimize");
+    var minimizeButton = card.querySelector(".header .card-controls [data-control='minimize']");
     if (minimizeButton != null){
       minimizeButton.addEventListener("click",() => minimizeCard(card));
       minimizeButton.addEventListener("keydown",event => {
@@ -2105,18 +1034,18 @@
       });
       minimizeButton.setAttribute("aria-label","Minimize");
     }
-    var closeButton = card.querySelector("button.nav.close");
+    var closeButton = card.querySelector(".header .card-controls [data-control='close']");
     if (closeButton != null){
-      closeButton.addEventListener("click",() => closeCard(closeButton.parentElement.parentElement));
+      closeButton.addEventListener("click",() => closeCard(card));
       closeButton.setAttribute("aria-label","Close");
     }
     if (!Editor.environment.macOS_device || !minimizeButton || !closeButton) return;
-    var controlsBox = minimizeButton.parentElement;
-    controlsBox.insertBefore(minimizeButton,controlsBox.firstChild);
-    controlsBox.insertBefore(closeButton,controlsBox.firstChild);
+    var header = card.querySelector(".header"), cardControls = card.querySelector(".header .card-controls");
+    cardControls.insertBefore(closeButton,minimizeButton);
+    header.insertBefore(cardControls,header.firstChild);
     var navigable = getNavigableElements(card);
     card.addEventListener("keydown",event => {
-      if (!card.classList.contains("modal")) return;
+      if (!card.classList.contains("dialog")) return;
       if (event.key == "Tab"){
         if (event.shiftKey){
           if (document.activeElement == navigable[0]){
@@ -2162,7 +1091,7 @@
     install_button.classList.remove("hidden");
   });
   window.addEventListener("beforeunload",event => {
-    if (!Editor.appearance.parent_window || (files.querySelectorAll("button.tab[data-unsaved]").length == 0)) return;
+    if (!Editor.appearance.parent_window || (files.querySelectorAll(".tab[data-unsaved]").length == 0)) return;
     event.preventDefault();
     event.returnValue = "";
   });
@@ -2172,7 +1101,7 @@
       setFileTabVisibility(Editor.query.file.tab());
       setFilesSectionOffset();
     }
-    if (Editor.view != "split" || !main.hasAttribute("data-scaling-offset")) return;
+    if (Editor.view != "split" || !document.body.hasAttribute("data-scaling-offset")) return;
     var currentWidth = window.innerWidth, currentHeight = window.innerHeight;
     window.setTimeout(() => {
       if ((Editor.orientation == "horizontal" && window.innerWidth == currentWidth) || (Editor.orientation == "vertical" && window.innerHeight == currentHeight)) return;
@@ -2181,11 +1110,11 @@
   });
   window.addEventListener("orientationchange",refreshSafeAreaInsets);
   window.addEventListener("blur",() => {
-    var activeDropdowns = document.querySelectorAll(".dropdown.active");
-    activeDropdowns.forEach(activeDropdown => {
-      if (activeDropdown == context_menu){
+    var activeMenus = document.querySelectorAll(".menu.active");
+    activeMenus.forEach(activeMenu => {
+      if (activeMenu == context_menu){
         closeContextMenu();
-      } else closeDropdown(activeDropdown);
+      } else closeMenu(activeMenu);
     });
   });
   document.body.addEventListener("keydown",event => {
@@ -2195,7 +1124,7 @@
       if (event.repeat) return;
       event.stopPropagation();
       if (context_menu.classList.contains("active")) return closeContextMenu();
-      if (Editor.active_modal) closeCard(Editor.active_modal);
+      if (Editor.active_dialog) closeCard(Editor.active_dialog);
     }
     if ((ctrlShift || shiftCommand) && pressed("x")){
       event.preventDefault();
@@ -2210,7 +1139,7 @@
     if ((ctrlShift || ctrlCommand) && (pressed("[") || pressed("{"))){
       event.preventDefault();
       if (event.repeat) return;
-      var activeTab = Editor.query.file.tab(), tabs = Array.from(files.querySelectorAll("button.tab")), newTab, withinEditor = (document.activeElement == Editor.query.file.textarea());
+      var activeTab = Editor.query.file.tab(), tabs = Array.from(files.querySelectorAll(".tab")), newTab, withinEditor = (document.activeElement == Editor.query.file.textarea());
       if (activeTab == tabs[0]){
         newTab = tabs[tabs.length - 1];
       } else newTab = tabs[tabs.indexOf(activeTab) - 1];
@@ -2220,7 +1149,7 @@
     if ((ctrlShift || ctrlCommand) && (pressed("]") || pressed("}"))){
       event.preventDefault();
       if (event.repeat) return;
-      var activeTab = Editor.query.file.tab(), tabs = Array.from(files.querySelectorAll("button.tab")), newTab, withinEditor = (document.activeElement == Editor.query.file.textarea());
+      var activeTab = Editor.query.file.tab(), tabs = Array.from(files.querySelectorAll(".tab")), newTab, withinEditor = (document.activeElement == Editor.query.file.textarea());
       if (activeTab == tabs[tabs.length - 1]){
         newTab = tabs[0];
       } else newTab = tabs[tabs.indexOf(activeTab) + 1];
@@ -2241,12 +1170,12 @@
       event.preventDefault();
       if (event.repeat) return;
       saveFile();
-    }
+    }/*
     if ((ctrlShift || ctrlCommand) && (pressed("1") || pressed("!"))){
       event.preventDefault();
       if (event.repeat) return;
       changeView("text");
-    }
+    }*/
     if ((ctrlShift || ctrlCommand) && (pressed("2") || pressed("@"))){
       event.preventDefault();
       if (event.repeat) return;
@@ -2330,20 +1259,20 @@
   });
   document.body.addEventListener("contextmenu",event => event.preventDefault());
   document.body.addEventListener("drop",() => {
-    var activeDropdowns = document.querySelectorAll(".dropdown.active");
-    if (activeDropdowns == null) return;
-    activeDropdowns.forEach(activeDropdown => {
-      if (activeDropdown == context_menu){
+    var activeMenus = document.querySelectorAll(".menu.active");
+    if (activeMenus == null) return;
+    activeMenus.forEach(activeMenu => {
+      if (activeMenu == context_menu){
         closeContextMenu();
-      } else closeDropdown(activeDropdown);
+      } else closeMenu(activeMenu);
     });
   });
   document.body.addEventListener("dragend",() => document.querySelectorAll("textarea").forEach(textarea => textarea.num_refreshLineCount()));
-  var toolbar = document.querySelector("#header .menu-bar");
-  toolbar.querySelectorAll(".dropdown").forEach(dropdown => {
-    dropdown.addEventListener("mouseenter",() => {
-      if (toolbar.querySelectorAll(".dropdown:not(.alternate).active").length == 0 || dropdown.classList.contains("alternate") || dropdown.classList.contains("active")) return;
-      openDropdown(dropdown);
+  var toolbar = document.querySelector("#header .menubar");
+  toolbar.querySelectorAll(".menu").forEach(menu => {
+    menu.addEventListener("mouseenter",() => {
+      if (toolbar.querySelectorAll(".menu:not(.alternate).active").length == 0 || menu.classList.contains("alternate") || menu.classList.contains("active")) return;
+      openMenu(menu);
     });
   });
   files.addEventListener("dragover",event => {
@@ -2378,14 +1307,14 @@
     if (event.touches.length != 1) return;
     toggleScaling();
     document.addEventListener("touchmove",setScaling,{ passive: true });
-    document.addEventListener("touchend",removeScaling,{ passive: true });
+    document.addEventListener("touchend",disableScaling,{ passive: true });
   },{ passive: true });
   scaler.addEventListener("mousedown",() => {
     toggleScaling();
     document.addEventListener("mousemove",setScaling);
-    document.addEventListener("mouseup",removeScaling);
+    document.addEventListener("mouseup",disableScaling);
   });
-  card_backdrop.addEventListener("click",() => closeCard(Editor.active_modal));
+  card_backdrop.addEventListener("click",() => closeCard(Editor.active_dialog));
   theme_setting.addEventListener("input",() => {
     theme_styles.innerText = theme_setting.value;
     updateSetting("theme",theme_setting.value);
@@ -2430,14 +1359,14 @@
   }
   function createFile(name,value){
     var identifier = Math.random(), tab = document.createElement("button"), container = document.createElement("div");
+    container.classList.add("editor");
     container.setAttribute("data-identifier",identifier);
     container.setAttribute("data-numbered-container",true);
     var textarea = document.createElement("textarea");
-    textarea.placeholder = "Welcome to Smart Text Editor, the text editor that requires only a browser and a keyboard!";
     textarea.addEventListener("input",() => {
       sourceChange = true;
       if (!tab.hasAttribute("data-unsaved")) tab.setAttribute("data-unsaved",true);
-      if (Editor.view == "split" || Editor.view == "preview") previewRefresh();
+      if (Editor.view == "split" || Editor.view == "preview") refreshPreview();
     });
     textarea.addEventListener("click",() => {
       if (Editor.insert_color) Editor.insert_color = false;
@@ -2449,7 +1378,6 @@
     textarea.selectionStart = 0;
     textarea.selectionEnd = 0;
     addInputCharacteristics(textarea);
-    if (Editor.view == "text") textarea.num_disableLineCount();
     tab.classList.add("tab");
     tab.setAttribute("data-identifier",identifier);
     var previewOption = document.createElement("li");
@@ -2465,7 +1393,7 @@
     fileName.setAttribute("data-file-name",true);
     tab.appendChild(fileName);
     var renameButton = document.createElement("button");
-    renameButton.innerHTML = "<svg><use href='#rename'/></svg>";
+    renameButton.innerHTML = "<svg><use href='#rename_icon'/></svg>";
     renameButton.addEventListener("click",event => {
       event.stopPropagation();
       var newFileName = prompt(`Enter a new file name for "${fileName.innerText}"`,fileName.innerText);
@@ -2476,7 +1404,7 @@
     });
     tab.appendChild(renameButton);
     var closeButton = document.createElement("button");
-    closeButton.innerHTML = "<svg><use href='#close'/></svg>";
+    closeButton.innerHTML = "<svg><use href='#close_icon'/></svg>";
     closeButton.addEventListener("click",event => {
       event.stopPropagation();
       closeFile(tab);
@@ -2502,13 +1430,13 @@
     return identifier;
   }
   function openFile(tab){
-    var identifier = tab.getAttribute("data-identifier"), tabs = files.querySelectorAll("button.tab");
+    var identifier = tab.getAttribute("data-identifier"), tabs = files.querySelectorAll(".tab");
     tabs.forEach(tab => {
       tab.classList.remove("active");
       tab.classList.remove("fade");
     });
     tab.classList.add("active");
-    var transitionDuration = parseInt(getElementStyle(tab,"transition-duration").split("s").join("") * 1000);
+    var transitionDuration = parseInt(getElementStyle(tab,"transition-duration").replace(/s/g,"") * 1000);
     window.setTimeout(() => tab.classList.add("fade"),transitionDuration);
     workspace.querySelectorAll("[data-numbered-container].active").forEach(activeFile => activeFile.classList.remove("active"));
     var container = workspace.querySelector(`[data-numbered-container][data-identifier="${identifier}"]`);
@@ -2524,7 +1452,7 @@
       var ask = confirm(`Are you sure you would like to close "${Editor.query.file.name({ identifier: identifier })}"?\nRecent changes have not yet been saved.`);
       if (!ask) return;
     }
-    var tabs = Array.from(files.querySelectorAll("button.tab")), withinEditor = (document.activeElement == Editor.query.file.textarea());
+    var tabs = Array.from(files.querySelectorAll(".tab")), withinEditor = (document.activeElement == Editor.query.file.textarea());
     if (tab == tabs[0] && tabs[1] && tab.classList.contains("active")) openFile(tabs[1]);
     if (tab == tabs[tabs.length - 1] && tab != tabs[0] && tab.classList.contains("active")) openFile(tabs[tabs.length - 2]);
     if (tab != tabs[0] && tab.classList.contains("active")) openFile(tabs[tabs.indexOf(tab) + 1]);
@@ -2543,25 +1471,25 @@
     var spacingOffset = 0;
     if (obstructedLeft){
       if (!tab.previousElementSibling){
-        spacingOffset = parseInt(getElementStyle(files,"padding-left").split("px").join(""));
-      } else spacingOffset = parseInt(getElementStyle(tab,"margin-left").split("px").join("") * 2);
+        spacingOffset = parseInt(getElementStyle(files,"padding-left").replace(/px/g,""));
+      } else spacingOffset = parseInt(getElementStyle(tab,"margin-left").replace(/px/g,"") * 2);
       files.scrollTo(tab.offsetLeft - spacingOffset,0);
     }
     if (obstructedRight){
       if (tab.nextElementSibling){
-        spacingOffset = parseInt(getElementStyle(tab.nextElementSibling,"margin-left").split("px").join("") * 2);
-      } else spacingOffset = parseInt(getElementStyle(tab,"::before","width").split("px").join(""));
+        spacingOffset = parseInt(getElementStyle(tab.nextElementSibling,"margin-left").replace(/px/g,"") * 2);
+      } else spacingOffset = parseInt(getElementStyle(tab,"::before","width").replace(/px/g,""));
       files.scrollTo(tab.offsetLeft + tab.clientWidth + spacingOffset - files.clientWidth,0);
     }
   }
   function setFilesSectionOffset(){
     if (Editor.view != "split" || Editor.orientation != "horizontal" || !Editor.active_widget && !Editor.active_editing_tools) return;
     var overflowOverlap, scalingOffset;
-    if (main.hasAttribute("data-scaling-offset")){
-      scalingOffset = parseInt(main.getAttribute("data-scaling-offset"));
+    if (document.body.hasAttribute("data-scaling-offset")){
+      scalingOffset = parseInt(document.body.getAttribute("data-scaling-offset"));
     } else scalingOffset = workspace.offsetWidth;
-    if (Editor.active_editing_tools) overflowOverlap = parseInt(getElementStyle(editing_tools,"width").split("px").join("")) + parseInt(getElementStyle(editing_tools,"margin").split("px").join("")) + scalingOffset > parseInt(getElementStyle(main,"width").split("px").join(""));
-    if (Editor.active_widget && !Editor.active_widget.classList.contains("minimize") && !Editor.active_editing_tools) overflowOverlap = parseInt(getElementStyle(Editor.active_widget,"width").split("px").join("")) + parseInt(getElementStyle(Editor.active_widget,"margin").split("px").join("")) + scalingOffset > parseInt(getElementStyle(main,"width").split("px").join(""));
+    if (Editor.active_editing_tools) overflowOverlap = parseInt(getElementStyle(editing_tools,"width").replace(/px/g,"")) + parseInt(getElementStyle(editing_tools,"margin").replace(/px/g,"")) + scalingOffset > parseInt(getElementStyle(main,"width").replace(/px/g,""));
+    if (Editor.active_widget && !Editor.active_widget.classList.contains("minimize") && !Editor.active_editing_tools) overflowOverlap = parseInt(getElementStyle(Editor.active_widget,"width").replace(/px/g,"")) + parseInt(getElementStyle(Editor.active_widget,"margin").replace(/px/g,"")) + scalingOffset > parseInt(getElementStyle(main,"width").replace(/px/g,""));
     if (overflowOverlap){
       main.classList.add("files-offset");
     } else main.classList.remove("files-offset");
@@ -2599,7 +1527,7 @@
     var savedRefresh = Editor.storage.getItem("refresh");
     if (savedRefresh){
       Editor.refresh = savedRefresh;
-      if (Editor.refresh == "true") previewRefresh();
+      if (Editor.refresh == "true") refreshPreview();
       updateCheckbox("refresh",savedRefresh);
     }
   }
@@ -2608,7 +1536,7 @@
     if (!ask) return;
     closeCard(reset_card);
     window.setTimeout(() => {
-      updateSelect("view","text");
+      updateSelect("view","code");
       updateSelect("orientation","horizontal");
       updateSelect("editing_tools","no");
       Editor.refresh = "true";
@@ -2679,7 +1607,7 @@
       input.addEventListener("contextmenu",event => {
         if (Editor.environment.mozilla_browser){
           event.stopPropagation();
-          dropdowns.forEach(dropdown => closeDropdown(dropdown));
+          menus.forEach(menu => closeMenu(menu));
         } else openContextMenu(event,"editing");
       });
       if (!Editor.environment.mozilla_browser){
@@ -2702,7 +1630,7 @@
       container.addEventListener("contextmenu",event => {
         if (Editor.environment.mozilla_browser){
           event.stopPropagation();
-          dropdowns.forEach(dropdown => closeDropdown(dropdown));
+          menus.forEach(menu => closeMenu(menu));
         } else openContextMenu(event,"editing");
       });
       if (!Editor.environment.mozilla_browser){
@@ -2744,28 +1672,22 @@
     history.pushState(null,"",completeAddress);
   }
   function changeView(newView){
-    if (main.classList.contains("resize")) return;
+    if (document.body.classList.contains("scaling-active")) return;
     if (newView != "preview"){
-      var transitionDuration = parseInt(getElementStyle(workspace,"transition-duration").split("s").join("") * 1000);
+      var transitionDuration = parseInt(getElementStyle(workspace,"transition-duration").replace(/s/g,"") * 1000);
       window.setTimeout(() => {
         setFileTabVisibility(Editor.query.file.tab());
         setFilesSectionOffset();
       },transitionDuration);
     }
-    var elements = [main,workspace,scaler,preview];
-    elements.forEach(element => changeClass(element,Editor.view,newView));
-    if (main.hasAttribute("data-scaling-offset")) main.removeAttribute("data-scaling-offset");
+    document.body.setAttribute("data-view",newView);
+    removeScaling();
     if (main.classList.contains("files-offset")) main.classList.remove("files-offset");
-    if (newView == "text" || newView == "code"){
+    if (newView == "code"){
       undo_tool.disabled = false;
       redo_tool.disabled = false;
       refresh_tool.disabled = true;
     }
-    document.querySelectorAll("textarea").forEach(textarea => {
-      if (newView == "text"){
-        textarea.num_disableLineCount();
-      } else textarea.num_enableLineCount();
-    });
     if (newView == "split"){
       undo_tool.disabled = false;
       redo_tool.disabled = false;
@@ -2777,11 +1699,10 @@
       refresh_tool.disabled = false;
     }
     Editor.view = newView;
-    previewRefresh();
+    refreshPreview();
   }
   function changeOrientation(newOrientation){
-    if (main.classList.contains("resize")) return;
-    var elements = [main,workspace,scaler,preview];
+    if (body.classList.contains("scaling-active")) return;
     if (!newOrientation){
       if (Editor.orientation == "horizontal"){
         newOrientation = "vertical";
@@ -2789,17 +1710,17 @@
       var transitionDuration;
       if (Editor.view == "split" || Editor.view == "preview"){
         changeView("code");
-        transitionDuration = parseInt(getElementStyle(workspace,"transition-duration").split("s").join("") * 1000);
+        transitionDuration = parseInt(getElementStyle(workspace,"transition-duration").replace(/s/g,"") * 1000);
       } else transitionDuration = 0;
       window.setTimeout(() => {
-        elements.forEach(element => changeClass(element,Editor.orientation,newOrientation));
+        document.body.setAttribute("data-orientation",newOrientation);
         scaler.style.transition = "none";
         preview.style.transition = "none";
         Editor.orientation = newOrientation;
         window.setTimeout(() => changeView("split"),25);
       },transitionDuration);
     } else {
-      elements.forEach(element => changeClass(element,Editor.orientation,newOrientation));
+      document.body.setAttribute("data-orientation",newOrientation);
       Editor.orientation = newOrientation;
     }
   }
@@ -2827,10 +1748,10 @@
       var ask = confirm("Changes you made may not be saved.");
       if (!ask) return;
       action(event);
-      closeCard(Editor.active_modal);
+      closeCard(Editor.active_dialog);
     } else {
       action(event);
-      closeCard(Editor.active_modal);
+      closeCard(Editor.active_dialog);
     }
   }
   function openEditorWindow(){
@@ -2944,49 +1865,49 @@
     textarea.num_refreshLineCount();
     sourceChange = true;
     Editor.query.file.tab().setAttribute("data-unsaved",true);
-    previewRefresh();
+    refreshPreview();
   }
   function openCard(card,previous){
     if (!card) return;
     if (card.classList.contains("active")) return closeCard(card);
     var cardType = card.classList[1];
-    if (cardType != "notification"){
+    if (cardType != "alert"){
       var activeCards = document.querySelectorAll(".card.active");
       activeCards.forEach(activeCard => {
         var activeCardType = activeCard.classList[1];
-        if (activeCardType != cardType && activeCardType != "modal") return;
+        if (activeCardType != cardType && activeCardType != "dialog") return;
         activeCard.classList.remove("active");
         if (!activeCard.classList.contains("minimize")) return;
-        var transitionDuration = parseInt(getElementStyle(activeCard,"transition-duration").split("s").join("") * 1000);
+        var transitionDuration = parseInt(getElementStyle(activeCard,"transition-duration").replace(/s/g,"") * 1000);
         window.setTimeout(() => minimizeCard(activeCard),transitionDuration);
       });
     }
     card.classList.add("active");
-    if (cardType != ("notification" || "modal")) card_backdrop.classList.remove("active");
-    if (cardType == "notification") window.setTimeout(() => closeCard(card),4000);
+    if (cardType != ("alert" || "dialog")) card_backdrop.classList.remove("active");
+    if (cardType == "alert") window.setTimeout(() => closeCard(card),4000);
     if (card == editing_tools_card) Editor.active_editing_tools = true;
-    if (cardType == "modal"){
+    if (cardType == "dialog"){
       document.body.addEventListener("keydown",catchCardNavigation);
       card_backdrop.classList.add("active");
-      if (!Editor.active_modal && !Editor.modal_previous){
-        var dropdownChild = (document.activeElement.closest(".dropdown"));
-        if (dropdownChild){
-          Editor.modal_previous = document.activeElement.closest(".dropdown").querySelector("button");
-        } else Editor.modal_previous = document.activeElement;
+      if (!Editor.active_dialog && !Editor.dialog_previous){
+        var menuChild = (document.activeElement.closest(".menu"));
+        if (menuChild){
+          Editor.dialog_previous = document.activeElement.closest(".menu").querySelector("button");
+        } else Editor.dialog_previous = document.activeElement;
       }
-      var activeDropdowns = document.querySelectorAll(".dropdown.active");
-      activeDropdowns.forEach(activeDropdown => {
-        if (activeDropdown == context_menu){
+      var activeMenus = document.querySelectorAll(".menu.active");
+      activeMenus.forEach(activeMenu => {
+        if (activeMenu == context_menu){
           closeContextMenu();
-        } else closeDropdown(activeDropdown);
+        } else closeMenu(activeMenu);
       });
-      var transitionDuration = parseInt(getElementStyle(card,"transition-duration").split("s").join("") * 500);
+      var transitionDuration = parseInt(getElementStyle(card,"transition-duration").replace(/s/g,"") * 500);
       window.setTimeout(() => {
         document.activeElement.blur();
         var previousElement = card.querySelector(`[data-previous-card="${previous}"]`);
         if (previousElement) previousElement.focus();
       },transitionDuration);
-      Editor.active_modal = card;
+      Editor.active_dialog = card;
     }
     if (cardType == "widget") Editor.active_widget = card;
     setFilesSectionOffset();
@@ -2996,18 +1917,18 @@
     var cardType = card.classList[1];
     card.classList.remove("active");
     if (card.classList.contains("minimize")){
-      var transitionDuration = parseInt(getElementStyle(card,"transition-duration").split("s").join("") * 1000);
+      var transitionDuration = parseInt(getElementStyle(card,"transition-duration").replace(/s/g,"") * 1000);
       window.setTimeout(() => minimizeCard(card),transitionDuration);
     }
-    if (cardType == "modal"){
+    if (cardType == "dialog"){
       document.body.removeEventListener("keydown",catchCardNavigation);
       card_backdrop.classList.remove("active");
-      Editor.active_modal = false;
-      if (Editor.modal_previous){
-        if (workspace.contains(Editor.modal_previous) && getElementStyle(Editor.modal_previous,"visibility") == "hidden"){
+      Editor.active_dialog = false;
+      if (Editor.dialog_previous){
+        if (workspace.contains(Editor.dialog_previous) && getElementStyle(Editor.dialog_previous,"visibility") == "hidden"){
           Editor.query.file.textarea().focus();
-        } else Editor.modal_previous.focus();
-        Editor.modal_previous = null;
+        } else Editor.dialog_previous.focus();
+        Editor.dialog_previous = null;
       }
     }
     if (card == editing_tools_card) Editor.active_editing_tools = false;
@@ -3018,27 +1939,27 @@
   }
   function minimizeCard(card){
     card.classList.toggle("minimize");
-    var minimizeButton = card.querySelector("button.nav.minimize");
+    var minimizeButton = card.querySelector(".header .card-controls [data-control='minimize']");
     var minimizeButtonIcon = minimizeButton.querySelector("svg");
     var minimizeButtonIconLink = minimizeButtonIcon.querySelector("use");
-    var transitionDuration = parseInt(getElementStyle(minimizeButtonIcon,"transition-duration").split(" ")[1].split("s").join("") * 275);
+    var transitionDuration = parseInt(getElementStyle(minimizeButtonIcon,"transition-duration").replace(/s/g,"") * 275);
     if (!card.classList.contains("minimize")){
       window.setTimeout(() => {
         minimizeButton.setAttribute("aria-label","Minimize");
-        minimizeButtonIconLink.setAttribute("href","#minimize");
+        minimizeButtonIconLink.setAttribute("href","#minimize_icon");
       },transitionDuration);
     } else {
       if (card.contains(document.activeElement) && document.activeElement != minimizeButton) minimizeButton.focus();
       window.setTimeout(() => {
         minimizeButton.setAttribute("aria-label","Maximize");
-        minimizeButtonIconLink.setAttribute("href","#arrow");
+        minimizeButtonIconLink.setAttribute("href","#arrow_icon");
       },transitionDuration);
     }
     setFilesSectionOffset();
   }
   function catchCardNavigation(event){
-    if (!Editor.active_modal || context_menu.classList.contains("active") || event.key != "Tab" || document.activeElement != document.body) return;
-    var navigable = getNavigableElements(Editor.active_modal);
+    if (!Editor.active_dialog || context_menu.classList.contains("active") || event.key != "Tab" || document.activeElement != document.body) return;
+    var navigable = getNavigableElements(Editor.active_dialog);
     if (event.shiftKey){
       event.preventDefault();
       navigable[navigable.length - 1].focus();
@@ -3047,41 +1968,41 @@
       navigable[0].focus();
     }
   }
-  function openDropdown(event,dropdown){
+  function openMenu(event,menu){
     if (Editor.long_touch.timeout) Editor.long_touch.timeout = null;
     if (Editor.long_touch.selection) Editor.long_touch.selection = null;
-    var currentDropdown;
-    if (!dropdown){
-      currentDropdown = event;
-    } else currentDropdown = dropdown;
-    dropdowns.forEach(dropdown => {
-      if (dropdown != currentDropdown && !dropdown.contains(event.target)) closeDropdown(dropdown);
+    var currentMenu;
+    if (!menu){
+      currentMenu = event;
+    } else currentMenu = menu;
+    menus.forEach(menu => {
+      if (menu != currentMenu && !menu.contains(event.target)) closeMenu(menu);
     });
-    currentDropdown.classList.toggle("active");
-    if (currentDropdown.classList.contains("active")){
-      document.body.addEventListener("click",catchDropdownExit);
-      if (currentDropdown == context_menu) document.body.addEventListener("contextmenu",catchDropdownExit);
+    currentMenu.classList.toggle("active");
+    if (currentMenu.classList.contains("active")){
+      document.body.addEventListener("click",catchMenuExit);
+      if (currentMenu == context_menu) document.body.addEventListener("contextmenu",catchMenuExit);
     } else {
-      document.body.removeEventListener("click",catchDropdownExit);
-      if (currentDropdown == context_menu) document.body.removeEventListener("contextmenu",catchDropdownExit);
+      document.body.removeEventListener("click",catchMenuExit);
+      if (currentMenu == context_menu) document.body.removeEventListener("contextmenu",catchMenuExit);
     }
-    function catchDropdownExit(){
-      if (currentDropdown.contains(document.activeElement)) return;
-      closeDropdown(currentDropdown);
-      document.body.removeEventListener("click",catchDropdownExit);
-      if (currentDropdown == context_menu) document.body.removeEventListener("contextmenu",catchDropdownExit);
+    function catchMenuExit(){
+      if (currentMenu.contains(document.activeElement)) return;
+      closeMenu(currentMenu);
+      document.body.removeEventListener("click",catchMenuExit);
+      if (currentMenu == context_menu) document.body.removeEventListener("contextmenu",catchMenuExit);
     }
   }
-  function closeDropdown(dropdown){
-    var submenus = dropdown.querySelectorAll("li > ul");
+  function closeMenu(menu){
+    var submenus = menu.querySelectorAll("li > ul");
     submenus.forEach(submenu => submenu.parentElement.classList.remove("active"));
-    dropdown.classList.remove("active");
-    if (dropdown != context_menu) return;
-    var menu = dropdown.querySelectorAll("ul")[0], transitionDuration = parseInt(getElementStyle(menu,"transition-duration").split("s").join("") * 1000);
+    menu.classList.remove("active");
+    if (menu != context_menu) return;
+    var menu = menu.querySelectorAll("ul")[0], transitionDuration = parseInt(getElementStyle(menu,"transition-duration").replace(/s/g,"") * 1000);
     window.setTimeout(() => {
       var types = ["window","link","editing"];
       types.forEach(type => {
-        if (dropdown.classList.contains(type)) dropdown.classList.remove(type);
+        if (menu.classList.contains(type)) menu.classList.remove(type);
       });
     },transitionDuration);
   }
@@ -3091,11 +2012,11 @@
     if (Editor.long_touch.timeout) Editor.long_touch.timeout = null;
     if (context_menu.classList.contains("active")){
       closeContextMenu();
-      var menu = context_menu.querySelectorAll("ul")[0], transitionDuration = parseInt(getElementStyle(menu,"transition-duration").split("s").join("") * 1000);
+      var menu = context_menu.querySelectorAll("ul")[0], transitionDuration = parseInt(getElementStyle(menu,"transition-duration").replace(/s/g,"") * 1000);
       return window.setTimeout(() => openContextMenu(event,type),transitionDuration);
     }
     Editor.context_menu_previous = event.target;
-    openDropdown(event,context_menu);
+    openMenu(event,context_menu);
     context_menu.classList.add(type);
     var pageLocation = {}, transformOrigin = {};
     if (Editor.environment.touch_device && event instanceof TouchEvent){
@@ -3116,11 +2037,11 @@
     context_menu.style.top = `${pageLocation.top}px`;
     menu.style.transformOrigin = `${transformOrigin.left}px ${transformOrigin.top}px`;
     document.body.addEventListener("keydown",catchContextMenuNavigation);
-    var transitionDuration = parseInt(getElementStyle(menu,"transition-duration").split("s").join("") * 500);
+    var transitionDuration = parseInt(getElementStyle(menu,"transition-duration").replace(/s/g,"") * 500);
     window.setTimeout(() => document.activeElement.blur(),transitionDuration);
   }
   function closeContextMenu(){
-    closeDropdown(context_menu);
+    closeMenu(context_menu);
     Editor.context_menu_previous.focus();
     Editor.context_menu_previous = null;
     document.body.removeEventListener("keydown",catchContextMenuNavigation);
@@ -3143,18 +2064,6 @@
     if (Editor.long_touch.timeout) window.clearTimeout(Editor.long_touch.timeout);
     if (Editor.long_touch.selection) Editor.long_touch.selection = null;
   }
-  function toggleLoadingOverlay(){
-    loading.classList.toggle("active");
-    var buffering = loading.querySelector("svg");
-    if (loading.classList.contains("active")){
-      buffering.classList.add("active");
-    } else {
-      var transitionDuration = parseInt(getElementStyle(loading,"transition-duration").split("s").join("") * 1000);
-      window.setTimeout(() => {
-        if (!loading.classList.contains("active")) buffering.classList.remove("active");
-      },transitionDuration);
-    }
-  }
   async function callCommand(element,action){
     element.focus();
     if (action == "paste"){
@@ -3167,7 +2076,7 @@
     Editor.query.file.textarea().num_changeValue(Editor.query.file.textarea().value.split(replacer_find.value).join(replacer_replace.value));
     sourceChange = true;
     Editor.query.file.tab().setAttribute("data-unsaved",true);
-    previewRefresh();
+    refreshPreview();
   }
   function flipReplacer(){
     var findContent = replacer_find.value;
@@ -3246,7 +2155,6 @@
   function insertTemplate(){
     Editor.query.file.textarea().num_changeValue(decodeURI("%3C!DOCTYPE%20html%3E%0A%3Chtml%20lang=%22en-US%22%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E"));
     sourceChange = true;
-    if (Editor.view == "text") changeView("code");
     if (Editor.view == "preview") changeView("split");
   }
   function forceRefresh(){
@@ -3254,10 +2162,10 @@
     Editor.refresh = "true";
     sourceChange = true;
     preview.contentWindow.location.reload();
-    previewRefresh();
+    refreshPreview();
     Editor.refresh = currentSetting;
   }
-  function previewRefresh(){
+  function refreshPreview(){
     if (Editor.refresh != "true" || !sourceChange) return;
     preview.src = "about:blank";
     preview.contentWindow.document.open();
@@ -3270,11 +2178,7 @@
     sourceChange = false;
   }
   function toggleScaling(){
-    header.classList.toggle("resize");
-    main.classList.toggle("resize");
-    workspace.classList.toggle("resize");
-    scaler.classList.toggle("active");
-    preview.classList.toggle("resize");
+    document.body.classList.toggle("scaling-active");
   }
   function setScaling(event){
     var scalingOffset, scalingRange = {};
@@ -3295,29 +2199,22 @@
     }
     if (scalingOffset < scalingRange.minimum) scalingOffset = scalingRange.minimum;
     if (scalingOffset > scalingRange.maximum) scalingOffset = scalingRange.maximum;
-    main.setAttribute("data-scaling-offset",scalingOffset);
-    if (Editor.orientation == "horizontal"){
-      workspace.style.width = `${scalingOffset}px`;
-      scaler.style.right = `calc(100% - ${scalingOffset}px - 8px)`;
-      preview.style.width = `calc(100% - ${scalingOffset}px)`;
-      setFilesSectionOffset();
-    }
-    if (Editor.orientation == "vertical"){
-      workspace.style.height = `calc(${scalingOffset}px)`;
-      scaler.style.bottom = `calc(100% - ${scalingOffset}px - 8px)`;
-      preview.style.height = `calc(100% - ${scalingOffset}px)`;
-    }
+    document.body.setAttribute("data-scaling-offset",scalingOffset);
+    if (Editor.orientation == "horizontal") setFilesSectionOffset();
   }
-  function removeScaling(event){
+  function disableScaling(event){
     if (Editor.environment.touch_device && event instanceof TouchEvent){
       document.removeEventListener("touchmove",setScaling);
-      document.removeEventListener("touchend",removeScaling);
+      document.removeEventListener("touchend",disableScaling);
       toggleScaling();
     } else {
       document.removeEventListener("mousemove",setScaling);
-      document.removeEventListener("mouseup",removeScaling);
+      document.removeEventListener("mouseup",disableScaling);
       toggleScaling();
     }
+  }
+  function removeScaling(){
+    if (document.body.hasAttribute("data-scaling-offset")) document.body.removeAttribute("data-scaling-offset");
   }
 </script>
 
