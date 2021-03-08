@@ -54,9 +54,10 @@
     appearance: () => {
       var parent_window = (window.self == window.top),
           standalone = (window.matchMedia("(display-mode: standalone)").matches || navigator.standalone || !window.menubar.visible),
+          apple_home_screen = (/(iPhone|iPad|iPod)/i.test(navigator.platform) && "standalone" in navigator && navigator.standalone),
           hidden_chrome = (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight),
           fullscreen = (window.matchMedia("(display-mode: fullscreen)").matches || (!window.screenY && !window.screenTop && hidden_chrome) || (!window.screenY && !window.screenTop && standalone));
-      return { parent_window, standalone, hidden_chrome, fullscreen };
+      return { parent_window, standalone, apple_home_screen, hidden_chrome, fullscreen };
     },
     environment: () => ({
       touch_device: ("ontouchstart" in window),
@@ -100,7 +101,7 @@
     preview_editor: "active-editor",
     file_handles: {},
     child_windows: [],
-    storage: window.localStorage,
+    storage: (window.location.protocol != "blob:") ? window.localStorage : null,
     refresh: true,
     active_editing_tools: false,
     active_dialog: null,
@@ -113,6 +114,7 @@
     install_prompt: null
   };
   //if (Editor.appearance().parent_window) document.documentElement.classList.add("startup-fade");
+  if (Editor.appearance().apple_home_screen) document.documentElement.classList.add("apple-home-screen");
   if (Editor.environment().touch_device) document.documentElement.classList.add("touch-device");
   if (Editor.environment().apple_device) document.documentElement.classList.add("apple-device");
   if (Editor.environment().macOS_device) document.documentElement.classList.add("macOS-device");
@@ -135,13 +137,16 @@
     --selection-background: var(--selection-background-inactive);
   }
   html {
-    position: fixed;
     width: 100%;
     height: 100%;
     overflow: hidden;
   }
+  html.apple-home-screen {
+    width: 100vw;
+    height: 100vh;
+  }
   body {
-    position: relative;
+    position: fixed;
     width: 100%;
     height: 100%;
     display: flex;
@@ -153,8 +158,6 @@
     overflow: hidden;
     user-select: none;
     -webkit-user-select: none;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
   }
   body.split.horizontal[data-scaling-active] {
@@ -164,14 +167,23 @@
     cursor: row-resize;
   }
   header {
-    padding-left: 8px;
+    padding: env(safe-area-inset-top,0) env(safe-area-inset-right,0) 0 calc(env(safe-area-inset-left,0) + 8px);
     position: relative;
     display: flex;
     align-items: center;
-    gap: 8px;
+    //gap: 8px;
     background: hsl(0,0%,15%);
     border-bottom: 1px solid #00000040;
   }
+
+
+/* -- Flex Gap Fix -- */
+
+  header > *:not(:first-child) + * {
+    margin-left: 8px;
+  }
+
+
   :root.apple-device header {
     border-color: #000000;
   }
@@ -197,16 +209,18 @@
   }
   header .app-icon {
     flex-shrink: 0;
-    width: 16px;
-    aspect-ratio: 1/1;
     display: flex;
+  }
+  header .app-icon img {
+    width: 16px;height: 16px;
+    //aspect-ratio: 1/1;
   }
   :root.macOS-device.electron-container header .app-icon {
     display: none;
   }
   header .menubar {
     min-width: 0;
-    height: 100%;
+    align-self: stretch;
     display: flex;
     z-index: 2;
     -webkit-app-region: no-drag;
@@ -223,12 +237,34 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+
+  header .menubar .menu .opener:hover, header .menubar .menu.active .opener {
+    background: #ffffff20;
+  }
+  header .menubar .menu .opener:focus {
+    background: #ffffff20;
+  }
+  header .menubar .menu:not(.active) .opener:not(:hover):focus:not(:focus-visible) {
+    background: none;
+  }
+  header .menubar .menu .opener:focus-visible {
+    background: #ffffff20;
+  }
+
+
+/* -- Future Focus Visible --
+
   header .menubar .menu .opener:where(:hover,:focus-visible), header .menubar .menu.active .opener {
     background: #ffffff20;
   }
+
+*/
+
+
   header .window-controls {
     margin-left: auto;
-    height: 100%;
+    align-self: stretch;
     flex-shrink: 0;
     display: flex;
     font-size: 10px;
@@ -273,12 +309,19 @@
     height: 27px;
   }
   main {
+    padding: 0 env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
     position: relative;
     flex-grow: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    --workspace-background: hsl(0,0%,12%);
+    --workspace-accent: #ffffff10;
+    --preview-border-color: hsl(0,0%,8.5%);
+  }
+  :root.apple-device main {
+    --workspace-accent: #ffffff20;
   }
   main .workspace {
     position: absolute;
@@ -286,11 +329,6 @@
     top: 0;
     display: flex;
     flex-direction: column;
-    --workspace-background: hsl(0,0%,11%);
-    --workspace-accent: #ffffff10;
-  }
-  :root.apple-device main .workspace {
-    --workspace-accent: #ffffff20;
   }
   body.code main .workspace {
     width: 100%;
@@ -323,11 +361,12 @@
     transition: none;
   }
   main .workspace .workspace-tabs {
-    padding: 0 6px;
+    padding-left: calc(env(safe-area-inset-left,0) + 6px);
+    padding-right: calc(env(safe-area-inset-right,0) + 6px);
     flex-shrink: 0;
     display: flex;
     gap: 3px;
-    box-shadow: 0 -1px 0 inset var(--workspace-accent), 0 -1px 0 inset var(--workspace-background);
+    box-shadow: 0 -1px 0 var(--workspace-accent) inset, 0 -1px 0 var(--workspace-background) inset;
     overflow-x: auto;
     scroll-behavior: smooth;
     scrollbar-width: none;
@@ -375,15 +414,43 @@
     justify-content: center;
     align-items: center;
   }
+  :root:not(.startup-fade) main .workspace .workspace-editors:empty {
+    border: solid transparent;
+    border-width: 0 env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
+  }
   :root:not(.startup-fade) main .workspace .workspace-editors:empty::before {
     content: "No Editors Open";
+  }
+  :root:not(.startup-fade) body.split.horizontal main .workspace .workspace-editors:empty {
+    border-right: none;
+  }
+  @media (orientation: portrait) {
+    :root:not(.startup-fade) body.split.horizontal main .workspace .workspace-editors:empty {
+      border-bottom-color: var(--preview-border-color);
+    }
+  }
+  :root:not(.startup-fade) body.split.vertical main .workspace .workspace-editors:empty {
+    border-bottom: none;
   }
   main .workspace .editor {
     position: absolute;
     width: 100%;
     height: 100%;
     background: var(--workspace-background);
+    border: solid transparent;
+    border-width: 0 env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
     visibility: hidden;
+  }
+  body.split.horizontal main .workspace .editor {
+    border-right: none;
+  }
+  @media (orientation: portrait) {
+    body.split.horizontal main .workspace .editor {
+      border-bottom-color: var(--preview-border-color);
+    }
+  }
+  body.split.vertical main .workspace .editor {
+    border-bottom: none;
   }
   main .workspace .editor:not(.active) {
     z-index: -1;
@@ -444,19 +511,24 @@
     width: 100%;
     height: 50%;
     background: #ffffff;
-    border: none;
+    border: solid var(--preview-border-color);
+    border-width: 0 env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
   }
   body.code.horizontal main .preview {
     width: 0%;
     height: 100%;
+    border-left: none;
+    border-right: none;
   }
   body.code.vertical main .preview {
     width: 100%;
     height: 0%;
+    border-bottom: none;
   }
   body.split.horizontal main .preview {
     width: 50%;
     height: 100%;
+    border-left: none;
   }
   body.split.vertical main .preview {
     width: 100%;
@@ -487,9 +559,9 @@
   }
   [data-numbered-container], input[type="text"] {
     color: #e8e8e8;
-    caret-color: currentColor;
+    caret-color: #e8e8e8;
     font-size: 13px;
-    font-family: ui-monospace, "Menlo", "Cousine", monospace;
+    font-family: "Cousine", monospace;
     line-height: 1.2;
     background: hsl(0,0%,11%);
     border: none;
@@ -567,12 +639,12 @@
     border-radius: calc(4px + var(--option-border-width));
     outline: none;
   }
-  .tab .option:is(:hover,:focus-visible) {
+  .tab .option:where(:hover,:focus-visible) {
     background-color: #ffffff20;
   }
   .tab .option svg {
-    width: 8px;
-    aspect-ratio: 1/1;
+    width: 8px;height: 8px;
+    //aspect-ratio: 1/1;
     fill: currentColor;
   }
   .menu {
@@ -646,8 +718,8 @@
     display: none;
   }
   .menu .list-item > img {
-    width: 16px;
-    aspect-ratio: 1/1;
+    width: 16px;height: 16px;
+    //aspect-ratio: 1/1;
   }
   .menu .list-item > img.invert {
     filter: invert() hue-rotate(180deg);
@@ -664,8 +736,8 @@
   }
   .menu .list-item svg.info {
     box-sizing: content-box;
-    width: 12px;
-    aspect-ratio: 1/1;
+    width: 12px;height: 12px;
+    //aspect-ratio: 1/1;
     fill: currentColor;
   }
   .menu .list-item:not(.list-parent):where(:hover,:focus-visible) .info {
@@ -723,7 +795,7 @@
   .select .menu .opener {
     padding: 2px 8px;
     justify-content: space-between;
-    background: hsl(0,0%,22%);
+    background: hsl(0,0%,26%);
     border: 1px solid transparent;
     border-radius: 4px;
     outline: none;
@@ -740,8 +812,8 @@
   }
   .select .menu .opener svg {
     margin-left: 10px;
-    width: 10px;
-    aspect-ratio: 1/1;
+    width: 10px;height: 10px;
+    //aspect-ratio: 1/1;
     fill: currentColor;
     transform: rotate(270deg);
   }
@@ -779,8 +851,8 @@
     margin-right: 4px;
     padding: var(--check-padding);
     --check-padding: 2px;
-    width: calc(14px + var(--check-padding) + var(--check-border-width));
-    aspect-ratio: 1/1;
+    width: calc(14px + var(--check-padding) + var(--check-border-width));height: calc(14px + var(--check-padding) + var(--check-border-width));
+    //aspect-ratio: 1/1;
     fill: transparent;
     border: var(--check-border-width) solid currentColor;
     --check-border-width: 2px;
@@ -792,7 +864,7 @@
   .card {
     display: flex;
     flex-direction: column;
-    background: hsl(0,0%,13%);
+    background: hsl(0,0%,15%);
     border: 1px solid #00000030;
     border-radius: 4px;
     box-shadow: 1px 2px 4px #00000020;
@@ -848,8 +920,8 @@
     background: #ffffff20;
   }
   .card .header .card-back svg {
-    width: 12px;
-    aspect-ratio: 1/1;
+    width: 12px;height: 12px;
+    //aspect-ratio: 1/1;
     fill: currentColor;
   }
   .card .header .title {
@@ -906,33 +978,21 @@
     fill: currentColor;
   }
   :root:not(.macOS-device) .card .header .card-controls .control svg {
-    width: 12px;
-    aspect-ratio: 1/1;
+    width: 12px;height: 12px;
+    //aspect-ratio: 1/1;
   }
   :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:hover svg {
     color: #ffffff;
   }
   :root.macOS-device .card .header .card-controls .control svg {
-    width: 6px;
-    aspect-ratio: 1/1;
+    width: 6px;height: 6px;
+    //aspect-ratio: 1/1;
     color: transparent;
     mix-blend-mode: luminosity;
   }
   :root.macOS-device .card .header .card-controls:where(:hover,:active) .control svg {
     color: #202020bf;
-  }/*
-  .card .header .option {
-    margin-right: 8px;
-    padding: 2px 4px;
-    font-size: 11px;
-    background: none;
-    border: 1px solid #ffffff40;
-    border-radius: 4px;
-    outline: none;
   }
-  .card .header .option:where(:active,:focus-visible) {
-    background: #ffffff20;
-  }*/
   .card .main {
     padding: 12px;
     display: flex;
@@ -964,7 +1024,7 @@
     justify-content: center;
     align-items: center;
     gap: 8px;
-    background: hsl(0,0%,22%);
+    background: hsl(0,0%,26%);
     border: 1px solid transparent;
     border-radius: 4px;
     outline: none;
@@ -979,19 +1039,19 @@
     //display: none;
   }
   .card .options button > img {
-    width: 16px;
-    aspect-ratio: 1/1;
+    width: 16px;height: 16px;
+    //aspect-ratio: 1/1;
   }
   .card .options button > svg {
-    width: 12px;
-    aspect-ratio: 1/1;
+    width: 12px;height: 12px;
+    //aspect-ratio: 1/1;
     fill: currentColor;
   }
   .card [data-numbered-container] {
     width: 32ch;
-    height: 16ch;
-    background: #ffffff0c;
-    border: 1px solid #00000080;
+    height: 12ch;
+    background: #ffffff0a;
+    border: 1px solid #000000bf;
     border-radius: 6px;
   }
   .card [data-numbered-container] ol {
@@ -1835,6 +1895,7 @@
   card_backdrop.addEventListener("click",() => closeCard(Editor.active_dialog));
 
   createEditor();
+  //createEditor({ value: document.documentElement.outerHTML, open: false });
   if (Editor.support().file_handling && Editor.support().file_system){
     window.launchQueue.setConsumer(params => {
       closeEditor();
@@ -1895,8 +1956,7 @@
     container.setAttribute("data-editor-identifier",identifier);
     container.setAttribute("data-numbered-container",true);
     textarea.value = value;
-    textarea.selectionStart = 0;
-    textarea.selectionEnd = 0;
+    textarea.setSelectionRange(0,0);
     textarea.addEventListener("input",() => {
       if (!tab.hasAttribute("data-editor-refresh")) tab.setAttribute("data-editor-refresh",true);
       if (!tab.hasAttribute("data-editor-unsaved")) tab.setAttribute("data-editor-unsaved",true);
@@ -1918,7 +1978,7 @@
       type: "editor-tab"
     });
     applyEditingBehavior(textarea);
-    if (open) openEditor(identifier);
+    if (open || !Editor.active_editor) openEditor(identifier);
     return identifier;
   }
   function openEditor(identifier){
@@ -2405,7 +2465,7 @@
   function setTitle(name){
     document.title = `${name} - Smart Text Editor`;
   }
-  function refreshChannels(){}setView("split");
+  function refreshChannels(){}//setView("split");
 </script>
 
 </body>
