@@ -104,7 +104,7 @@
     dialog_previous: null,
     active_widget: null,
     context_menu_previous: null,
-    long_touch: {
+    context_menu_touch: {
       timeout: null,
       selection: null
     },
@@ -174,7 +174,7 @@
   header .menubar .menu .opener {
     background: none;
     border: none;
-    outline: none;
+    //outline: none;
   }
   header .window-controls {
     margin-left: auto;
@@ -384,6 +384,12 @@
     position: relative;
     display: flex;
   }
+  .menu.context-menu {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 2;
+  }
   .menu .opener {
     display: flex;
     justify-content: center;
@@ -408,6 +414,7 @@
   }
   .menu .list-item .info {
     margin-left: auto;
+    pointer-events: none;
   }
   .menu .list .list {
     left: 100%;
@@ -928,7 +935,7 @@
       <li class="list-item editing" onclick="callCommand(Editor.context_menu_previous,'copy');">Copy<span class="info shortcut ctrl command">C</span></li>
       <li class="list-item editing" onclick="callCommand(Editor.context_menu_previous,'paste');">Paste<span class="info shortcut ctrl command">V</span></li>
       <li class="list-item editing" onclick="Editor.context_menu_previous.select();">Select All<span class="info shortcut ctrl command">A</span></li>
-      <li class="list-item web-sharing editing" onclick="navigator.share({ text: Editor.long_touch.selection });">Share Text</li>
+      <li class="list-item web-sharing editing" onclick="navigator.share({ text: Editor.context_menu_touch.selection });">Share Text</li>
     </ul>
   </section>
 </main>
@@ -948,19 +955,43 @@
   var menus = document.querySelectorAll(".menu");
   menus.forEach(menu => {
     var opener = menu.querySelector(".opener"), lists = menu.querySelectorAll(".list"), listItems = menu.querySelectorAll(".list-item"), subLists = menu.querySelectorAll(".list-parent > .list");
-    menu.addEventListener("click",event => event.stopPropagation());
+    menu.addEventListener("mousedown",event => event.stopPropagation());
+    menu.addEventListener("touchend",event => event.stopPropagation());
+    menu.addEventListener("click",event => {
+      if (event.target.matches(".list-item:not(.list-parent)")){
+        event.stopPropagation();
+        closeMenu(menu);
+      }
+    });
     menu.addEventListener("keydown",event => {
-      if (!menu.classList.contains("active") (event.key == "Escape" || event.key == "Shift" || event.key == "Tab") && !menu.classList.contains("context-menu")) return;
-      event.preventDefault();
-      event.stopPropagation();
-      if (event.key == "Tab") return;
-      closeMenu(menu);
-      if (opener) opener.focus();
+      if (!menu.classList.contains("active")) return;
+      //if (event.key != "Escape" && event.key != "Tab") return;
+      if (event.key == "Enter" || event.key == " "){
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.target.matches(".list-item:not(.list-parent)")){
+          event.target.click();
+        }
+        if (event.target.matches(".list-item.list-parent")){
+          openSubList(event.target.querySelector(".list"));
+        }
+      }
+      if (event.key == "Escape" || event.key == "Tab"){
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.key != "Escape" && !menu.closest(".select")) return;
+        closeMenu(menu);
+      }
     });
     if (opener){
       if (!menu.classList.contains("alternate")){
-        opener.addEventListener("mousedown",() => openMenu(menu));
+        opener.addEventListener("mousedown",event => {
+          if (event.button == 0) openMenu(menu);
+        });
         opener.addEventListener("touchstart",() => openMenu(menu));
+        opener.addEventListener("keydown",event => {
+          if (event.key == "Enter" || event.key == " ") openMenu(menu);
+        });
       } else {
         attachContextMenu({
           element: opener,
@@ -977,65 +1008,113 @@
         if (event.key == "ArrowUp") navigable[navigable.length - 1].focus();
       });
     }
+    lists.forEach(list => {
+      list.addEventListener("mousedown",event => {
+        var navigable = getNavigableElements({
+          container: list,
+          scoped: true
+        });
+        event.stopPropagation();
+        //if (navigable.indexOf(event.target) != -1) ;
+      });
+      list.addEventListener("keydown",event => {
+        if (event.key != "ArrowDown" && event.key != "ArrowUp") return;
+        var navigable = getNavigableElements({
+          container: list,
+          scoped: true
+        });
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.key == "ArrowDown"){
+          if (document.activeElement == navigable[navigable.length - 1]){
+            navigable[0].focus();
+          } else navigable[navigable.indexOf(document.activeElement) + 1].focus();
+        }
+        if (event.key == "ArrowUp"){
+          if (document.activeElement == navigable[0]){
+            navigable[navigable.length - 1].focus();
+          } else navigable[navigable.indexOf(document.activeElement) - 1].focus();
+        }
+      });
+    });
     listItems.forEach(listItem => {
-      var type = listItem.tagName.toLowerCase();
-      listItem.addEventListener("click",() => {
-        if (!listItem.matches(".list-parent")) return;
-        if (!menu.classList.contains("context-menu")){
-          closeMenu(menu);
-        } else closeContextMenu();
+      var list = listItem.closest(".list"), listParent = list.closest(".list-parent"), subLists = list.querySelectorAll(".list"), type = listItem.tagName.toLowerCase();
+      listItem.addEventListener("mouseenter",event => {
+        subLists.forEach(subList => {
+          var listParent = subList.closest(".list-parent");
+          if (listItem != listParent && listParent.classList.contains("active") && !listParent.contains(Editor.context_menu_previous) && !subList.contains(listItem) && !subList.contains(document.activeElement)) listParent.classList.remove("active");
+        });
       });
-      listItem.addEventListener("keydown",event => {
-        if (!listItem.matches(".list-parent")) return;
-        if (event.key == "Enter" || event.key == " "){
-          event.preventDefault();
-          event.stopPropagation();
-          listItem.click();
-          if (opener) opener.focus();
-        }
-        if (!menu.closest(".select")) return;
-        if (event.key == "Escape" || event.key == "Tab"){
-          event.preventDefault();
-          event.stopPropagation();
-          closeMenu(menu);
-          opener.focus();
-        }
-      });
-      listItem.addEventListener("mouseenter",() => subLists.forEach(subList => {
-        var listParent = subList.closest(".list-parent");
-        if (listItem != listParent && listParent.classList.contains("active") && !listParent.contains(Editor.context_menu_previous) && !subList.contains(listItem) && !subList.contains(document.activeElement)) listParent.classList.remove("active");
-      }));
       if (type != "a") listItem.setAttribute("tabindex","0");
     });
     subLists.forEach(subList => {
       var listParent = subList.closest(".list-parent");
-      listParent.addEventListener("click",event => openSubList(event));
-      listParent.addEventListener("keydown",event => {
-        if (event.key == "Enter" || event.key == " " || event.key == "ArrowRight") openSubList(event);
-        if (event.key == "ArrowLeft") closeSubList(event);
-      });
       listParent.addEventListener("mouseenter",() => {
         if (!listParent.classList.contains("active")) listParent.classList.add("active");
       });
-      function openSubList(event){
+      listParent.addEventListener("click",event => openSubList(subList));
+      listParent.addEventListener("keydown",event => {
+        if (event.key != "Enter" && event.key != " " && event.key != "ArrowRight" && event.key != "ArrowLeft") return;
+        event.preventDefault();
         event.stopPropagation();
-        if (listParent.classList.contains("active") && event.type == "click") return listParent.classList.remove("active");
-        if (subList.contains(document.activeElement)) return;
-        listParent.classList.add("active");
-        if (event.type == "click") return;
-        var navigable = getNavigableElements({
-          container: subList,
-          scoped: true
-        });
-        window.setTimeout(() => navigable[0].focus(),50);
-      }
-      function closeSubList(event){
-        if (listParent.classList.contains("active")) event.stopPropagation();
-        listParent.focus();
-        listParent.classList.remove("active");
-      }
+        if (event.key == "Enter" || event.key == " " || event.key == "ArrowRight") openSubList(subList);
+        if (event.key == "ArrowLeft") closeSubList(subList);
+      });
+      subList.addEventListener("click",event => event.stopPropagation());
     });
+    function openSubList(subList){
+      var listParent = subList.closest(".list-parent");
+      if (listParent.classList.contains("active")) return closeSubList(subList);
+      if (subList.contains(document.activeElement)) return;
+      listParent.classList.add("active");
+      if (event.type == "click") return;
+      var navigable = getNavigableElements({
+        container: subList,
+        scoped: true
+      });
+      window.setTimeout(() => navigable[0].focus(),20);
+    }
+    function closeSubList(subList){
+      var listParent = subList.closest(".list-parent"), listParents = listParent.querySelectorAll(".list-parent");
+      listParent.focus();
+      listParent.classList.remove("active");
+      if (listParents.length != 0) listParents.forEach(listParent => {
+        if (listParent.classList.contains("active")) listParent.classList.remove("active");
+      });
+    }
   });
+
+  function openMenu(menu,type){
+    if (menu.classList.contains("active")) return closeMenu(menu);
+    var opener = menu.querySelector(".opener");
+    menus.forEach(menu => {
+      if (menu.classList.contains("active")) closeMenu(menu);
+    });
+    menu.classList.add("active");
+    if (document.activeElement != opener && opener) opener.focus();
+    document.body.addEventListener("mousedown",catchMenuExit);
+    document.body.addEventListener("touchend",catchMenuExit);
+    function catchMenuExit(){
+      if (menu.contains(event.target)) return;
+      document.body.removeEventListener("mousedown",this);
+      document.body.removeEventListener("touchend",this);
+      closeMenu(menu);
+    }
+    if (!menu.classList.contains("context-menu")) return;
+    menu.style.left = `${event.pageX}px`;
+    menu.style.top = `${event.pageY}px`;
+  }
+  function closeMenu(menu){
+    var opener = menu.querySelector(".opener"), listParents = menu.querySelectorAll(".list-parent");
+    menu.classList.remove("active");
+    listParents.forEach(listParent => {
+      if (listParent.classList.contains("active")) listParent.classList.remove("active");
+    });
+    if (opener && opener != document.activeElement) opener.focus();
+    if (!menu.classList.contains("context-menu")) return;
+    
+  }
+
   document.querySelectorAll(".checkbox").forEach(checkbox => {
     var input = checkbox.querySelector("input[type='checkbox']");
     checkbox.addEventListener("click",() => input.click());
@@ -1100,7 +1179,7 @@
     event.returnValue = "";
   });
   window.addEventListener("resize",event => {
-    if (context_menu.classList.contains("active")) closeContextMenu();
+    if (context_menu.classList.contains("active")) closeMenu(context_menu);
     if (Editor.view() != "preview") setEditorTabsVisibility(Editor.query().tab);
     if (Editor.view() != "split" || !document.body.hasAttribute("data-scaling-offset")) return;
     var previousWidth = window.innerWidth, previousHeight = window.innerHeight;
@@ -1109,20 +1188,15 @@
     },100);
   });
   //window.addEventListener("orientationchange",refreshScreenSafeArea);
-  window.addEventListener("blur",() => {
-    menus.forEach(menu => {
-      if (!menu.classList.contains("active")) return;
-      if (!menu.classList.contains("context-menu")){
-        closeMenu(menu);
-      } else closeContextMenu();
-    });
-  });
+  window.addEventListener("blur",() => menus.forEach(menu => {
+    if (menu.classList.contains("active")) closeMenu(menu);
+  }));
   document.body.addEventListener("keydown",event => {
     var pressed = key => (event.key.toLowerCase() == key.toLowerCase()), control = (event.ctrlKey && !Editor.environment().apple_device), command = (event.metaKey && Editor.environment().apple_device), shift = (event.shiftKey || ((event.key.toUpperCase() == event.key) && (event.key + event.key == event.key * 2))), controlShift = (control && shift), shiftCommand = (shift && command), controlCommand = (event.ctrlKey && command);
     if (pressed("Escape")){
       event.preventDefault();
       if (event.repeat) return;
-      if (context_menu.classList.contains("active")) return closeContextMenu();
+      if (context_menu.classList.contains("active")) return closeMenu(context_menu);
       if (Editor.active_dialog) closeCard(Editor.active_dialog);
     }
     if ((controlShift || shiftCommand) && pressed("x")){
@@ -1245,14 +1319,9 @@
     event.stopPropagation();
   });
   document.body.addEventListener("contextmenu",event => event.preventDefault());
-  document.body.addEventListener("drop",() => {
-    menus.forEach(menu => {
-      if (!menu.classList.contains("active")) return;
-      if (!menu.classList.contains("context-menu")){
-        closeMenu(menu);
-      } else closeContextMenu();
-    });
-  });
+  document.body.addEventListener("drop",() => menus.forEach(menu => {
+    if (menu.classList.contains("active")) closeMenu(menu);
+  }));
   document.body.addEventListener("dragend",() => document.querySelectorAll("textarea").forEach(textarea => textarea.num_refreshLineCount()));
   var toolbar = document.querySelector("header .menubar");
   toolbar.querySelectorAll(".menu").forEach(menu => {
@@ -1298,6 +1367,7 @@
     });
   });
   scaler.addEventListener("mousedown",() => {
+    if (event.button != 0) return;
     if (Editor.view() != "split") return;
     document.body.setAttribute("data-scaling-active",true);
     document.addEventListener("mousemove",setScaling);
@@ -1384,6 +1454,7 @@
     });
     previewOption.classList.add("list-item");
     previewOption.setAttribute("data-editor-id",identifier);
+    previewOption.setAttribute("tabindex","0");
     previewOption.innerText = name;
     previewOption.addEventListener("click",() => {
       Editor.preview_editor = identifier;
@@ -1537,10 +1608,7 @@
         } else if (contextMenuItem) Editor.dialog_previous = Editor.context_menu_previous;
       }
       menus.forEach(menu => {
-        if (!menu.classList.contains("active")) return;
-        if (!menu.classList.contains("context-menu")){
-          closeMenu(menu);
-        } else closeContextMenu();
+        if (menu.classList.contains("active")) closeMenu(menu);
       });
       var transitionDuration = parseInt(getElementStyle({
         element: card,
@@ -1683,34 +1751,49 @@
       force: true
     });
   }
-  function openMenu(menu){
-    if (menu.classList.contains("active")) return closeMenu(menu);
-    menus.forEach(menu => {
-      if (menu.classList.contains("active")) closeMenu(menu);
-    });
-    menu.classList.add("active");
-    document.body.addEventListener("mousedown",catchMenuExit);
-    document.body.addEventListener("touchend",catchMenuExit);
-    function catchMenuExit(event){
-      if (menu.contains(event.target)) return;
-      document.body.removeEventListener("mousedown",this);
-      document.body.removeEventListener("touchend",this);
-      closeMenu(menu);
-    }
-  }
-
-
-  function closeMenu(menu){
-    var listParents = menu.querySelectorAll(".list-parent");
-    menu.classList.remove("active");
-    listParents.forEach(listParent => {
-      if (!listParent.classList.contains("active")) return;
-      listParent.classList.remove("active");
-    });
-  }
 
 
 /*
+  function openContextMenu(event,type){
+    event.preventDefault();
+    event.stopPropagation();
+    if (Editor.long_touch.timeout) Editor.long_touch.timeout = null;
+    if (context_menu.classList.contains("active")){
+      closeContextMenu();
+      var menu = context_menu.querySelectorAll("ul")[0], transitionDuration = parseInt(getElementStyle(menu,"transition-duration").replace(/s/g,"") * 1000);
+      return window.setTimeout(() => openContextMenu(event,type),transitionDuration);
+    }
+    Editor.context_menu_previous = event.target;
+    openMenu(event,context_menu);
+    context_menu.classList.add(type);
+    var pageLocation = {}, transformOrigin = {};
+    if (Editor.environment.touch_device && event instanceof TouchEvent){
+      pageLocation.left = event.touches[0].pageX;
+      pageLocation.top = event.touches[0].pageY;
+    } else {
+      pageLocation.left = event.pageX;
+      pageLocation.top = event.pageY;
+    }
+    transformOrigin.left = pageLocation.left;
+    transformOrigin.top = pageLocation.top;
+    var menu = context_menu.querySelectorAll("ul")[0];
+    if (pageLocation.left + menu.offsetWidth > window.innerWidth) pageLocation.left = window.innerWidth - menu.offsetWidth;
+    if (pageLocation.top + menu.offsetHeight > window.innerHeight) pageLocation.top = window.innerHeight - menu.offsetHeight;
+    transformOrigin.left -= pageLocation.left;
+    transformOrigin.top -= pageLocation.top;
+    context_menu.style.left = `${pageLocation.left}px`;
+    context_menu.style.top = `${pageLocation.top}px`;
+    menu.style.transformOrigin = `${transformOrigin.left}px ${transformOrigin.top}px`;
+    document.body.addEventListener("keydown",catchContextMenuNavigation);
+    var transitionDuration = parseInt(getElementStyle(menu,"transition-duration").replace(/s/g,"") * 500);
+    window.setTimeout(() => document.activeElement.blur(),transitionDuration);
+  }
+  function closeContextMenu(){
+    closeMenu(context_menu);
+    Editor.context_menu_previous.focus();
+    Editor.context_menu_previous = null;
+    document.body.removeEventListener("keydown",catchContextMenuNavigation);
+  }
   function openMenu(event,menu){
     if (Editor.long_touch.timeout) Editor.long_touch.timeout = null;
     if (Editor.long_touch.selection) Editor.long_touch.selection = null;
@@ -1751,6 +1834,24 @@
   }
 */
 
+  function getNavigableElements({ container, scope = false } = {}){
+    scope = (scope) ? "" : ":scope > ";
+    var navigable = container.querySelectorAll(`${scope}button:not([disabled]), ${scope}textarea:not([disabled]), ${scope}input:not([disabled]), ${scope}select:not([disabled]), ${scope}a[href]:not([disabled]), ${scope}[tabindex]:not([tabindex="-1"])`);
+    return Array.from(navigable).filter(element => (getElementStyle({
+      element: element,
+      property: "display"
+    }) != "none"));
+  }
+
+/*
+  function getNavigableElements(container,scope){
+    var navigable;
+    if (scope){
+      navigable = container.querySelectorAll(":scope > button:not([disabled]), :scope > textarea:not([disabled]), :scope > input:not([disabled]), :scope > select:not([disabled]), :scope > a[href]:not([disabled]), :scope > [tabindex]:not([tabindex='-1'])");
+    } else navigable = container.querySelectorAll("button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), a[href]:not([disabled]), [tabindex]:not([tabindex='-1'])");
+    return Array.from(navigable).filter(element => (getElementStyle(element,"display") != "none"));
+  }
+*/
 
   function getElementStyle({ element, pseudo = null, property } = {}){
     return window.getComputedStyle(element,pseudo).getPropertyValue(property);
@@ -1792,25 +1893,26 @@
       if (event.button == "2") event.preventDefault();
     });
     element.addEventListener("contextmenu",event => {
-      if (!Editor.support().editing_commands){
-        event.stopPropagation();
+      if (Editor.support().editing_commands){
+        openMenu(context_menu,type);
+      } else {
         menus.forEach(menu => closeMenu(menu));
-      } else openContextMenu(event,type);
+      }
     });
     if (!Editor.support().editing_commands) return;
     element.addEventListener("touchstart",event => {
       if (event.touches.length != 1) return;
-      Editor.long_touch.timeout = window.setTimeout(() => openContextMenu(event,type),750);
-      if (window.getSelection() != "") Editor.long_touch.selection = window.getSelection();
+      Editor.context_menu_touch.timeout = window.setTimeout(() => openMenu(context_menu,type),750);
+      if (window.getSelection() != "") Editor.context_menu_touch.selection = window.getSelection();
     });
-    element.addEventListener("touchmove",cancelLongTouch);
-    element.addEventListener("touchend",cancelLongTouch);
-    function cancelLongTouch(){
-      if (Editor.long_touch.timeout){
-        window.clearTimeout(Editor.long_touch.timeout);
-        Editor.long_touch.timeout = null;
+    element.addEventListener("touchmove",negateContextMenu);
+    element.addEventListener("touchend",negateContextMenu);
+    function negateContextMenu(){
+      if (Editor.context_menu_touch.timeout){
+        window.clearTimeout(Editor.context_menu_touch.timeout);
+        Editor.context_menu_touch.timeout = null;
       }
-      if (Editor.long_touch.selection) Editor.long_touch.selection = null;
+      if (Editor.context_menu_touch.selection) Editor.context_menu_touch.selection = null;
     }
   }/*
   function sendShortcutAction({ control, command, shift, controlShift, shiftCommand, controlCommand, key } = {}){
