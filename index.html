@@ -70,11 +70,12 @@
       web_sharing: ("share" in navigator)
     }),
     query: (identifier = Editor.active_editor) => ({
-      textarea: (workspace.querySelector(`[data-numbered-container][data-identifier="${identifier}"] textarea`)),
-      tab: (files.querySelector(`.tab[data-identifier="${identifier}"]`)),
+      tab: (workspace_tabs.querySelector(`.tab[data-editor-id="${identifier}"]`)),
+      container: (workspace_editors.querySelector(`[data-numbered-container][data-editor-id="${identifier}"]`)),
+      textarea: (workspace_editors.querySelector(`[data-numbered-container][data-editor-id="${identifier}"] textarea`)),
       name: section => {
-        if (document.querySelectorAll(`[data-identifier="${identifier}"]`).length == 0 && identifier != Editor.active_editor) return null;
-        var name = files.querySelector(`.tab[data-identifier="${identifier}"]`).innerText;
+        if (document.querySelectorAll(`[data-editor-id="${identifier}"]`).length == 0 && identifier != Editor.active_editor) return null;
+        var name = workspace_tabs.querySelector(`.tab[data-editor-id="${identifier}"]`).innerText;
         if (!section) return name;
         if (section == "name"){
           name = name.split(".");
@@ -85,7 +86,7 @@
     }),
     view: () => document.body.getAttribute("data-view"),
     orientation: () => document.body.getAttribute("data-orientation"),
-    unsaved_work: () => (!Editor.appearance().parent_window || (files.querySelectorAll(".tab[data-unsaved]").length == 0)),
+    unsaved_work: () => (!Editor.appearance().parent_window || (workspace_tabs.querySelectorAll(".tab[data-editor-unsaved]").length == 0)),
     preapproved_extensions: ["txt","html","css","js","php","json","webmanifest","xml","yaml","yml","dist","config","ini","md","markdown","mcmeta","lang","properties","uidx","material","h","fragment","vertex","fxh","hlsl","ihlsl","svg"],
     active_editor: null,
     preview_editor: null,
@@ -117,7 +118,7 @@
   *, *::before, *::after {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;transition: 0.5s;
+    box-sizing: border-box;//transition: 0.5s;
   }
   :root {
   }
@@ -220,76 +221,86 @@
     pointer-events: none;
     transition: none;
   }
-  main .workspace .editor-tabs {
+  main .workspace .workspace-tabs {min-height: 27px;
     flex-shrink: 0;
     display: flex;
     overflow-x: auto;
     scroll-behavior: smooth;
     scrollbar-width: none;
   }
-  main .workspace .editor-tabs::-webkit-scrollbar {
+  main .workspace .workspace-tabs::-webkit-scrollbar {
     display: none;
   }
-  main .workspace .editor {
-    height: 0;
+  main .workspace .workspace-tabs .tab.active {background: lightblue;
   }
-  main .workspace .editor.active {
+  main .workspace .workspace-editors {
+    width: 100%;
     height: 100%;
   }
-  main .workspace-scaler {
+  main .workspace .editor {color: white;background: #333;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    visibility: hidden;
+  }
+  main .workspace .editor.active {
+    visibility: visible;
+    z-index: 1;
+  }
+  main .scaler {
     position: absolute;
     touch-action: none;
     z-index: 1;
   }
-  main .workspace-scaler:hover, body[data-scaling-active] main .workspace-scaler {
+  main .scaler:hover, body[data-scaling-active] main .scaler {
     background-color: #444444;
   }
-  body[data-orientation="horizontal"] main .workspace-scaler {
+  body[data-orientation="horizontal"] main .scaler {background: #555;
     top: 0;
     width: 8px;
     height: 100%;
     cursor: col-resize;
   }
-  body[data-orientation="vertical"] main .workspace-scaler {
+  body[data-orientation="vertical"] main .scaler {
     left: 0;
     width: 100%;
     height: 8px;
     cursor: row-resize;
   }
-  body[data-view="code"][data-orientation="horizontal"] main .workspace-scaler {
+  body[data-view="code"][data-orientation="horizontal"] main .scaler {
     left: 100%;
     transform: translateX(0);
   }
-  body[data-view="code"][data-orientation="vertical"] main .workspace-scaler {
+  body[data-view="code"][data-orientation="vertical"] main .scaler {
     top: 100%;
     transform: translateY(0);
   }
-  body[data-view="split"][data-orientation="horizontal"] main .workspace-scaler {
+  body[data-view="split"][data-orientation="horizontal"] main .scaler {
     left: 50%;
     transform: translateX(-50%);
   }
-  body[data-view="split"][data-orientation="vertical"] main .workspace-scaler {
+  body[data-view="split"][data-orientation="vertical"] main .scaler {
     top: 50%;
     transform: translateY(-50%);
   }
-  body[data-view="split"][data-orientation="horizontal"][data-scaling-offset] main .workspace-scaler {
+  body[data-view="split"][data-orientation="horizontal"][data-scaling-offset] main .scaler {
     left: var(--scaling-offset);
   }
-  body[data-view="split"][data-orientation="vertical"][data-scaling-offset] main .workspace-scaler {
+  body[data-view="split"][data-orientation="vertical"][data-scaling-offset] main .scaler {
     top: var(--scaling-offset);
   }
-  body[data-view="preview"][data-orientation="horizontal"] main .workspace-scaler {
+  body[data-view="preview"][data-orientation="horizontal"] main .scaler {
     left: 0;
     transform: translateX(-100%);
   }
-  body[data-view="preview"][data-orientation="vertical"] main .workspace-scaler {
+  body[data-view="preview"][data-orientation="vertical"] main .scaler {
     top: 0;
     transform: translateY(-100%);
   }
-  body[data-scaling-active] main .workspace-scaler {
+  body[data-scaling-active] main .scaler {
     transition: none;
   }
-  main .workspace-preview {
+  main .preview {
     position: absolute;
     right: 0;
     bottom: 0;
@@ -298,33 +309,33 @@
     background: #ffffff;
     border: none;background: lightgray;
   }
-  body[data-view="code"][data-orientation="horizontal"] main .workspace-preview {
+  body[data-view="code"][data-orientation="horizontal"] main .preview {
     width: 0%;
     height: 100%;
   }
-  body[data-view="code"][data-orientation="vertical"] main .workspace-preview {
+  body[data-view="code"][data-orientation="vertical"] main .preview {
     width: 100%;
     height: 0%;
   }
-  body[data-view="split"][data-orientation="horizontal"] main .workspace-preview {
+  body[data-view="split"][data-orientation="horizontal"] main .preview {
     width: 50%;
     height: 100%;
   }
-  body[data-view="split"][data-orientation="vertical"] main .workspace-preview {
+  body[data-view="split"][data-orientation="vertical"] main .preview {
     width: 100%;
     height: 50%;
   }
-  body[data-view="split"][data-orientation="horizontal"][data-scaling-offset] main .workspace-preview {
+  body[data-view="split"][data-orientation="horizontal"][data-scaling-offset] main .preview {
     width: calc(100% - var(--scaling-offset));
   }
-  body[data-view="split"][data-orientation="vertical"][data-scaling-offset] main .workspace-preview {
+  body[data-view="split"][data-orientation="vertical"][data-scaling-offset] main .preview {
     height: calc(100% - var(--scaling-offset));
   }
-  body[data-view="preview"] main .workspace-preview {
+  body[data-view="preview"] main .preview {
     width: 100%;
     height: 100%;
   }
-  body[data-scaling-active] main .workspace-preview {
+  body[data-scaling-active] main .preview {
     pointer-events: none;
     transition: none;
   }
@@ -622,7 +633,7 @@
     </div>
     <div class="menu">
       <button class="opener">Preview</button>
-      <ul id="preview_files" class="list">
+      <ul id="preview_editors" class="list">
         <li class="list-item" onclick="Editor.preview_editor = null; forceRefresh();">Active Editor</li>
       </ul>
     </div>
@@ -673,10 +684,11 @@
 
 <main id="main">
   <section id="workspace" class="workspace">
-    <section id="files" class="editor-tabs"></section>
+    <section id="workspace_tabs" class="workspace-tabs"></section>
+    <section id="workspace_editors" class="workspace-editors"></section>
   </section>
-  <section id="scaler" class="workspace-scaler"></section>
-  <iframe id="preview" class="workspace-preview" src="about:blank"></iframe>
+  <section id="scaler" class="scaler"></section>
+  <iframe id="preview" class="preview" src="about:blank"></iframe>
   <section id="card_backdrop" class="card-backdrop"></section>
   <section id="settings_card" class="card dialog">
     <section class="header">
@@ -1037,12 +1049,12 @@
     if (!Editor.environment().macOS_device) return;
     cardControls.insertBefore(close,minimize);
     header.insertBefore(cardControls,header.firstChild);
-  });
+  });/*
   picker_card.querySelectorAll("input[type='range']").forEach(channel => {
     channel.addEventListener("input",refreshChannels);
     channel.min = "0";
     channel.max = "255";
-  });
+  });*/
   window.addEventListener("load",() => {
     if (!("serviceWorker" in navigator) || !Editor.appearance().parent_window || window.location.protocol != "https:") return;
     navigator.serviceWorker.register("service-worker.js");
@@ -1215,7 +1227,187 @@
       openCard(settings_card);
     }
   });
+  document.body.addEventListener("mousedown",event => {
+    if (event.button != 2) return;
+    event.preventDefault();
+    event.stopPropagation();
+  });
+  document.body.addEventListener("contextmenu",event => event.preventDefault());
+  document.body.addEventListener("drop",() => {
+    menus.forEach(menu => {
+      if (!menu.classList.contains("active")) return;
+      if (!menu.classList.contains("context-menu")){
+        closeMenu(menu);
+      } else closeContextMenu();
+    });
+  });
+  document.body.addEventListener("dragend",() => document.querySelectorAll("textarea").forEach(textarea => textarea.num_refreshLineCount()));
+  var toolbar = document.querySelector("header .menubar");
+  toolbar.querySelectorAll(".menu").forEach(menu => {
+    menu.addEventListener("mouseenter",() => {
+      if (toolbar.querySelectorAll(".menu:not(.alternate).active").length == 0 || menu.classList.contains("alternate") || menu.classList.contains("active")) return;
+      openMenu(menu);
+    });
+  });/*
+  main.addEventListener("scroll",event => {
+    main.scrollLeft = 0;
+    main.scrollTop = 0;
+  },{ passive: true });*/
+  workspace_tabs.addEventListener("dragover",event => {
+    event.preventDefault();
+    workspace_tabs.classList.add("drag");
+    event.dataTransfer.dropEffect = "copy";
+  });
+  workspace_tabs.addEventListener("dragleave",() => files.classList.remove("drag"));
+  workspace_tabs.addEventListener("drop",event => {
+    event.preventDefault();
+    workspace_tabs.classList.remove("drag");
+    Array.from(event.dataTransfer.items).forEach(async item => {
+      if (item.kind == "file"){
+        if (!Editor.support.file_system || !("getAsFileSystemHandle" in item)){
+          var file = item.getAsFile(), reader = new FileReader();
+          reader.readAsText(file,"UTF-8");
+          reader.addEventListener("loadend",() => createFile(file.name,reader.result));
+        } else {
+          var fileHandle = await item.getAsFileSystemHandle();
+          if (fileHandle.kind != "file") return;
+          var file = await fileHandle.getFile(), identifier = createFile(await file.name,await file.text());
+          Editor.file_handles[identifier] = await fileHandle;
+        }
+      } else if (item.kind == "string") createFile(undefined,event.dataTransfer.getData("text"));
+    });
+  });
+  scaler.addEventListener("touchstart",event => {
+    if (event.touches.length != 1) return;
+    document.body.setAttribute("data-scaling-active",true);
+    document.addEventListener("touchmove",setScaling,{ passive: true });
+    document.addEventListener("touchend",disableScaling,{ passive: true });
+  },{ passive: true });
+  scaler.addEventListener("mousedown",() => {
+    document.body.setAttribute("data-scaling-active",true);
+    document.addEventListener("mousemove",setScaling);
+    document.addEventListener("mouseup",disableScaling);
+  });
+  card_backdrop.addEventListener("click",() => closeCard(Editor.active_dialog));
 
+  createEditor();
+  if (Editor.support().file_handling && Editor.support().file_system){
+    window.launchQueue.setConsumer(params => {
+      closeEditor();
+      params.files.forEach(async fileHandle => {
+        var file = await fileHandle.getFile(), identifier = createEditor({
+          name: await file.name,
+          value: await file.text()
+        });
+        Editor.file_handles[identifier] = await fileHandle;
+      });
+      if (!Editor.environment().touch_device) Editor.query().textarea.focus();
+    });
+  }
+  if (Editor.appearance().parent_window) window.setTimeout(() => document.body.classList.remove("startup-fade"),50);
+  if (Editor.support().editing_commands){
+    undo_tool.classList.add("hidden");
+    redo_tool.classList.add("hidden");
+  }
+  /*refreshScreenSafeArea();
+  refreshPickerInput();
+  var queryParameters = new URLSearchParams(window.location.search);
+  if (queryParameters.get("template")){
+    confirmOverwrite(insertTemplate);
+    removeQueryParameters(["template"]);
+  }
+  if (queryParameters.get("settings")){
+    openCard(settings_card);
+    removeQueryParameters(["settings"]);
+  }*/
+  function createEditor(params = { name: "Untitled.txt", value: "", open: true }){
+    var name = params.name, value = params.value, open = params.open, identifier = Math.random().toString(), tab = document.createElement("button"), tabName = document.createElement("span"), tabRename = document.createElement("button"), tabClose = document.createElement("button"), container = document.createElement("div"), textarea = document.createElement("textarea"), previewOption = document.createElement("li");
+    tab.classList.add("tab");
+    tab.setAttribute("data-editor-id",identifier);
+    tab.addEventListener("click",() => {
+      if (tab != Editor.query().tab) openEditor(identifier);
+    });
+    tab.addEventListener("dragover",event => {
+      event.preventDefault();
+      event.stopPropagation();
+      event.dataTransfer.dropEffect = "copy";
+      if (tab != Editor.query().tab) openEditor(identifier);
+    });
+    tab.addEventListener("drop",event => {
+      event.preventDefault();
+      event.stopPropagation();
+    });
+    tabName.setAttribute("data-editor-name",name);
+    tabName.innerText = name;
+    tabRename.innerHTML = "<svg><use href='#rename_icon'/></svg>";
+    tabRename.addEventListener("click",event => {
+      event.stopPropagation();
+      var newTabName = prompt(`Enter a new file name for "${tabName.innerText}"`,tabName.innerText);
+      if (!newTabName) return;
+      tabName.innerText = newTabName;
+      previewOption.innerText = newTabName;
+      if (tab == Editor.query().tab) refreshTitle(newTabName);
+    });
+    tabClose.innerHTML = "<svg><use href='#close_icon'/></svg>";
+    tabClose.addEventListener("click",event => {
+      event.stopPropagation();
+      closeEditor(identifier);
+    });
+    container.classList.add("editor");
+    container.setAttribute("data-editor-id",identifier);
+    container.setAttribute("data-numbered-container",true);
+    textarea.value = value;
+    textarea.selectionStart = 0;
+    textarea.selectionEnd = 0;
+    textarea.addEventListener("input",() => {
+      if (!tab.hasAttribute("data-editor-unsaved")) tab.setAttribute("data-editor-unsaved",true);
+      if (Editor.view() != "code") refreshPreview();
+    });
+    previewOption.setAttribute("data-editor-id",identifier);
+    previewOption.innerText = name;
+    previewOption.addEventListener("click",() => {
+      Editor.preview_editor = identifier;
+      refreshPreview({
+        force: true
+      });
+    });
+    tab.appendChild(tabName);
+    tab.appendChild(tabRename);
+    tab.appendChild(tabClose);
+    workspace_tabs.appendChild(tab);
+    container.appendChild(textarea);
+    workspace_editors.appendChild(container);
+    preview_editors.appendChild(previewOption);
+    applyEditingBehavior(textarea);
+    if (open) openEditor(identifier);
+    return identifier;
+  }
+  function openEditor(identifier){
+    var editor = Editor.query(identifier), tab = editor.tab, container = editor.container, name = editor.name();
+    if (Editor.query().tab) Editor.query().tab.classList.remove("active");
+    if (Editor.query().container) Editor.query().container.classList.remove("active");
+    tab.classList.add("active");
+    container.classList.add("active");
+    Editor.active_editor = identifier;
+    setEditorTabsVisibility(Editor.query().tab);
+    refreshPreview();
+    refreshTitle(name);
+  }
+  function closeEditor(identifier){
+    var editor = Editor.query(identifier), tab = editor.tab, container = editor.container, name = editor.name(), previewOption = preview_editors.querySelector(`li[data-editor-id="${identifier}"]`), active = (tab.classList.contains("active")), focused = (document.activeElement == Editor.query(identifier).textarea), editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab"));
+    if (tab.hasAttribute("data-editor-unsaved")){
+      var ask = confirm(`Are you sure you would like to close "${name}"?\nRecent changes have not yet been saved.`);
+      if (!ask) return;
+    }
+    if (tab == editorTabs[0] && editorTabs[1] && tab.classList.contains("active")) openEditor(editorTabs[1].getAttribute("data-editor-id"));
+    if (tab == editorTabs[editorTabs.length - 1] && tab != editorTabs[0] && tab.classList.contains("active")) openEditor(editorTabs[editorTabs.length - 2].getAttribute("data-editor-id"));
+    if (tab != editorTabs[0] && tab.classList.contains("active")) openEditor(editorTabs[editorTabs.indexOf(tab) + 1].getAttribute("data-editor-id"));
+    if (focused) Editor.query().textarea.focus();
+    workspace_tabs.removeChild(tab);
+    workspace_editors.removeChild(container);
+    preview_editors.removeChild(previewOption);
+    if (Editor.file_handles[identifier]) delete Editor.file_handles[identifier];
+  }
 
 
 
@@ -1288,6 +1480,9 @@
       key: key
     }));
   }*/
+  function setEditorTabsVisibility(){}
+  function refreshPreview(){}
+  function refreshTitle(){}
   function refreshChannels(){}
 </script>
 
