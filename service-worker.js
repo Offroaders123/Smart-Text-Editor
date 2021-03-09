@@ -1,5 +1,5 @@
 var worker = {
-  cache_version: 2.20
+  cache_version: 2.21
 }
 self.addEventListener("activate",event => {
   event.waitUntil(caches.keys().then(cacheVersions => Promise.all(cacheVersions.map(cache => {
