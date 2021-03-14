@@ -415,7 +415,7 @@
     border-bottom-color: #ffffff80;
   }
   main .workspace .workspace-tabs .tab.active {
-    color: #e8e8e8;
+    color: #eaeaea;
     background: var(--workspace-background);
     border-left-color: var(--workspace-accent);
     border-top-color: var(--workspace-accent);
@@ -423,6 +423,26 @@
   }
   main .workspace .workspace-tabs .tab[data-editor-unsaved] {
     font-style: italic;
+  }
+  main .workspace .workspace-tabs .tab [data-editor-rename] {
+    margin: calc(calc(var(--editor-rename-padding-y) + var(--editor-rename-border)) * -1) calc(calc(var(--editor-rename-padding-x) + var(--editor-rename-border)) * -1);
+    padding: var(--editor-rename-padding-y) var(--editor-rename-padding-x);
+    --editor-rename-padding-x: 4px;
+    --editor-rename-padding-y: 3px;
+    width: calc(var(--editor-name-width) + calc(var(--editor-rename-padding-x) + var(--editor-rename-border)) * 2);
+    color: inherit;
+    font-size: inherit;
+    font-family: inherit;
+    background: none;
+    border: var(--editor-rename-border) solid #ffffff80;
+    border-radius: 4px;
+    --editor-rename-border: 1px;
+  }
+  main .workspace .workspace-tabs .tab [data-editor-name] {
+    pointer-events: none;
+  }
+  main .workspace .workspace-tabs .tab [data-editor-rename] ~ [data-editor-name] {
+    display: none;
   }
   main .workspace .workspace-tabs .tab[data-editor-unsaved] [data-editor-name]::after {
     content: "*";
@@ -583,8 +603,8 @@
     text-decoration: none;
   }
   [data-numbered-container], input[type="text"] {
-    color: #e8e8e8;
-    caret-color: #e8e8e8;
+    color: #eaeaea;
+    caret-color: #eaeaea;
     font-size: 13px;
     font-family: "Cousine", monospace;
     line-height: 1.2;
@@ -1657,8 +1677,8 @@
     if (!image.alt) image.alt = "";
     image.draggable = false;
   });
-  document.querySelectorAll("input[type='text']").forEach(input => applyEditingBehavior(input));
-  document.querySelectorAll("textarea").forEach(textarea => applyEditingBehavior(textarea));
+  document.querySelectorAll("input[type='text']").forEach(input => applyEditingBehavior({ element: input }));
+  document.querySelectorAll("textarea").forEach(textarea => applyEditingBehavior({ element: textarea }));
   var menus = document.querySelectorAll(".menu");
   menus.forEach(menu => {
     var opener = menu.querySelector(".opener"), lists = menu.querySelectorAll(".list"), listItems = menu.querySelectorAll(".list-item"), subLists = menu.querySelectorAll(".list-parent > .list");
@@ -2126,9 +2146,46 @@
     tab.classList.add("tab");
     tab.setAttribute("data-editor-identifier",identifier);
     if (value) tab.setAttribute("data-editor-refresh",true);
-    tab.addEventListener("click",() => {
+    tab.addEventListener("mousedown",event => {
+      if (event.button != 0 || document.activeElement.matches("[data-editor-rename]")) return;
+      event.preventDefault();
       if (tab != Editor.query().tab) openEditor(identifier);
     });
+
+
+    tab.addEventListener("contextmenu",event => {
+      if (event.target != tab) return;
+      var editorRename = tab.querySelector("[data-editor-rename]");
+      if (!editorRename){
+        editorRename = document.createElement("input");
+      } else return editorRename.blur();
+      editorRename.type = "text";
+      editorRename.placeholder = Editor.query(identifier).getName();
+      editorRename.setAttribute("data-editor-rename",true);
+      editorRename.setAttribute("tabindex","-1");
+      editorRename.style.setProperty("--editor-name-width",`${editorName.getBoundingClientRect().width}px`);
+      editorRename.value = Editor.query(identifier).getName();
+      editorRename.addEventListener("keydown",event => {
+        if (event.key == "Escape") editorRename.blur();
+      });
+      editorRename.addEventListener("change",() => {
+        if (editorRename.value) renameEditor({
+          identifier,
+          name: editorRename.value
+        });
+        editorRename.blur();
+      });
+      editorRename.addEventListener("blur",() => editorRename.remove());
+      tab.insertBefore(editorRename,tab.firstChild);
+      applyEditingBehavior({
+        element: editorRename,
+        advanced: false
+      });
+      editorRename.focus();
+      editorRename.select();
+    });
+
+
     tab.addEventListener("dragover",event => {
       event.preventDefault();
       event.stopPropagation();
@@ -2144,6 +2201,7 @@
     editorClose.classList.add("option");
     editorClose.setAttribute("tabindex","-1");
     editorClose.innerHTML = "<svg><use href='#close_icon'/></svg>";
+    editorClose.addEventListener("mousedown",event => event.stopPropagation());
     editorClose.addEventListener("click",event => {
       event.stopPropagation();
       closeEditor({ identifier });
@@ -2169,7 +2227,7 @@
     container.appendChild(textarea);
     workspace_editors.appendChild(container);
     preview_options.appendChild(previewOption);
-    applyEditingBehavior(textarea);
+    applyEditingBehavior({ element: textarea });
     if (open || !Editor.active_editor) openEditor(identifier);
     return identifier;
   }
@@ -2601,21 +2659,22 @@
   function getElementStyle({ element, pseudo = null, property } = {}){
     return window.getComputedStyle(element,pseudo).getPropertyValue(property);
   }
-  function applyEditingBehavior(element){
+  function applyEditingBehavior({ element, advanced = true } = {}){
     var type = element.tagName.toLowerCase();
     element.spellcheck = false;
     element.autocomplete = "off";
     element.autocapitalize = "off";
     element.setAttribute("autocorrect","off");
     if (type == "input"){
+      if (!advanced) return;
       attachContextMenu({
         element: element,
         type: "editing"
       });
-    }
-    if (type == "textarea"){
+    } else if (type == "textarea"){
       var container = element.closest("[data-numbered-container]");
       container.num_establishContainer();
+      if (!advanced) return;
       container.addEventListener("dragover",event => {
         container.classList.add("drag");
         event.dataTransfer.dropEffect = "copy";
