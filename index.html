@@ -53,10 +53,10 @@
   window.Editor = {
     appearance: () => {
       var parent_window = (window.self == window.top),
-          standalone = (window.matchMedia("(display-mode: standalone)").matches || navigator.standalone || !window.menubar.visible),
-          apple_home_screen = (/(iPhone|iPad|iPod)/i.test(navigator.platform) && "standalone" in navigator && navigator.standalone),
-          hidden_chrome = (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight),
-          fullscreen = (window.matchMedia("(display-mode: fullscreen)").matches || (!window.screenY && !window.screenTop && hidden_chrome) || (!window.screenY && !window.screenTop && standalone));
+        standalone = (window.matchMedia("(display-mode: standalone)").matches || navigator.standalone || !window.menubar.visible),
+        apple_home_screen = (/(iPhone|iPad|iPod)/i.test(navigator.platform) && "standalone" in navigator && navigator.standalone),
+        hidden_chrome = (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight),
+        fullscreen = (window.matchMedia("(display-mode: fullscreen)").matches || (!window.screenY && !window.screenTop && hidden_chrome) || (!window.screenY && !window.screenTop && standalone));
       return { parent_window, standalone, apple_home_screen, hidden_chrome, fullscreen };
     },
     environment: () => ({
@@ -236,13 +236,9 @@
   }
 
 
-  header .menubar .menu .opener:hover, header .menubar .menu.active .opener {
+  header .menubar .menu .opener:hover, header .menubar .menu .opener:focus, header .menubar .menu.active .opener {
     color: #ffffff;
-    background: #ffffff2a;
-  }
-  header .menubar .menu .opener:focus {
-    color: #ffffff;
-    background: #ffffff2a;
+    background: #ffffff20;
   }
   header .menubar .menu:not(.active) .opener:not(:hover):focus:not(:focus-visible) {
     color: inherit;
@@ -250,21 +246,17 @@
   }
   header .menubar .menu .opener:focus-visible {
     color: #ffffff;
-    background: #ffffff2a;
+    background: #ffffff20;
   }
 
 /* -- Future Focus Visible --
   header .menubar .menu .opener:where(:hover,:focus-visible), header .menubar .menu.active .opener {
     color: #ffffff;
-    background: #ffffff2a;
+    background: #ffffff20;
   }
 */
 
 
-  header .menubar .preview-options .list-item.selected::before {
-    content: "\2713";
-    line-height: 12px;
-  }
   header .window-controls {
     margin-left: auto;
     align-self: stretch;
@@ -735,8 +727,12 @@
     border-top-left-radius: 0;
     border-top-right-radius: 0;
   }
+  .menu .list.selectable {
+    --list-item-selected-icon-size: 10px;
+  }
   .menu .list-item {
     padding: calc(var(--list-item-padding-y) - var(--list-item-border)) calc(var(--list-item-padding-x) - var(--list-item-border));
+    padding-left: calc(var(--list-item-padding-x) + var(--list-item-selected-icon-size,0px) - var(--list-item-border));
     --list-item-padding-x: 12px;
     --list-item-padding-y: 3px;
     position: relative;
@@ -754,26 +750,39 @@
   }
 
 
-  .menu .list-item:hover, .menu .list-item:focus-visible {
+  .menu .list-item:hover, .menu .list-item:focus-visible, .select .menu .list-item:focus {
     color: #ffffff;
     background: hsl(213,94%,43%,0.75);
   }
 
 /* -- Future Where --
-  .menu .list-item:where(:hover,:focus-visible) {
+  .menu .list-item:where(:hover,:focus-visible), .select .menu .list-item:focus {
     color: #ffffff;
     background: hsl(213,94%,43%,0.75);
   }
 */
 
 
-  .menu .list-item:focus-visible {
+  .menu .list-item:focus-visible, .select .menu .list-item:focus {
     border-color: #c0c0c0;
+  }
+  .menu .list.selectable .list-item.selected::before {
+    content: "";
+    margin-left: calc(var(--list-item-padding-x) * 0.5 - var(--list-item-border));
+    position: absolute;
+    left: 0;
+    width: var(--list-item-selected-icon-size);
+    height: var(--list-item-selected-icon-size);
+    background: currentColor;
+    mask: var(--list-item-selected-icon-source);
+    -webkit-mask: var(--list-item-selected-icon-source);
+    --list-item-selected-icon-source: url("data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%20512%20512%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%3Cpath%20d%3D%22m63.346%20191.15%20192.72%20192.72-63.402%2063.402-192.72-192.72z%22%2F%3E%0A%20%20%3Cpath%20d%3D%22m129.5%20383.87%20319.15-319.15%2063.402%2063.402-319.15%20319.15z%22%2F%3E%0A%3C%2Fsvg%3E");
+    pointer-events: none;
   }
   .menu .list-item.hidden {
     //display: none;
   }
-  .menu.context-menu.window > .list .list-item:not(.window), .menu.context-menu.editor-tab > .list .list-item:not(.editor-tab), .menu.context-menu.link > .list .list-item:not(.link), .menu.context-menu.editing > .list .list-item:not(.editing), :root:not(.web-sharing) .menu.context-menu > .list .list-item.web-sharing, :root.web-sharing .menu.context-menu > .list .list-item.web-sharing-alt {
+  .menu.context-menu.link > .list .list-item:not(.link):not(.global), .menu.context-menu.editing > .list .list-item:not(.editing):not(.global), :root:not(.web-sharing) .menu.context-menu > .list .list-item.web-sharing:not(.global), :root.web-sharing .menu.context-menu > .list .list-item.web-sharing-alt:not(.global) {
     display: none;
   }
   .menu .list-item > img {
@@ -830,10 +839,15 @@
 
 
   .menu .list hr {
-    margin: calc(var(--list-padding-y) * 0.5) calc(var(--list-padding-y) * 2);
+    margin: calc(var(--list-padding-y) * 0.6) calc(var(--list-padding-y) * 2);
+    margin-left: calc(var(--list-padding-y) * 2 + var(--list-item-selected-icon-size,0px));
     border: none;
     border-top: 1px solid currentColor;
     opacity: 0.6;
+  }
+  :root.apple-device .menu .list hr {
+    margin-left: calc(var(--list-padding-y) + var(--list-item-selected-icon-size,0px));
+    margin-right: var(--list-padding-y);
   }
   .menu .list hr:last-child {
     display: none;
@@ -965,7 +979,6 @@
   }
   :root.apple-device .card {
     border-color: #ffffff30;
-    border-radius: 8px;
   }
   .card.active {
     visibility: visible;
@@ -1316,17 +1329,18 @@
     </div>
     <div class="menu">
       <button class="opener">View</button>
-      <ul class="list">
-        <li class="list-item" onclick="setView('code');">Code<span class="info shortcut ctrl-shift ctrl-command">1</span></li>
+      <ul class="list selectable">
+        <li class="list-item selected" onclick="setView('code');">Code<span class="info shortcut ctrl-shift ctrl-command">1</span></li>
         <li class="list-item" onclick="setView('split');">Split<span class="info shortcut ctrl-shift ctrl-command">2</span></li>
         <li class="list-item" onclick="setView('preview');">Preview<span class="info shortcut ctrl-shift ctrl-command">3</span></li>
-        <li class="list-item" onclick="setOrientation();">Orientation<span class="info shortcut ctrl-shift ctrl-command">4</span></li>
-        <li class="list-item" onclick="createDisplay();">Display<span class="info shortcut ctrl-shift ctrl-command">5</span></li>
+        <hr>
+        <li class="list-item non-selectable" onclick="setOrientation();">Orientation<span class="info shortcut ctrl-shift ctrl-command">4</span></li>
+        <li class="list-item non-selectable" onclick="createDisplay();">Display<span class="info shortcut ctrl-shift ctrl-command">5</span></li>
       </ul>
     </div>
     <div class="menu">
       <button class="opener">Preview</button>
-      <ul id="preview_options" class="preview-options list">
+      <ul id="preview_options" class="list selectable">
         <li class="list-item selected" onclick="setPreviewSource({ active_editor: true });">Active Editor</li>
         <hr>
       </ul>
@@ -1400,8 +1414,8 @@
             <label for="view_setting">Default View:</label>
             <div class="menu">
               <button id="view_setting" class="opener">Code<svg><use href="#back_icon"/></svg></button>
-              <ul class="list">
-                <li class="list-item" onclick="updateSelect('view','code');">Code</li>
+              <ul class="list selectable">
+                <li class="list-item selected" onclick="updateSelect('view','code');">Code</li>
                 <li class="list-item" onclick="updateSelect('view','split');">Split</li>
               </ul>
             </div>
@@ -1410,8 +1424,8 @@
             <label for="orientation_setting">Default Orientation:</label>
             <div class="menu">
               <button id="orientation_setting" class="opener">Horizontal<svg><use href="#back_icon"/></svg></button>
-              <ul class="list">
-                <li class="list-item" onclick="updateSelect('orientation','horizontal');">Horizontal</li>
+              <ul class="list selectable">
+                <li class="list-item selected" onclick="updateSelect('orientation','horizontal');">Horizontal</li>
                 <li class="list-item" onclick="updateSelect('orientation','vertical');">Vertical</li>
               </ul>
             </div>
@@ -1605,9 +1619,7 @@
   </section>
   <section id="context_menu" class="menu context-menu">
     <ul class="list">
-      <li class="list-item window" onclick="window.location.reload();">Reload<span class="info shortcut ctrl command">R</span></li>
-      <li class="list-item editor-tab" onclick="window.setTimeout(() => renameEditor({ identifier: Editor.context_menu_previous.closest('[data-editor-identifier]').getAttribute('data-editor-identifier') }),10);">Rename<span class="info shortcut ctrl-shift shift-command">R</span></li>
-      <li class="list-item editor-tab" onclick="setPreviewSource({ identifier: Editor.context_menu_previous.closest('.tab').getAttribute('data-editor-identifier') });">Set Preview Source<span class="info shortcut ctrl-shift shift-command">P</span></li>
+      <li class="list-item global" onclick="window.location.reload();">Reload<span class="info shortcut ctrl command">R</span></li>
       <li class="list-item link" onclick="Editor.context_menu_previous.click();">Open in New Tab</li>
       <li class="list-item web-sharing link" onclick="navigator.share({ url: Editor.context_menu_previous.href });">Share Link</li>
       <li class="list-item web-sharing-alt link" onclick="navigator.clipboard.writeText(Editor.context_menu_previous.href).catch(error => alert('Clipboard could not be written to, please check site permissions for clipboard use.'));">Copy Link</li>
@@ -1697,17 +1709,25 @@
         if (!menu.classList.contains("active")) return;
         var navigable = getNavigableElements({
           container: lists[0],
-          scoped: true
+          scope: true
         });
         if (event.key == "ArrowDown") navigable[0].focus();
         if (event.key == "ArrowUp") navigable[navigable.length - 1].focus();
       });
     }
     lists.forEach(list => {
+      list.addEventListener("click",event => {
+        if (!list.classList.contains("selectable") || !event.target.matches(".list-item") || event.target.classList.contains("non-selectable")) return;
+        var listItems = list.querySelectorAll(".list-item");
+        listItems.forEach(listItem => {
+          if (listItem.classList.contains("selected")) listItem.classList.remove("selected");
+        });
+        event.target.classList.add("selected");
+      });
       list.addEventListener("mousedown",event => {
         var navigable = getNavigableElements({
           container: list,
-          scoped: true
+          scope: true
         });
         event.stopPropagation();
         //if (navigable.indexOf(event.target) != -1) ;
@@ -1716,7 +1736,7 @@
         if (event.key != "ArrowDown" && event.key != "ArrowUp") return;
         var navigable = getNavigableElements({
           container: list,
-          scoped: true
+          scope: true
         });
         event.preventDefault();
         event.stopPropagation();
@@ -1765,7 +1785,7 @@
       if (event.type == "click") return;
       var navigable = getNavigableElements({
         container: subList,
-        scoped: true
+        scope: true
       });
       window.setTimeout(() => navigable[0].focus(),20);
     }
@@ -1800,14 +1820,46 @@
       minimize.click();
     });
     close.addEventListener("click",() => closeCard(card));
-    if (!Editor.environment().macOS_device) return;
-    cardControls.insertBefore(close,minimize);
-    header.insertBefore(cardControls,header.firstChild);
-  });
-  color_picker_card.querySelectorAll("input[type='range']").forEach(channel => {
-    channel.addEventListener("input",refreshChannels);
-    channel.min = "0";
-    channel.max = "255";
+    if (Editor.environment().macOS_device){
+      cardControls.insertBefore(close,minimize);
+      header.insertBefore(cardControls,header.firstChild);
+    }
+    var navigable = getNavigableElements({
+      container: card,
+      scope: true
+    });
+    card.addEventListener("keydown",event => {
+      if (card.getAttribute("data-card") != "dialog" || event.key != "Tab") return;
+      if (!event.shiftKey){
+        if (document.activeElement != navigable[navigable.length - 1]) return;
+        event.preventDefault();
+        navigable[0].focus();
+      } else if (document.activeElement == navigable[0]){
+        event.preventDefault();
+        navigable[navigable.length - 1].focus();
+      }
+    });
+
+
+/*
+    var navigable = getNavigableElements(card);
+    card.addEventListener("keydown",event => {
+      if (!card.classList.contains("modal")) return;
+      if (event.key == "Tab"){
+        if (event.shiftKey){
+          if (document.activeElement == navigable[0]){
+            event.preventDefault();
+            navigable[navigable.length - 1].focus();
+          }
+        } else if (document.activeElement == navigable[navigable.length - 1]){
+          event.preventDefault();
+          navigable[0].focus();
+        }
+      }
+    });
+*/
+
+
   });
   window.addEventListener("load",() => {
     if (!("serviceWorker" in navigator) || !Editor.appearance().parent_window || window.location.protocol != "https:") return;
@@ -2059,7 +2111,6 @@
     undo_tool.classList.add("hidden");
     redo_tool.classList.add("hidden");
   }
-  //refreshPickerInput();
   var queryParameters = new URLSearchParams(window.location.search);
   if (queryParameters.get("template")){
     confirmOverwrite(insertTemplate);
@@ -2118,10 +2169,6 @@
     container.appendChild(textarea);
     workspace_editors.appendChild(container);
     preview_options.appendChild(previewOption);
-    attachContextMenu({
-      element: tab,
-      type: "editor-tab"
-    });
     applyEditingBehavior(textarea);
     if (open || !Editor.active_editor) openEditor(identifier);
     return identifier;
@@ -2237,16 +2284,9 @@
   }
   function setPreviewSource({ identifier, active_editor }){
     if (!identifier && !active_editor) return;
-    preview_options.querySelectorAll(".list-item").forEach(listItem => {
-      if (listItem.classList.contains("selected")) listItem.classList.remove("selected");
-    });
     if ((!identifier && active_editor) || (Editor.preview_editor == identifier)){
       Editor.preview_editor = "active-editor";
-      preview_options.querySelector(":first-child").classList.add("selected");
-    } else {
-      Editor.preview_editor = identifier;
-      preview_options.querySelector(`.list-item[data-editor-identifier="${identifier}"]`).classList.add("selected");
-    }
+    } else Editor.preview_editor = identifier;
     refreshPreview({ force: true });
   }
   function openCard(card,previous){
@@ -2279,6 +2319,7 @@
     }
     if (card == editing_tools_card) Editor.active_editing_tools = true;
     if (type == "dialog"){
+      document.body.addEventListener("keydown",catchCardNavigation);
       card_backdrop.classList.add("active");
       if (!Editor.active_dialog && !Editor.dialog_previous){
         var menuItem = (document.activeElement.closest(".menu")), contextMenuItem = (document.activeElement.closest(".context-menu"));
@@ -2314,6 +2355,7 @@
       window.setTimeout(() => minimizeCard(card),transitionDuration);
     }
     if (type == "dialog"){
+      document.body.removeEventListener("keydown",catchCardNavigation);
       card_backdrop.classList.remove("active");
       Editor.active_dialog = null;
       if (Editor.dialog_previous){
@@ -2335,7 +2377,32 @@
     card.classList.toggle("minimize");
     if (card.classList.contains("minimize") && card.contains(document.activeElement) && document.activeElement != minimize) minimize.focus();
   }
+  function catchCardNavigation(){
+    if (!Editor.active_dialog || context_menu.classList.contains("active") || event.key != "Tab" || document.activeElement != document.body) return;
+    var navigable = getNavigableElements({
+      container: Editor.active_dialog,
+      scope: true
+    });
+    event.preventDefault();
+    if (!event.shiftKey){
+      navigable[0].focus();
+    } else navigable[navigable.length - 1].focus();
+  }
 
+
+/*
+  function catchCardNavigation(event){
+    if (!Editor.active_modal || contextMenu.classList.contains("active") || event.key != "Tab" || document.activeElement != document.body) return;
+    var navigable = getNavigableElements(Editor.active_modal);
+    if (event.shiftKey){
+      event.preventDefault();
+      navigable[navigable.length - 1].focus();
+    } else {
+      event.preventDefault();
+      navigable[0].focus();
+    }
+  }
+*/
 
   function createWindow(){
     var features = (Editor.appearance().standalone || Editor.appearance().fullscreen) ? "popup" : "", win = window.open(window.location.href,"_blank",features);
@@ -2433,15 +2500,15 @@
 
   function createDisplay(){
     var width = window.screen.availWidth * 2/3,
-        height = window.screen.availHeight * 2/3,
-        left = window.screen.availWidth / 2 + window.screen.availLeft - width / 2,
-        top = window.screen.availHeight / 2 + window.screen.availTop - height / 2,
-        features = (Editor.appearance().standalone || Editor.appearance().fullscreen) ? "popup" : "",
-        extension = Editor.query().getName("extension"),
-        link = window.URL.createObjectURL(new Blob([Editor.query().textarea.value],{
-          type: (["html","xml","md","markdown","svg"].includes(extension)) ? `text/${extension}` : `text/plain`
-        })),
-        win = window.open(link,"_blank",features);
+      height = window.screen.availHeight * 2/3,
+      left = window.screen.availWidth / 2 + window.screen.availLeft - width / 2,
+      top = window.screen.availHeight / 2 + window.screen.availTop - height / 2,
+      features = (Editor.appearance().standalone || Editor.appearance().fullscreen) ? "popup" : "",
+      extension = Editor.query().getName("extension"),
+      link = window.URL.createObjectURL(new Blob([Editor.query().textarea.value],{
+        type: (["html","xml","md","markdown","svg"].includes(extension)) ? `text/${extension}` : `text/plain`
+      })),
+      win = window.open(link,"_blank",features);
     window.URL.revokeObjectURL(link);
     win.moveTo(left,top);
     win.resizeTo(width,height);
@@ -2465,14 +2532,18 @@
       document.body.removeEventListener("mousedown",catchMenuExit);
       document.body.removeEventListener("touchend",catchMenuExit);
       if (event.button != "2") closeMenu(menu);
-    }/* -- Select value should be focused when opened --
+    }
     if (menu.closest(".select")){
-      var navigable = getNavigableElements({
+      var selected, navigable = getNavigableElements({
         container: list,
         scope: true
       });
-      window.setTimeout(() => navigable[0].focus(),20);
-    }*/
+      navigable.forEach(element => {
+        if (!selected && element.classList.contains("selected")) selected = element;
+      });
+      if (!selected) selected = navigable[0];
+      window.setTimeout(() => selected.focus(),20);
+    }
     if (!menu.classList.contains("context-menu")) return;
     if (Editor.context_menu_timeout) Editor.context_menu_timeout = null;
     Editor.context_menu_previous = event.target;
@@ -2505,12 +2576,12 @@
     if (opener && opener != document.activeElement) opener.focus();
     if (!menu.classList.contains("context-menu")) return;
     Editor.context_menu_previous.focus();
-    var types = ["window","editor-tab","link","editing"], transitionDuration = parseInt(getElementStyle({
+    var types = ["link","editing"], transitionDuration = parseInt(getElementStyle({
       element: list,
       property: "transition-duration"
     }).replace(/s/g,"") * 1000);
     window.setTimeout(() => {
-      var types = ["window","editor-tab","link","editing"];
+      var types = ["link","editing"];
       types.forEach(type => {
         if (menu.classList.contains(type)) menu.classList.remove(type);
       });
@@ -2523,7 +2594,7 @@
     scope = (scope) ? "" : ":scope > ";
     var navigable = container.querySelectorAll(`${scope}button:not([disabled]), ${scope}textarea:not([disabled]), ${scope}input:not([disabled]), ${scope}select:not([disabled]), ${scope}a[href]:not([disabled]), ${scope}[tabindex]:not([tabindex="-1"])`);
     return Array.from(navigable).filter(element => (getElementStyle({
-      element: element,
+      element,
       property: "display"
     }) != "none"));
   }
@@ -2620,7 +2691,22 @@
   function setTitle(name){
     document.title = `${name} - Smart Text Editor`;
   }
-  function refreshChannels(){}
+  function addQueryParameters(entries){
+    var parameters = new URLSearchParams(window.location.search);
+    entries.forEach(entry => parameters.set(entry,true));
+    changeQueryParameters(parameters);
+  }
+  function removeQueryParameters(entries){
+    var parameters = new URLSearchParams(window.location.search);
+    entries.forEach(entry => parameters.delete(entry));
+    changeQueryParameters(parameters);
+  }
+  function changeQueryParameters(parameters){
+    var query = parameters.toString();
+    if (query) query = "?" + query;
+    var address = window.location.pathname + query;
+    history.pushState(null,"",address);
+  }
 </script>
 
 </body>
