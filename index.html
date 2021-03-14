@@ -14,7 +14,7 @@
 <meta property="og:image" content="resources/share-1200.png">
 <meta property="og:url" content="https://offroaders123.github.io/Smart-Text-Editor/">
 <meta name="twitter:card" content="summary_large_image">
-<meta id="theme_color" name="theme-color" content="hsl(0,0%,15%)">
+<meta id="theme_color" name="theme-color" content="#191919">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Smart Text Editor">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -151,9 +151,9 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    color: hsl(0,0%,85%);
-    font-size: 13.3px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+    color: #cccccc;
+    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, "Rubik", sans-serif;
     background: #121212;
     overflow: hidden;
     user-select: none;
@@ -172,21 +172,18 @@
     display: flex;
     align-items: center;
     //gap: 8px;
-    background: hsl(0,0%,15%);
-    border-bottom: 1px solid #00000040;
+    font-size: 13px;
+    background: #191919;
+    border-bottom: 1px solid #000000;
   }
 
-
-/* -- Flex Gap Fix -- */
+/* -- Temp Flex Gap -- */
 
   header > *:not(:first-child) + * {
     margin-left: 8px;
   }
 
 
-  :root.apple-device header {
-    border-color: #000000;
-  }
   :root.macOS-device.electron-container header {
     padding-top: 1px;
     padding-left: 68px;
@@ -240,28 +237,34 @@
 
 
   header .menubar .menu .opener:hover, header .menubar .menu.active .opener {
-    background: #ffffff20;
+    color: #ffffff;
+    background: #ffffff2a;
   }
   header .menubar .menu .opener:focus {
-    background: #ffffff20;
+    color: #ffffff;
+    background: #ffffff2a;
   }
   header .menubar .menu:not(.active) .opener:not(:hover):focus:not(:focus-visible) {
+    color: inherit;
     background: none;
   }
   header .menubar .menu .opener:focus-visible {
-    background: #ffffff20;
+    color: #ffffff;
+    background: #ffffff2a;
   }
-
 
 /* -- Future Focus Visible --
-
   header .menubar .menu .opener:where(:hover,:focus-visible), header .menubar .menu.active .opener {
-    background: #ffffff20;
+    color: #ffffff;
+    background: #ffffff2a;
   }
-
 */
 
 
+  header .menubar .preview-options .list-item.selected::before {
+    content: "\2713";
+    line-height: 12px;
+  }
   header .window-controls {
     margin-left: auto;
     align-self: stretch;
@@ -272,11 +275,23 @@
     z-index: 3;
     -webkit-app-region: no-drag;
   }
+
+
+  :root.macOS-device header .window-controls, :root:not(.electron-container) header .window-controls {
+    width: 0;
+    visibility: hidden;
+    overflow: hidden;
+  }
+
+/* -- Future Where --
   :root:where(.macOS-device,:not(.electron-container)) header .window-controls {
     width: 0;
     visibility: hidden;
     overflow: hidden;
   }
+*/
+
+
   header .window-controls .control {
     width: 46px;
     height: 32px;
@@ -286,10 +301,21 @@
     transition: 100ms linear;
     transition-property: color, background;
   }
+
+
+  header .window-controls .control:hover, header .window-controls .control:focus-visible {
+    color: #ffffff;
+    background: #ffffff20;
+  }
+
+/* -- Future Where --
   header .window-controls .control:where(:hover,:focus-visible) {
     color: #ffffff;
     background: #ffffff20;
   }
+*/
+
+
   header .window-controls .control:active {
     transition: none;
   }
@@ -299,9 +325,19 @@
   header .window-controls .control[data-control="maximize"] [data-icon]:not(.active) {
     display: none;
   }
+
+
+  header .window-controls .control[data-control="close"]:hover, header .window-controls .control[data-control="close"]:focus-visible {
+    background: #e81123;
+  }
+
+/* -- Future Where --
   header .window-controls .control[data-control="close"]:where(:hover,:focus-visible) {
     background: #e81123;
   }
+*/
+
+
   header .window-controls .control[data-control="close"]:hover:active {
     background: #94141e;
   }
@@ -316,12 +352,9 @@
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    --workspace-background: hsl(0,0%,12%);
-    --workspace-accent: #ffffff10;
-    --preview-border-color: hsl(0,0%,8.5%);
-  }
-  :root.apple-device main {
+    --workspace-background: #1f1f1f;
     --workspace-accent: #ffffff20;
+    --preview-border-color: #141414;
   }
   main .workspace {
     position: absolute;
@@ -563,7 +596,7 @@
     font-size: 13px;
     font-family: "Cousine", monospace;
     line-height: 1.2;
-    background: hsl(0,0%,11%);
+    background: #252525;
     border: none;
     outline: none;
   }
@@ -607,13 +640,13 @@
   ::-webkit-scrollbar-thumb {
     width: 36px;
     height: 36px;
-    background: hsl(0,0%,50%);
+    background: #797979;
     background-clip: content-box;
     border: 4px solid transparent;
     border-radius: 10px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background-color: hsl(0,0%,60%);
+    background-color: #999999;
   }
   .tab {
     display: flex;
@@ -639,9 +672,22 @@
     border-radius: calc(4px + var(--option-border-width));
     outline: none;
   }
-  .tab .option:where(:hover,:focus-visible) {
+
+
+
+  .tab .option:hover, .tab .option:focus-visible {
+    color: #ffffff;
     background-color: #ffffff20;
   }
+
+/* -- Future Where --
+  .tab .option:where(:hover,:focus-visible) {
+    color: #ffffff;
+    background-color: #ffffff20;
+  }
+*/
+
+
   .tab .option svg {
     width: 8px;height: 8px;
     //aspect-ratio: 1/1;
@@ -669,9 +715,10 @@
     position: absolute;
     left: 0;
     top: 100%;
+    color: #cccccc;
     font-size: 13px;
-    background: hsl(0,0%,19%);
-    border: var(--list-border) solid #00000040;
+    background: #2a2a2a;
+    border: var(--list-border) solid #ffffff1a;
     --list-border: 1px;
     border-radius: calc(var(--list-padding-y) + var(--list-border));
     box-shadow: 1px 2px 4px #00000080;
@@ -681,7 +728,7 @@
   }
   :root.apple-device .menu .list {
     --list-padding-x: 5px;
-    border-color: #ffffff30;
+    border-color: #ffffff20;
   }
   .menu:not(.context-menu) > .list {
     border-top: none;
@@ -705,9 +752,21 @@
     --list-item-padding-x: 8px;
     border-radius: calc(var(--list-padding-y) - var(--list-border));
   }
-  .menu .list-item:where(:hover,:focus-visible) {
+
+
+  .menu .list-item:hover, .menu .list-item:focus-visible {
+    color: #ffffff;
     background: hsl(213,94%,43%,0.75);
   }
+
+/* -- Future Where --
+  .menu .list-item:where(:hover,:focus-visible) {
+    color: #ffffff;
+    background: hsl(213,94%,43%,0.75);
+  }
+*/
+
+
   .menu .list-item:focus-visible {
     border-color: #c0c0c0;
   }
@@ -740,15 +799,36 @@
     //aspect-ratio: 1/1;
     fill: currentColor;
   }
+
+
+  .menu .list-item:not(.list-parent):hover .info, .menu .list-item:not(.list-parent):focus-visible .info {
+    opacity: 1;
+  }
+
+/* -- Future Where --
   .menu .list-item:not(.list-parent):where(:hover,:focus-visible) .info {
     opacity: 1;
   }
+*/
+
+
   .menu .list-parent.active {
+    color: #ffffff;
     background: hsl(213,94%,43%,0.75);
   }
+
+
+  .menu .list-parent:hover > svg.info, .menu .list-parent:focus-visible > svg.info, .menu .list-parent.active > svg.info {
+    opacity: 1;
+  }
+
+/* -- Future Where --
   .menu .list-parent:where(:hover,:focus-visible,.active) > svg.info {
     opacity: 1;
   }
+*/
+
+
   .menu .list hr {
     margin: calc(var(--list-padding-y) * 0.5) calc(var(--list-padding-y) * 2);
     border: none;
@@ -795,14 +875,26 @@
   .select .menu .opener {
     padding: 2px 8px;
     justify-content: space-between;
-    background: hsl(0,0%,26%);
+    background: #3a3a3a;
     border: 1px solid transparent;
     border-radius: 4px;
     outline: none;
   }
-  .select .menu .opener:where(:hover,:focus-visible), .select .menu.active .opener {
-    background: hsl(0,0%,30%);
+
+
+  .select .menu .opener:hover, .select .menu .opener:focus-visible, .select .menu.active .opener {
+    color: #ffffff;
+    background: #4a4a4a;
   }
+
+/* -- Future Where --
+  .select .menu .opener:where(:hover,:focus-visible), .select .menu.active .opener {
+    color: #ffffff;
+    background: #4a4a4a;
+  }
+*/
+
+
   .select .menu .opener:focus-visible {
     border-color: #c0c0c0;
   }
@@ -864,10 +956,10 @@
   .card {
     display: flex;
     flex-direction: column;
-    background: hsl(0,0%,15%);
-    border: 1px solid #00000030;
-    border-radius: 4px;
-    box-shadow: 1px 2px 4px #00000020;
+    background: #191919;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    box-shadow: 1px 2px 4px #00000060;
     visibility: hidden;
     overflow: hidden;
   }
@@ -892,17 +984,20 @@
   }
   .card.dialog {
     position: absolute;
+    border-radius: 12px;
     z-index: 2;
   }
   .card .header {
     display: flex;
+    justify-content: center;
     align-items: center;
-    background: #ffffff14;
   }
   :root.apple-device .card .header {
+    background: #ffffff14;
     border-bottom: 1px solid #000000;
   }
   .card .header .card-back {
+    margin-right: auto;
     padding: 8px;
     display: flex;
     background: none;
@@ -916,22 +1011,39 @@
   .card .header .card-back:not([data-card-parent]) {
     display: none;
   }
-  .card .header .card-back:where(:hover,:focus-visible) {
+
+
+  .card .header .card-back:hover, .card .header .card-back:focus-visible {
+    color: #ffffff;
     background: #ffffff20;
   }
+
+/* -- Future Where --
+  .card .header .card-back:where(:hover,:focus-visible) {
+    color: #ffffff;
+    background: #ffffff20;
+  }
+*/
+
+
   .card .header .card-back svg {
     width: 12px;height: 12px;
     //aspect-ratio: 1/1;
     fill: currentColor;
   }
   .card .header .title {
-    margin: 0 auto;
-  }
+    //margin: 0 auto;
+    position: absolute;
+  }/*
   :root.macOS-device .card .header .title {
     margin-left: 16px;
     font-weight: bold;
+  }*/
+  .card.dialog .header .title {
+    font-size: 18px;
   }
   .card .header .card-controls {
+    margin-left: auto;
     display: flex;
   }
   :root.macOS-device .card .header .card-controls {
@@ -949,9 +1061,21 @@
     padding: 8px;
     --control-background: none;
   }
-  :root:not(.macOS-device) .card .header .card-controls .control:where(:hover,:focus-visible) {
+
+
+  :root:not(.macOS-device) .card .header .card-controls .control:hover, :root:not(.macOS-device) .card .header .card-controls .control:focus-visible {
+    color: #ffffff;
     --control-background: #ffffff20;
   }
+
+/* -- Future Where
+  :root:not(.macOS-device) .card .header .card-controls .control:where(:hover,:focus-visible) {
+    color: #ffffff;
+    --control-background: #ffffff20;
+  }
+*/
+
+
   :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:hover {
     --control-background: #e81123;
   }
@@ -990,9 +1114,19 @@
     color: transparent;
     mix-blend-mode: luminosity;
   }
+
+
+  :root.macOS-device .card .header .card-controls:hover .control svg, :root.macOS-device .card .header .card-controls:focus-visible .control svg {
+    color: #202020bf;
+  }
+
+/* -- Future Where --
   :root.macOS-device .card .header .card-controls:where(:hover,:active) .control svg {
     color: #202020bf;
   }
+*/
+
+
   .card .main {
     padding: 12px;
     display: flex;
@@ -1024,14 +1158,26 @@
     justify-content: center;
     align-items: center;
     gap: 8px;
-    background: hsl(0,0%,26%);
+    background: #3a3a3a;
     border: 1px solid transparent;
     border-radius: 4px;
     outline: none;
   }
-  .card .options button:where(:active,:focus-visible) {
-    background: hsl(0,0%,28%);
+
+
+  .card .options button:hover, .card .options button:focus-visible {
+    color: #ffffff;
+    background: #4a4a4a;
   }
+
+/* -- Future Where --
+  .card .options button:where(:hover,:focus-visible) {
+    color: #ffffff;
+    background: #4a4a4a;
+  }
+*/
+
+
   .card .options button:focus-visible {
     border-color: currentColor;
   }
@@ -1069,7 +1215,7 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background: hsl(0,0%,0%,0.2);
+    background: #19191960;
     visibility: hidden;
     z-index: 2;
   }
@@ -1180,8 +1326,8 @@
     </div>
     <div class="menu">
       <button class="opener">Preview</button>
-      <ul id="preview_options" class="list">
-        <li class="list-item" onclick="setPreviewSource({ active_editor: true });">Active Editor</li>
+      <ul id="preview_options" class="preview-options list">
+        <li class="list-item selected" onclick="setPreviewSource({ active_editor: true });">Active Editor</li>
         <hr>
       </ul>
     </div>
@@ -1698,7 +1844,7 @@
   window.addEventListener("unload",() => Editor.child_windows.forEach(win => win.close()));
   window.addEventListener("resize",event => {
     if (context_menu.classList.contains("active")) closeMenu(context_menu);
-    if (Editor.view() != "preview") setEditorTabsVisibility(Editor.query().tab);
+    if (Editor.view() != "preview") setEditorTabsVisibility();
     if (Editor.view() != "split" || !document.body.hasAttribute("data-scaling-offset")) return;
     var previousWidth = window.innerWidth, previousHeight = window.innerHeight;
     window.setTimeout(() => {
@@ -1895,7 +2041,6 @@
   card_backdrop.addEventListener("click",() => closeCard(Editor.active_dialog));
 
   createEditor();
-  //createEditor({ value: document.documentElement.outerHTML, open: false });
   if (Editor.support().file_handling && Editor.support().file_system){
     window.launchQueue.setConsumer(params => {
       closeEditor();
@@ -1989,7 +2134,7 @@
     tab.classList.add("active");
     container.classList.add("active");
     Editor.active_editor = identifier;
-    setEditorTabsVisibility(Editor.query().tab);
+    setEditorTabsVisibility();
     setTitle(getName());
     if (Editor.preview_editor == "active-editor") refreshPreview({ force: true });
   }
@@ -2024,6 +2169,10 @@
     if (tab == Editor.query().tab) setTitle(rename);
     if ((Editor.preview_editor == "active-editor" && Editor.active_editor == identifier) || Editor.preview_editor == identifier) refreshPreview({ force: true });
     return rename;
+  }
+  function setEditorTabsVisibility({ identifier = Editor.active_editor } = {}){
+    var { tab } = Editor.query(identifier);
+    tab.scrollIntoView();
   }
   function setView(view){
     if (Editor.active_scaling()) return;
@@ -2088,9 +2237,16 @@
   }
   function setPreviewSource({ identifier, active_editor }){
     if (!identifier && !active_editor) return;
+    preview_options.querySelectorAll(".list-item").forEach(listItem => {
+      if (listItem.classList.contains("selected")) listItem.classList.remove("selected");
+    });
     if ((!identifier && active_editor) || (Editor.preview_editor == identifier)){
       Editor.preview_editor = "active-editor";
-    } else Editor.preview_editor = identifier;
+      preview_options.querySelector(":first-child").classList.add("selected");
+    } else {
+      Editor.preview_editor = identifier;
+      preview_options.querySelector(`.list-item[data-editor-identifier="${identifier}"]`).classList.add("selected");
+    }
     refreshPreview({ force: true });
   }
   function openCard(card,previous){
@@ -2447,7 +2603,6 @@
       key: key
     }));
   }*/
-  function setEditorTabsVisibility(){}
   function refreshPreview({ force = false } = {}){
     if (Editor.view() == "code") return;
     var source = (Editor.preview_editor == "active-editor") ? Editor.query() : Editor.query(Editor.preview_editor);
@@ -2465,7 +2620,7 @@
   function setTitle(name){
     document.title = `${name} - Smart Text Editor`;
   }
-  function refreshChannels(){}//setView("split");
+  function refreshChannels(){}
 </script>
 
 </body>
