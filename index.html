@@ -67,8 +67,8 @@
       mozilla_browser: (CSS.supports("-moz-appearance: none"))
     }),
     support: () => ({
-      file_system: ("chooseFileSystemEntries" in window || "showOpenFilePicker" in window),
-      file_handling: ("launchQueue" in window && "LaunchParams" in window),
+      file_system: ("chooseFileSystemEntries" in window || "showOpenFilePicker" in window && !Editor.environment().electron_container),
+      file_handling: ("launchQueue" in window && "LaunchParams" in window && !Editor.environment().electron_container),
       editing_commands: (!Editor.environment().mozilla_browser),
       web_sharing: ("share" in navigator)
     }),
@@ -113,7 +113,7 @@
     insert_color: false,
     install_prompt: null
   };
-  //if (Editor.appearance().parent_window) document.documentElement.classList.add("startup-fade");
+  if (Editor.appearance().parent_window) document.documentElement.classList.add("startup-fade");
   if (Editor.appearance().apple_home_screen) document.documentElement.classList.add("apple-home-screen");
   if (Editor.environment().touch_device) document.documentElement.classList.add("touch-device");
   if (Editor.environment().apple_device) document.documentElement.classList.add("apple-device");
@@ -159,6 +159,21 @@
     user-select: none;
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
+  }
+  body::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #191919;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 3;
+    transition: opacity 0.25s;
+  }
+  :root.startup-fade body::after {
+    opacity: 1;
+    pointer-events: all;
   }
   body.split.horizontal[data-scaling-active] {
     cursor: col-resize;
@@ -264,7 +279,7 @@
     display: flex;
     font-size: 10px;
     font-family: "Segoe MDL2 Assets";
-    z-index: 3;
+    z-index: 4;
     -webkit-app-region: no-drag;
   }
 
@@ -958,8 +973,8 @@
     border-radius: calc(var(--checkbox-padding) * 2);
     outline: none;
   }
-  .checkbox:active {
-    opacity: 0.75;
+  .checkbox:where(:hover,:focus-visible) {
+    color: #ffffff;
   }
   .checkbox:focus-visible {
     border-color: currentColor;
@@ -1403,7 +1418,7 @@
   <section class="window-controls">
     <button class="control" data-control="minimize" title="Minimize">&#xE921;</button>
     <button class="control" data-control="maximize" title="Maximize">
-      <span data-icon="maximize">&#xE922;</span>
+      <span data-icon="maximize" class="active">&#xE922;</span>
       <span data-icon="restore">&#xE923;</span>
     </button>
     <button class="control" data-control="close" title="Close">&#xE8BB;</button>
@@ -1654,7 +1669,10 @@
 </main>
 
 <script>
-  document.querySelectorAll("header .window-controls .control").forEach(control => {/*
+  if (Editor.environment().electron_container) window.mainProcess.receive("refresh-maximize",refreshMaximizeControl);
+  document.querySelectorAll("header .window-controls .control").forEach(control => {
+    control.setAttribute("tabindex","-1");
+    if (!Editor.environment().electron_container) return;
     var controlType = control.getAttribute("data-control");
     if (controlType == "minimize") control.addEventListener("click",() => window.mainProcess.minimize());
     if (controlType == "maximize") control.addEventListener("click",() => {
@@ -1662,8 +1680,7 @@
         window.mainProcess.maximize();
       } else window.mainProcess.unmaximize();
     });
-    if (controlType == "close") control.addEventListener("click",() => window.mainProcess.close());*/
-    control.setAttribute("tabindex","-1");
+    if (controlType == "close") control.addEventListener("click",() => window.mainProcess.close());
   });
   document.querySelectorAll("a[href]").forEach(anchor => {
     anchor.rel = "noopener";
@@ -1859,27 +1876,6 @@
         navigable[navigable.length - 1].focus();
       }
     });
-
-
-/*
-    var navigable = getNavigableElements(card);
-    card.addEventListener("keydown",event => {
-      if (!card.classList.contains("modal")) return;
-      if (event.key == "Tab"){
-        if (event.shiftKey){
-          if (document.activeElement == navigable[0]){
-            event.preventDefault();
-            navigable[navigable.length - 1].focus();
-          }
-        } else if (document.activeElement == navigable[navigable.length - 1]){
-          event.preventDefault();
-          navigable[0].focus();
-        }
-      }
-    });
-*/
-
-
   });
   window.addEventListener("load",() => {
     if (!("serviceWorker" in navigator) || !Editor.appearance().parent_window || window.location.protocol != "https:") return;
@@ -2112,6 +2108,7 @@
   },{ passive: true });
   card_backdrop.addEventListener("click",() => closeCard(Editor.active_dialog));
 
+  if (Editor.environment().electron_container) refreshMaximizeControl();
   createEditor();
   if (Editor.support().file_handling && Editor.support().file_system){
     window.launchQueue.setConsumer(params => {
@@ -2126,7 +2123,7 @@
       if (!Editor.environment().touch_device) Editor.query().textarea.focus();
     });
   }
-  if (Editor.appearance().parent_window) window.setTimeout(() => document.body.classList.remove("startup-fade"),50);
+  if (Editor.appearance().parent_window) window.setTimeout(() => document.documentElement.classList.remove("startup-fade"),50);
   if (Editor.support().editing_commands){
     undo_tool.classList.add("hidden");
     redo_tool.classList.add("hidden");
@@ -2264,7 +2261,7 @@
     if (Editor.file_handles[identifier]) delete Editor.file_handles[identifier];
   }
   function renameEditor({ name, identifier = Editor.active_editor } = {}){
-    var { tab, getName } = Editor.query(identifier), editorName = tab.querySelector("[data-editor-name]"), previewOption = preview_options.querySelector(`.list-item[data-editor-identifier="${identifier}"]`), currentName = getName(), base = getName("base"), extension = getName("extension"), rename = (name) ? name : prompt(`Enter a new file name for "${currentName}"`,currentName);
+    var { tab, getName } = Editor.query(identifier), editorName = tab.querySelector("[data-editor-name]"), previewOption = preview_options.querySelector(`.list-item[data-editor-identifier="${identifier}"]`), currentName = getName(), base = getName("base"), extension = getName("extension"), rename = (name) ? name : prompt(`Enter a new file name for "${currentName}".`,currentName);
     if (!rename) return;
     if (!rename.includes(".")){
       rename = `${rename}.${extension}`;
@@ -2765,6 +2762,13 @@
     if (query) query = "?" + query;
     var address = window.location.pathname + query;
     history.pushState(null,"",address);
+  }
+  function refreshMaximizeControl(){
+    var maximizeControl = document.querySelector("header .window-controls .control[data-control='maximize']");
+    maximizeControl.querySelectorAll("[data-icon]").forEach(icon => icon.classList.remove("active"));
+    var icon = (!window.mainProcess.isMaximized()) ? "maximize" : "restore";
+    maximizeControl.querySelector(`[data-icon="${icon}"]`).classList.add("active");
+    maximizeControl.title = icon[0].toUpperCase() + icon.slice(1);
   }
 </script>
 
