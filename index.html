@@ -182,7 +182,7 @@
     cursor: row-resize;
   }
   header {
-    padding: env(safe-area-inset-top,0) env(safe-area-inset-right,0) 0 calc(env(safe-area-inset-left,0) + 8px);
+    padding: env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) 0 calc(env(safe-area-inset-left,0px) + 8px);
     position: relative;
     display: flex;
     align-items: center;
@@ -352,7 +352,7 @@
     height: 27px;
   }
   main {
-    padding: 0 env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
+    padding: 0 env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);
     position: relative;
     flex-grow: 1;
     display: flex;
@@ -408,8 +408,8 @@
     transition: none;
   }
   main .workspace .workspace-tabs {
-    padding-left: calc(env(safe-area-inset-left,0) + 6px);
-    padding-right: calc(env(safe-area-inset-right,0) + 6px);
+    padding-left: calc(env(safe-area-inset-left,0px) + 6px);
+    padding-right: calc(env(safe-area-inset-right,0px) + 6px);
     flex-shrink: 0;
     display: flex;
     gap: 3px;
@@ -447,18 +447,18 @@
     font-style: italic;
   }
   main .workspace .workspace-tabs .tab [data-editor-rename] {
-    margin: calc(calc(var(--editor-rename-padding-y) + var(--editor-rename-border)) * -1) calc(calc(var(--editor-rename-padding-x) + var(--editor-rename-border)) * -1);
+    margin: calc(calc(var(--editor-rename-padding-y) + var(--editor-rename-border-width)) * -1) calc(calc(var(--editor-rename-padding-x) + var(--editor-rename-border-width)) * -1);
     padding: var(--editor-rename-padding-y) var(--editor-rename-padding-x);
     --editor-rename-padding-x: 4px;
     --editor-rename-padding-y: 3px;
-    min-width: calc(var(--editor-name-width) + calc(var(--editor-rename-padding-x) + var(--editor-rename-border)) * 2);
-    width: calc(var(--editor-name-width) + calc(var(--editor-rename-padding-x) + var(--editor-rename-border)) * 2);
+    min-width: calc(var(--editor-name-width) + calc(var(--editor-rename-padding-x) + var(--editor-rename-border-width)) * 2);
+    width: calc(var(--editor-rename-width,0px) + calc(var(--editor-rename-border-width) * 2));
     color: inherit;
     font-size: inherit;
     font-family: inherit;
     background: none;
-    border: var(--editor-rename-border) solid #ffffff80;
-    --editor-rename-border: 1px;
+    border: var(--editor-rename-border-width) solid #ffffff80;
+    --editor-rename-border-width: 1px;
     border-radius: 4px;
   }
   main .workspace .workspace-tabs .tab [data-editor-name] {
@@ -484,7 +484,7 @@
   }
   :root:not(.startup-fade) main .workspace .workspace-editors:empty {
     border: solid transparent;
-    border-width: 0 env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
+    border-width: 0 env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);
   }
   :root:not(.startup-fade) main .workspace .workspace-editors:empty::before {
     content: "No Editors Open";
@@ -506,7 +506,7 @@
     height: 100%;
     background: var(--workspace-background);
     border: solid transparent;
-    border-width: 0 env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
+    border-width: 0 env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);
     visibility: hidden;
   }
   body.split.horizontal main .workspace .editor {
@@ -597,7 +597,7 @@
     height: 50%;
     background: #ffffff;
     border: solid var(--preview-border-color);
-    border-width: 0 env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
+    border-width: 0 env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);
     transition: var(--speed);
     transition-property: width, height, opacity;
   }
@@ -776,9 +776,9 @@
     font-size: 13px;
     line-height: 16px;
     background: #2a2a2a;
-    border: var(--list-border) solid #ffffff1a;
-    --list-border: 1px;
-    border-radius: calc(var(--list-padding-y) + var(--list-border));
+    border: var(--list-border-width) solid #ffffff1a;
+    --list-border-width: 1px;
+    border-radius: calc(var(--list-padding-y) + var(--list-border-width));
     box-shadow: 1px 2px 4px #00000080;
     visibility: hidden;
     z-index: 1;
@@ -797,44 +797,44 @@
     --list-item-selected-icon-size: 10px;
   }
   .menu .list-item {
-    padding: calc(var(--list-item-padding-y) - var(--list-item-border)) calc(var(--list-item-padding-x) - var(--list-item-border));
-    padding-left: calc(var(--list-item-padding-x) + var(--list-item-selected-icon-size,0px) - var(--list-item-border));
+    padding: calc(var(--list-item-padding-y) - var(--list-item-border-width)) calc(var(--list-item-padding-x) - var(--list-item-border-width));
+    padding-left: calc(var(--list-item-padding-x) + var(--list-item-selected-icon-size,0px) - var(--list-item-border-width));
     --list-item-padding-x: 12px;
     --list-item-padding-y: 3px;
     position: relative;
     display: flex;
     align-items: center;
     gap: 8px;
-    border: var(--list-item-border) solid transparent;
-    --list-item-border: 1px;
+    border: var(--list-item-border-width) solid transparent;
+    --list-item-border-width: 1px;
     outline: none;
     white-space: nowrap;
   }
   :root.apple-device .menu .list-item {
     --list-item-padding-x: 8px;
-    border-radius: calc(var(--list-padding-y) - var(--list-border));
+    border-radius: calc(var(--list-padding-y) - var(--list-border-width));
   }
 
 
-  .menu .list-item:hover, .menu .list-item:focus-visible, .select .menu .list-item:focus {
+  .menu .list-item:hover, .menu .list-item:focus-visible {
     color: #ffffff;
     background: hsl(213,94%,43%,0.75);
   }
 
 /* -- Future Where --
-  .menu .list-item:where(:hover,:focus-visible), .select .menu .list-item:focus {
+  .menu .list-item:where(:hover,:focus-visible) {
     color: #ffffff;
     background: hsl(213,94%,43%,0.75);
   }
 */
 
 
-  .menu .list-item:focus-visible, .select .menu .list-item:focus {
+  .menu .list-item:focus-visible {
     border-color: #c0c0c0;
   }
   .menu .list.selectable .list-item.selected::before {
     content: "";
-    margin-left: calc(var(--list-item-padding-x) * 0.5 - var(--list-item-border));
+    margin-left: calc(var(--list-item-padding-x) * 0.5 - var(--list-item-border-width));
     position: absolute;
     left: 0;
     width: var(--list-item-selected-icon-size);
@@ -919,11 +919,11 @@
     display: none;
   }
   .menu .list .list {
-    left: calc(100% + var(--list-padding-x) + var(--list-border) + var(--list-item-border));
-    top: calc(calc(var(--list-padding-y) + var(--list-border) + var(--list-item-border)) * -1);
+    left: calc(100% + var(--list-padding-x) + var(--list-border-width) + var(--list-item-border-width));
+    top: calc(calc(var(--list-padding-y) + var(--list-border-width) + var(--list-item-border-width)) * -1);
   }
   :root.apple-device .menu .list .list {
-    left: calc(100% + var(--list-item-border));
+    left: calc(100% + var(--list-item-border-width));
   }
   .menu.active > .list, .menu .list-parent.active > .list {
     visibility: visible;
@@ -944,47 +944,30 @@
     content: "\2303\2318";
   }
   .select {
+    margin: calc(var(--select-padding) * -1);
+    padding: var(--select-padding);
+    --select-padding: 4px;
     display: flex;
     justify-content: center;
+    gap: 6px;
+    transition: color 75ms;
+  }
+  .select:where(:hover,:focus-within,.active) {
+    color: #ffffff;
   }
   .select label {
-    margin-right: 4px;
     display: flex;
     align-items: center;
   }
-  .select .menu .opener {
-    padding: 2px 8px;
-    justify-content: space-between;
-    background: #3a3a3a;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    outline: none;
-  }
-
-
-  .select .menu .opener:hover, .select .menu .opener:focus-visible, .select .menu.active .opener {
-    color: #ffffff;
+  .select:hover .menu .opener {
     background: #4a4a4a;
-  }
-
-/* -- Future Where --
-  .select .menu .opener:where(:hover,:focus-visible), .select .menu.active .opener {
-    color: #ffffff;
-    background: #4a4a4a;
-  }
-*/
-
-
-  .select .menu .opener:focus-visible {
-    border-color: #c0c0c0;
   }
   .select .menu.active .opener {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
   }
   .select .menu .opener svg {
-    margin-left: 10px;
-    width: 10px;height: 10px;
+    width: 12px;height: 12px;
     //aspect-ratio: 1/1;
     fill: currentColor;
     transform: rotate(270deg);
@@ -994,45 +977,75 @@
   }
   .checkbox {
     margin: calc(var(--checkbox-padding) * -1);
-    padding: var(--checkbox-padding);
-    --checkbox-padding: 3px;
+    padding: calc(var(--checkbox-padding) - var(--checkbox-border-width));
+    --checkbox-padding: 4px;
     display: flex;
     justify-content: center;
     align-items: center;
-    border: var(--checkbox-border) solid transparent;
-    --checkbox-border: 1px;
-    border-radius: calc(var(--checkbox-padding) * 2);
+    border: var(--checkbox-border-width) solid transparent;
+    --checkbox-border-width: 1px;
+    --checkbox-check-border-width: 2px;
+    border-radius: calc(var(--checkbox-padding) + var(--checkbox-border-width) + var(--checkbox-check-border-width));
     outline: none;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transition: 75ms;
+    transition-property: color, border-color, opacity;
   }
   .checkbox:where(:hover,:focus-visible) {
     color: #ffffff;
   }
+  .checkbox:active {
+    opacity: 0.85;
+  }
   .checkbox:focus-visible {
-    border-color: currentColor;
+    border-color: #c0c0c0;
   }
   .checkbox input[type="checkbox"] {
     display: none;
   }
   .checkbox label {
     display: flex;
-    justify-content: center;
     align-items: center;
+    gap: 6px;
+    --check-padding: 2px;
+    --check-size: 12px;
     pointer-events: none;
   }
-  .checkbox label .check {
-    margin-right: 4px;
+
+
+  .checkbox label::before {
+    content: "";
     padding: var(--check-padding);
-    --check-padding: 2px;
-    width: calc(14px + var(--check-padding) + var(--check-border-width));height: calc(14px + var(--check-padding) + var(--check-border-width));
+    width: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));height: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));
+    //aspect-ratio: 1/1;
+    background: #ffffff0c;
+    border: var(--checkbox-check-border-width) solid currentColor;
+    border-radius: calc(var(--check-padding) + calc(var(--checkbox-check-border-width) * 2));
+    transition: background 75ms;
+  }
+  .checkbox:where(:hover,:focus-visible) label::before {
+    background: #ffffff1c;
+  }
+
+  .checkbox label .check {
+    padding: calc(var(--check-padding) + var(--checkbox-check-border-width));
+    position: absolute;
+    width: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));height: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));
     //aspect-ratio: 1/1;
     fill: transparent;
-    border: var(--check-border-width) solid currentColor;
-    --check-border-width: 2px;
-    border-radius: calc(1px + var(--check-padding) + var(--check-border-width));
+    transform: rotate(-45deg) scale(0);
+    transform-origin: 45% 65%;
+    transition: 125ms ease-in;
+    transition-property: fill, transform;
   }
   .checkbox input[type="checkbox"]:checked + label .check {
     fill: currentColor;
+    transform: rotate(0deg) scale(1);
+    transition-timing-function: ease-out;
   }
+
+
   .card {
     display: flex;
     flex-direction: column;
@@ -1211,6 +1224,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    font-size: 14px;
   }
   .card .main .content {
     display: flex;
@@ -1220,7 +1234,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
   }
   .card .main .content .item.start {
     align-items: flex-start;
@@ -1229,37 +1243,31 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
   }
-  .card .options button {
-    padding: 3px 8px;
+
+
+  .card .main button {
+    padding: 2px 8px;
     display: flex;
-    justify-content: center;
     align-items: center;
     gap: 8px;
     background: #3a3a3a;
     border: 1px solid transparent;
-    border-radius: 4px;
+    border-radius: 5px;
     outline: none;
+    transition: 75ms;
+    transition-property: color, background, border-color;
   }
-
-
-  .card .options button:hover, .card .options button:focus-visible {
+  .card .main button:where(:hover,:focus-visible), .select .menu.active .opener {
     color: #ffffff;
     background: #4a4a4a;
   }
-
-/* -- Future Where --
-  .card .options button:where(:hover,:focus-visible) {
-    color: #ffffff;
-    background: #4a4a4a;
+  .card .main button:focus-visible {
+    border-color: #c0c0c0;
   }
-*/
 
 
-  .card .options button:focus-visible {
-    border-color: currentColor;
-  }
   .card .options button.hidden {
     //display: none;
   }
@@ -1870,7 +1878,10 @@
     var input = checkbox.querySelector("input[type='checkbox']");
     checkbox.addEventListener("click",() => input.click());
     checkbox.addEventListener("keydown",event => {
-      if (event.key == "Enter" || event.key == " ") input.click();
+      if (!event.repeat && event.key == "Enter") input.click();
+    });
+    checkbox.addEventListener("keyup",event => {
+      if (event.key == " ") input.click();
     });
     checkbox.setAttribute("tabindex","0");
     input.addEventListener("click",event => event.stopPropagation());
@@ -2192,20 +2203,17 @@
       editorRename.placeholder = Editor.query(identifier).getName();
       editorRename.setAttribute("data-editor-rename",true);
       editorRename.setAttribute("tabindex","-1");
-      editorRename.style.setProperty("--editor-name-width",`${editorName.getBoundingClientRect().width}px`);
+      editorRename.style.setProperty("--editor-name-width",`${editorName.offsetWidth}px`);
       editorRename.value = Editor.query(identifier).getName();
       editorRename.addEventListener("keydown",event => {
         if (event.key == "Escape") editorRename.blur();
       });
-
-/* --- Input Resizing --- */
       editorRename.addEventListener("input",() => {
         editorRename.style.width = "0px";
         editorRename.offsetWidth;
-        editorRename.style.width = editorRename.scrollWidth + 4 + "px";
+        editorRename.style.setProperty("--editor-rename-width",`${editorRename.scrollWidth + 1}px`);
+        editorRename.style.removeProperty("width");
       });
-
-
       editorRename.addEventListener("change",() => {
         if (editorRename.value) renameEditor({
           name: editorRename.value,
