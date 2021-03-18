@@ -361,7 +361,9 @@
     overflow: hidden;
     --workspace-background: #1f1f1f;
     --workspace-accent: #ffffff20;
+    --scaler-size: 16px;
     --preview-border-color: #141414;
+    --speed: 0.4s;
   }
   main .workspace {
     position: absolute;
@@ -369,24 +371,29 @@
     top: 0;
     display: flex;
     flex-direction: column;
+    transition: var(--speed);
+    transition-property: width, height, opacity;
   }
   body.code main .workspace {
     width: 100%;
     height: 100%;
   }
   body.split.horizontal main .workspace {
-    width: 50%;
+    width: calc(50% - calc(var(--scaler-size) * 0.5));
     height: 100%;
   }
   body.split.vertical main .workspace {
     width: 100%;
-    height: 50%;
+    height: calc(50% - calc(var(--scaler-size) * 0.5));
   }
   body.split.horizontal[data-scaling-offset] main .workspace {
-    width: var(--scaling-offset);
+    width: calc(var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
   }
   body.split.vertical[data-scaling-offset] main .workspace {
-    height: var(--scaling-offset);
+    height: calc(var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
+  }
+  body.preview main .workspace {
+    opacity: 0;
   }
   body.preview.horizontal main .workspace {
     width: 0%;
@@ -444,14 +451,15 @@
     padding: var(--editor-rename-padding-y) var(--editor-rename-padding-x);
     --editor-rename-padding-x: 4px;
     --editor-rename-padding-y: 3px;
+    min-width: calc(var(--editor-name-width) + calc(var(--editor-rename-padding-x) + var(--editor-rename-border)) * 2);
     width: calc(var(--editor-name-width) + calc(var(--editor-rename-padding-x) + var(--editor-rename-border)) * 2);
     color: inherit;
     font-size: inherit;
     font-family: inherit;
     background: none;
     border: var(--editor-rename-border) solid #ffffff80;
-    border-radius: 4px;
     --editor-rename-border: 1px;
+    border-radius: 4px;
   }
   main .workspace .workspace-tabs .tab [data-editor-name] {
     pointer-events: none;
@@ -518,23 +526,40 @@
   main .workspace .editor.active {
     visibility: visible;
   }
+  main .workspace .editor textarea::-webkit-scrollbar {
+    width: 18px;
+    height: 18px;
+  }
+  main .workspace .editor textarea::-webkit-scrollbar-thumb {
+    border-width: 5px;
+  }
   main .scaler {
     position: absolute;
+    background: #3a3a3a;
     touch-action: none;
     z-index: 1;
+    transition: var(--speed);
+    transition-property: left, top, width, height, opacity;
   }
   main .scaler:hover, body[data-scaling-active] main .scaler {
+    background: #4a4a4a;
+  }
+  body.code main .scaler {
+    opacity: 0;
+  }
+  body.preview main .scaler {
+    opacity: 0;
   }
   body.horizontal main .scaler {
     top: 0;
-    width: 8px;
+    width: var(--scaler-size);
     height: 100%;
     cursor: col-resize;
   }
   body.vertical main .scaler {
     left: 0;
     width: 100%;
-    height: 8px;
+    height: var(--scaler-size);
     cursor: row-resize;
   }
   body.code.horizontal main .scaler {
@@ -544,22 +569,22 @@
     top: 100%;
   }
   body.split.horizontal main .scaler {
-    left: calc(50% - 4px);
+    left: calc(50% - calc(var(--scaler-size) * 0.5));
   }
   body.split.vertical main .scaler {
-    top: calc(50% - 4px);
+    top: calc(50% - calc(var(--scaler-size) * 0.5));
   }
   body.split.horizontal[data-scaling-offset] main .scaler {
-    left: calc(var(--scaling-offset) - 4px);
+    left: calc(var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
   }
   body.split.vertical[data-scaling-offset] main .scaler {
-    top: calc(var(--scaling-offset) - 4px);
+    top: calc(var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
   }
   body.preview.horizontal main .scaler {
-    left: -8px;
+    left: calc(var(--scaler-size) * -1);
   }
   body.preview.vertical main .scaler {
-    top: -8px;
+    top: calc(var(--scaler-size) * -1);
   }
   body[data-scaling-active] main .scaler {
     transition: none;
@@ -573,6 +598,11 @@
     background: #ffffff;
     border: solid var(--preview-border-color);
     border-width: 0 env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
+    transition: var(--speed);
+    transition-property: width, height, opacity;
+  }
+  body.code main .preview {
+    opacity: 0;
   }
   body.code.horizontal main .preview {
     width: 0%;
@@ -586,19 +616,19 @@
     border-bottom: none;
   }
   body.split.horizontal main .preview {
-    width: 50%;
+    width: calc(50% - calc(var(--scaler-size) * 0.5));
     height: 100%;
     border-left: none;
   }
   body.split.vertical main .preview {
     width: 100%;
-    height: 50%;
+    height: calc(50% - calc(var(--scaler-size) * 0.5));
   }
   body.split.horizontal[data-scaling-offset] main .preview {
-    width: calc(100% - var(--scaling-offset));
+    width: calc(100% - var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
   }
   body.split.vertical[data-scaling-offset] main .preview {
-    height: calc(100% - var(--scaling-offset));
+    height: calc(100% - var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
   }
   body.preview main .preview {
     width: 100%;
@@ -744,6 +774,7 @@
     top: 100%;
     color: #cccccc;
     font-size: 13px;
+    line-height: 16px;
     background: #2a2a2a;
     border: var(--list-border) solid #ffffff1a;
     --list-border: 1px;
@@ -1365,9 +1396,9 @@
     <div class="menu">
       <button class="opener">View</button>
       <ul class="list selectable">
-        <li class="list-item selected" onclick="setView('code');">Code<span class="info shortcut ctrl-shift ctrl-command">1</span></li>
-        <li class="list-item" onclick="setView('split');">Split<span class="info shortcut ctrl-shift ctrl-command">2</span></li>
-        <li class="list-item" onclick="setView('preview');">Preview<span class="info shortcut ctrl-shift ctrl-command">3</span></li>
+        <li class="list-item selected" onclick="setView({ type: 'code' });">Code<span class="info shortcut ctrl-shift ctrl-command">1</span></li>
+        <li class="list-item" onclick="setView({ type: 'split' });">Split<span class="info shortcut ctrl-shift ctrl-command">2</span></li>
+        <li class="list-item" onclick="setView({ type: 'preview' });">Preview<span class="info shortcut ctrl-shift ctrl-command">3</span></li>
         <hr>
         <li class="list-item non-selectable" onclick="setOrientation();">Orientation<span class="info shortcut ctrl-shift ctrl-command">4</span></li>
         <li class="list-item non-selectable" onclick="createDisplay();">Display<span class="info shortcut ctrl-shift ctrl-command">5</span></li>
@@ -1889,7 +1920,8 @@
           reader.readAsText(file,"UTF-8");
           reader.addEventListener("loadend",() => createEditor({
             name: file.name,
-            value: reader.result
+            value: reader.result,
+            auto_created: true
           }));
         });
       }
@@ -1916,7 +1948,7 @@
     if (Editor.view() != "split" || !document.body.hasAttribute("data-scaling-offset")) return;
     var previousWidth = window.innerWidth, previousHeight = window.innerHeight;
     window.setTimeout(() => {
-      if ((Editor.orientation() == "horizontal" && window.innerWidth != previousWidth) || (Editor.orientation() == "vertical" && window.innerHeight != previousHeight)) setView("split");
+      if ((Editor.orientation() == "horizontal" && window.innerWidth != previousWidth) || (Editor.orientation() == "vertical" && window.innerHeight != previousHeight)) setView({ type: "split" });
     },100);
   });
   window.addEventListener("blur",() => {
@@ -1975,17 +2007,17 @@
     if ((controlShift || controlCommand) && (pressed("1") || pressed("!"))){
       event.preventDefault();
       if (event.repeat) return;
-      setView("code");
+      setView({ type: "code" });
     }
     if ((controlShift || controlCommand) && (pressed("2") || pressed("@"))){
       event.preventDefault();
       if (event.repeat) return;
-      setView("split");
+      setView({ type: "split" });
     }
     if ((controlShift || controlCommand) && (pressed("3") || pressed("#"))){
       event.preventDefault();
       if (event.repeat) return;
-      setView("preview");
+      setView({ type: "preview" });
     }
     if ((controlShift || controlCommand) && (pressed("4") || pressed("$"))){
       event.preventDefault();
@@ -2093,9 +2125,10 @@
       });
     });
   });
-  scaler.addEventListener("mousedown",() => {
+  scaler.addEventListener("mousedown",event => {
     if (event.button != 0) return;
     if (Editor.view() != "split") return;
+    event.preventDefault();
     document.body.setAttribute("data-scaling-active",true);
     document.addEventListener("mousemove",setScaling);
     document.addEventListener("mouseup",disableScaling);
@@ -2109,14 +2142,15 @@
   card_backdrop.addEventListener("click",() => closeCard(Editor.active_dialog));
 
   if (Editor.environment().electron_container) refreshMaximizeControl();
-  createEditor();
+  createEditor({ auto_created: true });
   if (Editor.support().file_handling && Editor.support().file_system){
     window.launchQueue.setConsumer(params => {
       closeEditor();
       params.files.forEach(async handle => {
         var file = await handle.getFile(), identifier = createEditor({
           name: await file.name,
-          value: await file.text()
+          value: await file.text(),
+          auto_created: true
         });
         Editor.file_handles[identifier] = await handle;
       });
@@ -2137,7 +2171,7 @@
     openCard(settings_card);
     removeQueryParameters(["settings"]);
   }
-  function createEditor({ name = "Untitled.txt", value = "", open = true } = {}){
+  function createEditor({ name = "Untitled.txt", value = "", open = true, auto_created = false } = {}){
     var identifier = Math.random().toString(), tab = document.createElement("button"), editorName = document.createElement("span"), editorClose = document.createElement("button"), container = document.createElement("div"), textarea = document.createElement("textarea"), previewOption = document.createElement("li");
     if (!name.includes(".")) name = `${name}.txt`;
     tab.classList.add("tab");
@@ -2146,10 +2180,8 @@
     tab.addEventListener("mousedown",event => {
       if (event.button != 0 || document.activeElement.matches("[data-editor-rename]")) return;
       event.preventDefault();
-      if (tab != Editor.query().tab) openEditor(identifier);
+      if (tab != Editor.query().tab) openEditor({ identifier });
     });
-
-
     tab.addEventListener("contextmenu",event => {
       if (event.target != tab) return;
       var editorRename = tab.querySelector("[data-editor-rename]");
@@ -2165,10 +2197,19 @@
       editorRename.addEventListener("keydown",event => {
         if (event.key == "Escape") editorRename.blur();
       });
+
+/* --- Input Resizing --- */
+      editorRename.addEventListener("input",() => {
+        editorRename.style.width = "0px";
+        editorRename.offsetWidth;
+        editorRename.style.width = editorRename.scrollWidth + 4 + "px";
+      });
+
+
       editorRename.addEventListener("change",() => {
         if (editorRename.value) renameEditor({
-          identifier,
-          name: editorRename.value
+          name: editorRename.value,
+          identifier
         });
         editorRename.blur();
       });
@@ -2181,13 +2222,11 @@
       editorRename.focus();
       editorRename.select();
     });
-
-
     tab.addEventListener("dragover",event => {
       event.preventDefault();
       event.stopPropagation();
       event.dataTransfer.dropEffect = "copy";
-      if (tab != Editor.query().tab) openEditor(identifier);
+      if (tab != Editor.query().tab) openEditor({ identifier });
     });
     tab.addEventListener("drop",event => {
       event.preventDefault();
@@ -2225,12 +2264,12 @@
     workspace_editors.appendChild(container);
     preview_options.appendChild(previewOption);
     applyEditingBehavior({ element: textarea });
-    if (open || !Editor.active_editor) openEditor(identifier);
+    if (open || !Editor.active_editor) openEditor({ identifier, auto_created });
     return identifier;
   }
-  function openEditor(identifier){
+  function openEditor({ identifier, auto_created = false } = {}){
     if (!identifier) return;
-    var { tab, container, getName } = Editor.query(identifier);
+    var { tab, container, textarea, getName } = Editor.query(identifier), focused = (document.activeElement == Editor.query().textarea) ? true : false;
     if (Editor.query().tab) Editor.query().tab.classList.remove("active");
     if (Editor.query().container) Editor.query().container.classList.remove("active");
     tab.classList.add("active");
@@ -2238,6 +2277,7 @@
     Editor.active_editor = identifier;
     setEditorTabsVisibility();
     setTitle(getName());
+    if ((auto_created && !Editor.environment().touch_device && Editor.appearance().parent_window) || focused) textarea.focus({ preventScroll: true });
     if (Editor.preview_editor == "active-editor") refreshPreview({ force: true });
   }
   function closeEditor({ identifier = Editor.active_editor } = {}){
@@ -2251,9 +2291,9 @@
       preview.src = "about:blank";
     }
     if (Editor.preview_editor == identifier) setPreviewSource({ active_editor: true });
-    if (tab == editorTabs[0] && editorTabs[1] && tab.classList.contains("active")) openEditor(editorTabs[1].getAttribute("data-editor-identifier"));
-    if (tab == editorTabs[editorTabs.length - 1] && tab != editorTabs[0] && tab.classList.contains("active")) openEditor(editorTabs[editorTabs.length - 2].getAttribute("data-editor-identifier"));
-    if (tab != editorTabs[0] && tab.classList.contains("active")) openEditor(editorTabs[editorTabs.indexOf(tab) + 1].getAttribute("data-editor-identifier"));
+    if (tab == editorTabs[0] && editorTabs[1] && tab.classList.contains("active")) openEditor({ identifier: editorTabs[1].getAttribute("data-editor-identifier") });
+    if (tab == editorTabs[editorTabs.length - 1] && tab != editorTabs[0] && tab.classList.contains("active")) openEditor({ identifier: editorTabs[editorTabs.length - 2].getAttribute("data-editor-identifier") });
+    if (tab != editorTabs[0] && tab.classList.contains("active")) openEditor({ identifier: editorTabs[editorTabs.indexOf(tab) + 1].getAttribute("data-editor-identifier") });
     if (focused && Editor.query().textarea) Editor.query().textarea.focus();
     workspace_tabs.removeChild(tab);
     workspace_editors.removeChild(container);
@@ -2276,23 +2316,23 @@
     var { tab } = Editor.query(identifier);
     tab.scrollIntoView();
   }
-  function setView(view){
-    if (Editor.active_scaling()) return;
+  function setView({ type, force = false } = {}){
+    if ((Editor.active_orienting() && !force) || Editor.active_scaling()) return;
     document.body.classList.remove(Editor.view());
-    document.body.setAttribute("data-view",view);
+    document.body.setAttribute("data-view",type);
     document.body.classList.add(Editor.view());
-    //removeScaling();
-    if (view == "code") setEditingToolVisibility({
+    removeScaling();
+    if (type == "code") setEditingToolVisibility({
       undo: true,
       redo: true,
       refresh: false
     });
-    if (view == "split") setEditingToolVisibility({
+    if (type == "split") setEditingToolVisibility({
       undo: true,
       redo: true,
       refresh: true
     });
-    if (view == "preview") setEditingToolVisibility({
+    if (type == "preview") setEditingToolVisibility({
       undo: false,
       redo: false,
       refresh: true
@@ -2305,35 +2345,36 @@
     }
   }
   function setOrientation(orientation){
-    if (Editor.active_scaling()) return;
+    if (Editor.active_orienting() || Editor.active_scaling()) return;
     var param = (orientation), transitionDuration = ((Editor.view() != "split") ? 0 : parseInt(getElementStyle({
       element: workspace,
       property: "transition-duration"
     }).replace(/s/g,"") * 1000));
-    if (!param && Editor.view() == "split") setView("code");
+    document.body.setAttribute("data-orienting-active",true);
+    if (!param && Editor.view() == "split") setView({ type: "code", force: true });
     if (!param && Editor.orientation() == "horizontal") orientation = "vertical";
     if (!param && Editor.orientation() == "vertical") orientation = "horizontal";
     window.setTimeout(() => {
-    setTransitionDurations(false);
-    document.body.classList.remove(Editor.orientation());
-    document.body.setAttribute("data-orientation",orientation);
-    document.body.classList.add(Editor.orientation());
-    workspace.offsetHeight;
-    scaler.offsetHeight;
-    preview.offsetHeight;
-    setTransitionDurations(true);
-    if (!param) setView("split");
+      removeTransitionDurations(true);
+      document.body.classList.remove(Editor.orientation());
+      document.body.setAttribute("data-orientation",orientation);
+      document.body.classList.add(Editor.orientation());
+      workspace.offsetHeight;
+      scaler.offsetHeight;
+      preview.offsetHeight;
+      removeTransitionDurations(false);
+      if (!param) setView({ type: "split", force: true });
+      window.setTimeout(() => document.body.removeAttribute("data-orienting-active"),transitionDuration);
     },transitionDuration);
-    function setTransitionDurations(value){
-      if (value == true) {
-        workspace.style.removeProperty("transition-duration");
-        scaler.style.removeProperty("transition-duration");
-        preview.style.removeProperty("transition-duration");
-      }
-      if (value == false){
+    function removeTransitionDurations(value){
+      if (value){
         workspace.style.transitionDuration = "0s";
         scaler.style.transitionDuration = "0s";
         preview.style.transitionDuration = "0s";
+      } else {
+        workspace.style.removeProperty("transition-duration");
+        scaler.style.removeProperty("transition-duration");
+        preview.style.removeProperty("transition-duration");
       }
     }
   }
@@ -2769,6 +2810,36 @@
     var icon = (!window.mainProcess.isMaximized()) ? "maximize" : "restore";
     maximizeControl.querySelector(`[data-icon="${icon}"]`).classList.add("active");
     maximizeControl.title = icon[0].toUpperCase() + icon.slice(1);
+  }
+  function setScaling(event){
+    var scalingOffset,
+      scalingRange = {
+        minimum: ((Editor.orientation() == "vertical") ? workspace_tabs.offsetHeight : 0) + 80,
+        maximum: ((Editor.orientation() == "horizontal") ? window.innerWidth : (Editor.orientation() == "vertical") ? (window.innerHeight - header.offsetHeight) : 0) - 80
+      },
+      touchEvent = (Editor.environment().touch_device && event instanceof TouchEvent);
+    if (Editor.orientation() == "horizontal") scalingOffset = (!touchEvent) ? event.pageX : event.touches[0].pageX;
+    if (Editor.orientation() == "vertical") scalingOffset = (!touchEvent) ? event.pageY - header.offsetHeight : event.touches[0].pageY - header.offsetHeight;
+    if (scalingOffset < scalingRange.minimum) scalingOffset = scalingRange.minimum;
+    if (scalingOffset > scalingRange.maximum) scalingOffset = scalingRange.maximum;
+    document.body.setAttribute("data-scaling-offset",scalingOffset);
+    document.body.style.setProperty("--scaling-offset",`${scalingOffset}px`);
+  }
+  function disableScaling(event){
+    var touchEvent = (Editor.environment().touch_device && event instanceof TouchEvent);
+    if (!touchEvent){
+      document.removeEventListener("mousemove",setScaling);
+      document.removeEventListener("mouseup",disableScaling);
+    } else {
+      document.removeEventListener("touchmove",setScaling);
+      document.removeEventListener("touchend",disableScaling);
+    }
+    document.body.removeAttribute("data-scaling-active");
+  }
+  function removeScaling(){
+    if (!document.body.hasAttribute("data-scaling-offset")) return;
+    document.body.removeAttribute("data-scaling-offset");
+    document.body.style.removeProperty("--scaling-offset");
   }
 </script>
 
