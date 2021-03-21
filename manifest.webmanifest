@@ -17,7 +17,7 @@
       "sizes": "512x512"
     },
     {
-      "src": "resources/icon-512-maskable.png",
+      "src": "resources/icon-maskable.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"
@@ -53,7 +53,7 @@
       "url": "https://offroaders123.github.io/Smart-Text-Editor/?template=true",
       "icons": [
         {
-          "src": "resources/template-192.png",
+          "src": "resources/template.png",
           "sizes": "192x192"
         }
       ]
@@ -65,7 +65,7 @@
       "url": "https://offroaders123.github.io/Smart-Text-Editor/?settings=true",
       "icons": [
         {
-          "src": "resources/settings-192.png",
+          "src": "resources/settings.png",
           "sizes": "192x192"
         }
       ]
