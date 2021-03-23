@@ -251,8 +251,6 @@
     outline: none;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: var(--transition-fast);
-    transition-property: color, background;
   }
 
 
@@ -277,9 +275,6 @@
 */
 
 
-  header .menubar .menu.active .opener {
-    transition: none;
-  }
   header .window-controls {
     margin-left: auto;
     align-self: stretch;
@@ -787,7 +782,7 @@
   .menu .list {
     padding: var(--list-padding-y) var(--list-padding-x);
     --list-padding-x: 0px;
-    --list-padding-y: 5px;
+    --list-padding-y: 6px;
     position: absolute;
     left: 0;
     top: 100%;
@@ -795,7 +790,7 @@
     font-size: 13px;
     line-height: 16px;
     background: #2a2a2a;
-    border: var(--list-border-width) solid #ffffff1a;
+    border: var(--list-border-width) solid transparent;
     --list-border-width: 1px;
     border-radius: calc(var(--list-padding-y) + var(--list-border-width));
     box-shadow: 1px 2px 4px #00000080;
@@ -819,7 +814,7 @@
     padding: calc(var(--list-item-padding-y) - var(--list-item-border-width)) calc(var(--list-item-padding-x) - var(--list-item-border-width));
     padding-left: calc(var(--list-item-padding-x) + var(--list-item-selected-icon-size,0px) - var(--list-item-border-width));
     --list-item-padding-x: 12px;
-    --list-item-padding-y: 3px;
+    --list-item-padding-y: 4px;
     position: relative;
     display: flex;
     align-items: center;
@@ -884,7 +879,7 @@
     margin-left: auto;
     padding-left: 8px;
     font-size: 12px;
-    opacity: 0.6;
+    opacity: 0.5;
     pointer-events: none;
   }
   .menu .list-item svg.info {
