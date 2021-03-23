@@ -130,6 +130,8 @@
     box-sizing: border-box;
   }
   :root {
+    --transition-fast: 80ms;
+
     --selection-color: #0a0a0a;
     --selection-background: #b4d5ffbf;
     --selection-background-inactive: #ccccccbf;
@@ -170,7 +172,7 @@
     opacity: 0;
     pointer-events: none;
     z-index: 3;
-    transition: opacity 0.25s;
+    transition: opacity 250ms;
   }
   :root.startup-fade body::after {
     opacity: 1;
@@ -249,6 +251,8 @@
     outline: none;
     overflow: hidden;
     text-overflow: ellipsis;
+    transition: var(--transition-fast);
+    transition-property: color, background;
   }
 
 
@@ -273,6 +277,9 @@
 */
 
 
+  header .menubar .menu.active .opener {
+    transition: none;
+  }
   header .window-controls {
     margin-left: auto;
     align-self: stretch;
@@ -364,7 +371,7 @@
     --workspace-accent: #ffffff20;
     --scaler-size: 16px;
     --preview-border-color: #141414;
-    --speed: 0.4s;
+    --speed: 400ms;
   }
   main .workspace {
     position: absolute;
@@ -409,15 +416,26 @@
     transition: none;
   }
   main .workspace .workspace-tabs {
-    padding-left: calc(env(safe-area-inset-left,0px) + 6px);
-    padding-right: calc(env(safe-area-inset-right,0px) + 6px);
+    --workspace-tabs-padding-left: calc(env(safe-area-inset-left,0px) + 6px);
+    --workspace-tabs-padding-right: calc(env(safe-area-inset-right,0px) + 6px);
     flex-shrink: 0;
     display: flex;
-    gap: 3px;
     box-shadow: 0 -1px 0 var(--workspace-accent) inset, 0 -1px 0 var(--workspace-background) inset;
     overflow-x: auto;
     scroll-behavior: smooth;
     scrollbar-width: none;
+  }
+  main .workspace .workspace-tabs::before, main .workspace .workspace-tabs::after {
+    content: "";
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+  main .workspace .workspace-tabs::before {
+    width: var(--workspace-tabs-padding-left);
+  }
+  main .workspace .workspace-tabs::after {
+    margin-left: auto;
+    width: var(--workspace-tabs-padding-right);
   }
   main .workspace .workspace-tabs::-webkit-scrollbar {
     display: none;
@@ -951,7 +969,7 @@
     display: flex;
     justify-content: center;
     gap: 6px;
-    transition: color 75ms;
+    transition: color var(--transition-fast);
   }
   .select:where(:hover,:focus-within,.active) {
     color: #ffffff;
@@ -990,7 +1008,7 @@
     outline: none;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    transition: 75ms;
+    transition: var(--transition-fast);
     transition-property: color, border-color, opacity;
   }
   .checkbox:where(:hover,:focus-visible) {
@@ -1023,7 +1041,7 @@
     background: #ffffff0c;
     border: var(--checkbox-check-border-width) solid currentColor;
     border-radius: calc(var(--check-padding) + calc(var(--checkbox-check-border-width) * 2));
-    transition: background 75ms;
+    transition: background var(--transition-fast);
   }
   .checkbox:where(:hover,:focus-visible) label::before {
     background: #ffffff1c;
@@ -1257,7 +1275,7 @@
     border: 1px solid transparent;
     border-radius: 5px;
     outline: none;
-    transition: 75ms;
+    transition: var(--transition-fast);
     transition-property: color, background, border-color;
   }
   .card .main button:where(:hover,:focus-visible), .select .menu.active .opener {
@@ -1989,12 +2007,12 @@
     if ((controlShift || controlCommand) && (pressed("[") || pressed("{"))){
       event.preventDefault();
       if (event.repeat) return;
-      openNextEditor();
+      openPreviousEditor();
     }
     if ((controlShift || controlCommand) && (pressed("]") || pressed("}"))){
       event.preventDefault();
       if (event.repeat) return;
-      openPreviousEditor();
+      openNextEditor();
     }
     if ((controlShift || shiftCommand) && pressed("c")){
       event.preventDefault();
@@ -2321,9 +2339,24 @@
     if ((Editor.preview_editor == "active-editor" && Editor.active_editor == identifier) || Editor.preview_editor == identifier) refreshPreview({ force: true });
     return rename;
   }
+  function openPreviousEditor({ identifier = Editor.active_editor } = {}){
+    var { tab } = Editor.query(identifier), editorTabs = workspace_tabs.querySelectorAll(".tab"), previousTab = (tab.previousElementSibling) ? tab.previousElementSibling : editorTabs[editorTabs.length - 1], previousEditor = previousTab.getAttribute("data-editor-identifier");
+    openEditor({ identifier: previousEditor });
+  }
+  function openNextEditor({ identifier = Editor.active_editor } = {}){
+    var { tab } = Editor.query(identifier), editorTabs = workspace_tabs.querySelectorAll(".tab"), nextTab = (tab.nextElementSibling) ? tab.nextElementSibling : editorTabs[0], nextEditor = nextTab.getAttribute("data-editor-identifier");
+    openEditor({ identifier: nextEditor });
+  }
   function setEditorTabsVisibility({ identifier = Editor.active_editor } = {}){
-    var { tab } = Editor.query(identifier);
-    tab.scrollIntoView();
+    var { tab } = Editor.query(identifier), obstructedLeft = (tab.offsetLeft <= workspace_tabs.scrollLeft), obstructedRight = ((tab.offsetLeft + tab.clientWidth) >= (workspace_tabs.scrollLeft + workspace_tabs.clientWidth)), spacingOffset = 0;
+    if ((workspace_tabs.clientWidth < tab.clientWidth) && !obstructedLeft) return;
+    if (obstructedLeft){
+      spacingOffset = parseInt(getElementStyle({ element: workspace_tabs, pseudo: "::before", property: "width" }),10) * 3;
+      workspace_tabs.scrollTo(tab.offsetLeft - spacingOffset,0);
+    } else if (obstructedRight){
+      spacingOffset = parseInt(getElementStyle({ element: workspace_tabs, pseudo: "::after", property: "width" }),10) * 3;
+      workspace_tabs.scrollTo(tab.offsetLeft + tab.clientWidth + spacingOffset - workspace_tabs.clientWidth,0);
+    }
   }
   function setView({ type, force = false } = {}){
     if ((Editor.active_orienting() && !force) || Editor.active_scaling()) return;
@@ -2331,6 +2364,23 @@
     document.body.setAttribute("data-view",type);
     document.body.classList.add(Editor.view());
     removeScaling();
+    if (type != "preview"){
+      var transitionDuration = parseInt(getElementStyle({ element: workspace, property: "transition-duration" }).replace(/s/g,"") * 1000);
+      window.setTimeout(setEditorTabsVisibility,transitionDuration);
+    }
+
+
+/*
+    if (newView != "preview"){
+      var transitionDuration = parseInt(getElementStyle(workspace,"transition-duration").split("s").join("") * 1000);
+      window.setTimeout(() => {
+        setFileTabVisibility(Editor.query.file.tab());
+        setFilesSectionOffset();
+      },transitionDuration);
+    }
+*/
+
+
     if (type == "code") setEditingToolVisibility({
       undo: true,
       redo: true,
@@ -2355,10 +2405,7 @@
   }
   function setOrientation(orientation){
     if (Editor.active_orienting() || Editor.active_scaling()) return;
-    var param = (orientation), transitionDuration = ((Editor.view() != "split") ? 0 : parseInt(getElementStyle({
-      element: workspace,
-      property: "transition-duration"
-    }).replace(/s/g,"") * 1000));
+    var param = (orientation), transitionDuration = ((Editor.view() != "split") ? 0 : parseInt(getElementStyle({ element: workspace, property: "transition-duration" }).replace(/s/g,"") * 1000));
     document.body.setAttribute("data-orienting-active",true);
     if (!param && Editor.view() == "split") setView({ type: "code", force: true });
     if (!param && Editor.orientation() == "horizontal") orientation = "vertical";
@@ -2404,10 +2451,7 @@
         if (openType != "dialog" && openType != type) return;
         openCard.classList.remove("active");
         if (!openCard.classList.contains("minimize")) return;
-        var transitionDuration = parseInt(getElementStyle({
-          element: openCard,
-          property: "transition-duration"
-        }).replace(/s/g,"") * 1000);
+        var transitionDuration = parseInt(getElementStyle({ element: openCard, property: "transition-duration" }).replace(/s/g,"") * 1000);
         window.setTimeout(() => minimizeCard(openCard),transitionDuration);
       });
     }
@@ -2437,10 +2481,7 @@
       menus.forEach(menu => {
         if (menu.classList.contains("active")) closeMenu(menu);
       });
-      var transitionDuration = parseInt(getElementStyle({
-        element: card,
-        property: "transition-duration"
-      }).replace(/s/g,"") * 500);
+      var transitionDuration = parseInt(getElementStyle({ element: card, property: "transition-duration" }).replace(/s/g,"") * 500);
       window.setTimeout(() => {
         document.activeElement.blur();
         if (previous) card.querySelector(`[data-card-previous="${previous.id}"]`).focus();
@@ -2453,10 +2494,7 @@
     var type = card.getAttribute("data-card");
     card.classList.remove("active");
     if (card.classList.contains("minimize")){
-      var transitionDuration = parseInt(getElementStyle({
-        element: card,
-        property: "transition-duration"
-      }).replace(/s/g,"") * 1000);
+      var transitionDuration = parseInt(getElementStyle({ element: card, property: "transition-duration" }).replace(/s/g,"") * 1000);
       window.setTimeout(() => minimizeCard(card),transitionDuration);
     }
     if (type == "dialog"){
@@ -2464,10 +2502,7 @@
       card_backdrop.classList.remove("active");
       Editor.active_dialog = null;
       if (Editor.dialog_previous){
-        var hidden = (getElementStyle({
-          element: Editor.dialog_previous,
-          property: "visibility"
-        }) == "hidden");
+        var hidden = (getElementStyle({ element: Editor.dialog_previous, property: "visibility" }) == "hidden");
         if (!workspace_editors.contains(Editor.dialog_previous) && !hidden){
           Editor.dialog_previous.focus();
         } else Editor.query().textarea.focus();
@@ -2666,10 +2701,7 @@
     menu.style.left = `${location.left}px`;
     menu.style.top = `${location.top}px`;
     //document.body.addEventListener("keydown",catchMenuNavigation);
-    var transitionDuration = parseInt(getElementStyle({
-      element: list,
-      property: "transition-duration"
-    }).replace(/s/g,"") * 500);
+    var transitionDuration = parseInt(getElementStyle({ element: list, property: "transition-duration" }).replace(/s/g,"") * 500);
     window.setTimeout(() => document.activeElement.blur(),transitionDuration);
   }
   function closeMenu(menu){
@@ -2681,10 +2713,7 @@
     if (opener && opener != document.activeElement) opener.focus();
     if (!menu.classList.contains("context-menu")) return;
     Editor.context_menu_previous.focus();
-    var types = ["link","editing"], transitionDuration = parseInt(getElementStyle({
-      element: list,
-      property: "transition-duration"
-    }).replace(/s/g,"") * 1000);
+    var types = ["link","editing"], transitionDuration = parseInt(getElementStyle({ element: list, property: "transition-duration" }).replace(/s/g,"") * 1000);
     window.setTimeout(() => {
       var types = ["link","editing"];
       types.forEach(type => {
@@ -2698,10 +2727,7 @@
   function getNavigableElements({ container, scope = false } = {}){
     scope = (scope) ? "" : ":scope > ";
     var navigable = container.querySelectorAll(`${scope}button:not([disabled]), ${scope}textarea:not([disabled]), ${scope}input:not([disabled]), ${scope}select:not([disabled]), ${scope}a[href]:not([disabled]), ${scope}[tabindex]:not([tabindex="-1"])`);
-    return Array.from(navigable).filter(element => (getElementStyle({
-      element,
-      property: "display"
-    }) != "none"));
+    return Array.from(navigable).filter(element => (getElementStyle({ element, property: "display" }) != "none"));
   }
   function getElementStyle({ element, pseudo = null, property } = {}){
     return window.getComputedStyle(element,pseudo).getPropertyValue(property);
