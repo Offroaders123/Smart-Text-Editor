@@ -1,0 +1,73 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="background_shadows" x="48" y="50" width="416" height="418" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
+      <feOffset dy="2"/>
+      <feGaussianBlur stdDeviation="1"/>
+      <feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+      <feBlend in2="BackgroundImageFix" result="effect1_dropShadow"/>
+      <feBlend in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+      <feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
+      <feOffset dy="6"/>
+      <feGaussianBlur stdDeviation="12.5"/>
+      <feComposite in2="hardAlpha" k2="-1" k3="1" operator="arithmetic"/>
+      <feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.06 0"/>
+      <feBlend in2="shape" result="effect2_innerShadow"/>
+    </filter>
+    <filter id="pencil_glow" x="57.5" y="57.5" width="396.52" height="397.06" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+      <feGaussianBlur result="effect1_foregroundBlur" stdDeviation="31"/>
+    </filter>
+    <linearGradient id="background" x1="256" x2="256" y1="50" y2="462" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2a2a2a" offset="0"/>
+      <stop stop-color="#121212" offset="1"/>
+    </linearGradient>
+    <linearGradient id="wood" x1="95.793" x2="142.1" y1="368.94" y2="415.73" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e5cfad" offset="0"/>
+      <stop stop-color="#dec196" offset="0.25"/>
+      <stop stop-color="#daba8a" offset="0.5"/>
+      <stop stop-color="#c4a77c" offset="0.75"/>
+      <stop stop-color="#988260" offset="1"/>
+    </linearGradient>
+    <linearGradient id="paint" x1="150.94" x2="198.72" y1="312.14" y2="360.23" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f3ac4d" offset="0"/>
+      <stop stop-color="#f0941a" offset="0.25"/>
+      <stop stop-color="#ee8800" offset="0.5"/>
+      <stop stop-color="#d67a00" offset="0.75"/>
+      <stop stop-color="#a65f00" offset="1"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="274.67" x2="322.41" y1="188.79" y2="236.85" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#d5d5d5" offset="0"/>
+      <stop stop-color="#c9c9c9" offset="0.25"/>
+      <stop stop-color="#c3c3c3" offset="0.5"/>
+      <stop stop-color="#afafaf" offset="0.75"/>
+      <stop stop-color="#888888" offset="1"/>
+    </linearGradient>
+    <linearGradient id="eraser" x1="303.47" x2="351.66" y1="159.55" y2="208.06" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#db7c88" offset="0"/>
+      <stop stop-color="#d15766" offset="0.25"/>
+      <stop stop-color="#cc4455" offset="0.5"/>
+      <stop stop-color="#b73d4c" offset="0.75"/>
+      <stop stop-color="#8e2f3b" offset="1"/>
+    </linearGradient>
+  </defs>
+  <g filter="url(#background_shadows)">
+    <path d="m50 142c0-50.81 41.19-92 92-92h228c50.81 0 92 41.19 92 92v228c0 50.81-41.19 92-92 92h-228c-50.81 0-92-41.19-92-92v-228z" fill="url(#background)"/>
+  </g>
+  <g filter="url(#pencil_glow)" opacity="0.4">
+    <path d="m207.4 351.42-62.79 29.385-13.355-13.89 28.315-61.72 47.83 46.225z" fill="url(#wood)"/>
+    <path d="m147.55 379.47-28.05 13.09 13.09-28.59c2.19 3.865 3.025 6.195 6.15 9.35 2.985 3.035 8.81 6.15 8.81 6.15z" fill="#2a2a2a"/>
+    <path d="m284.69 179.35c-5.21 5.215 1.185 20.07 14.3 33.185 13.11 13.11 27.975 19.515 33.185 14.3l-123.83 123.84c-5.215 5.215-20.08-1.19-33.185-14.3-13.12-13.115-19.515-27.97-14.3-33.185l123.83-123.84z" fill="url(#paint)"/>
+    <path d="m313.76 149.96c-5.255 5.245 1.19 20.205 14.395 33.4 13.2 13.2 28.16 19.645 33.405 14.4l-29.46 29.46c-5.245 5.245-20.205-1.2-33.405-14.4-13.195-13.205-19.64-28.155-14.395-33.41l29.46-29.45z" fill="url(#metal)"/>
+    <path d="m342.32 121.11c-5.29 5.285 1.07 20.375 14.395 33.7s28.415 19.835 33.7 14.55l-29 28.99c-5.285 5.295-20.375-1.225-33.7-14.55-13.325-13.315-19.835-28.405-14.55-33.7l29.155-28.99z" fill="url(#eraser)"/>
+    <path d="m342.02 121.34c5.28-5.295 20.335 1.235 33.635 14.575 13.305 13.34 19.805 28.455 14.52 33.75-5.28 5.295-20.335-1.235-33.635-14.575-13.305-13.34-19.795-28.455-14.52-33.75z" fill="#db7c88"/>
+  </g>
+  <path d="m207.1 351.66-62.79 29.385-13.355-13.89 28.315-61.72 47.83 46.225z" fill="url(#wood)"/>
+  <path d="m147.26 379.7-28.05 13.09 13.09-28.59c2.19 3.865 3.025 6.195 6.15 9.35 2.985 3.035 8.81 6.15 8.81 6.15z" fill="#2a2a2a"/>
+  <path d="m284.4 179.58c-5.21 5.215 1.185 20.07 14.3 33.185 13.11 13.11 27.975 19.515 33.185 14.3l-123.83 123.84c-5.215 5.215-20.08-1.19-33.185-14.3-13.12-13.115-19.515-27.97-14.3-33.185l123.83-123.84z" fill="url(#paint)"/>
+  <path d="m313.47 150.2c-5.255 5.245 1.19 20.205 14.395 33.4 13.2 13.2 28.16 19.645 33.405 14.4l-29.46 29.46c-5.245 5.245-20.205-1.2-33.405-14.4-13.195-13.205-19.64-28.155-14.395-33.41l29.46-29.45z" fill="url(#metal)"/>
+  <path d="m342.03 121.34c-5.29 5.285 1.07 20.375 14.395 33.7s28.415 19.835 33.7 14.55l-29 28.99c-5.285 5.295-20.375-1.225-33.7-14.55-13.325-13.315-19.835-28.405-14.55-33.7l29.155-28.99z" fill="url(#eraser)"/>
+  <path d="m341.73 121.58c5.28-5.295 20.335 1.235 33.635 14.575 13.305 13.34 19.805 28.455 14.52 33.75-5.28 5.295-20.335-1.235-33.635-14.575-13.305-13.34-19.795-28.455-14.52-33.75z" fill="#db7c88"/>
+</svg>
