@@ -2639,9 +2639,8 @@
       left = window.screen.availWidth / 2 + window.screen.availLeft - width / 2,
       top = window.screen.availHeight / 2 + window.screen.availTop - height / 2,
       features = (Editor.appearance().standalone || Editor.appearance().fullscreen) ? "popup" : "",
-      extension = Editor.query().getName("extension"),
       link = window.URL.createObjectURL(new Blob([Editor.query().textarea.value],{
-        type: (["html","xml","md","markdown","svg"].includes(extension)) ? `text/${extension}` : `text/plain`
+        type: "text/html"
       })),
       win = window.open(link,"_blank",features);
     window.URL.revokeObjectURL(link);
@@ -2807,12 +2806,12 @@
     if (!source.textarea) return;
     var change = (source.tab.hasAttribute("data-editor-refresh"));
     if (!change && !force) return;
-    var extension = source.getName("extension"), type = (["html","xml","md","markdown","svg"].includes(extension)) ? `text/${extension}` : `text/plain`;
-    if (["md","markdown"].includes(type)) type = "text/html";
-    if (type == "text/svg") type = "image/svg+xml";
-    var link = window.URL.createObjectURL(new Blob([source.textarea.value],{ type }));
-    preview.src = link;
-    window.URL.revokeObjectURL(link);
+    preview.addEventListener("load",() => {
+      preview.contentWindow.document.open();
+      preview.contentWindow.document.write(source.textarea.value);
+      preview.contentWindow.document.close();
+    },{ once: true });
+    preview.src = "about:blank";
     if (change) source.tab.removeAttribute("data-editor-refresh");
   }
   function setTitle(name){
