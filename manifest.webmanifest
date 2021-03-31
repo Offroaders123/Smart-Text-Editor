@@ -1,23 +1,35 @@
 {
   "name": "Smart Text Editor",
-  "short_name": "Smart Text Editor",
-  "start_url": "https://offroaders123.github.io/Smart-Text-Editor/",
+  "short_name": "Text Editor",
+  "start_url": "_origin_/",
   "display": "standalone",
   "theme_color": "#191919",
   "background_color": "#191919",
   "icons": [
     {
-      "src": "resources/icon-192.png",
+      "src": "_origin_/resources/icon-192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "resources/icon-512.png",
+      "platform": "macOS",
+      "src": "_origin_/resources/icon-macOS-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "_origin_/resources/icon-512.png",
       "type": "image/png",
       "sizes": "512x512"
     },
     {
-      "src": "resources/icon-maskable.png",
+      "platform": "macOS",
+      "src": "_origin_/resources/icon-macOS-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "_origin_/resources/icon-maskable.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"
@@ -25,7 +37,7 @@
   ],
   "file_handlers": [
     {
-      "action": "https://offroaders123.github.io/Smart-Text-Editor/",
+      "action": "_origin_/",
       "accept": {
         "text/*": [".txt",".html",".css",".js",".php",".json",".webmanifest",".xml",".yaml",".yml",".dist",".config",".ini",".md",".markdown",".mcmeta",".lang",".properties",".uidx",".material",".h",".fragment",".vertex",".fxh",".hlsl",".ihlsl"],
         "image/svg+xml": [".svg"]
@@ -33,7 +45,7 @@
     }
   ],
   "share_target": {
-    "action": "https://offroaders123.github.io/Smart-Text-Editor/",
+    "action": "_origin_/",
     "method": "POST",
     "enctype": "multipart/form-data",
     "params": {
@@ -50,10 +62,10 @@
       "name": "HTML Template",
       "short_name": "HTML Template",
       "description": "Create a new file with boilerplate HTML to start with",
-      "url": "https://offroaders123.github.io/Smart-Text-Editor/?template=true",
+      "url": "_origin_/?template=true",
       "icons": [
         {
-          "src": "resources/template.png",
+          "src": "_origin_/resources/template.png",
           "sizes": "192x192"
         }
       ]
@@ -62,10 +74,10 @@
       "name": "Settings",
       "short_name": "Settings",
       "description": "Open settings for Smart Text Editor",
-      "url": "https://offroaders123.github.io/Smart-Text-Editor/?settings=true",
+      "url": "_origin_/?settings=true",
       "icons": [
         {
-          "src": "resources/settings.png",
+          "src": "_origin_/resources/settings.png",
           "sizes": "192x192"
         }
       ]

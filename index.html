@@ -16,10 +16,11 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta id="theme_color" name="theme-color" content="#191919">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Smart Text Editor">
+<meta name="apple-mobile-web-app-title" content="Text Editor">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<base href="/">
 <link rel="canonical" href="https://offroaders123.github.io/Smart-Text-Editor/">
-<link rel="manifest" href="manifest.webmanifest">
+<link rel="manifest">
 <link rel="icon" type="image/svg+xml" href="resources/icon.svg">
 <link rel="alternate icon" type="image/png" sizes="16x16" href="resources/icon-16.png">
 <link rel="alternate icon" type="image/png" sizes="32x32" href="resources/icon-32.png">
@@ -1934,7 +1935,7 @@
     });
   });
   window.addEventListener("load",() => {
-    if (!("serviceWorker" in navigator) || !Editor.appearance().parent_window || window.location.protocol != "https:") return;
+    if (!("serviceWorker" in navigator) || !Editor.appearance().parent_window) return;
     navigator.serviceWorker.register("service-worker.js");
     if (!navigator.serviceWorker.controller) return;
     navigator.serviceWorker.addEventListener("message",event => {
@@ -2870,6 +2871,16 @@
     document.body.removeAttribute("data-scaling-offset");
     document.body.style.removeProperty("--scaling-offset");
   }
+  fetch("manifest.webmanifest").then(async response => {
+    var manifest = await response.json();
+    manifest.icons.forEach(icon => {
+      if (!Editor.environment().macOS_device) return;
+      if (icon.platform != "macOS" && icon.purpose != "maskable") console.log(icon);
+    });
+    manifest.short_name = "fart text editor";
+    var link = window.URL.createObjectURL(new Blob([JSON.stringify(manifest,null,"  ").replace(/_origin_/g,window.location.origin)],{ type: "text/json" }));
+    document.querySelector("link[rel='manifest']").setAttribute("href",link);
+  });
 </script>
 
 </body>
