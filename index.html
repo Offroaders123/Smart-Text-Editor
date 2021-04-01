@@ -53,6 +53,7 @@
 
 <script>
   window.Editor = {
+    origin: () => (document.head.querySelector("base").href),
     appearance: () => {
       var parent_window = (window.self == window.top),
         standalone = (window.matchMedia("(display-mode: standalone)").matches || navigator.standalone || !window.menubar.visible),
@@ -1936,8 +1937,10 @@
   });
   window.addEventListener("load",() => {
     if (!("serviceWorker" in navigator) || !Editor.appearance().parent_window) return;
+    if (new URL(window.location.href).pathname.includes("index.html")) history.pushState(null,"",Editor.origin());
     navigator.serviceWorker.register("service-worker.js");
     if (!navigator.serviceWorker.controller) return;
+    document.querySelector("link[rel='manifest']").href = "manifest.webmanifest";
     navigator.serviceWorker.addEventListener("message",event => {
       if (event.data.action == "open-files"){
         var files = Array.from(event.data.files);
@@ -2871,16 +2874,6 @@
     document.body.removeAttribute("data-scaling-offset");
     document.body.style.removeProperty("--scaling-offset");
   }
-  fetch("manifest.webmanifest").then(async response => {
-    var manifest = await response.json();
-    manifest.icons.forEach(icon => {
-      if (!Editor.environment().macOS_device) return;
-      if (icon.platform != "macOS" && icon.purpose != "maskable") console.log(icon);
-    });
-    manifest.short_name = "fart text editor";
-    var link = window.URL.createObjectURL(new Blob([JSON.stringify(manifest,null,"  ").replace(/_origin_/g,window.location.origin)],{ type: "text/json" }));
-    document.querySelector("link[rel='manifest']").setAttribute("href",link);
-  });
 </script>
 
 </body>
