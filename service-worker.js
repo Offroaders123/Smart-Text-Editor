@@ -1,5 +1,5 @@
 self.Editor = {
-  version: 2.27,
+  version: 2.28,
   origin: "https://offroaders123.github.io/Smart-Text-Editor",
   environment: () => ({
     macOS_device: (/(Mac)/i.test(navigator.platform) && navigator.standalone == undefined)
