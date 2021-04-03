@@ -3,6 +3,7 @@
   "short_name": "Text Editor",
   "start_url": "_origin_/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay"],
   "theme_color": "#191919",
   "background_color": "#191919",
   "icons": [
