@@ -12,21 +12,32 @@
       "sizes": "192x192"
     },
     {
+      "src": "_origin_/resources/app-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "_origin_/resources/app-1024.png",
+      "type": "image/png",
+      "sizes": "1024x1024"
+    },
+    {
       "platform": "macOS",
       "src": "_origin_/resources/app-macOS-192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "_origin_/resources/app-512.png",
+      "platform": "macOS",
+      "src": "_origin_/resources/app-macOS-512.png",
       "type": "image/png",
       "sizes": "512x512"
     },
     {
       "platform": "macOS",
-      "src": "_origin_/resources/app-macOS-512.png",
+      "src": "_origin_/resources/app-macOS-1024.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "1024x1024"
     },
     {
       "src": "_origin_/resources/app-maskable.png",
