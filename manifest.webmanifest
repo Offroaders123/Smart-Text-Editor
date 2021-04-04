@@ -1,6 +1,7 @@
 {
   "name": "Smart Text Editor",
   "short_name": "Text Editor",
+  "description": "The text editor that requires only a browser and a keyboard!",
   "start_url": "_origin_/",
   "display": "standalone",
   "display_override": ["window-controls-overlay"],
@@ -47,28 +48,6 @@
       "purpose": "maskable"
     }
   ],
-  "file_handlers": [
-    {
-      "action": "_origin_/",
-      "accept": {
-        "text/*": [".txt",".html",".css",".js",".php",".json",".webmanifest",".xml",".yaml",".yml",".dist",".config",".ini",".md",".markdown",".mcmeta",".lang",".properties",".uidx",".material",".h",".fragment",".vertex",".fxh",".hlsl",".ihlsl"],
-        "image/svg+xml": [".svg"]
-      }
-    }
-  ],
-  "share_target": {
-    "action": "_origin_/",
-    "method": "POST",
-    "enctype": "multipart/form-data",
-    "params": {
-      "files": [
-        {
-          "name": "media",
-          "accept": ["text/*",".txt",".html",".css",".js",".php",".json",".webmanifest",".xml",".yaml",".yml",".dist",".config",".ini",".md",".markdown",".mcmeta",".lang",".properties",".material",".h",".fragment",".vertex",".fxh",".hlsl",".ihlsl","image/svg+xml",".svg"]
-        }
-      ]
-    }
-  },
   "shortcuts": [
     {
       "name": "HTML Template",
@@ -94,5 +73,27 @@
         }
       ]
     }
-  ]
+  ],
+  "file_handlers": [
+    {
+      "action": "_origin_/",
+      "accept": {
+        "text/*": [".txt",".html",".css",".js",".php",".json",".webmanifest",".xml",".yaml",".yml",".dist",".config",".ini",".md",".markdown",".mcmeta",".lang",".properties",".uidx",".material",".h",".fragment",".vertex",".fxh",".hlsl",".ihlsl"],
+        "image/svg+xml": [".svg"]
+      }
+    }
+  ],
+  "share_target": {
+    "action": "_origin_/",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "files": [
+        {
+          "name": "media",
+          "accept": ["text/*",".txt",".html",".css",".js",".php",".json",".webmanifest",".xml",".yaml",".yml",".dist",".config",".ini",".md",".markdown",".mcmeta",".lang",".properties",".material",".h",".fragment",".vertex",".fxh",".hlsl",".ihlsl","image/svg+xml",".svg"]
+        }
+      ]
+    }
+  }
 }

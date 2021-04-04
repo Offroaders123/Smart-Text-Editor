@@ -2173,7 +2173,7 @@
   createEditor({ auto_created: true });
   if (Editor.support().file_handling && Editor.support().file_system){
     window.launchQueue.setConsumer(params => {
-      closeEditor();
+      //closeEditor(); - Causes an "Aw, Snap!" error for some reason. Todo: close any automatically opened editors without crashing the entire site! -
       params.files.forEach(async handle => {
         var file = await handle.getFile(), identifier = createEditor({
           name: await file.name,
