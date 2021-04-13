@@ -47,7 +47,6 @@
 <link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="resources/startup-ipadpro2-portrait.png">
 <link rel="preconnect" href="https://fonts.gstatic.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cousine&family=Rubik&display=swap">
-<link rel="stylesheet" href="https://offroaders123.github.io/Numbered-Textarea-Plugin/styles.css">
 <script src="https://offroaders123.github.io/Numbered-Textarea-Plugin/script.js"></script>
 
 <script>
@@ -65,12 +64,11 @@
       touch_device: ("ontouchstart" in window),
       apple_device: (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform)),
       macOS_device: (/(Mac)/i.test(navigator.platform) && navigator.standalone == undefined),
-      electron_container: ("mainProcess" in window),
       mozilla_browser: (CSS.supports("-moz-appearance: none"))
     }),
     support: () => ({
-      file_system: ("chooseFileSystemEntries" in window || "showOpenFilePicker" in window && !Editor.environment().electron_container),
-      file_handling: ("launchQueue" in window && "LaunchParams" in window && !Editor.environment().electron_container),
+      file_system: ("chooseFileSystemEntries" in window || "showOpenFilePicker" in window),
+      file_handling: ("launchQueue" in window && "LaunchParams" in window),
       editing_commands: (!Editor.environment().mozilla_browser),
       web_sharing: ("share" in navigator)
     }),
@@ -120,7 +118,6 @@
   if (Editor.environment().touch_device) document.documentElement.classList.add("touch-device");
   if (Editor.environment().apple_device) document.documentElement.classList.add("apple-device");
   if (Editor.environment().macOS_device) document.documentElement.classList.add("macOS-device");
-  if (Editor.environment().electron_container) document.documentElement.classList.add("electron-container");
   if (Editor.support().web_sharing) document.documentElement.classList.add("web-sharing");
 </script>
 
@@ -137,7 +134,7 @@
     --selection-background: #b4d5ffbf;
     --selection-background-inactive: #ccccccbf;
   }
-  :root:-moz-window-inactive {
+  :root:-moz-window-inactive, :root:-moz-window-inactive num-text::part(editor) {
     --selection-background: var(--selection-background-inactive);
   }
   html {
@@ -188,6 +185,7 @@
   header {
     padding: env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) 0 calc(env(safe-area-inset-left,0px) + 8px);
     position: relative;
+    height: 33px;
     display: flex;
     align-items: center;
     //gap: 8px;
@@ -203,11 +201,6 @@
   }
 
 
-  :root.macOS-device.electron-container header {
-    padding-top: 1px;
-    padding-left: 68px;
-    padding-right: 1px;
-  }
   body[data-scaling-active] header {
     pointer-events: none;
   }
@@ -230,9 +223,6 @@
   header .app-icon img {
     width: 16px;height: 16px;
     //aspect-ratio: 1/1;
-  }
-  :root.macOS-device.electron-container header .app-icon {
-    display: none;
   }
   header .menubar {
     min-width: 0;
@@ -276,85 +266,6 @@
 */
 
 
-  header .window-controls {
-    margin-left: auto;
-    align-self: stretch;
-    flex-shrink: 0;
-    display: flex;
-    font-size: 10px;
-    font-family: "Segoe MDL2 Assets";
-    z-index: 4;
-    -webkit-app-region: no-drag;
-  }
-
-
-  :root.macOS-device header .window-controls, :root:not(.electron-container) header .window-controls {
-    width: 0;
-    visibility: hidden;
-    overflow: hidden;
-  }
-
-/* -- Future Where --
-  :root:where(.macOS-device,:not(.electron-container)) header .window-controls {
-    width: 0;
-    visibility: hidden;
-    overflow: hidden;
-  }
-*/
-
-
-  header .window-controls .control {
-    width: 46px;
-    height: 32px;
-    background: none;
-    border: none;
-    outline: none;
-    transition: 100ms linear;
-    transition-property: color, background;
-  }
-
-
-  header .window-controls .control:hover, header .window-controls .control:focus-visible {
-    color: #ffffff;
-    background: #ffffff20;
-  }
-
-/* -- Future Where --
-  header .window-controls .control:where(:hover,:focus-visible) {
-    color: #ffffff;
-    background: #ffffff20;
-  }
-*/
-
-
-  header .window-controls .control:active {
-    transition: none;
-  }
-  header .window-controls .control:hover:active {
-    background: #ffffff40;
-  }
-  header .window-controls .control[data-control="maximize"] [data-icon]:not(.active) {
-    display: none;
-  }
-
-
-  header .window-controls .control[data-control="close"]:hover, header .window-controls .control[data-control="close"]:focus-visible {
-    background: #e81123;
-  }
-
-/* -- Future Where --
-  header .window-controls .control[data-control="close"]:where(:hover,:focus-visible) {
-    background: #e81123;
-  }
-*/
-
-
-  header .window-controls .control[data-control="close"]:hover:active {
-    background: #94141e;
-  }
-  :root.macOS-device.electron-container header .window-controls .control {
-    height: 27px;
-  }
   main {
     padding: 0 env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);
     position: relative;
@@ -662,46 +573,46 @@
     color: inherit;
     text-decoration: none;
   }
-  [data-numbered-container], input[type="text"] {
+  
+
+  num-text {
+    --padding: 8px;
+    color: #eaeaea;
+    caret-color: #eaeaea;
+    font-family: "Cousine", monospace;
+    background: #252525;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  num-text::part(container) {
+    border-radius: inherit;
+  }
+  num-text::part(editor) {
+    resize: none;
+  }
+  input[type="text"] {
+    padding: 8px;
     color: #eaeaea;
     caret-color: #eaeaea;
     font-size: 13px;
     font-family: "Cousine", monospace;
-    line-height: 1.2;
+    line-height: 1.3;
     background: #252525;
     border: none;
-    outline: none;
-  }
-  [data-numbered-container] {
-    position: relative;
-  }
-  [data-numbered-container] ol {
-    padding: 8px 16px;
-    color: inherit;
-    line-height: inherit;
-    background: transparent;
-    border: none;
-    opacity: 0.55;
-  }
-  [data-numbered-container] textarea {
-    padding: 8px;
-    line-height: inherit;
-    resize: none;
-    scrollbar-width: inherit;
-    scrollbar-color: inherit;
-  }
-  input[type="text"] {
-    padding: 8px;
     border-radius: 0;
+    outline: none;
     -webkit-appearance: none;
   }
-  ::selection {
+  ::selection, num-text::part(editor)::selection {
     color: var(--selection-color);
     background: var(--selection-background);
   }
-  ::selection:window-inactive {
+  ::selection:window-inactive, num-text::part(editor)::selection:window-inactive {
     background: var(--selection-background-inactive);
   }
+
+/* Todo: Figure out how to add custom scrollbar styles to Shadow DOM content from the main document */
   ::-webkit-scrollbar {
     width: 16px;
     height: 16px;
@@ -720,6 +631,8 @@
   ::-webkit-scrollbar-thumb:hover {
     background-color: #999999;
   }
+
+
   .tab {
     display: flex;
     justify-content: center;
@@ -1295,20 +1208,23 @@
     //aspect-ratio: 1/1;
     fill: currentColor;
   }
-  .card [data-numbered-container] {
+  .card num-text {
     width: 32ch;
     height: 12ch;
-    background: #ffffff0a;
-    border: 1px solid #000000bf;
+    background: #ffffff0d;
     border-radius: 6px;
   }
-  .card [data-numbered-container] ol {
-    padding-left: 12px;
-    padding-right: 12px;
+  .card num-text::part(container)::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    box-shadow: 0 2px 4px #000000bf inset;
+    pointer-events: none;
   }
   .card input[type="text"] {
-    background: #ffffff0c;
-    border: 1px solid #00000080;
+    background: #ffffff0d;
     border-radius: 6px;
   }
   .card-backdrop {
@@ -1317,7 +1233,7 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background: #19191960;
+    background: #25252560;
     visibility: hidden;
     z-index: 2;
   }
@@ -1469,14 +1385,6 @@
       </ul>
     </div>
   </section>
-  <section class="window-controls">
-    <button class="control" data-control="minimize" title="Minimize">&#xE921;</button>
-    <button class="control" data-control="maximize" title="Maximize">
-      <span data-icon="maximize" class="active">&#xE922;</span>
-      <span data-icon="restore">&#xE923;</span>
-    </button>
-    <button class="control" data-control="close" title="Close">&#xE8BB;</button>
-  </section>
 </header>
 
 <main id="main">
@@ -1551,9 +1459,7 @@
     <section class="main">
       <div class="content">
         <div class="item list expand">
-          <div data-numbered-container>
-            <textarea id="theme_setting" placeholder="CSS to modify..."></textarea>
-          </div>
+          <num-text id="theme_setting" placeholder="CSS to modify..."></num-text>
         </div>
       </div>
       <div class="options">
@@ -1606,12 +1512,8 @@
     <section class="main">
       <div class="content">
         <div class="item list expand">
-          <div data-numbered-container>
-            <textarea id="replacer_find" placeholder="Text to find..."></textarea>
-          </div>
-          <div data-numbered-container>
-            <textarea id="replacer_replace" placeholder="Replace with..."></textarea>
-          </div>
+          <num-text id="replacer_find" placeholder="Text to find..."></num-text>
+          <num-text id="replacer_replace" placeholder="Replace with..."></num-text>
         </div>
       </div>
       <div class="options">
@@ -1664,15 +1566,13 @@
     <section class="main">
       <div class="content">
         <div class="item expand">
-          <div class="expand" data-numbered-container>
-            <textarea id="formatter_input" placeholder="JSON data to format..."></textarea>
-          </div>
+          <num-text id="formatter_input" class="expand" placeholder="JSON data to format..."></num-text>
         </div>
       </div>
       <div class="options">
         <button onclick="activateFormatter('  ');">Format</button>
         <button onclick="activateFormatter('');">Collapse</button>
-        <button onclick="formatter_input.num_changeValue('');">Clear</button>
+        <button onclick="formatter_input.value = '';">Clear</button>
       </div>
     </section>
   </section>
@@ -1688,15 +1588,13 @@
     <section class="main">
       <div class="content">
         <div class="item expand">
-          <div class="expand" data-numbered-container>
-            <textarea id="encoder_input" placeholder="Text to encode..."></textarea>
-          </div>
+          <num-text id="encoder_input" class="expand" placeholder="Text to encode..."></num-text>
         </div>
       </div>
       <div class="options">
         <button onclick="activateEncoder(true);">Encode</button>
         <button onclick="activateEncoder(false);">Decode</button>
-        <button onclick="encoder_input.num_changeValue('');">Clear</button>
+        <button onclick="encoder_input.value = '';">Clear</button>
       </div>
       <div class="options">
         <div class="checkbox">
@@ -1723,19 +1621,6 @@
 </main>
 
 <script>
-  if (Editor.environment().electron_container) window.mainProcess.receive("refresh-maximize",refreshMaximizeControl);
-  document.querySelectorAll("header .window-controls .control").forEach(control => {
-    control.setAttribute("tabindex","-1");
-    if (!Editor.environment().electron_container) return;
-    var controlType = control.getAttribute("data-control");
-    if (controlType == "minimize") control.addEventListener("click",() => window.mainProcess.minimize());
-    if (controlType == "maximize") control.addEventListener("click",() => {
-      if (!window.mainProcess.isMaximized()){
-        window.mainProcess.maximize();
-      } else window.mainProcess.unmaximize();
-    });
-    if (controlType == "close") control.addEventListener("click",() => window.mainProcess.close());
-  });
   document.querySelectorAll("a[href]").forEach(anchor => {
     anchor.rel = "noopener";
     anchor.target = "_blank";
@@ -2113,7 +1998,7 @@
   document.body.addEventListener("drop",() => menus.forEach(menu => {
     if (menu.classList.contains("active")) closeMenu(menu);
   }));
-  document.body.addEventListener("dragend",() => document.querySelectorAll("textarea").forEach(textarea => textarea.num_refreshLineCount()));
+  //document.body.addEventListener("dragend",() => document.querySelectorAll("textarea").forEach(textarea => textarea.num_refreshLineCount()));
   var toolbar = document.querySelector("header .menubar");
   toolbar.querySelectorAll(".menu").forEach(menu => {
     menu.addEventListener("mouseenter",() => {
@@ -2169,7 +2054,6 @@
   },{ passive: true });
   card_backdrop.addEventListener("click",() => closeCard(Editor.active_dialog));
 
-  if (Editor.environment().electron_container) refreshMaximizeControl();
   createEditor({ auto_created: true });
   if (Editor.support().file_handling && Editor.support().file_system){
     window.launchQueue.setConsumer(params => {
@@ -2200,7 +2084,7 @@
     removeQueryParameters(["settings"]);
   }
   function createEditor({ name = "Untitled.txt", value = "", open = true, auto_created = false } = {}){
-    var identifier = Math.random().toString(), tab = document.createElement("button"), editorName = document.createElement("span"), editorClose = document.createElement("button"), container = document.createElement("div"), textarea = document.createElement("textarea"), previewOption = document.createElement("li");
+    var identifier = Math.random().toString(), tab = document.createElement("button"), editorName = document.createElement("span"), editorClose = document.createElement("button"), container = document.createElement("num-text"), previewOption = document.createElement("li");
     if (!name.includes(".")) name = `${name}.txt`;
     tab.classList.add("tab");
     tab.setAttribute("data-editor-identifier",identifier);
@@ -2270,13 +2154,12 @@
     container.classList.add("editor");
     container.setAttribute("data-editor-identifier",identifier);
     container.setAttribute("data-numbered-container",true);
-    textarea.value = value;
-    textarea.setSelectionRange(0,0);
-    textarea.addEventListener("input",() => {
+    container.setAttribute("value",value);
+    /*container.editor.addEventListener("input",() => {
       if (!tab.hasAttribute("data-editor-refresh")) tab.setAttribute("data-editor-refresh",true);
       if (!tab.hasAttribute("data-editor-unsaved")) tab.setAttribute("data-editor-unsaved",true);
       refreshPreview();
-    });
+    });*/
     previewOption.classList.add("list-item");
     previewOption.setAttribute("data-editor-identifier",identifier);
     previewOption.setAttribute("tabindex","0");
@@ -2285,10 +2168,9 @@
     tab.appendChild(editorName);
     tab.appendChild(editorClose);
     workspace_tabs.appendChild(tab);
-    container.appendChild(textarea);
     workspace_editors.appendChild(container);
     preview_options.appendChild(previewOption);
-    applyEditingBehavior({ element: textarea });
+    //applyEditingBehavior({ element: textarea });
     if (open || !Editor.active_editor) openEditor({ identifier, auto_created });
     return identifier;
   }
@@ -2302,7 +2184,7 @@
     Editor.active_editor = identifier;
     setEditorTabsVisibility();
     setTitle(getName());
-    if ((auto_created && !Editor.environment().touch_device && Editor.appearance().parent_window) || focused) textarea.focus({ preventScroll: true });
+    //if ((auto_created && !Editor.environment().touch_device && Editor.appearance().parent_window) || focused) textarea.focus({ preventScroll: true });
     if (Editor.preview_editor == "active-editor") refreshPreview({ force: true });
   }
   function closeEditor({ identifier = Editor.active_editor } = {}){
@@ -2743,7 +2625,6 @@
       });
     } else if (type == "textarea"){
       var container = element.closest("[data-numbered-container]");
-      container.num_establishContainer();
       if (!advanced) return;
       container.addEventListener("dragover",event => {
         container.classList.add("drag");
@@ -2753,7 +2634,7 @@
       container.addEventListener("drop",event => {
         container.classList.remove("drag");
         if (Array.from(event.dataTransfer.items)[0].kind == "string"){
-          window.setTimeout(() => element.num_refreshLineCount(),5);
+          window.setTimeout(() => element.refreshLineNumbers(),5);
         } else preventDefault();
       });
       attachContextMenu({
@@ -2835,13 +2716,6 @@
     if (query) query = "?" + query;
     var address = window.location.pathname + query;
     history.pushState(null,"",address);
-  }
-  function refreshMaximizeControl(){
-    var maximizeControl = document.querySelector("header .window-controls .control[data-control='maximize']");
-    maximizeControl.querySelectorAll("[data-icon]").forEach(icon => icon.classList.remove("active"));
-    var icon = (!window.mainProcess.isMaximized()) ? "maximize" : "restore";
-    maximizeControl.querySelector(`[data-icon="${icon}"]`).classList.add("active");
-    maximizeControl.title = icon[0].toUpperCase() + icon.slice(1);
   }
   function setScaling(event){
     var scalingOffset,
