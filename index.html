@@ -47,7 +47,7 @@
 <link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="resources/startup-ipadpro2-portrait.png">
 <link rel="preconnect" href="https://fonts.gstatic.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cousine&family=Rubik&display=swap">
-<script src="https://offroaders123.github.io/Numbered-Textarea-Plugin/script.js"></script>
+<script src="https://offroaders123.github.io/Num-Text-Component/script.js"></script>
 
 <script>
   window.Editor = {
@@ -72,25 +72,26 @@
       editing_commands: (!Editor.environment().mozilla_browser),
       web_sharing: ("share" in navigator)
     }),
-    query: (identifier = Editor.active_editor) => ({
-      tab: workspace_tabs.querySelector(`.tab[data-editor-identifier="${identifier}"]`),
-      container: workspace_editors.querySelector(`.editor[data-editor-identifier="${identifier}"]`),
-      textarea: workspace_editors.querySelector(`.editor[data-editor-identifier="${identifier}"] textarea`),
-      getName: section => {
-        if ((document.querySelectorAll(`[data-editor-identifier="${identifier}"]`).length == 0) && (identifier != Editor.active_editor)) return null;
-        var name = workspace_tabs.querySelector(`.tab[data-editor-identifier="${identifier}"] [data-editor-name]`).innerText;
-        if (!section || (!name.includes(".") && section == "base")) return name;
-        if (section == "base"){
-          name = name.split(".");
-          name.pop();
-          return name.join(".");
+    query: (identifier = Editor.active_editor) => {
+      var tab = workspace_tabs.querySelector(`.tab[data-editor-identifier="${identifier}"]`),
+        container = workspace_editors.querySelector(`.editor[data-editor-identifier="${identifier}"]`),
+        textarea = (container) ? container.editor : null,
+        getName = section => {
+          if ((document.querySelectorAll(`[data-editor-identifier="${identifier}"]`).length == 0) && (identifier != Editor.active_editor)) return null;
+          var name = workspace_tabs.querySelector(`.tab[data-editor-identifier="${identifier}"] [data-editor-name]`).innerText;
+          if (!section || (!name.includes(".") && section == "base")) return name;
+          if (section == "base"){
+            name = name.split(".");
+            name.pop();
+            return name.join(".");
+          }
+          if (section == "extension"){
+            if (!name.includes(".")) return "";
+            return name.split(".").pop();
+          }
         }
-        if (section == "extension"){
-          if (!name.includes(".")) return "";
-          return name.split(".").pop();
-        }
-      }
-    }),
+      return { tab, container, textarea, getName };
+    },
     view: () => document.body.getAttribute("data-view"),
     orientation: () => document.body.getAttribute("data-orientation"),
     active_orienting: () => (document.body.hasAttribute("data-orienting-active")),
@@ -185,7 +186,6 @@
   header {
     padding: env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) 0 calc(env(safe-area-inset-left,0px) + 8px);
     position: relative;
-    height: 33px;
     display: flex;
     align-items: center;
     //gap: 8px;
@@ -224,17 +224,17 @@
     width: 16px;height: 16px;
     //aspect-ratio: 1/1;
   }
-  header .menubar {
+  header .app-menubar {
     min-width: 0;
     align-self: stretch;
     display: flex;
     z-index: 2;
     -webkit-app-region: no-drag;
   }
-  header .menubar .menu {
+  header .app-menubar .menu {
     min-width: 0;
   }
-  header .menubar .menu .opener {
+  header .app-menubar .menu .opener {
     padding: 0 8px;
     display: unset;
     background: none;
@@ -245,27 +245,34 @@
   }
 
 
-  header .menubar .menu .opener:hover, header .menubar .menu .opener:focus, header .menubar .menu.active .opener {
+  header .app-menubar .menu .opener:hover, header .app-menubar .menu .opener:focus, header .app-menubar .menu.active .opener {
     color: #ffffff;
     background: #ffffff20;
   }
-  header .menubar .menu:not(.active) .opener:not(:hover):focus:not(:focus-visible) {
+  header .app-menubar .menu:not(.active) .opener:not(:hover):focus:not(:focus-visible) {
     color: inherit;
     background: none;
   }
-  header .menubar .menu .opener:focus-visible {
+  header .app-menubar .menu .opener:focus-visible {
     color: #ffffff;
     background: #ffffff20;
   }
 
 /* -- Future Focus Visible --
-  header .menubar .menu .opener:where(:hover,:focus-visible), header .menubar .menu.active .opener {
+  header .app-menubar .menu .opener:where(:hover,:focus-visible), header .app-menubar .menu.active .opener {
     color: #ffffff;
     background: #ffffff20;
   }
 */
 
 
+/* -- Future Window Controls Overlay title bar spacer -- */
+  header .app-title-bar {
+    margin-left: auto;
+    height: 32px;
+    align-self: stretch;
+    flex-shrink: 0;
+  }
   main {
     padding: 0 env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);
     position: relative;
@@ -573,8 +580,6 @@
     color: inherit;
     text-decoration: none;
   }
-  
-
   num-text {
     --padding: 8px;
     color: #eaeaea;
@@ -584,6 +589,7 @@
     border: none;
     border-radius: 0;
     box-shadow: none;
+    transition: none;
   }
   num-text::part(container) {
     border-radius: inherit;
@@ -1303,7 +1309,7 @@
   <section class="app-icon">
     <img src="resources/icon.svg">
   </section>
-  <section class="menubar">
+  <section class="app-menubar">
     <div class="menu">
       <button class="opener">File</button>
       <ul class="list">
@@ -1385,6 +1391,7 @@
       </ul>
     </div>
   </section>
+  <section class="app-title-bar"></section>
 </header>
 
 <main id="main">
@@ -1634,7 +1641,6 @@
     image.draggable = false;
   });
   document.querySelectorAll("input[type='text']").forEach(input => applyEditingBehavior({ element: input }));
-  document.querySelectorAll("textarea").forEach(textarea => applyEditingBehavior({ element: textarea }));
   var menus = document.querySelectorAll(".menu");
   menus.forEach(menu => {
     var opener = menu.querySelector(".opener"), lists = menu.querySelectorAll(".list"), listItems = menu.querySelectorAll(".list-item"), subLists = menu.querySelectorAll(".list-parent > .list");
@@ -1999,7 +2005,7 @@
     if (menu.classList.contains("active")) closeMenu(menu);
   }));
   //document.body.addEventListener("dragend",() => document.querySelectorAll("textarea").forEach(textarea => textarea.num_refreshLineCount()));
-  var toolbar = document.querySelector("header .menubar");
+  var toolbar = document.querySelector("header .app-menubar");
   toolbar.querySelectorAll(".menu").forEach(menu => {
     menu.addEventListener("mouseenter",() => {
       if (toolbar.querySelectorAll(".menu:not(.alternate).active").length == 0 || menu.classList.contains("alternate") || menu.classList.contains("active")) return;
@@ -2153,13 +2159,7 @@
     });
     container.classList.add("editor");
     container.setAttribute("data-editor-identifier",identifier);
-    container.setAttribute("data-numbered-container",true);
     container.setAttribute("value",value);
-    /*container.editor.addEventListener("input",() => {
-      if (!tab.hasAttribute("data-editor-refresh")) tab.setAttribute("data-editor-refresh",true);
-      if (!tab.hasAttribute("data-editor-unsaved")) tab.setAttribute("data-editor-unsaved",true);
-      refreshPreview();
-    });*/
     previewOption.classList.add("list-item");
     previewOption.setAttribute("data-editor-identifier",identifier);
     previewOption.setAttribute("tabindex","0");
@@ -2169,8 +2169,13 @@
     tab.appendChild(editorClose);
     workspace_tabs.appendChild(tab);
     workspace_editors.appendChild(container);
+    container.editor.addEventListener("input",() => {
+      if (!tab.hasAttribute("data-editor-refresh")) tab.setAttribute("data-editor-refresh",true);
+      if (!tab.hasAttribute("data-editor-unsaved")) tab.setAttribute("data-editor-unsaved",true);
+      refreshPreview();
+    });
     preview_options.appendChild(previewOption);
-    //applyEditingBehavior({ element: textarea });
+    applyEditingBehavior({ element: container });
     if (open || !Editor.active_editor) openEditor({ identifier, auto_created });
     return identifier;
   }
@@ -2184,7 +2189,7 @@
     Editor.active_editor = identifier;
     setEditorTabsVisibility();
     setTitle(getName());
-    //if ((auto_created && !Editor.environment().touch_device && Editor.appearance().parent_window) || focused) textarea.focus({ preventScroll: true });
+    if ((auto_created && !Editor.environment().touch_device && Editor.appearance().parent_window) || focused) textarea.focus({ preventScroll: true });
     if (Editor.preview_editor == "active-editor") refreshPreview({ force: true });
   }
   function closeEditor({ identifier = Editor.active_editor } = {}){
@@ -2613,32 +2618,32 @@
   }
   function applyEditingBehavior({ element, advanced = true } = {}){
     var type = element.tagName.toLowerCase();
-    element.spellcheck = false;
-    element.autocomplete = "off";
-    element.autocapitalize = "off";
-    element.setAttribute("autocorrect","off");
     if (type == "input"){
+      element.spellcheck = false;
+      element.autocomplete = "off";
+      element.autocapitalize = "off";
+      element.setAttribute("autocorrect","off");
       if (!advanced) return;
       attachContextMenu({
         element: element,
         type: "editing"
       });
-    } else if (type == "textarea"){
-      var container = element.closest("[data-numbered-container]");
+    }
+    if (type == "num-text"){
       if (!advanced) return;
-      container.addEventListener("dragover",event => {
-        container.classList.add("drag");
+      element.addEventListener("dragover",event => {
+        element.classList.add("drag");
         event.dataTransfer.dropEffect = "copy";
       });
-      container.addEventListener("dragleave",() => container.classList.remove("drag"));
-      container.addEventListener("drop",event => {
-        container.classList.remove("drag");
+      element.addEventListener("dragleave",() => element.classList.remove("drag"));
+      element.addEventListener("drop",event => {
+        element.classList.remove("drag");
         if (Array.from(event.dataTransfer.items)[0].kind == "string"){
           window.setTimeout(() => element.refreshLineNumbers(),5);
         } else preventDefault();
       });
       attachContextMenu({
-        element: container,
+        element: element,
         type: "editing"
       });
     }
