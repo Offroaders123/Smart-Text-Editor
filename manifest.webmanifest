@@ -9,40 +9,40 @@
   "background_color": "#191919",
   "icons": [
     {
-      "src": "_origin_/resources/app-192.png",
+      "src": "resources/app-192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "_origin_/resources/app-512.png",
+      "src": "resources/app-512.png",
       "type": "image/png",
       "sizes": "512x512"
     },
     {
-      "src": "_origin_/resources/app-1024.png",
+      "src": "resources/app-1024.png",
       "type": "image/png",
       "sizes": "1024x1024"
     },
     {
       "platform": "macOS",
-      "src": "_origin_/resources/app-macOS-192.png",
+      "src": "resources/app-macOS-192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
       "platform": "macOS",
-      "src": "_origin_/resources/app-macOS-512.png",
+      "src": "resources/app-macOS-512.png",
       "type": "image/png",
       "sizes": "512x512"
     },
     {
       "platform": "macOS",
-      "src": "_origin_/resources/app-macOS-1024.png",
+      "src": "resources/app-macOS-1024.png",
       "type": "image/png",
       "sizes": "1024x1024"
     },
     {
-      "src": "_origin_/resources/app-maskable.png",
+      "src": "resources/app-maskable.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"
@@ -56,7 +56,7 @@
       "url": "_origin_/?template=true",
       "icons": [
         {
-          "src": "_origin_/resources/template.png",
+          "src": "resources/template.png",
           "sizes": "192x192"
         }
       ]
@@ -68,7 +68,7 @@
       "url": "_origin_/?settings=true",
       "icons": [
         {
-          "src": "_origin_/resources/settings.png",
+          "src": "resources/settings.png",
           "sizes": "192x192"
         }
       ]

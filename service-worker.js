@@ -1,6 +1,6 @@
 self.Editor = {
-  version: 2.30,
-  origin: "https://offroaders123.github.io/Smart-Text-Editor",
+  version: 2.31,
+  origin: self.location.href.replace(/\/service-worker.js/,""),
   environment: () => ({
     macOS_device: (/(Mac)/i.test(navigator.platform) && navigator.standalone == undefined)
   })
@@ -37,7 +37,7 @@ self.addEventListener("message",event => {
   }
 });
 
-/* Web Share Target hook - to be re-added at some point
+/* Web Share Target hook - to be re-added to the fetch event at some point
 
   if (event.request.method == "POST"){
     event.respondWith(async () => {
