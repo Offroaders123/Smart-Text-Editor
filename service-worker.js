@@ -1,5 +1,5 @@
 self.Editor = {
-  version: 2.31,
+  version: 2.33,
   origin: self.location.href.replace(/\/service-worker.js/,""),
   environment: () => ({
     macOS_device: (/(Mac)/i.test(navigator.platform) && navigator.standalone == undefined)

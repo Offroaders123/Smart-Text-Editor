@@ -14,7 +14,7 @@
 <meta property="og:image" content="resources/share-1200.png">
 <meta property="og:url" content="https://offroaders123.github.io/Smart-Text-Editor/">
 <meta name="twitter:card" content="summary_large_image">
-<meta id="theme_color" name="theme-color" content="#191919">
+<meta id="theme_color" name="theme-color" content="#1e1e1e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Text Editor">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -154,7 +154,7 @@
     display: flex;
     flex-direction: column;
     color: #cccccc;
-    font-size: 14px;
+    font-size: 14.5px;
     font-family: -apple-system, BlinkMacSystemFont, "Rubik", sans-serif;
     background: #121212;
     overflow: hidden;
@@ -167,7 +167,7 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    background: #191919;
+    background: #1e1e1e;
     opacity: 0;
     pointer-events: none;
     z-index: 3;
@@ -184,14 +184,35 @@
     cursor: row-resize;
   }
   header {
-    padding: env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) 0 calc(env(safe-area-inset-left,0px) + 8px);
+    padding-top: env(safe-area-inset-top,0px);
     position: relative;
+    --header-height: max(calc(env(titlebar-area-height,0px)),34px);
     display: flex;
     align-items: center;
     //gap: 8px;
     font-size: 13px;
-    background: #191919;
+    background: #1e1e1e;
     border-bottom: 1px solid #000000;
+  }
+  header::before {
+    content: "";
+    width: calc(env(safe-area-inset-left,0px) + env(titlebar-area-x,0px) + 8px);
+    height: var(--header-height);
+    flex-shrink: 0;
+    -webkit-app-region: no-drag;
+  }
+  header::after {
+    content: "";
+    margin-left: auto;
+    width: calc(env(safe-area-inset-right,0px));
+    height: var(--header-height);
+    flex-shrink: 0;
+    -webkit-app-region: no-drag;
+  }
+  @media (display-mode: standalone), (display-mode: window-controls-overlay) {
+    header::after {
+      width: calc(100% - env(titlebar-area-width));
+    }
   }
 
 /* -- Temp Flex Gap -- */
@@ -247,7 +268,7 @@
 
   header .app-menubar .menu .opener:hover, header .app-menubar .menu .opener:focus, header .app-menubar .menu.active .opener {
     color: #ffffff;
-    background: #ffffff20;
+    background: #ffffff24;
   }
   header .app-menubar .menu:not(.active) .opener:not(:hover):focus:not(:focus-visible) {
     color: inherit;
@@ -255,24 +276,17 @@
   }
   header .app-menubar .menu .opener:focus-visible {
     color: #ffffff;
-    background: #ffffff20;
+    background: #ffffff24;
   }
 
 /* -- Future Focus Visible --
   header .app-menubar .menu .opener:where(:hover,:focus-visible), header .app-menubar .menu.active .opener {
     color: #ffffff;
-    background: #ffffff20;
+    background: #ffffff24;
   }
 */
 
 
-/* -- Future Window Controls Overlay title bar spacer -- */
-  header .app-title-bar {
-    margin-left: auto;
-    height: 32px;
-    align-self: stretch;
-    flex-shrink: 0;
-  }
   main {
     padding: 0 env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);
     position: relative;
@@ -281,11 +295,11 @@
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    --workspace-background: #1f1f1f;
-    --workspace-accent: #ffffff20;
+    --workspace-background: #222222;
+    --workspace-accent: #ffffff24;
     --scaler-size: 16px;
-    --preview-border-color: #141414;
-    --speed: 400ms;
+    --preview-border-color: #181818;
+    --main-transition-duration: 400ms;
   }
   main .workspace {
     position: absolute;
@@ -293,7 +307,7 @@
     top: 0;
     display: flex;
     flex-direction: column;
-    transition: var(--speed);
+    transition: var(--main-transition-duration);
     transition-property: width, height, opacity;
   }
   body.code main .workspace {
@@ -414,24 +428,41 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    border: 0 solid transparent;
   }
   :root:not(.startup-fade) main .workspace .workspace-editors:empty {
-    border: solid transparent;
     border-width: 0 env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);
+    transition: var(--main-transition-duration);
+    transition-property: border-width, border-color;
   }
   :root:not(.startup-fade) main .workspace .workspace-editors:empty::before {
     content: "No Editors Open";
+    padding: 8px;
+    text-align: center;
+    transition: transform var(--main-transition-duration);
+  }
+  :root:not(.startup-fade) body.preview main .workspace .workspace-editors:empty::before {
+    transform: scale(0);
   }
   :root:not(.startup-fade) body.split.horizontal main .workspace .workspace-editors:empty {
-    border-right: none;
+    border-right-width: 0;
+  }
+  :root:not(.startup-fade) body.preview.horizontal main .workspace .workspace-editors:empty {
+    border-right-width: 0;
   }
   @media (orientation: portrait) {
     :root:not(.startup-fade) body.split.horizontal main .workspace .workspace-editors:empty {
       border-bottom-color: var(--preview-border-color);
     }
+    :root:not(.startup-fade) body.preview.horizontal main .workspace .workspace-editors:empty {
+      border-bottom-color: var(--preview-border-color);
+    }
   }
   :root:not(.startup-fade) body.split.vertical main .workspace .workspace-editors:empty {
-    border-bottom: none;
+    border-bottom-width: 0;
+  }
+  :root:not(.startup-fade) body.preview.vertical main .workspace .workspace-editors:empty {
+    border-bottom-width: 0;
   }
   main .workspace .editor {
     position: absolute;
@@ -441,17 +472,28 @@
     border: solid transparent;
     border-width: 0 env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);
     visibility: hidden;
+    transition: var(--main-transition-duration);
+    transition-property: border-width, border-color;
   }
   body.split.horizontal main .workspace .editor {
-    border-right: none;
+    border-right-width: 0;
+  }
+  body.preview.horizontal main .workspace .editor {
+    border-right-width: 0;
   }
   @media (orientation: portrait) {
     body.split.horizontal main .workspace .editor {
       border-bottom-color: var(--preview-border-color);
     }
+    body.preview.horizontal main .workspace .editor {
+      border-bottom-color: var(--preview-border-color);
+    }
   }
   body.split.vertical main .workspace .editor {
-    border-bottom: none;
+    border-bottom-width: 0;
+  }
+  body.preview.vertical main .workspace .editor {
+    border-bottom-width: 0;
   }
   main .workspace .editor:not(.active) {
     z-index: -1;
@@ -468,19 +510,22 @@
   }
   main .scaler {
     position: absolute;
-    background: #3a3a3a;
+    background: #424242;
+    border: 0 solid transparent;
     touch-action: none;
     z-index: 1;
-    transition: var(--speed);
-    transition-property: left, top, width, height, opacity;
+    transition: var(--main-transition-duration);
+    transition-property: left, top, width, height, border-width, border-color, opacity;
   }
   main .scaler:hover, body[data-scaling-active] main .scaler {
-    background: #4a4a4a;
+    background: #4b4b4b;
   }
   body.code main .scaler {
+    --scaler-size: 0px;
     opacity: 0;
   }
   body.preview main .scaler {
+    --scaler-size: 0px;
     opacity: 0;
   }
   body.horizontal main .scaler {
@@ -488,6 +533,12 @@
     width: var(--scaler-size);
     height: 100%;
     cursor: col-resize;
+  }
+  @media (orientation: portrait) {
+    body.horizontal main .scaler {
+      border-bottom-width: env(safe-area-inset-bottom);
+      border-bottom-color: var(--preview-border-color);
+    }
   }
   body.vertical main .scaler {
     left: 0;
@@ -531,8 +582,8 @@
     background: #ffffff;
     border: solid var(--preview-border-color);
     border-width: 0 env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);
-    transition: var(--speed);
-    transition-property: width, height, opacity;
+    transition: var(--main-transition-duration);
+    transition-property: width, height, border-width, opacity;
   }
   body.code main .preview {
     opacity: 0;
@@ -540,18 +591,16 @@
   body.code.horizontal main .preview {
     width: 0%;
     height: 100%;
-    border-left: none;
-    border-right: none;
+    border-left-width: 0;
   }
   body.code.vertical main .preview {
     width: 100%;
     height: 0%;
-    border-bottom: none;
   }
   body.split.horizontal main .preview {
     width: calc(50% - calc(var(--scaler-size) * 0.5));
     height: 100%;
-    border-left: none;
+    border-left-width: 0;
   }
   body.split.vertical main .preview {
     width: 100%;
@@ -668,13 +717,13 @@
 
   .tab .option:hover, .tab .option:focus-visible {
     color: #ffffff;
-    background-color: #ffffff20;
+    background-color: #ffffff24;
   }
 
 /* -- Future Where --
   .tab .option:where(:hover,:focus-visible) {
     color: #ffffff;
-    background-color: #ffffff20;
+    background-color: #ffffff24;
   }
 */
 
@@ -709,18 +758,18 @@
     color: #cccccc;
     font-size: 13px;
     line-height: 16px;
-    background: #2a2a2a;
+    background: #2e2e2e;
     border: var(--list-border-width) solid transparent;
     --list-border-width: 1px;
     border-radius: calc(var(--list-padding-y) + var(--list-border-width));
-    box-shadow: 1px 2px 4px #00000080;
+    box-shadow: 0 5px 10px #00000060;
     visibility: hidden;
     z-index: 1;
     list-style: none;
   }
   :root.apple-device .menu .list {
     --list-padding-x: 5px;
-    border-color: #ffffff20;
+    border-color: #ffffff24;
   }
   .menu:not(.context-menu) > .list {
     border-top: none;
@@ -738,7 +787,7 @@
     position: relative;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
     border: var(--list-item-border-width) solid transparent;
     --list-item-border-width: 1px;
     outline: none;
@@ -839,7 +888,7 @@
 
 
   .menu .list hr {
-    margin: calc(var(--list-padding-y) * 0.6) calc(var(--list-padding-y) * 2);
+    margin: calc(var(--list-padding-y) * 0.8) calc(var(--list-padding-y) * 2);
     margin-left: calc(var(--list-padding-y) * 2 + var(--list-item-selected-icon-size,0px));
     border: none;
     border-top: 1px solid currentColor;
@@ -894,7 +943,7 @@
     align-items: center;
   }
   .select:hover .menu .opener {
-    background: #4a4a4a;
+    background: #4b4b4b;
   }
   .select .menu.active .opener {
     border-bottom-left-radius: 0;
@@ -983,7 +1032,7 @@
   .card {
     display: flex;
     flex-direction: column;
-    background: #191919;
+    background: #1e1e1e;
     border: 1px solid transparent;
     border-radius: 8px;
     box-shadow: 1px 2px 4px #00000060;
@@ -991,7 +1040,7 @@
     overflow: hidden;
   }
   :root.apple-device .card {
-    border-color: #ffffff30;
+    border-color: #ffffff24;
   }
   .card.active {
     visibility: visible;
@@ -1019,7 +1068,7 @@
     align-items: center;
   }
   :root.apple-device .card .header {
-    background: #ffffff14;
+    background: #ffffff12;
     border-bottom: 1px solid #000000;
   }
   .card .header .card-back {
@@ -1041,13 +1090,13 @@
 
   .card .header .card-back:hover, .card .header .card-back:focus-visible {
     color: #ffffff;
-    background: #ffffff20;
+    background: #ffffff24;
   }
 
 /* -- Future Where --
   .card .header .card-back:where(:hover,:focus-visible) {
     color: #ffffff;
-    background: #ffffff20;
+    background: #ffffff24;
   }
 */
 
@@ -1091,13 +1140,13 @@
 
   :root:not(.macOS-device) .card .header .card-controls .control:hover, :root:not(.macOS-device) .card .header .card-controls .control:focus-visible {
     color: #ffffff;
-    --control-background: #ffffff20;
+    --control-background: #ffffff24;
   }
 
 /* -- Future Where
   :root:not(.macOS-device) .card .header .card-controls .control:where(:hover,:focus-visible) {
     color: #ffffff;
-    --control-background: #ffffff20;
+    --control-background: #ffffff24;
   }
 */
 
@@ -1186,7 +1235,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: #3a3a3a;
+    background: #424242;
     border: 1px solid transparent;
     border-radius: 5px;
     outline: none;
@@ -1195,7 +1244,7 @@
   }
   .card .main button:where(:hover,:focus-visible), .select .menu.active .opener {
     color: #ffffff;
-    background: #4a4a4a;
+    background: #4b4b4b;
   }
   .card .main button:focus-visible {
     border-color: #c0c0c0;
@@ -1239,7 +1288,7 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background: #25252560;
+    background: #1e1e1e60;
     visibility: hidden;
     z-index: 2;
   }
@@ -1391,7 +1440,6 @@
       </ul>
     </div>
   </section>
-  <section class="app-title-bar"></section>
 </header>
 
 <main id="main">
@@ -2233,6 +2281,7 @@
     openEditor({ identifier: nextEditor });
   }
   function setEditorTabsVisibility({ identifier = Editor.active_editor } = {}){
+    if (!Editor.active_editor) return;
     var { tab } = Editor.query(identifier), obstructedLeft = (tab.offsetLeft <= workspace_tabs.scrollLeft), obstructedRight = ((tab.offsetLeft + tab.clientWidth) >= (workspace_tabs.scrollLeft + workspace_tabs.clientWidth)), spacingOffset = 0;
     if ((workspace_tabs.clientWidth < tab.clientWidth) && !obstructedLeft) return;
     if (obstructedLeft){
