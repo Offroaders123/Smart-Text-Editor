@@ -5,8 +5,8 @@
   "start_url": "_origin_/",
   "display": "standalone",
   "display_override": ["window-controls-overlay"],
-  "theme_color": "#191919",
-  "background_color": "#191919",
+  "theme_color": "#1e1e1e",
+  "background_color": "#1e1e1e",
   "icons": [
     {
       "src": "resources/app-192.png",
