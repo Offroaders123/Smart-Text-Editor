@@ -55,10 +55,19 @@
     appearance: () => {
       var parent_window = (window.self == window.top),
         standalone = (window.matchMedia("(display-mode: standalone)").matches || navigator.standalone || !window.menubar.visible),
-        apple_home_screen = (/(iPhone|iPad|iPod)/i.test(navigator.platform) && "standalone" in navigator && navigator.standalone),
+        apple_home_screen = (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform) && "standalone" in navigator && navigator.standalone),
         hidden_chrome = (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight),
-        fullscreen = (window.matchMedia("(display-mode: fullscreen)").matches || (!window.screenY && !window.screenTop && hidden_chrome) || (!window.screenY && !window.screenTop && standalone));
-      return { parent_window, standalone, apple_home_screen, hidden_chrome, fullscreen };
+        fullscreen = (window.matchMedia("(display-mode: fullscreen)").matches || (!window.screenY && !window.screenTop && hidden_chrome) || (!window.screenY && !window.screenTop && standalone)),
+        safe_area_insets = {
+          left: getSafeAreaInset("left"),
+          top: getSafeAreaInset("top"),
+          right: getSafeAreaInset("right"),
+          bottom: getSafeAreaInset("bottom"),
+        };
+        function getSafeAreaInset(side){
+          return parseInt(window.getComputedStyle(document.documentElement).getPropertyValue(`--safe-area-inset-${side}`),10);
+        }
+      return { parent_window, standalone, apple_home_screen, hidden_chrome, fullscreen, safe_area_insets };
     },
     environment: () => ({
       touch_device: ("ontouchstart" in window),
@@ -93,9 +102,10 @@
       return { tab, container, textarea, getName };
     },
     view: () => document.body.getAttribute("data-view"),
+    view_change: () => (document.body.hasAttribute("data-view-change")),
     orientation: () => document.body.getAttribute("data-orientation"),
-    active_orienting: () => (document.body.hasAttribute("data-orienting-active")),
-    active_scaling: () => (document.body.hasAttribute("data-scaling-active")),
+    orientation_change: () => (document.body.hasAttribute("data-orientation-change")),
+    scaling_change: () => (document.body.hasAttribute("data-scaling-change")),
     unsaved_work: () => (!Editor.appearance().parent_window || (workspace_tabs.querySelectorAll(".tab[data-editor-unsaved]").length == 0)),
     preapproved_extensions: ["txt","html","css","js","php","json","webmanifest","xml","yaml","yml","dist","config","ini","md","markdown","mcmeta","lang","properties","uidx","material","h","fragment","vertex","fxh","hlsl","ihlsl","svg"],
     active_editor: null,
@@ -129,6 +139,11 @@
     box-sizing: border-box;
   }
   :root {
+    --safe-area-inset-left: env(safe-area-inset-left,0px);
+    --safe-area-inset-top: env(safe-area-inset-top,0px);
+    --safe-area-inset-right: env(safe-area-inset-right,0px);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom,0px);
+
     --transition-fast: 80ms;
 
     --selection-color: #0a0a0a;
@@ -177,26 +192,32 @@
     opacity: 1;
     pointer-events: all;
   }
-  body.split.horizontal[data-scaling-active] {
+  body.split.horizontal[data-scaling-change] {
     cursor: col-resize;
   }
-  body.split.vertical[data-scaling-active] {
+  body.split.vertical[data-scaling-change] {
     cursor: row-resize;
   }
+
   header {
-    padding-top: env(safe-area-inset-top,0px);
+    padding-top: var(--safe-area-inset-top);
     position: relative;
     --header-height: max(calc(env(titlebar-area-height,0px)),34px);
     display: flex;
     align-items: center;
-    //gap: 8px;
+    /*gap: 8px;*/
     font-size: 13px;
     background: #1e1e1e;
     border-bottom: 1px solid #000000;
   }
+/* -- Temp Flex Gap -- */
+  header > *:not(:first-child) + * {
+    margin-left: 8px;
+  }
+
   header::before {
     content: "";
-    width: calc(env(safe-area-inset-left,0px) + env(titlebar-area-x,0px) + 8px);
+    width: calc(var(--safe-area-inset-left) + env(titlebar-area-x,0px) + 8px);
     height: var(--header-height);
     flex-shrink: 0;
     -webkit-app-region: no-drag;
@@ -204,7 +225,7 @@
   header::after {
     content: "";
     margin-left: auto;
-    width: calc(env(safe-area-inset-right,0px));
+    width: var(--safe-area-inset-right);
     height: var(--header-height);
     flex-shrink: 0;
     -webkit-app-region: no-drag;
@@ -214,15 +235,7 @@
       width: calc(100% - env(titlebar-area-width));
     }
   }
-
-/* -- Temp Flex Gap -- */
-
-  header > *:not(:first-child) + * {
-    margin-left: 8px;
-  }
-
-
-  body[data-scaling-active] header {
+  body[data-scaling-change] header {
     pointer-events: none;
   }
   header .app-region {
@@ -243,7 +256,7 @@
   }
   header .app-icon img {
     width: 16px;height: 16px;
-    //aspect-ratio: 1/1;
+    /*aspect-ratio: 1/1;*/
   }
   header .app-menubar {
     min-width: 0;
@@ -265,7 +278,6 @@
     text-overflow: ellipsis;
   }
 
-
   header .app-menubar .menu .opener:hover, header .app-menubar .menu .opener:focus, header .app-menubar .menu.active .opener {
     color: #ffffff;
     background: #ffffff24;
@@ -278,7 +290,6 @@
     color: #ffffff;
     background: #ffffff24;
   }
-
 /* -- Future Focus Visible --
   header .app-menubar .menu .opener:where(:hover,:focus-visible), header .app-menubar .menu.active .opener {
     color: #ffffff;
@@ -286,9 +297,8 @@
   }
 */
 
-
   main {
-    padding: 0 env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);
+    padding: 0 var(--safe-area-inset-right) var(---safe-area-inset-bottom) var(---safe-area-inset-left);
     position: relative;
     flex-grow: 1;
     display: flex;
@@ -339,13 +349,12 @@
     width: 100%;
     height: 0%;
   }
-  body[data-scaling-active] main .workspace {
+  body[data-scaling-change] main .workspace {
     pointer-events: none;
     transition: none;
   }
   main .workspace .workspace-tabs {
-    --workspace-tabs-padding-left: calc(env(safe-area-inset-left,0px) + 6px);
-    --workspace-tabs-padding-right: calc(env(safe-area-inset-right,0px) + 6px);
+    --workspace-tabs-padding: 6px;
     flex-shrink: 0;
     display: flex;
     box-shadow: 0 -1px 0 var(--workspace-accent) inset, 0 -1px 0 var(--workspace-background) inset;
@@ -357,29 +366,42 @@
     content: "";
     flex-shrink: 0;
     pointer-events: none;
+    transition: width var(--main-transition-duration);
   }
   main .workspace .workspace-tabs::before {
-    width: var(--workspace-tabs-padding-left);
+    width: calc(var(--safe-area-inset-left) + var(--workspace-tabs-padding));
   }
   main .workspace .workspace-tabs::after {
     margin-left: auto;
-    width: var(--workspace-tabs-padding-right);
+    width: calc(var(--safe-area-inset-right) + var(--workspace-tabs-padding));
+  }
+  body.split.horizontal main .workspace .workspace-tabs::after {
+    width: var(--workspace-tabs-padding);
+  }
+  body.preview.horizontal main .workspace .workspace-tabs::after {
+    width: var(--workspace-tabs-padding);
   }
   main .workspace .workspace-tabs::-webkit-scrollbar {
     display: none;
   }
+
   main .workspace .workspace-tabs .tab {
     margin-top: 3px;
     padding: calc(6px - var(--tab-border-width));
     padding-left: calc(10px - var(--tab-border-width));
     padding-bottom: calc(7px - var(--tab-border-width));
     flex-shrink: 0;
-    gap: 6px;
+    /*gap: 6px;*/
     color: #aaaaaa;
     font-size: 12px;
     background: none;
     outline: none;
   }
+/* -- Temp Flex Gap -- */
+  main .workspace .workspace-tabs .tab > * + * {
+    margin-left: 2px;
+  }
+
   main .workspace .workspace-tabs .tab:focus-visible {
     border-bottom-color: #ffffff80;
   }
@@ -431,7 +453,7 @@
     border: 0 solid transparent;
   }
   :root:not(.startup-fade) main .workspace .workspace-editors:empty {
-    border-width: 0 env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);
+    border-width: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
     transition: var(--main-transition-duration);
     transition-property: border-width, border-color;
   }
@@ -450,7 +472,7 @@
   :root:not(.startup-fade) body.preview.horizontal main .workspace .workspace-editors:empty {
     border-right-width: 0;
   }
-  @media (orientation: portrait) {
+  @media (orientation: portrait) and (max-aspect-ratio: 5/8) {
     :root:not(.startup-fade) body.split.horizontal main .workspace .workspace-editors:empty {
       border-bottom-color: var(--preview-border-color);
     }
@@ -470,7 +492,7 @@
     height: 100%;
     background: var(--workspace-background);
     border: solid transparent;
-    border-width: 0 env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);
+    border-width: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
     visibility: hidden;
     transition: var(--main-transition-duration);
     transition-property: border-width, border-color;
@@ -481,7 +503,7 @@
   body.preview.horizontal main .workspace .editor {
     border-right-width: 0;
   }
-  @media (orientation: portrait) {
+  @media (orientation: portrait) and (max-aspect-ratio: 5/8) {
     body.split.horizontal main .workspace .editor {
       border-bottom-color: var(--preview-border-color);
     }
@@ -517,7 +539,7 @@
     transition: var(--main-transition-duration);
     transition-property: left, top, width, height, border-width, border-color, opacity;
   }
-  main .scaler:hover, body[data-scaling-active] main .scaler {
+  main .scaler:hover, body[data-scaling-change] main .scaler {
     background: #4b4b4b;
   }
   body.code main .scaler {
@@ -534,9 +556,9 @@
     height: 100%;
     cursor: col-resize;
   }
-  @media (orientation: portrait) {
+  @media (orientation: portrait) and (max-aspect-ratio: 5/8) {
     body.horizontal main .scaler {
-      border-bottom-width: env(safe-area-inset-bottom);
+      border-bottom-width: var(--safe-area-inset-bottom);
       border-bottom-color: var(--preview-border-color);
     }
   }
@@ -570,7 +592,7 @@
   body.preview.vertical main .scaler {
     top: calc(var(--scaler-size) * -1);
   }
-  body[data-scaling-active] main .scaler {
+  body[data-scaling-change] main .scaler {
     transition: none;
   }
   main .preview {
@@ -581,7 +603,7 @@
     height: 50%;
     background: #ffffff;
     border: solid var(--preview-border-color);
-    border-width: 0 env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);
+    border-width: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
     transition: var(--main-transition-duration);
     transition-property: width, height, border-width, opacity;
   }
@@ -616,7 +638,7 @@
     width: 100%;
     height: 100%;
   }
-  body[data-scaling-active] main .preview {
+  body[data-scaling-change] main .preview {
     pointer-events: none;
     transition: none;
   }
@@ -667,7 +689,7 @@
     background: var(--selection-background-inactive);
   }
 
-/* Todo: Figure out how to add custom scrollbar styles to Shadow DOM content from the main document */
+/* Todo: Figure out how to add custom scrollbar styles to Shadow DOM content from the main document *edit: Almost have it figured it out now! :P */
   ::-webkit-scrollbar {
     width: 16px;
     height: 16px;
@@ -686,7 +708,6 @@
   ::-webkit-scrollbar-thumb:hover {
     background-color: #999999;
   }
-
 
   .tab {
     display: flex;
@@ -713,24 +734,24 @@
     outline: none;
   }
 
-
-
-  .tab .option:hover, .tab .option:focus-visible {
+  .tab .option:hover, .tab .option:active {
     color: #ffffff;
     background-color: #ffffff24;
   }
-
+  .tab .option:focus-visible {
+    color: #ffffff;
+    background-color: #ffffff24;
+  }
 /* -- Future Where --
-  .tab .option:where(:hover,:focus-visible) {
+  .tab .option:where(:hover,:active,:focus-visible) {
     color: #ffffff;
     background-color: #ffffff24;
   }
 */
 
-
   .tab .option svg {
     width: 8px;height: 8px;
-    //aspect-ratio: 1/1;
+    /*aspect-ratio: 1/1;*/
     fill: currentColor;
   }
   .menu {
@@ -797,20 +818,24 @@
     --list-item-padding-x: 8px;
     border-radius: calc(var(--list-padding-y) - var(--list-border-width));
   }
+  :root.apple-device .menu .list.selectable .list-item {
+    padding-left: calc(var(--list-padding-x) + var(--list-padding-x) + var(--list-item-selected-icon-size,0px) - var(--list-item-border-width));
+  }
 
-
-  .menu .list-item:hover, .menu .list-item:focus-visible {
+  .menu .list-item:hover, .menu .list-item:active {
     color: #ffffff;
     background: hsl(213,94%,43%,0.75);
   }
-
+  .menu .list-item:focus-visible {
+    color: #ffffff;
+    background: hsl(213,94%,43%,0.75);
+  }
 /* -- Future Where --
-  .menu .list-item:where(:hover,:focus-visible) {
+  .menu .list-item:where(:hover,:active,:focus-visible) {
     color: #ffffff;
     background: hsl(213,94%,43%,0.75);
   }
 */
-
 
   .menu .list-item:focus-visible {
     border-color: #c0c0c0;
@@ -829,14 +854,14 @@
     pointer-events: none;
   }
   .menu .list-item.hidden {
-    //display: none;
+    display: none;
   }
   .menu.context-menu.link > .list .list-item:not(.link):not(.global), .menu.context-menu.editing > .list .list-item:not(.editing):not(.global), :root:not(.web-sharing) .menu.context-menu > .list .list-item.web-sharing:not(.global), :root.web-sharing .menu.context-menu > .list .list-item.web-sharing-alt:not(.global) {
     display: none;
   }
   .menu .list-item > img {
     width: 16px;height: 16px;
-    //aspect-ratio: 1/1;
+    /*aspect-ratio: 1/1;*/
   }
   .menu .list-item > img.invert {
     filter: invert() hue-rotate(180deg);
@@ -854,38 +879,38 @@
   .menu .list-item svg.info {
     box-sizing: content-box;
     width: 12px;height: 12px;
-    //aspect-ratio: 1/1;
+    /*aspect-ratio: 1/1;*/
     fill: currentColor;
   }
 
-
-  .menu .list-item:not(.list-parent):hover .info, .menu .list-item:not(.list-parent):focus-visible .info {
+  .menu .list-item:not(.list-parent):hover .info, .menu .list-item:not(.list-parent):active .info {
     opacity: 1;
   }
-
+  .menu .list-item:not(.list-parent):focus-visible .info {
+    opacity: 1;
+  }
 /* -- Future Where --
-  .menu .list-item:not(.list-parent):where(:hover,:focus-visible) .info {
+  .menu .list-item:not(.list-parent):where(:hover,:active,:focus-visible) .info {
     opacity: 1;
   }
 */
-
 
   .menu .list-parent.active {
     color: #ffffff;
     background: hsl(213,94%,43%,0.75);
   }
 
-
-  .menu .list-parent:hover > svg.info, .menu .list-parent:focus-visible > svg.info, .menu .list-parent.active > svg.info {
+  .menu .list-parent:hover > svg.info, .menu .list-parent.active > svg.info {
     opacity: 1;
   }
-
+  .menu .list-parent:focus-visible > svg.info {
+    opacity: 1;
+  }
 /* -- Future Where --
   .menu .list-parent:where(:hover,:focus-visible,.active) > svg.info {
     opacity: 1;
   }
 */
-
 
   .menu .list hr {
     margin: calc(var(--list-padding-y) * 0.8) calc(var(--list-padding-y) * 2);
@@ -897,6 +922,9 @@
   :root.apple-device .menu .list hr {
     margin-left: calc(var(--list-padding-y) + var(--list-item-selected-icon-size,0px));
     margin-right: var(--list-padding-y);
+  }
+  :root.apple-device .menu .list.selectable hr {
+    margin-left: calc(var(--list-padding-y) + var(--list-item-selected-icon-size,0px) + var(--list-border-width));
   }
   .menu .list hr:last-child {
     display: none;
@@ -951,7 +979,7 @@
   }
   .select .menu .opener svg {
     width: 12px;height: 12px;
-    //aspect-ratio: 1/1;
+    /*aspect-ratio: 1/1;*/
     fill: currentColor;
     transform: rotate(270deg);
   }
@@ -995,27 +1023,24 @@
     --check-size: 12px;
     pointer-events: none;
   }
-
-
   .checkbox label::before {
     content: "";
     padding: var(--check-padding);
     width: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));height: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));
-    //aspect-ratio: 1/1;
+    /*aspect-ratio: 1/1;*/
     background: #ffffff0c;
     border: var(--checkbox-check-border-width) solid currentColor;
     border-radius: calc(var(--check-padding) + calc(var(--checkbox-check-border-width) * 2));
-    transition: background var(--transition-fast);
+    transition: background-color var(--transition-fast);
   }
   .checkbox:where(:hover,:focus-visible) label::before {
     background: #ffffff1c;
   }
-
   .checkbox label .check {
     padding: calc(var(--check-padding) + var(--checkbox-check-border-width));
     position: absolute;
     width: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));height: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));
-    //aspect-ratio: 1/1;
+    /*aspect-ratio: 1/1;*/
     fill: transparent;
     transform: rotate(-45deg) scale(0);
     transform-origin: 45% 65%;
@@ -1027,8 +1052,6 @@
     transform: rotate(0deg) scale(1);
     transition-timing-function: ease-out;
   }
-
-
   .card {
     display: flex;
     flex-direction: column;
@@ -1087,12 +1110,10 @@
     display: none;
   }
 
-
   .card .header .card-back:hover, .card .header .card-back:focus-visible {
     color: #ffffff;
     background: #ffffff24;
   }
-
 /* -- Future Where --
   .card .header .card-back:where(:hover,:focus-visible) {
     color: #ffffff;
@@ -1100,20 +1121,21 @@
   }
 */
 
-
   .card .header .card-back svg {
     width: 12px;height: 12px;
-    //aspect-ratio: 1/1;
+    /*aspect-ratio: 1/1;*/
     fill: currentColor;
   }
+
   .card .header .title {
-    //margin: 0 auto;
+    /*margin: 0 auto;*/
     position: absolute;
   }/*
   :root.macOS-device .card .header .title {
     margin-left: 16px;
     font-weight: bold;
   }*/
+
   .card.dialog .header .title {
     font-size: 18px;
   }
@@ -1137,19 +1159,16 @@
     --control-background: none;
   }
 
-
   :root:not(.macOS-device) .card .header .card-controls .control:hover, :root:not(.macOS-device) .card .header .card-controls .control:focus-visible {
     color: #ffffff;
     --control-background: #ffffff24;
   }
-
 /* -- Future Where
   :root:not(.macOS-device) .card .header .card-controls .control:where(:hover,:focus-visible) {
     color: #ffffff;
     --control-background: #ffffff24;
   }
 */
-
 
   :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:hover {
     --control-background: #e81123;
@@ -1178,29 +1197,26 @@
   }
   :root:not(.macOS-device) .card .header .card-controls .control svg {
     width: 12px;height: 12px;
-    //aspect-ratio: 1/1;
+    /*aspect-ratio: 1/1;*/
   }
   :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:hover svg {
     color: #ffffff;
   }
   :root.macOS-device .card .header .card-controls .control svg {
     width: 6px;height: 6px;
-    //aspect-ratio: 1/1;
+    /*aspect-ratio: 1/1;*/
     color: transparent;
     mix-blend-mode: luminosity;
   }
 
-
   :root.macOS-device .card .header .card-controls:hover .control svg, :root.macOS-device .card .header .card-controls:focus-visible .control svg {
     color: #202020bf;
   }
-
 /* -- Future Where --
   :root.macOS-device .card .header .card-controls:where(:hover,:active) .control svg {
     color: #202020bf;
   }
 */
-
 
   .card .main {
     padding: 12px;
@@ -1228,8 +1244,6 @@
     align-items: center;
     gap: 12px;
   }
-
-
   .card .main button {
     padding: 2px 8px;
     display: flex;
@@ -1240,7 +1254,7 @@
     border-radius: 5px;
     outline: none;
     transition: var(--transition-fast);
-    transition-property: color, background, border-color;
+    transition-property: color, background-color, border-color;
   }
   .card .main button:where(:hover,:focus-visible), .select .menu.active .opener {
     color: #ffffff;
@@ -1249,18 +1263,16 @@
   .card .main button:focus-visible {
     border-color: #c0c0c0;
   }
-
-
   .card .options button.hidden {
-    //display: none;
+    display: none;
   }
   .card .options button > img {
     width: 16px;height: 16px;
-    //aspect-ratio: 1/1;
+    /*aspect-ratio: 1/1;*/
   }
   .card .options button > svg {
     width: 12px;height: 12px;
-    //aspect-ratio: 1/1;
+    /*aspect-ratio: 1/1;*/
     fill: currentColor;
   }
   .card num-text {
@@ -1413,7 +1425,7 @@
         <li class="list-item" onclick="openCard(color_picker_card);">Color Picker<span class="info shortcut ctrl-shift shift-command">K</span></li>
         <li class="list-item" onclick="openCard(json_formatter_card);">JSON Formatter<span class="info shortcut ctrl-shift shift-command">G</span></li>
         <li class="list-item" onclick="openCard(uri_encoder_card);">URI Encoder<span class="info shortcut ctrl-shift shift-command">Y</span></li>
-        <li class="list-item" onclick="confirmOverwrite(insertTemplate);">Import HTML Template<span class="info shortcut ctrl-shift shift-command">H</span></li>
+        <li class="list-item" onclick="insertHTMLTemplate();">Import HTML Template<span class="info shortcut ctrl-shift shift-command">H</span></li>
         <li class="list-item list-parent">Online Resources...<svg class="info"><use href="#arrow_icon"/></svg>
           <ul class="list">
             <a class="list-item" href="https://webformatter.com"><img src="resources/web-formatter.svg">Code Formatter</a>
@@ -2029,8 +2041,7 @@
     if ((controlShift || shiftCommand) && pressed("h")){
       event.preventDefault();
       if (event.repeat) return;
-      insertMarkupTemplate();
-      //confirmOverwrite(insertTemplate);
+      insertHTMLTemplate();
     }
     if ((controlShift || shiftCommand) && pressed("m")){
       event.preventDefault();
@@ -2096,13 +2107,13 @@
     if (event.button != 0) return;
     if (Editor.view() != "split") return;
     event.preventDefault();
-    document.body.setAttribute("data-scaling-active",true);
+    document.body.setAttribute("data-scaling-change",true);
     document.addEventListener("mousemove",setScaling);
     document.addEventListener("mouseup",disableScaling);
   });
   scaler.addEventListener("touchstart",event => {
     if (Editor.view() != "split" || event.touches.length != 1) return;
-    document.body.setAttribute("data-scaling-active",true);
+    document.body.setAttribute("data-scaling-change",true);
     document.addEventListener("touchmove",setScaling,{ passive: true });
     document.addEventListener("touchend",disableScaling,{ passive: true });
   },{ passive: true });
@@ -2130,7 +2141,7 @@
   }
   var queryParameters = new URLSearchParams(window.location.search);
   if (queryParameters.get("template")){
-    confirmOverwrite(insertTemplate);
+    insertHTMLTemplate();
     removeQueryParameters(["template"]);
   }
   if (queryParameters.get("settings")){
@@ -2293,43 +2304,18 @@
     }
   }
   function setView({ type, force = false } = {}){
-    if ((Editor.active_orienting() && !force) || Editor.active_scaling()) return;
+    if ((Editor.orientation_change() && !force) || Editor.scaling_change()) return;
+    var transitionDuration = parseInt(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
+    document.body.setAttribute("data-view-change",true);
     document.body.classList.remove(Editor.view());
     document.body.setAttribute("data-view",type);
     document.body.classList.add(Editor.view());
     removeScaling();
-    if (type != "preview"){
-      var transitionDuration = parseInt(getElementStyle({ element: workspace, property: "transition-duration" }).replace(/s/g,"") * 1000);
-      window.setTimeout(setEditorTabsVisibility,transitionDuration);
-    }
-
-
-/*
-    if (newView != "preview"){
-      var transitionDuration = parseInt(getElementStyle(workspace,"transition-duration").split("s").join("") * 1000);
-      window.setTimeout(() => {
-        setFileTabVisibility(Editor.query.file.tab());
-        setFilesSectionOffset();
-      },transitionDuration);
-    }
-*/
-
-
-    if (type == "code") setEditingToolVisibility({
-      undo: true,
-      redo: true,
-      refresh: false
-    });
-    if (type == "split") setEditingToolVisibility({
-      undo: true,
-      redo: true,
-      refresh: true
-    });
-    if (type == "preview") setEditingToolVisibility({
-      undo: false,
-      redo: false,
-      refresh: true
-    });
+    if (type != "preview") window.setTimeout(setEditorTabsVisibility,transitionDuration);
+    if (type == "code") setEditingToolVisibility({ undo: true, redo: true, refresh: false });
+    if (type == "split") setEditingToolVisibility({ undo: true, redo: true, refresh: true });
+    if (type == "preview") setEditingToolVisibility({ undo: false, redo: false, refresh: true });
+    window.setTimeout(() => document.body.removeAttribute("data-view-change"),transitionDuration);
     refreshPreview();
     function setEditingToolVisibility({ undo, redo, refresh } = {}){
       undo_tool.disabled = !undo;
@@ -2338,33 +2324,34 @@
     }
   }
   function setOrientation(orientation){
-    if (Editor.active_orienting() || Editor.active_scaling()) return;
-    var param = (orientation), transitionDuration = ((Editor.view() != "split") ? 0 : parseInt(getElementStyle({ element: workspace, property: "transition-duration" }).replace(/s/g,"") * 1000));
-    document.body.setAttribute("data-orienting-active",true);
+    if (Editor.orientation_change() || Editor.scaling_change()) return;
+    var param = (orientation), transitionDuration = ((Editor.view() != "split") ? 0 : parseInt(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000));
+    document.body.setAttribute("data-orientation-change",true);
     if (!param && Editor.view() == "split") setView({ type: "code", force: true });
     if (!param && Editor.orientation() == "horizontal") orientation = "vertical";
     if (!param && Editor.orientation() == "vertical") orientation = "horizontal";
     window.setTimeout(() => {
-      removeTransitionDurations(true);
+      setTransitionDurations("off");
       document.body.classList.remove(Editor.orientation());
       document.body.setAttribute("data-orientation",orientation);
       document.body.classList.add(Editor.orientation());
       workspace.offsetHeight;
       scaler.offsetHeight;
       preview.offsetHeight;
-      removeTransitionDurations(false);
+      setTransitionDurations("on");
       if (!param) setView({ type: "split", force: true });
-      window.setTimeout(() => document.body.removeAttribute("data-orienting-active"),transitionDuration);
+      window.setTimeout(() => document.body.removeAttribute("data-orientation-change"),transitionDuration);
     },transitionDuration);
-    function removeTransitionDurations(value){
-      if (value){
-        workspace.style.transitionDuration = "0s";
-        scaler.style.transitionDuration = "0s";
-        preview.style.transitionDuration = "0s";
-      } else {
+    function setTransitionDurations(state){
+      if (state == "on"){
         workspace.style.removeProperty("transition-duration");
         scaler.style.removeProperty("transition-duration");
         preview.style.removeProperty("transition-duration");
+      }
+      if (state == "off"){
+        workspace.style.transitionDuration = "0s";
+        scaler.style.transitionDuration = "0s";
+        preview.style.transitionDuration = "0s";
       }
     }
   }
@@ -2385,7 +2372,7 @@
         if (openType != "dialog" && openType != type) return;
         openCard.classList.remove("active");
         if (!openCard.classList.contains("minimize")) return;
-        var transitionDuration = parseInt(getElementStyle({ element: openCard, property: "transition-duration" }).replace(/s/g,"") * 1000);
+        var transitionDuration = parseInt(getElementStyle({ element: openCard, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
         window.setTimeout(() => minimizeCard(openCard),transitionDuration);
       });
     }
@@ -2415,7 +2402,7 @@
       menus.forEach(menu => {
         if (menu.classList.contains("active")) closeMenu(menu);
       });
-      var transitionDuration = parseInt(getElementStyle({ element: card, property: "transition-duration" }).replace(/s/g,"") * 500);
+      var transitionDuration = parseInt(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 500);
       window.setTimeout(() => {
         document.activeElement.blur();
         if (previous) card.querySelector(`[data-card-previous="${previous.id}"]`).focus();
@@ -2428,7 +2415,7 @@
     var type = card.getAttribute("data-card");
     card.classList.remove("active");
     if (card.classList.contains("minimize")){
-      var transitionDuration = parseInt(getElementStyle({ element: card, property: "transition-duration" }).replace(/s/g,"") * 1000);
+      var transitionDuration = parseInt(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
       window.setTimeout(() => minimizeCard(card),transitionDuration);
     }
     if (type == "dialog"){
@@ -2462,22 +2449,6 @@
       navigable[0].focus();
     } else navigable[navigable.length - 1].focus();
   }
-
-
-/*
-  function catchCardNavigation(event){
-    if (!Editor.active_modal || contextMenu.classList.contains("active") || event.key != "Tab" || document.activeElement != document.body) return;
-    var navigable = getNavigableElements(Editor.active_modal);
-    if (event.shiftKey){
-      event.preventDefault();
-      navigable[navigable.length - 1].focus();
-    } else {
-      event.preventDefault();
-      navigable[0].focus();
-    }
-  }
-*/
-
   function createWindow(){
     var features = (Editor.appearance().standalone || Editor.appearance().fullscreen) ? "popup" : "", win = window.open(window.location.href,"_blank",features);
     if (Editor.appearance().fullscreen){
@@ -2634,7 +2605,7 @@
     menu.style.left = `${location.left}px`;
     menu.style.top = `${location.top}px`;
     //document.body.addEventListener("keydown",catchMenuNavigation);
-    var transitionDuration = parseInt(getElementStyle({ element: list, property: "transition-duration" }).replace(/s/g,"") * 500);
+    var transitionDuration = parseInt(getElementStyle({ element: list, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 500);
     window.setTimeout(() => document.activeElement.blur(),transitionDuration);
   }
   function closeMenu(menu){
@@ -2646,7 +2617,7 @@
     if (opener && opener != document.activeElement) opener.focus();
     if (!menu.classList.contains("context-menu")) return;
     Editor.context_menu_previous.focus();
-    var types = ["link","editing"], transitionDuration = parseInt(getElementStyle({ element: list, property: "transition-duration" }).replace(/s/g,"") * 1000);
+    var types = ["link","editing"], transitionDuration = parseInt(getElementStyle({ element: list, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
     window.setTimeout(() => {
       var types = ["link","editing"];
       types.forEach(type => {
@@ -2726,7 +2697,7 @@
       window.clearTimeout(Editor.context_menu_timeout);
       Editor.context_menu_timeout = null;
     }
-  }/*
+  }
   function sendShortcutAction({ control, command, shift, controlShift, shiftCommand, controlCommand, key } = {}){
     if (!key) return;
     var appleDevice = (Editor.environment().apple_device);
@@ -2737,7 +2708,7 @@
       shiftKey: shift,
       key: key
     }));
-  }*/
+  }
   function refreshPreview({ force = false } = {}){
     if (Editor.view() == "code") return;
     var source = (Editor.preview_editor == "active-editor") ? Editor.query() : Editor.query(Editor.preview_editor);
@@ -2754,6 +2725,14 @@
   }
   function setTitle(name){
     document.title = `${name} - Smart Text Editor`;
+  }
+  function insertHTMLTemplate(){
+    Editor.query().container.value = decodeURI(`%3C!DOCTYPE%20html%3E%0A%3Chtml%20lang=%22${navigator.language}%22%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E`);
+    if (!Editor.environment().touch_device) window.setTimeout(() => {
+      Editor.query().textarea.setSelectionRange(0,0);
+      Editor.query().textarea.focus();
+    },10);
+    if (Editor.view() == "preview") setView({ type: "split" });
   }
   function addQueryParameters(entries){
     var parameters = new URLSearchParams(window.location.search);
@@ -2772,10 +2751,11 @@
     history.pushState(null,"",address);
   }
   function setScaling(event){
-    var scalingOffset,
+    var { safe_area_insets: safeAreaInsets } = Editor.appearance(),
+      scalingOffset,
       scalingRange = {
-        minimum: ((Editor.orientation() == "vertical") ? workspace_tabs.offsetHeight : 0) + 80,
-        maximum: ((Editor.orientation() == "horizontal") ? window.innerWidth : (Editor.orientation() == "vertical") ? (window.innerHeight - header.offsetHeight) : 0) - 80
+        minimum: ((Editor.orientation() == "vertical") ? workspace_tabs.offsetHeight : safeAreaInsets.left) + 80,
+        maximum: ((Editor.orientation() == "horizontal") ? window.innerWidth - safeAreaInsets.right : (Editor.orientation() == "vertical") ? (window.innerHeight - header.offsetHeight - safeAreaInsets.bottom) : 0) - 80
       },
       touchEvent = (Editor.environment().touch_device && event instanceof TouchEvent);
     if (Editor.orientation() == "horizontal") scalingOffset = (!touchEvent) ? event.pageX : event.touches[0].pageX;
@@ -2794,7 +2774,7 @@
       document.removeEventListener("touchmove",setScaling);
       document.removeEventListener("touchend",disableScaling);
     }
-    document.body.removeAttribute("data-scaling-active");
+    document.body.removeAttribute("data-scaling-change");
   }
   function removeScaling(){
     if (!document.body.hasAttribute("data-scaling-offset")) return;
