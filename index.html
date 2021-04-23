@@ -177,7 +177,7 @@
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
   }
-  body::after {
+  body::after {/* Todo: Disable this from appearing once the service worker is installed, because there isn't any delay to hide once all resources can be fetched from Cache Storage. */
     content: "";
     position: absolute;
     width: 100%;
@@ -653,10 +653,10 @@
   }
   num-text {
     --padding: 8px;
-    color: #eaeaea;
+    --color: #eaeaea;
     caret-color: #eaeaea;
     font-family: "Cousine", monospace;
-    background: #252525;
+    --background: #2d2d2d;
     border: none;
     border-radius: 0;
     box-shadow: none;
@@ -675,7 +675,7 @@
     font-size: 13px;
     font-family: "Cousine", monospace;
     line-height: 1.3;
-    background: #252525;
+    background: #2d2d2d;
     border: none;
     border-radius: 0;
     outline: none;
@@ -1055,10 +1055,10 @@
   .card {
     display: flex;
     flex-direction: column;
-    background: #1e1e1e;
+    background: #212121;
     border: 1px solid transparent;
     border-radius: 8px;
-    box-shadow: 1px 2px 4px #00000060;
+    box-shadow: 0 8px 15px #00000050;
     visibility: hidden;
     overflow: hidden;
   }
@@ -1106,7 +1106,7 @@
     padding: 4px;
     border-radius: 4px;
   }
-  .card .header .card-back:not([data-card-parent]) {
+  .card .header:not([data-card-parent]) .card-back {
     display: none;
   }
 
@@ -1128,13 +1128,8 @@
   }
 
   .card .header .title {
-    /*margin: 0 auto;*/
     position: absolute;
-  }/*
-  :root.macOS-device .card .header .title {
-    margin-left: 16px;
-    font-weight: bold;
-  }*/
+  }
 
   .card.dialog .header .title {
     font-size: 18px;
@@ -1144,9 +1139,12 @@
     display: flex;
   }
   :root.macOS-device .card .header .card-controls {
-    margin: 8px;
+    margin: 7px;
     padding: 4px;
     gap: 8px;
+  }
+  :root.macOS-device .card .header:not([data-card-parent]) .card-controls {
+    margin-right: auto;
   }
   .card .header .card-controls .control {
     display: flex;
@@ -1249,7 +1247,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: #424242;
+    background: #444444;
     border: 1px solid transparent;
     border-radius: 5px;
     outline: none;
@@ -1278,7 +1276,7 @@
   .card num-text {
     width: 32ch;
     height: 12ch;
-    background: #ffffff0d;
+    --background: #2d2d2d;
     border-radius: 6px;
   }
   .card num-text::part(container)::before {
@@ -1291,7 +1289,6 @@
     pointer-events: none;
   }
   .card input[type="text"] {
-    background: #ffffff0d;
     border-radius: 6px;
   }
   .card-backdrop {
@@ -1445,7 +1442,7 @@
     <div class="menu alternate">
       <button class="opener" onclick="openCard(settings_card);">Settings</button>
       <ul class="list">
-        <li id="install_option" class="list-item hidden" onclick="installApp();"><img src="resources/icon.svg">Install</button>
+        <li id="install_option" class="list-item hidden" onclick="showInstallPrompt();"><img src="resources/icon.svg">Install</button>
         <li class="list-item" onclick="openCard(theme_card); Editor.dialog_previous = this.closest('.menu').querySelector('button');">Theme Settings</li>
         <li class="list-item" id="clear_cache_option" class="hidden" onclick="clearCache();">Clear Cache</li>
         <li class="list-item" onclick="resetSettings();">Reset Settings</li>
@@ -1505,7 +1502,7 @@
         </div>
       </div>
       <div class="options">
-        <button id="install_button" class="hidden" onclick="installApp();"><img src="resources/icon.svg">Install</button>
+        <button id="install_button" class="hidden" onclick="showInstallPrompt();"><img src="resources/icon.svg">Install</button>
         <button id="theme_button" onclick="openCard(theme_card);" data-card-previous="theme_card"><svg><use href="#arrow_icon"/></svg></button>
       </div>
       <div class="options">
@@ -1515,8 +1512,8 @@
     </section>
   </section>
   <section id="theme_card" class="card dialog" data-card="dialog">
-    <section class="header">
-      <button class="card-back" data-card-parent="settings_card"><svg><use href="#back_icon"/></svg></button>
+    <section class="header" data-card-parent="settings_card">
+      <button class="card-back"><svg><use href="#back_icon"/></svg></button>
       <span class="title">Theme</span>
       <section class="card-controls">
         <button class="control" data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
@@ -1856,7 +1853,7 @@
   cards.forEach(card => {
     if (!card.querySelector(".header .card-controls")) return;
     var header = card.querySelector(".header"), back = header.querySelector(".card-back"), cardControls = header.querySelector(".card-controls"), minimize = cardControls.querySelector(".control[data-control='minimize']"), close = cardControls.querySelector(".control[data-control='close']");
-    back.addEventListener("click",() => openCard(document.querySelector(`#${back.getAttribute("data-card-parent")}`),card));
+    back.addEventListener("click",() => openCard(document.querySelector(`#${back.closest(".header").getAttribute("data-card-parent")}`),card));
     minimize.addEventListener("click",() => minimizeCard(card));
     minimize.addEventListener("keydown",event => {
       if (event.key != "Enter") return;
@@ -2749,6 +2746,14 @@
     if (query) query = "?" + query;
     var address = window.location.pathname + query;
     history.pushState(null,"",address);
+  }
+  function showInstallPrompt(){
+    Editor.install_prompt.prompt();
+    Editor.install_prompt.userChoice.then(result => {
+      if (result.outcome != "accepted") return;
+      install_option.classList.add("hidden");
+      install_button.classList.add("hidden");
+    });
   }
   function setScaling(event){
     var { safe_area_insets: safeAreaInsets } = Editor.appearance(),
