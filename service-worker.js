@@ -1,6 +1,5 @@
 self.Editor = {
-  version: 2.35,
-  origin: self.location.href.replace(/\/service-worker.js/,""),
+  version: 2.37,
   environment: () => ({
     macOS_device: (/(Mac)/i.test(navigator.platform) && navigator.standalone == undefined)
   })
@@ -11,28 +10,33 @@ self.addEventListener("activate",event => {
   }))));
 });
 self.addEventListener("fetch",event => {
-  if (event.request.url == `${Editor.origin}/manifest.webmanifest`){
-    return event.respondWith(caches.match(event.request).then(response => response || fetch("manifest.webmanifest").then(async request => {
-      var manifest = await request.json();
-      manifest.icons = manifest.icons.filter(icon => {
-        if (!Editor.environment().macOS_device && icon.platform != "macOS") return icon;
-        if (Editor.environment().macOS_device && icon.platform == "macOS" || icon.purpose == "maskable") return icon;
+  if (event.request.url == `${self.location.href.match("(.*\/).*")[1]}manifest.webmanifest`){
+    return event.respondWith(caches.match(event.request).then(response => {
+      return response || fetch("manifest.webmanifest").then(async request => {
+        var manifest = await request.json();
+        manifest.icons = manifest.icons.filter(icon => {
+          if (!Editor.environment().macOS_device && icon.platform != "macOS") return icon;
+          if (Editor.environment().macOS_device && icon.platform == "macOS" || icon.purpose == "maskable") return icon;
+        });
+        var response = new Response(new Blob([JSON.stringify(manifest,null,"  ")],{ type: "text/json" }));
+        caches.open(Editor.version).then(cache => cache.put(event.request,response));
+        return response.clone();
       });
-      var response = new Response(new Blob([JSON.stringify(manifest,null,"  ").replace(/_origin_/g,Editor.origin)],{ type: "text/json" }));
+    }));
+  }
+  event.respondWith(caches.match(event.request).then(response => {
+    return response || fetch(event.request).then(async response => {
       caches.open(Editor.version).then(cache => cache.put(event.request,response));
       return response.clone();
-    })));
-  }
-  event.respondWith(caches.match(event.request).then(response => response || fetch(event.request).then(response => caches.open(Editor.version).then(cache => {
-    cache.put(event.request,response.clone());
-    return response;
-  }))));
+    });
+  }));
 });
 self.addEventListener("message",event => {
-  if (event.data.action == "clear-cache"){
+
+  if (event.data.action == "clear-site-caches"){
     caches.keys().then(versions => {
       Promise.all(versions.map(cache => caches.delete(cache)));
-      self.clients.matchAll().then(clients => clients.forEach(client => client.postMessage({ action: "clear-cache-success" })));
+      clients.matchAll().then(clients => clients.forEach(client => client.postMessage({ action: "clear-site-caches-complete" })));
     });
   }
 });

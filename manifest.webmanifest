@@ -2,7 +2,8 @@
   "name": "Smart Text Editor",
   "short_name": "Text Editor",
   "description": "The text editor that requires only a browser and a keyboard!",
-  "start_url": "_origin_/",
+  "start_url": "./",
+  "scope": ".",
   "display": "standalone",
   "display_override": ["window-controls-overlay"],
   "theme_color": "#1e1e1e",
@@ -53,7 +54,7 @@
       "name": "HTML Template",
       "short_name": "HTML Template",
       "description": "Create a new file with boilerplate HTML to start with",
-      "url": "_origin_/?template=true",
+      "url": "./?template=true",
       "icons": [
         {
           "src": "resources/template.png",
@@ -65,7 +66,7 @@
       "name": "Settings",
       "short_name": "Settings",
       "description": "Open settings for Smart Text Editor",
-      "url": "_origin_/?settings=true",
+      "url": "./?settings=true",
       "icons": [
         {
           "src": "resources/settings.png",
@@ -76,7 +77,7 @@
   ],
   "file_handlers": [
     {
-      "action": "_origin_/",
+      "action": "./",
       "accept": {
         "text/*": [".txt",".html",".css",".js",".php",".json",".webmanifest",".xml",".yaml",".yml",".dist",".config",".ini",".md",".markdown",".mcmeta",".lang",".properties",".uidx",".material",".h",".fragment",".vertex",".fxh",".hlsl",".ihlsl"],
         "image/svg+xml": [".svg"]
@@ -84,7 +85,7 @@
     }
   ],
   "share_target": {
-    "action": "_origin_/",
+    "action": "./",
     "method": "POST",
     "enctype": "multipart/form-data",
     "params": {

@@ -51,12 +51,12 @@
 
 <script>
   window.Editor = {
-    origin: () => (document.head.querySelector("base").href),
     appearance: () => {
       var parent_window = (window.self == window.top),
         standalone = (window.matchMedia("(display-mode: standalone)").matches || navigator.standalone || !window.menubar.visible),
         apple_home_screen = (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform) && "standalone" in navigator && navigator.standalone),
         hidden_chrome = (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight),
+        window_controls_overlay = ((("windowControlsOverlay" in navigator) ? navigator.windowControlsOverlay.visible : false) && standalone),
         fullscreen = (window.matchMedia("(display-mode: fullscreen)").matches || (!window.screenY && !window.screenTop && hidden_chrome) || (!window.screenY && !window.screenTop && standalone)),
         safe_area_insets = {
           left: getSafeAreaInset("left"),
@@ -67,7 +67,7 @@
         function getSafeAreaInset(side){
           return parseInt(window.getComputedStyle(document.documentElement).getPropertyValue(`--safe-area-inset-${side}`),10);
         }
-      return { parent_window, standalone, apple_home_screen, hidden_chrome, fullscreen, safe_area_insets };
+      return { parent_window, standalone, apple_home_screen, hidden_chrome, window_controls_overlay, fullscreen, safe_area_insets };
     },
     environment: () => ({
       touch_device: ("ontouchstart" in window),
@@ -76,8 +76,9 @@
       mozilla_browser: (CSS.supports("-moz-appearance: none"))
     }),
     support: () => ({
-      file_system: ("chooseFileSystemEntries" in window || "showOpenFilePicker" in window),
+      file_system: ("showOpenFilePicker" in window),
       file_handling: ("launchQueue" in window && "LaunchParams" in window),
+      window_controls_overlay: ("windowControlsOverlay" in navigator),
       editing_commands: (!Editor.environment().mozilla_browser),
       web_sharing: ("share" in navigator)
     }),
@@ -198,42 +199,33 @@
   body.split.vertical[data-scaling-change] {
     cursor: row-resize;
   }
-
   header {
     padding-top: var(--safe-area-inset-top);
     position: relative;
     --header-height: max(calc(env(titlebar-area-height,0px)),34px);
     display: flex;
     align-items: center;
-    /*gap: 8px;*/
+    --header-gap: 8px;
+    gap: var(--header-gap);
     font-size: 13px;
     background: #1e1e1e;
     border-bottom: 1px solid #000000;
   }
-/* -- Temp Flex Gap -- */
-  header > *:not(:first-child) + * {
-    margin-left: 8px;
-  }
-
-  header::before {
+  header::before, header::after {
     content: "";
-    width: calc(var(--safe-area-inset-left) + env(titlebar-area-x,0px) + 8px);
     height: var(--header-height);
     flex-shrink: 0;
     -webkit-app-region: no-drag;
+  }
+  header::before {
+    width: calc(var(--safe-area-inset-left) + env(titlebar-area-x,0px));
   }
   header::after {
-    content: "";
-    margin-left: auto;
     width: var(--safe-area-inset-right);
-    height: var(--header-height);
-    flex-shrink: 0;
-    -webkit-app-region: no-drag;
   }
-  @media (display-mode: standalone), (display-mode: window-controls-overlay) {
-    header::after {
-      width: calc(100% - env(titlebar-area-width));
-    }
+  :root.window-controls-overlay header::after {
+    margin-left: calc(var(--header-gap) * -1);
+    width: calc(var(--safe-area-inset-left) + calc(100% - env(titlebar-area-width,0px)));
   }
   body[data-scaling-change] header {
     pointer-events: none;
@@ -297,6 +289,37 @@
   }
 */
 
+  header .app-github {
+    margin-left: auto;
+    align-self: flex-start;
+    flex-shrink: 0;
+    display: flex;
+    -webkit-app-region: no-drag;
+  }
+  header .app-github a {
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    outline: none;
+  }
+  :root.window-controls-overlay header .app-github a {
+    height: env(titlebar-area-height,0px);
+  }
+  header .app-github svg {
+    padding: 4px;
+    box-sizing: content-box;
+    width: 14px;height: 14px;
+    /*aspect-ratio: 1/1;*/
+    fill: #ffffff;
+    border-radius: 50%;
+    transition: background-color 0.25s linear;
+  }
+  header .app-github a:hover > svg {
+    background-color: #ffffff14;
+  }
+  header .app-github a:where(:active,:focus-visible) > svg {
+    background-color: #ffffff22;
+  }
   main {
     padding: 0 var(--safe-area-inset-right) var(---safe-area-inset-bottom) var(---safe-area-inset-left);
     position: relative;
@@ -317,9 +340,18 @@
     top: 0;
     display: flex;
     flex-direction: column;
+  }
+
+  body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace {
     transition: var(--main-transition-duration);
     transition-property: width, height, opacity;
   }
+/* Temp Where */
+  body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace {
+    transition: var(--main-transition-duration);
+    transition-property: width, height, opacity;
+  }
+
   body.code main .workspace {
     width: 100%;
     height: 100%;
@@ -330,7 +362,7 @@
   }
   body.split.vertical main .workspace {
     width: 100%;
-    height: calc(50% - calc(var(--scaler-size) * 0.5));
+    height: calc(50% - calc(var(--scaler-size) * 0.5) - calc(var(--safe-area-inset-bottom) * 0.5));
   }
   body.split.horizontal[data-scaling-offset] main .workspace {
     width: calc(var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
@@ -351,7 +383,6 @@
   }
   body[data-scaling-change] main .workspace {
     pointer-events: none;
-    transition: none;
   }
   main .workspace .workspace-tabs {
     --workspace-tabs-padding: 6px;
@@ -366,8 +397,16 @@
     content: "";
     flex-shrink: 0;
     pointer-events: none;
+  }
+
+  body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-tabs::before, body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-tabs::after {
     transition: width var(--main-transition-duration);
   }
+/* Temp Where */
+  body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-tabs::before, body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-tabs::after {
+    transition: width var(--main-transition-duration);
+  }
+
   main .workspace .workspace-tabs::before {
     width: calc(var(--safe-area-inset-left) + var(--workspace-tabs-padding));
   }
@@ -384,24 +423,18 @@
   main .workspace .workspace-tabs::-webkit-scrollbar {
     display: none;
   }
-
   main .workspace .workspace-tabs .tab {
     margin-top: 3px;
     padding: calc(6px - var(--tab-border-width));
     padding-left: calc(10px - var(--tab-border-width));
     padding-bottom: calc(7px - var(--tab-border-width));
     flex-shrink: 0;
-    /*gap: 6px;*/
+    gap: 6px;
     color: #aaaaaa;
     font-size: 12px;
     background: none;
     outline: none;
   }
-/* -- Temp Flex Gap -- */
-  main .workspace .workspace-tabs .tab > * + * {
-    margin-left: 2px;
-  }
-
   main .workspace .workspace-tabs .tab:focus-visible {
     border-bottom-color: #ffffff80;
   }
@@ -454,15 +487,35 @@
   }
   :root:not(.startup-fade) main .workspace .workspace-editors:empty {
     border-width: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
+  }
+
+  :root:not(.startup-fade) body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-editors:empty {
     transition: var(--main-transition-duration);
     transition-property: border-width, border-color;
   }
+/* Temp Where */
+  :root:not(.startup-fade) body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-editors:empty {
+    transition: var(--main-transition-duration);
+    transition-property: border-width, border-color;
+  }
+
   :root:not(.startup-fade) main .workspace .workspace-editors:empty::before {
     content: "No Editors Open";
     padding: 8px;
     text-align: center;
+  }
+
+  :root:not(.startup-fade) body[data-view-change] main .workspace .workspace-editors:empty::before {
+    white-space: nowrap;
+  }
+  :root:not(.startup-fade) body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-editors:empty::before {
     transition: transform var(--main-transition-duration);
   }
+/* Temp Where */
+  :root:not(.startup-fade) body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-editors:empty::before {
+    transition: transform var(--main-transition-duration);
+  }
+
   :root:not(.startup-fade) body.preview main .workspace .workspace-editors:empty::before {
     transform: scale(0);
   }
@@ -494,9 +547,18 @@
     border: solid transparent;
     border-width: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
     visibility: hidden;
+  }
+
+  body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .editor {
     transition: var(--main-transition-duration);
     transition-property: border-width, border-color;
   }
+/* Temp Where */
+  body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .editor {
+    transition: var(--main-transition-duration);
+    transition-property: border-width, border-color;
+  }
+
   body.split.horizontal main .workspace .editor {
     border-right-width: 0;
   }
@@ -523,11 +585,15 @@
   main .workspace .editor.active {
     visibility: visible;
   }
-  main .workspace .editor textarea::-webkit-scrollbar {
+  main .workspace .editor::part(content) {
+    min-width: 0;
+    min-height: 0;
+  }
+  main .workspace .editor::part(editor)::-webkit-scrollbar {/* Not yet functional */
     width: 18px;
     height: 18px;
   }
-  main .workspace .editor textarea::-webkit-scrollbar-thumb {
+  main .workspace .editor::part(editor)::-webkit-scrollbar-thumb {/* Not yet functional */
     border-width: 5px;
   }
   main .scaler {
@@ -536,9 +602,18 @@
     border: 0 solid transparent;
     touch-action: none;
     z-index: 1;
+  }
+
+  body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .scaler {
     transition: var(--main-transition-duration);
     transition-property: left, top, width, height, border-width, border-color, opacity;
   }
+/* Temp Where */
+  body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .scaler {
+    transition: var(--main-transition-duration);
+    transition-property: left, top, width, height, border-width, border-color, opacity;
+  }
+
   main .scaler:hover, body[data-scaling-change] main .scaler {
     background: #4b4b4b;
   }
@@ -578,7 +653,7 @@
     left: calc(50% - calc(var(--scaler-size) * 0.5));
   }
   body.split.vertical main .scaler {
-    top: calc(50% - calc(var(--scaler-size) * 0.5));
+    top: calc(50% - calc(var(--scaler-size) * 0.5) - calc(var(--safe-area-inset-bottom) * 0.5));
   }
   body.split.horizontal[data-scaling-offset] main .scaler {
     left: calc(var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
@@ -592,9 +667,6 @@
   body.preview.vertical main .scaler {
     top: calc(var(--scaler-size) * -1);
   }
-  body[data-scaling-change] main .scaler {
-    transition: none;
-  }
   main .preview {
     position: absolute;
     right: 0;
@@ -604,9 +676,18 @@
     background: #ffffff;
     border: solid var(--preview-border-color);
     border-width: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
+  }
+
+  body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .preview {
     transition: var(--main-transition-duration);
     transition-property: width, height, border-width, opacity;
   }
+/* Temp Where */
+  body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .preview {
+    transition: var(--main-transition-duration);
+    transition-property: width, height, border-width, opacity;
+  }
+
   body.code main .preview {
     opacity: 0;
   }
@@ -626,7 +707,7 @@
   }
   body.split.vertical main .preview {
     width: 100%;
-    height: calc(50% - calc(var(--scaler-size) * 0.5));
+    height: calc(50% - calc(var(--scaler-size) * 0.5) + var(--safe-area-inset-bottom) * 0.5);
   }
   body.split.horizontal[data-scaling-offset] main .preview {
     width: calc(100% - var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
@@ -640,7 +721,6 @@
   }
   body[data-scaling-change] main .preview {
     pointer-events: none;
-    transition: none;
   }
   button {
     color: inherit;
@@ -1056,14 +1136,11 @@
     display: flex;
     flex-direction: column;
     background: #212121;
-    border: 1px solid transparent;
+    border: 1px solid #ffffff24;
     border-radius: 8px;
     box-shadow: 0 8px 15px #00000050;
     visibility: hidden;
     overflow: hidden;
-  }
-  :root.apple-device .card {
-    border-color: #ffffff24;
   }
   .card.active {
     visibility: visible;
@@ -1089,8 +1166,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-  :root.apple-device .card .header {
     background: #ffffff12;
     border-bottom: 1px solid #000000;
   }
@@ -1126,11 +1201,9 @@
     /*aspect-ratio: 1/1;*/
     fill: currentColor;
   }
-
   .card .header .title {
     position: absolute;
   }
-
   .card.dialog .header .title {
     font-size: 18px;
   }
@@ -1360,6 +1433,9 @@
     <path d="m510.27 285.75c-13.893 118.73-108.1 212.04-226.96 224.79-118.86 12.751-230.71-58.451-269.47-171.53-38.761-113.08 5.8941-237.93 107.58-300.78 101.68-62.846 233.32-46.955 317.13 38.282l-37.067 36.446c-66.79-67.929-171.7-80.593-252.74-30.508-81.036 50.084-116.62 149.58-85.733 239.7 30.89 90.117 120.03 146.86 214.75 136.7 94.721-10.161 169.8-84.522 180.87-179.14z"/>
     <path d="m512 189.01v-189.01l-188.98 189.01z"/>
   </symbol>
+  <symbol id="github_mark" viewBox="0 0 512 512">
+    <path d="m255.95 6c-141.33 0-255.95 114.62-255.95 256.05 0 113.04 73.338 209.01 175.07 242.85 12.782 2.357 17.496-5.553 17.496-12.31 0-6.077-0.262-22.211-0.367-43.531-47.459 10.319-76.218-1.153-86.223-34.312-7.7532-19.748-17.235-32.216-28.445-37.454-15.506-10.582-14.877-15.768 1.7811-15.558 17.13 1.205 30.173 10.005 39.183 26.349 22.84 39.131 59.927 27.816 74.543 21.268 2.304-16.501 8.905-27.816 16.239-34.207-56.837-6.443-116.61-28.444-116.61-126.51 0-27.973 9.9529-50.812 26.349-68.727-2.619-6.444-11.419-32.478 2.515-67.733 14.3-4.557 37.768 4.191 70.404 26.245 20.377-5.658 42.326-8.487 64.065-8.591 21.739 0.104 43.636 2.933 64.118 8.591 32.583-22.054 55.998-30.802 70.299-26.245 13.986 35.255 5.186 61.289 2.567 67.733 16.396 17.915 26.297 40.754 26.297 68.727 0 98.325-59.875 119.96-116.87 126.3 9.167 7.91 17.392 23.52 17.392 47.407 0 34.259-0.315 61.865-0.315 70.247 0 6.81 4.61 14.824 17.601 12.31 101.62-33.945 174.91-129.81 174.91-242.85 0-141.44-114.67-256.05-256.05-256.05z"/>
+  </symbol>
 </svg>
 
 <header id="header">
@@ -1444,10 +1520,13 @@
       <ul class="list">
         <li id="install_option" class="list-item hidden" onclick="showInstallPrompt();"><img src="resources/icon.svg">Install</button>
         <li class="list-item" onclick="openCard(theme_card); Editor.dialog_previous = this.closest('.menu').querySelector('button');">Theme Settings</li>
-        <li class="list-item" id="clear_cache_option" class="hidden" onclick="clearCache();">Clear Cache</li>
+        <li class="list-item" id="clear_site_caches_option" class="hidden" onclick="clearSiteCaches();">Clear Cache</li>
         <li class="list-item" onclick="resetSettings();">Reset Settings</li>
       </ul>
     </div>
+  </section>
+  <section class="app-github">
+    <a href="https://github.com/Offroaders123/Smart-Text-Editor" title="Smart Text Editor on GitHub"><svg><use href="#github_mark"/></svg></a>
   </section>
 </header>
 
@@ -1506,7 +1585,7 @@
         <button id="theme_button" onclick="openCard(theme_card);" data-card-previous="theme_card"><svg><use href="#arrow_icon"/></svg></button>
       </div>
       <div class="options">
-        <button id="clear_cache_button" class="warning hidden" onclick="clearCache();">Clear Cache</button>
+        <button id="clear_site_caches_button" class="warning hidden" onclick="clearSiteCaches();">Clear Cache</button>
         <button class="warning" onclick="resetSettings();">Reset Settings</button>
       </div>
     </section>
@@ -1688,10 +1767,7 @@
   document.querySelectorAll("a[href]").forEach(anchor => {
     anchor.rel = "noopener";
     anchor.target = "_blank";
-    attachContextMenu({
-      element: anchor,
-      type: "link"
-    });
+    attachContextMenu({ element: anchor, type: "link" });
   });
   document.querySelectorAll("img").forEach(image => {
     if (!image.alt) image.alt = "";
@@ -1739,17 +1815,11 @@
           if (event.key == "Enter" || event.key == " ") openMenu(menu);
         });
       } else {
-        attachContextMenu({
-          element: opener,
-          type: "alternate"
-        });
+        attachContextMenu({ element: opener, type: "alternate" });
       }
       opener.addEventListener("keydown",event => {
         if (!menu.classList.contains("active")) return;
-        var navigable = getNavigableElements({
-          container: lists[0],
-          scope: true
-        });
+        var navigable = getNavigableElements({ container: lists[0], scope: true });
         if (event.key == "ArrowDown") navigable[0].focus();
         if (event.key == "ArrowUp") navigable[navigable.length - 1].focus();
       });
@@ -1764,19 +1834,13 @@
         event.target.classList.add("selected");
       });
       list.addEventListener("mousedown",event => {
-        var navigable = getNavigableElements({
-          container: list,
-          scope: true
-        });
+        var navigable = getNavigableElements({ container: list, scope: true });
         event.stopPropagation();
         //if (navigable.indexOf(event.target) != -1) ;
       });
       list.addEventListener("keydown",event => {
         if (event.key != "ArrowDown" && event.key != "ArrowUp") return;
-        var navigable = getNavigableElements({
-          container: list,
-          scope: true
-        });
+        var navigable = getNavigableElements({ container: list, scope: true });
         event.preventDefault();
         event.stopPropagation();
         if (event.key == "ArrowDown"){
@@ -1822,10 +1886,7 @@
       if (subList.contains(document.activeElement)) return;
       listParent.classList.add("active");
       if (event.type == "click") return;
-      var navigable = getNavigableElements({
-        container: subList,
-        scope: true
-      });
+      var navigable = getNavigableElements({ container: subList, scope: true });
       window.setTimeout(() => navigable[0].focus(),20);
     }
     function closeSubList(subList){
@@ -1866,10 +1927,7 @@
       cardControls.insertBefore(close,minimize);
       header.insertBefore(cardControls,header.firstChild);
     }
-    var navigable = getNavigableElements({
-      container: card,
-      scope: true
-    });
+    var navigable = getNavigableElements({ container: card, scope: true });
     card.addEventListener("keydown",event => {
       if (card.getAttribute("data-card") != "dialog" || event.key != "Tab") return;
       if (!event.shiftKey){
@@ -1883,28 +1941,29 @@
     });
   });
   window.addEventListener("load",() => {
+    if (window.location.href.includes("index.html")) history.pushState(null,"",window.location.href.replace(/index.html/,""));
     if (!("serviceWorker" in navigator) || !Editor.appearance().parent_window) return;
-    if (new URL(window.location.href).pathname.includes("index.html")) history.pushState(null,"",Editor.origin());
-    navigator.serviceWorker.register("service-worker.js");
-    if (!navigator.serviceWorker.controller) return;
-    document.querySelector("link[rel='manifest']").href = "manifest.webmanifest";
-    navigator.serviceWorker.addEventListener("message",event => {
-      if (event.data.action == "open-files"){
-        var files = Array.from(event.data.files);
-        files.forEach(file => {
-          var reader = new FileReader();
-          reader.readAsText(file,"UTF-8");
-          reader.addEventListener("loadend",() => createEditor({
-            name: file.name,
-            value: reader.result,
-            auto_created: true
-          }));
-        });
-      }
-      if (event.data.action == "clear-cache-success") openCard(cleared_cache_card);
+    navigator.serviceWorker.register("service-worker.js").then(() => {
+      document.querySelector("link[rel='manifest']").href = "manifest.webmanifest";
+
+      /* Web Share Target hook - to be re-added at some point
+
+      navigator.serviceWorker.addEventListener("message",event => {
+        if (event.data.action == "open-files"){
+          var files = Array.from(event.data.files);
+          files.forEach(file => {
+            var reader = new FileReader();
+            reader.readAsText(file,"UTF-8");
+            reader.addEventListener("loadend",() => createEditor({ name: file.name, value: reader.result, auto_created: true }));
+          });
+        }
+        if (event.data.action == "clear-site-caches-complete") openCard(cleared_cache_card);
+      });
+      */
+
+      clear_site_caches_option.classList.remove("hidden");
+      clear_site_caches_button.classList.remove("hidden");
     });
-    clear_cache_option.classList.remove("hidden");
-    clear_cache_button.classList.remove("hidden");
   });
   window.addEventListener("beforeinstallprompt",event => {
     event.preventDefault();
@@ -1919,6 +1978,7 @@
   });
   window.addEventListener("unload",() => Editor.child_windows.forEach(win => win.close()));
   window.addEventListener("resize",event => {
+    refreshWindowControlsOverlay();
     if (context_menu.classList.contains("active")) closeMenu(context_menu);
     if (Editor.view() != "preview") setEditorTabsVisibility();
     if (Editor.view() != "split" || !document.body.hasAttribute("data-scaling-offset")) return;
@@ -2082,22 +2142,14 @@
         if (!Editor.support.file_system || !("getAsFileSystemHandle" in item)){
           var file = item.getAsFile(), reader = new FileReader();
           reader.readAsText(file,"UTF-8");
-          reader.addEventListener("loadend",() => createEditor({
-            name: file.name,
-            value: reader.result
-          }));
+          reader.addEventListener("loadend",() => createEditor({ name: file.name, value: reader.result }));
         } else {
           var handle = await item.getAsFileSystemHandle();
           if (handle.kind != "file") return;
-          var file = await handle.getFile(), identifier = createEditor({
-            name: await file.name,
-            value: await file.text()
-          });
+          var file = await handle.getFile(), identifier = createEditor({ name: await file.name, value: await file.text() });
           Editor.file_handles[identifier] = await handle;
         }
-      } else if (item.kind == "string") createEditor({
-        value: event.dataTransfer.getData("text")
-      });
+      } else if (item.kind == "string") createEditor({ value: event.dataTransfer.getData("text") });
     });
   });
   scaler.addEventListener("mousedown",event => {
@@ -2121,17 +2173,14 @@
     window.launchQueue.setConsumer(params => {
       //closeEditor(); - Causes an "Aw, Snap!" error for some reason. Todo: close any automatically opened editors without crashing the entire site! -
       params.files.forEach(async handle => {
-        var file = await handle.getFile(), identifier = createEditor({
-          name: await file.name,
-          value: await file.text(),
-          auto_created: true
-        });
+        var file = await handle.getFile(), identifier = createEditor({ name: await file.name, value: await file.text(), auto_created: true });
         Editor.file_handles[identifier] = await handle;
       });
       if (!Editor.environment().touch_device) Editor.query().textarea.focus();
     });
   }
   if (Editor.appearance().parent_window) window.setTimeout(() => document.documentElement.classList.remove("startup-fade"),50);
+  refreshWindowControlsOverlay();
   if (Editor.support().editing_commands){
     undo_tool.classList.add("hidden");
     redo_tool.classList.add("hidden");
@@ -2178,18 +2227,12 @@
         editorRename.style.removeProperty("width");
       });
       editorRename.addEventListener("change",() => {
-        if (editorRename.value) renameEditor({
-          name: editorRename.value,
-          identifier
-        });
+        if (editorRename.value) renameEditor({ name: editorRename.value, identifier });
         editorRename.blur();
       });
       editorRename.addEventListener("blur",() => editorRename.remove());
       tab.insertBefore(editorRename,tab.firstChild);
-      applyEditingBehavior({
-        element: editorRename,
-        advanced: false
-      });
+      applyEditingBehavior({ element: editorRename, advanced: false });
       editorRename.focus();
       editorRename.select();
     });
@@ -2302,8 +2345,8 @@
   }
   function setView({ type, force = false } = {}){
     if ((Editor.orientation_change() && !force) || Editor.scaling_change()) return;
-    var transitionDuration = parseInt(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
     document.body.setAttribute("data-view-change",true);
+    var transitionDuration = parseInt(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
     document.body.classList.remove(Editor.view());
     document.body.setAttribute("data-view",type);
     document.body.classList.add(Editor.view());
@@ -2322,8 +2365,8 @@
   }
   function setOrientation(orientation){
     if (Editor.orientation_change() || Editor.scaling_change()) return;
-    var param = (orientation), transitionDuration = ((Editor.view() != "split") ? 0 : parseInt(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000));
     document.body.setAttribute("data-orientation-change",true);
+    var param = (orientation), transitionDuration = ((Editor.view() != "split") ? 0 : parseInt(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000));
     if (!param && Editor.view() == "split") setView({ type: "code", force: true });
     if (!param && Editor.orientation() == "horizontal") orientation = "vertical";
     if (!param && Editor.orientation() == "vertical") orientation = "horizontal";
@@ -2437,10 +2480,7 @@
   }
   function catchCardNavigation(){
     if (!Editor.active_dialog || context_menu.classList.contains("active") || event.key != "Tab" || document.activeElement != document.body) return;
-    var navigable = getNavigableElements({
-      container: Editor.active_dialog,
-      scope: true
-    });
+    var navigable = getNavigableElements({ container: Editor.active_dialog, scope: true });
     event.preventDefault();
     if (!event.shiftKey){
       navigable[0].focus();
@@ -2461,40 +2501,19 @@
       var input = document.createElement("input");
       input.type = "file";
       input.multiple = true;
+      input.addEventListener("change",() => Array.from(input.files).forEach(file => {
+        var reader = new FileReader();
+        reader.readAsText(file,"UTF-8");
+        reader.addEventListener("loadend",() => createEditor({ name: file.name, value: reader.result }));
+      }));
       input.click();
-      input.addEventListener("change",() => {
-        var files = Array.from(input.files);
-        files.forEach(file => {
-          var reader = new FileReader();
-          reader.readAsText(file,"UTF-8");
-          reader.addEventListener("loadend",() => createEditor({
-            name: file.name,
-            value: reader.result
-          }));
-        });
-        input.value = null;
-      });
     } else {
-      var handles;
-      if ("showOpenFilePicker" in window){
-        handles = await window.showOpenFilePicker({
-          multiple: true
-        }).catch(error => {
-          if (error.message.toLowerCase().includes("abort")) return;
-        });
-      } else if ("chooseFileSystemEntries" in window){
-        handles = await window.chooseFileSystemEntries({
-          type: "open-file",
-          multiple: true
-        }).catch(error => {
-          if (error.message.toLowerCase().includes("abort")) return;
-        });
-      }
-      if (handles) handles.forEach(async handle => {
-        var file = await handle.getFile(), identifier = createEditor({
-          name: await file.name,
-          value: await file.text()
-        });
+      var handles = await window.showOpenFilePicker({ multiple: true }).catch(error => {
+        if (error.message.toLowerCase().includes("abort")) return;
+      });
+      if (!handles) return;
+      handles.forEach(async handle => {
+        var file = await handle.getFile(), identifier = createEditor({ name: await file.name, value: await file.text() });
         Editor.file_handles[identifier] = await handle;
       });
     }
@@ -2510,17 +2529,9 @@
     } else {
       var identifier = Editor.active_editor, handle;
       if (!Editor.file_handles[identifier]){
-        if ("showOpenFilePicker" in window){
-          handle = await window.showSaveFilePicker().catch(error => {
-            if (error.message.toLowerCase().includes("abort")) return;
-          });
-        } else if ("chooseFileSystemEntries" in window){
-          handle = await window.chooseFileSystemEntries({
-            type: "save-file"
-          }).catch(error => {
-            if (error.message.toLowerCase().includes("abort")) return;
-          });
-        }
+        handle = await window.showSaveFilePicker().catch(error => {
+          if (error.message.toLowerCase().includes("abort")) return;
+        });
         if (!handle) return;
         Editor.file_handles[identifier] = await handle;
       } else handle = Editor.file_handles[identifier];
@@ -2532,23 +2543,18 @@
       await stream.write(Editor.query().textarea.value);
       await stream.close();
       var currentName = Editor.query().getName(), file = await handle.getFile(), rename = await file.name;
-      if (currentName != rename) renameEditor({
-        name: rename
-      });
+      if (currentName != rename) renameEditor({ name: rename });
     }
     Editor.query().tab.removeAttribute("data-editor-unsaved");
     refreshPreview({ force: true });
   }
-
   function createDisplay(){
     var width = window.screen.availWidth * 2/3,
       height = window.screen.availHeight * 2/3,
       left = window.screen.availWidth / 2 + window.screen.availLeft - width / 2,
       top = window.screen.availHeight / 2 + window.screen.availTop - height / 2,
       features = (Editor.appearance().standalone || Editor.appearance().fullscreen) ? "popup" : "",
-      link = window.URL.createObjectURL(new Blob([Editor.query().textarea.value],{
-        type: "text/html"
-      })),
+      link = window.URL.createObjectURL(new Blob([Editor.query().textarea.value],{ type: "text/html" })),
       win = window.open(link,"_blank",features);
     window.URL.revokeObjectURL(link);
     win.moveTo(left,top);
@@ -2575,10 +2581,7 @@
       if (event.button != "2") closeMenu(menu);
     }
     if (menu.closest(".select")){
-      var selected, navigable = getNavigableElements({
-        container: list,
-        scope: true
-      });
+      var selected, navigable = getNavigableElements({ container: list, scope: true });
       navigable.forEach(element => {
         if (!selected && element.classList.contains("selected")) selected = element;
       });
@@ -2622,6 +2625,13 @@
       });
     },transitionDuration);
   }
+  function refreshWindowControlsOverlay(){
+    var visibility = Editor.appearance().window_controls_overlay, styling = document.documentElement.classList.contains("window-controls-overlay");
+    if (visibility == styling) return;
+    if (visibility){
+      document.documentElement.classList.add("window-controls-overlay");
+    } else document.documentElement.classList.remove("window-controls-overlay");
+  }
   function catchMenuNavigation(){
   }
 
@@ -2641,10 +2651,7 @@
       element.autocapitalize = "off";
       element.setAttribute("autocorrect","off");
       if (!advanced) return;
-      attachContextMenu({
-        element: element,
-        type: "editing"
-      });
+      attachContextMenu({ element: element, type: "editing" });
     }
     if (type == "num-text"){
       if (!advanced) return;
@@ -2659,10 +2666,7 @@
           window.setTimeout(() => element.refreshLineNumbers(),5);
         } else preventDefault();
       });
-      attachContextMenu({
-        element: element,
-        type: "editing"
-      });
+      attachContextMenu({ element: element, type: "editing" });
     }
   }
   function attachContextMenu({ element, type } = {}){
@@ -2699,12 +2703,7 @@
     if (!key) return;
     var appleDevice = (Editor.environment().apple_device);
     control = ((control && !appleDevice) || (controlShift && !appleDevice) || (controlCommand && appleDevice)), command = ((command && appleDevice) || (shiftCommand && appleDevice) || (controlCommand && appleDevice)), shift = (shift || (controlShift && !appleDevice) || (shiftCommand && appleDevice)), key = key.toString().toLowerCase();
-    document.body.dispatchEvent(new KeyboardEvent("keydown",{
-      ctrlKey: control,
-      metaKey: command,
-      shiftKey: shift,
-      key: key
-    }));
+    document.body.dispatchEvent(new KeyboardEvent("keydown",{ ctrlKey: control, metaKey: command, shiftKey: shift, key }));
   }
   function refreshPreview({ force = false } = {}){
     if (Editor.view() == "code") return;
@@ -2724,7 +2723,9 @@
     document.title = `${name} - Smart Text Editor`;
   }
   function insertHTMLTemplate(){
-    Editor.query().container.value = decodeURI(`%3C!DOCTYPE%20html%3E%0A%3Chtml%20lang=%22${navigator.language}%22%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E`);
+    var language = navigator.language;
+    if (language.includes("-")) language = language.replace(/[^-]+$/g,code => code.toUpperCase());
+    Editor.query().container.value = decodeURI(`%3C!DOCTYPE%20html%3E%0A%3Chtml%20lang=%22${language}%22%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E`);
     if (!Editor.environment().touch_device) window.setTimeout(() => {
       Editor.query().textarea.setSelectionRange(0,0);
       Editor.query().textarea.focus();
@@ -2754,6 +2755,9 @@
       install_option.classList.add("hidden");
       install_button.classList.add("hidden");
     });
+  }
+  function clearSiteCaches(){
+    if (confirm("Are you sure you would like to clear all cache?\nSmart Text Editor will no longer work offline until an Internet connection is available.")) navigator.serviceWorker.controller.postMessage({ action: "clear-site-caches" });
   }
   function setScaling(event){
     var { safe_area_insets: safeAreaInsets } = Editor.appearance(),
