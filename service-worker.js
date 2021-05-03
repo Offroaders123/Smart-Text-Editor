@@ -1,5 +1,5 @@
 self.Editor = {
-  version: 2.37,
+  version: 2.38,
   environment: () => ({
     macOS_device: (/(Mac)/i.test(navigator.platform) && navigator.standalone == undefined)
   })
@@ -8,6 +8,8 @@ self.addEventListener("activate",event => {
   event.waitUntil(caches.keys().then(versions => Promise.all(versions.map(cache => {
     if (cache != Editor.version) return caches.delete(cache);
   }))));
+  event.waitUntil(clients.claim());
+  postMessageAllClients({ action: "service-worker-activated" });
 });
 self.addEventListener("fetch",event => {
   if (event.request.url == `${self.location.href.match("(.*\/).*")[1]}manifest.webmanifest`){
@@ -32,14 +34,16 @@ self.addEventListener("fetch",event => {
   }));
 });
 self.addEventListener("message",event => {
-
   if (event.data.action == "clear-site-caches"){
     caches.keys().then(versions => {
       Promise.all(versions.map(cache => caches.delete(cache)));
-      clients.matchAll().then(clients => clients.forEach(client => client.postMessage({ action: "clear-site-caches-complete" })));
+      postMessageAllClients({ action: "clear-site-caches-complete" });
     });
   }
 });
+function postMessageAllClients(data){
+  clients.matchAll().then(clients => clients.forEach(client => client.postMessage(data)));
+}
 
 /* Web Share Target hook - to be re-added to the fetch event at some point
 
