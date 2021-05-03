@@ -145,6 +145,11 @@
     --safe-area-inset-right: env(safe-area-inset-right,0px);
     --safe-area-inset-bottom: env(safe-area-inset-bottom,0px);
 
+    --titlebar-area-inset-width-left: env(titlebar-area-x,0px);
+    --titlebar-area-inset-width-right: calc(100vw - env(titlebar-area-width,100vw) - var(--titlebar-area-inset-width-left));
+    --titlebar-area-inset-top: env(titlebar-area-y,0px);
+    --titlebar-area-inset-height: env(titlebar-area-height,0px);
+
     --transition-fast: 80ms;
 
     --selection-color: #0a0a0a;
@@ -200,9 +205,9 @@
     cursor: row-resize;
   }
   header {
-    padding-top: var(--safe-area-inset-top);
+    padding-top: calc(var(--safe-area-inset-top) + var(--titlebar-area-inset-top));
     position: relative;
-    --header-height: max(calc(env(titlebar-area-height,0px)),34px);
+    --header-height: max(var(--titlebar-area-inset-height),34px);
     display: flex;
     align-items: center;
     --header-gap: 8px;
@@ -218,14 +223,10 @@
     -webkit-app-region: no-drag;
   }
   header::before {
-    width: calc(var(--safe-area-inset-left) + env(titlebar-area-x,0px));
+    width: calc(var(--safe-area-inset-left) + var(--titlebar-area-inset-width-left));
   }
   header::after {
-    width: var(--safe-area-inset-right);
-  }
-  :root.window-controls-overlay header::after {
-    margin-left: calc(var(--header-gap) * -1);
-    width: calc(var(--safe-area-inset-left) + calc(100% - env(titlebar-area-width,0px)));
+    width: calc(var(--safe-area-inset-left) + var(--titlebar-area-inset-width-right));
   }
   body[data-scaling-change] header {
     pointer-events: none;
@@ -245,6 +246,9 @@
   header .app-icon {
     flex-shrink: 0;
     display: flex;
+  }
+  :root.window-controls-overlay.macOS-device header .app-icon {
+    display: none;
   }
   header .app-icon img {
     width: 16px;height: 16px;
@@ -303,7 +307,7 @@
     outline: none;
   }
   :root.window-controls-overlay header .app-github a {
-    height: env(titlebar-area-height,0px);
+    height: var(--titlebar-area-inset-height);
   }
   header .app-github svg {
     padding: 4px;
@@ -1944,11 +1948,12 @@
     if (window.location.href.includes("index.html")) history.pushState(null,"",window.location.href.replace(/index.html/,""));
     if (!("serviceWorker" in navigator) || !Editor.appearance().parent_window) return;
     navigator.serviceWorker.register("service-worker.js").then(() => {
-      document.querySelector("link[rel='manifest']").href = "manifest.webmanifest";
+      if ((navigator.serviceWorker.controller) ? (navigator.serviceWorker.controller.state == "activated") : false) activateManifest();
+      navigator.serviceWorker.addEventListener("message",event => {
+        if (event.data.action == "service-worker-activated") activateManifest();
 
       /* Web Share Target hook - to be re-added at some point
 
-      navigator.serviceWorker.addEventListener("message",event => {
         if (event.data.action == "open-files"){
           var files = Array.from(event.data.files);
           files.forEach(file => {
@@ -1957,13 +1962,16 @@
             reader.addEventListener("loadend",() => createEditor({ name: file.name, value: reader.result, auto_created: true }));
           });
         }
-        if (event.data.action == "clear-site-caches-complete") openCard(cleared_cache_card);
-      });
       */
 
+        if (event.data.action == "clear-site-caches-complete") openCard(cleared_cache_card);
+      });
       clear_site_caches_option.classList.remove("hidden");
       clear_site_caches_button.classList.remove("hidden");
     });
+    function activateManifest(){
+      document.querySelector("link[rel='manifest']").href = "manifest.webmanifest";
+    }
   });
   window.addEventListener("beforeinstallprompt",event => {
     event.preventDefault();
@@ -2757,7 +2765,7 @@
     });
   }
   function clearSiteCaches(){
-    if (confirm("Are you sure you would like to clear all cache?\nSmart Text Editor will no longer work offline until an Internet connection is available.")) navigator.serviceWorker.controller.postMessage({ action: "clear-site-caches" });
+    if (confirm("Are you sure you would like to clear all cache?\n\nSmart Text Editor will no longer work offline until an Internet connection is available.")) navigator.serviceWorker.controller.postMessage({ action: "clear-site-caches" });
   }
   function setScaling(event){
     var { safe_area_insets: safeAreaInsets } = Editor.appearance(),
