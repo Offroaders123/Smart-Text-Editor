@@ -155,9 +155,19 @@
     --selection-color: #0a0a0a;
     --selection-background: #b4d5ffbf;
     --selection-background-inactive: #ccccccbf;
+
+    --scrollbar-width: 16px;
+    --scrollbar-height: 16px;
+    --scrollbar-border-width: 4px;
   }
   :root:-moz-window-inactive, :root:-moz-window-inactive num-text::part(editor) {
     --selection-background: var(--selection-background-inactive);
+  }
+  :root:not(.window-controls-overlay) {
+    --titlebar-area-inset-width-left: 0px;
+    --titlebar-area-inset-width-right: 0px;
+    --titlebar-area-inset-top: 0px;
+    --titlebar-area-inset-height: 0px;
   }
   html {
     width: 100%;
@@ -183,7 +193,7 @@
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
   }
-  body::after {/* Todo: Disable this from appearing once the service worker is installed, because there isn't any delay to hide once all resources can be fetched from Cache Storage. */
+  body::after {
     content: "";
     position: absolute;
     width: 100%;
@@ -554,6 +564,9 @@
     border: solid transparent;
     border-width: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
     visibility: hidden;
+    --scrollbar-width: 18px;
+    --scrollbar-height: 18px;
+    --scrollbar-border-width: 5px;
   }
 
   body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .editor {
@@ -595,13 +608,6 @@
   main .workspace .editor::part(content) {
     min-width: 0;
     min-height: 0;
-  }
-  main .workspace .editor::part(editor)::-webkit-scrollbar {/* Not yet functional */
-    width: 18px;
-    height: 18px;
-  }
-  main .workspace .editor::part(editor)::-webkit-scrollbar-thumb {/* Not yet functional */
-    border-width: 5px;
   }
   main .scaler {
     position: absolute;
@@ -687,15 +693,16 @@
 
   body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .preview {
     transition: var(--main-transition-duration);
-    transition-property: width, height, border-width, opacity;
+    transition-property: width, height, border-width, visibility, opacity;
   }
 /* Temp Where */
   body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .preview {
     transition: var(--main-transition-duration);
-    transition-property: width, height, border-width, opacity;
+    transition-property: width, height, border-width, visibility, opacity;
   }
 
   body.code main .preview {
+    visibility: hidden;
     opacity: 0;
   }
   body.code.horizontal main .preview {
@@ -777,11 +784,13 @@
   ::selection:window-inactive, num-text::part(editor)::selection:window-inactive {
     background: var(--selection-background-inactive);
   }
+</style>
 
-/* Todo: Figure out how to add custom scrollbar styles to Shadow DOM content from the main document *edit: Almost have it figured it out now! :P */
+<style id="scrollbar_styles">
+/* Todo: Figure out how to add custom scrollbar styles to Shadow DOM content from the main document *edit: Almost have it figured it out now! :P **edit: Temporarily adding these styles to each <num-text> using JavaScript */
   ::-webkit-scrollbar {
-    width: 16px;
-    height: 16px;
+    width: var(--scrollbar-width);
+    height: var(--scrollbar-height);
   }
   ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner {
     background: none;
@@ -791,13 +800,15 @@
     height: 36px;
     background: #808080;
     background-clip: content-box;
-    border: 4px solid transparent;
+    border: var(--scrollbar-border-width) solid transparent;
     border-radius: 10px;
   }
   ::-webkit-scrollbar-thumb:hover {
     background-color: #a0a0a0;
   }
+</style>
 
+<style>
   .tab {
     display: flex;
     justify-content: center;
@@ -1457,7 +1468,7 @@
     <div class="menu">
       <button class="opener">File</button>
       <ul class="list">
-        <li class="list-item" onclick="createEditor();">New Editor<span class="info shortcut ctrl-shift shift-command">X</span></li>
+        <li class="list-item" onclick="createEditor({ auto_replace: false });">New Editor<span class="info shortcut ctrl-shift shift-command">X</span></li>
         <li class="list-item" onclick="createWindow();">New Window<span class="info shortcut ctrl-shift shift-command">C</span></li>
         <li class="list-item" onclick="openFiles();">Open<span class="info shortcut ctrl command">O</span></li>
         <li class="list-item" onclick="window.setTimeout(renameEditor,10);">Rename<span class="info shortcut ctrl-shift shift-command">R</span></li>
@@ -1508,7 +1519,7 @@
         <li class="list-item" onclick="openCard(color_picker_card);">Color Picker<span class="info shortcut ctrl-shift shift-command">K</span></li>
         <li class="list-item" onclick="openCard(json_formatter_card);">JSON Formatter<span class="info shortcut ctrl-shift shift-command">G</span></li>
         <li class="list-item" onclick="openCard(uri_encoder_card);">URI Encoder<span class="info shortcut ctrl-shift shift-command">Y</span></li>
-        <li class="list-item" onclick="insertHTMLTemplate();">Import HTML Template<span class="info shortcut ctrl-shift shift-command">H</span></li>
+        <li class="list-item" onclick="Tools.insertTemplate({ type: 'html' });">Insert HTML Template<span class="info shortcut ctrl-shift shift-command">H</span></li>
         <li class="list-item list-parent">Online Resources...<svg class="info"><use href="#arrow_icon"/></svg>
           <ul class="list">
             <a class="list-item" href="https://webformatter.com"><img src="resources/web-formatter.svg">Code Formatter</a>
@@ -1670,9 +1681,9 @@
         </div>
       </div>
       <div class="options">
-        <button onclick="activateReplacer();">Replace</button>
-        <button onclick="flipReplacer();">Flip</button>
-        <button onclick="clearReplacer();">Clear</button>
+        <button onclick="Tools.replaceText.replace();">Replace</button>
+        <button onclick="Tools.replaceText.flip();">Flip</button>
+        <button onclick="Tools.replaceText.clear();">Clear</button>
       </div>
     </section>
   </section>
@@ -1723,9 +1734,9 @@
         </div>
       </div>
       <div class="options">
-        <button onclick="activateFormatter('  ');">Format</button>
-        <button onclick="activateFormatter('');">Collapse</button>
-        <button onclick="formatter_input.value = '';">Clear</button>
+        <button onclick="Tools.jsonFormatter.format();">Format</button>
+        <button onclick="Tools.jsonFormatter.collapse();">Collapse</button>
+        <button onclick="Tools.jsonFormatter.clear();">Clear</button>
       </div>
     </section>
   </section>
@@ -1745,14 +1756,14 @@
         </div>
       </div>
       <div class="options">
-        <button onclick="activateEncoder(true);">Encode</button>
-        <button onclick="activateEncoder(false);">Decode</button>
-        <button onclick="encoder_input.value = '';">Clear</button>
+        <button onclick="Tools.uriEncoder.encode();">Encode</button>
+        <button onclick="Tools.uriEncoder.decode();">Decode</button>
+        <button onclick="Tools.uriEncoder.clear();">Clear</button>
       </div>
       <div class="options">
         <div class="checkbox">
-          <input id="component_setting" type="checkbox">
-          <label for="component_setting"><svg class="check"><use href="#check_icon"/></svg>Enable URI Component</label>
+          <input id="encoder_type" type="checkbox">
+          <label for="encoder_type"><svg class="check"><use href="#check_icon"/></svg>Enable URI Component</label>
         </div>
       </div>
     </section>
@@ -1762,7 +1773,7 @@
       <li class="list-item global" onclick="window.location.reload();">Reload<span class="info shortcut ctrl command">R</span></li>
       <li class="list-item link" onclick="Editor.context_menu_previous.click();">Open in New Tab</li>
       <li class="list-item web-sharing link" onclick="navigator.share({ url: Editor.context_menu_previous.href });">Share Link</li>
-      <li class="list-item web-sharing-alt link" onclick="navigator.clipboard.writeText(Editor.context_menu_previous.href).catch(error => alert('Clipboard could not be written to, please check site permissions for clipboard use.'));">Copy Link</li>
+      <li class="list-item web-sharing-alt link" onclick="navigator.clipboard.writeText(Editor.context_menu_previous.href).catch(error => alert('Clipboard could not be written to, please check app permissions for clipboard use.'));">Copy Link</li>
       <li class="list-item editing" onclick="callCommand(Editor.context_menu_previous,'undo');">Undo<span class="info shortcut ctrl command">Z</span></li>
       <li class="list-item editing" onclick="callCommand(Editor.context_menu_previous,'redo');">Redo<span class="info shortcut ctrl-shift shift-command">Z</span></li>
       <li class="list-item editing" onclick="callCommand(Editor.context_menu_previous,'cut');">Cut<span class="info shortcut ctrl command">X</span></li>
@@ -1783,6 +1794,7 @@
     if (!image.alt) image.alt = "";
     image.draggable = false;
   });
+  document.querySelectorAll("num-text").forEach(textarea => applyEditingBehavior({ element: textarea }));
   document.querySelectorAll("input[type='text']").forEach(input => applyEditingBehavior({ element: input }));
   var menus = document.querySelectorAll(".menu");
   menus.forEach(menu => {
@@ -1873,7 +1885,7 @@
           if (listItem != listParent && listParent.classList.contains("active") && !listParent.contains(Editor.context_menu_previous) && !subList.contains(listItem) && !subList.contains(document.activeElement)) listParent.classList.remove("active");
         });
       });
-      if (type != "a") listItem.setAttribute("tabindex","0");
+      if (type != "a") listItem.tabIndex = 0;
     });
     subLists.forEach(subList => {
       var listParent = subList.closest(".list-parent");
@@ -1917,7 +1929,7 @@
     checkbox.addEventListener("keyup",event => {
       if (event.key == " ") input.click();
     });
-    checkbox.setAttribute("tabindex","0");
+    checkbox.tabIndex = 0;
     input.addEventListener("click",event => event.stopPropagation());
   });
   var cards = document.querySelectorAll(".card");
@@ -1950,6 +1962,82 @@
       }
     });
   });
+  window.Tools = {
+    replaceText: {
+      replace: () => {
+        var { container: editor } = Editor.query();
+        if (!editor) return;
+        var replaced = editor.value.split(replacer_find.value).join(replacer_replace.value);
+        if (replaced != editor.value) editor.value = replaced;
+      },
+      flip: () => [replacer_find.value,replacer_replace.value] = [replacer_replace.value,replacer_find.value],
+      clear: () => [replacer_find.value,replacer_replace.value] = ""
+    },
+    jsonFormatter: {
+      format: (spacing = "  ") => {
+        try {
+          var formatted = JSON.stringify(JSON.parse(formatter_input.value),null,spacing);
+          if (formatted != formatter_input.value) formatter_input.value = formatted;
+        } catch (error){
+          var message = error.toString().match(/^(.+?)position /)[0],
+            errorIndex = error.toString().match(/position (\d+)/)[1],
+
+            errorLine,
+            errorLineIndex = (() => {
+              var lineIndexes = indexi("\n",formatter_input.value);
+              errorLine = formatter_input.value.substring(0,errorIndex).split("\n").length - 1;
+              return lineIndexes[errorLine - 1] || 1;
+            })(),
+            errorPosition = errorIndex - errorLineIndex + 1;
+
+          alert(`Could not parse JSON, an error occurred.\n${message}line ${errorLine + 1} position ${errorPosition}`);
+        }
+
+
+      function indexi(char,str){
+        var list = [], i = -1;
+        while ((i = str.indexOf(char,i + 1)) >= 0) list.push(i + 1);
+        return list;
+      }
+
+
+      },
+      collapse: () => {
+        Tools.jsonFormatter.format("");
+      },
+      clear: () => formatter_input.value = ""
+    },
+    uriEncoder: {
+      encode: () => {
+        var encodingType = (!encoder_type.checked) ? encodeURI : encodeURIComponent;
+        encoder_input.value = encodingType(encoder_input.value);
+      },
+      decode: () => {
+        var decodingType = (!encoder_type.checked) ? decodeURI : decodeURIComponent;
+        encoder_input.value = decodingType(encoder_input.value);
+      },
+      clear: () => encoder_input.value = ""
+    },
+    insertTemplate: ({ type } = {}) => {
+      var template, editor = Editor.query(), name;
+      if (type == "html"){
+        var language = navigator.language;
+        if (language.includes("-")) language = language.replace(/[^-]+$/g,code => code.toUpperCase());
+        name = "index.html";
+        template = decodeURI(`%3C!DOCTYPE%20html%3E%0A%3Chtml%20lang=%22${language}%22%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E`);
+      }
+      if (!template) return;
+      if (editor.container && !editor.tab.hasAttribute("data-editor-auto-created")){
+        if (template == editor.container.value) return;
+        editor.container.value = template;
+        if (!Editor.environment().touch_device) window.setTimeout(() => {
+          editor.textarea.setSelectionRange(0,0);
+          editor.textarea.focus();
+        },10);
+      } else createEditor({ name, value: template });
+      if (Editor.view() == "preview") setView({ type: "split" });
+    }
+  };
   window.addEventListener("load",() => {
     if (window.location.href.includes("index.html")) history.pushState(null,"",window.location.href.replace(/index.html/,""));
     if (!("serviceWorker" in navigator) || !Editor.appearance().parent_window) return;
@@ -1965,7 +2053,7 @@
           files.forEach(file => {
             var reader = new FileReader();
             reader.readAsText(file,"UTF-8");
-            reader.addEventListener("loadend",() => createEditor({ name: file.name, value: reader.result, auto_created: true }));
+            reader.addEventListener("loadend",() => createEditor({ name: file.name, value: reader.result }));
           });
         }
       */
@@ -2017,7 +2105,7 @@
     if ((controlShift || shiftCommand) && pressed("x")){
       event.preventDefault();
       if (event.repeat) return;
-      createEditor();
+      createEditor({ auto_replace: false });
     }
     if ((controlShift || shiftCommand) && pressed("d")){
       event.preventDefault();
@@ -2112,7 +2200,7 @@
     if ((controlShift || shiftCommand) && pressed("h")){
       event.preventDefault();
       if (event.repeat) return;
-      insertHTMLTemplate();
+      Tools.insertTemplate({ type: "html" });
     }
     if ((controlShift || shiftCommand) && pressed("m")){
       event.preventDefault();
@@ -2185,9 +2273,8 @@
   createEditor({ auto_created: true });
   if (Editor.support().file_handling && Editor.support().file_system){
     window.launchQueue.setConsumer(params => {
-      //closeEditor(); - Causes an "Aw, Snap!" error for some reason. Todo: close any automatically opened editors without crashing the entire site! -
       params.files.forEach(async handle => {
-        var file = await handle.getFile(), identifier = createEditor({ name: await file.name, value: await file.text(), auto_created: true });
+        var file = await handle.getFile(), identifier = createEditor({ name: await file.name, value: await file.text() });
         Editor.file_handles[identifier] = await handle;
       });
       if (!Editor.environment().touch_device) Editor.query().textarea.focus();
@@ -2201,15 +2288,15 @@
   }
   var queryParameters = new URLSearchParams(window.location.search);
   if (queryParameters.get("template")){
-    insertHTMLTemplate();
+    Tools.insertTemplate({ type: "html" });
     removeQueryParameters(["template"]);
   }
   if (queryParameters.get("settings")){
     openCard(settings_card);
     removeQueryParameters(["settings"]);
   }
-  function createEditor({ name = "Untitled.txt", value = "", open = true, auto_created = false } = {}){
-    var identifier = Math.random().toString(), tab = document.createElement("button"), editorName = document.createElement("span"), editorClose = document.createElement("button"), container = document.createElement("num-text"), previewOption = document.createElement("li");
+  function createEditor({ name = "Untitled.txt", value = "", open = true, auto_created = false, auto_replace = true } = {}){
+    var identifier = Math.random().toString(), tab = document.createElement("button"), editorName = document.createElement("span"), editorClose = document.createElement("button"), container = document.createElement("num-text"), previewOption = document.createElement("li"), focused_override;
     if (!name.includes(".")) name = `${name}.txt`;
     tab.classList.add("tab");
     tab.setAttribute("data-editor-identifier",identifier);
@@ -2228,7 +2315,7 @@
       editorRename.type = "text";
       editorRename.placeholder = Editor.query(identifier).getName();
       editorRename.setAttribute("data-editor-rename",true);
-      editorRename.setAttribute("tabindex","-1");
+      editorRename.tabIndex = -1;
       editorRename.style.setProperty("--editor-name-width",`${editorName.offsetWidth}px`);
       editorRename.value = Editor.query(identifier).getName();
       editorRename.addEventListener("keydown",event => {
@@ -2263,7 +2350,7 @@
     editorName.setAttribute("data-editor-name",name);
     editorName.innerText = name;
     editorClose.classList.add("option");
-    editorClose.setAttribute("tabindex","-1");
+    editorClose.tabIndex = -1;
     editorClose.innerHTML = "<svg><use href='#close_icon'/></svg>";
     editorClose.addEventListener("mousedown",event => event.stopPropagation());
     editorClose.addEventListener("click",event => {
@@ -2275,29 +2362,37 @@
     container.setAttribute("value",value);
     previewOption.classList.add("list-item");
     previewOption.setAttribute("data-editor-identifier",identifier);
-    previewOption.setAttribute("tabindex","0");
+    previewOption.tabIndex = 0;
     previewOption.innerText = name;
     previewOption.addEventListener("click",() => setPreviewSource({ identifier }));
+    if ((Editor.active_editor) ? Editor.query().tab.hasAttribute("data-editor-auto-created") : false){
+      if (document.activeElement == Editor.query().container) focused_override = true;
+      if (auto_replace){
+        closeEditor();
+      } else Editor.query().tab.removeAttribute("data-editor-auto-created");
+    }
     tab.appendChild(editorName);
     tab.appendChild(editorClose);
     workspace_tabs.appendChild(tab);
     workspace_editors.appendChild(container);
     container.editor.addEventListener("input",() => {
+      if (tab.hasAttribute("data-editor-auto-created")) tab.removeAttribute("data-editor-auto-created");
       if (!tab.hasAttribute("data-editor-refresh")) tab.setAttribute("data-editor-refresh",true);
       if (!tab.hasAttribute("data-editor-unsaved")) tab.setAttribute("data-editor-unsaved",true);
       refreshPreview();
     });
     preview_options.appendChild(previewOption);
     applyEditingBehavior({ element: container });
-    if (open || !Editor.active_editor) openEditor({ identifier, auto_created });
+    if (open || !Editor.active_editor) openEditor({ identifier, auto_created, focused_override });
     return identifier;
   }
-  function openEditor({ identifier, auto_created = false } = {}){
+  function openEditor({ identifier, auto_created = false, focused_override = false } = {}){
     if (!identifier) return;
-    var { tab, container, textarea, getName } = Editor.query(identifier), focused = (document.activeElement == Editor.query().textarea) ? true : false;
+    var { tab, container, textarea, getName } = Editor.query(identifier), focused = (document.activeElement == Editor.query().container) || focused_override;
     if (Editor.query().tab) Editor.query().tab.classList.remove("active");
     if (Editor.query().container) Editor.query().container.classList.remove("active");
     tab.classList.add("active");
+    if (auto_created) tab.setAttribute("data-editor-auto-created",true);
     container.classList.add("active");
     Editor.active_editor = identifier;
     setEditorTabsVisibility();
@@ -2307,7 +2402,7 @@
   }
   function closeEditor({ identifier = Editor.active_editor } = {}){
     if (!identifier) return;
-    var { tab, container, textarea, getName } = Editor.query(identifier), previewOption = preview_options.querySelector(`.list-item[data-editor-identifier="${identifier}"]`), active = (tab.classList.contains("active")), focused = (document.activeElement == textarea), editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab"));
+    var { tab, container, textarea, getName } = Editor.query(identifier), previewOption = preview_options.querySelector(`.list-item[data-editor-identifier="${identifier}"]`), active = (tab.classList.contains("active")), focused = (document.activeElement == container), editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab"));
     if (tab.hasAttribute("data-editor-unsaved")){
       if (!confirm(`Are you sure you would like to close "${getName()}"?\nRecent changes have not yet been saved.`)) return;
     }
@@ -2333,6 +2428,7 @@
     } else if (rename.charAt(0) == ".") rename = `${base}${rename}`;
     editorName.innerText = rename;
     previewOption.innerText = rename;
+    if (tab.hasAttribute("data-editor-auto-created")) tab.removeAttribute("data-editor-auto-created");
     if (tab == Editor.query().tab) setTitle(rename);
     if ((Editor.preview_editor == "active-editor" && Editor.active_editor == identifier) || Editor.preview_editor == identifier) refreshPreview({ force: true });
     return rename;
@@ -2359,7 +2455,8 @@
   }
   function setView({ type, force = false } = {}){
     if ((Editor.orientation_change() && !force) || Editor.scaling_change()) return;
-    document.body.setAttribute("data-view-change",true);
+    var changeIdentifier = Math.random().toString();
+    document.body.setAttribute("data-view-change",changeIdentifier);
     var transitionDuration = parseInt(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
     document.body.classList.remove(Editor.view());
     document.body.setAttribute("data-view",type);
@@ -2369,7 +2466,9 @@
     if (type == "code") setEditingToolVisibility({ undo: true, redo: true, refresh: false });
     if (type == "split") setEditingToolVisibility({ undo: true, redo: true, refresh: true });
     if (type == "preview") setEditingToolVisibility({ undo: false, redo: false, refresh: true });
-    window.setTimeout(() => document.body.removeAttribute("data-view-change"),transitionDuration);
+    window.setTimeout(() => {
+      if (document.body.getAttribute("data-view-change") == changeIdentifier) document.body.removeAttribute("data-view-change");
+    },transitionDuration);
     refreshPreview();
     function setEditingToolVisibility({ undo, redo, refresh } = {}){
       undo_tool.disabled = !undo;
@@ -2559,7 +2658,8 @@
       var currentName = Editor.query().getName(), file = await handle.getFile(), rename = await file.name;
       if (currentName != rename) renameEditor({ name: rename });
     }
-    Editor.query().tab.removeAttribute("data-editor-unsaved");
+    if (tab.hasAttribute("data-editor-auto-created")) Editor.query().tab.removeAttribute("data-editor-auto-created");
+    if (tab.hasAttribute("data-editor-unsaved")) Editor.query().tab.removeAttribute("data-editor-unsaved");
     refreshPreview({ force: true });
   }
   function createDisplay(){
@@ -2664,10 +2764,12 @@
       element.autocomplete = "off";
       element.autocapitalize = "off";
       element.setAttribute("autocorrect","off");
-      if (!advanced) return;
-      attachContextMenu({ element: element, type: "editing" });
+      if (advanced) attachContextMenu({ element, type: "editing" });
     }
     if (type == "num-text"){
+      var scrollbarStyles = document.createElement("style");
+      scrollbarStyles.textContent = scrollbar_styles.textContent;
+      element.container.insertBefore(scrollbarStyles,element.styles.nextElementSibling);
       if (!advanced) return;
       element.addEventListener("dragover",event => {
         element.classList.add("drag");
@@ -2680,16 +2782,10 @@
           window.setTimeout(() => element.refreshLineNumbers(),5);
         } else preventDefault();
       });
-      attachContextMenu({ element: element, type: "editing" });
+      attachContextMenu({ element, type: "editing" });
     }
   }
   function attachContextMenu({ element, type } = {}){
-    element.addEventListener("keydown",event => {
-      if (event.repeat) return;
-      if (!event.shiftKey || event.key != " ") return;
-      event.preventDefault();
-      element.dispatchEvent(new MouseEvent("contextmenu"));
-    });
     element.addEventListener("mousedown",event => {
       if (event.button == "2") event.preventDefault();
     });
@@ -2702,6 +2798,7 @@
         menus.forEach(menu => closeMenu(menu));
       }
     });
+    if (Editor.environment().touch_device && type != "alternate") return;
     element.addEventListener("touchstart",event => {
       if (event.touches.length == 1) Editor.context_menu_timeout = window.setTimeout(() => element.dispatchEvent(new MouseEvent("contextmenu")),750);
     },{ passive: true });
@@ -2736,16 +2833,6 @@
   function setTitle(name){
     document.title = `${name} - Smart Text Editor`;
   }
-  function insertHTMLTemplate(){
-    var language = navigator.language;
-    if (language.includes("-")) language = language.replace(/[^-]+$/g,code => code.toUpperCase());
-    Editor.query().container.value = decodeURI(`%3C!DOCTYPE%20html%3E%0A%3Chtml%20lang=%22${language}%22%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E`);
-    if (!Editor.environment().touch_device) window.setTimeout(() => {
-      Editor.query().textarea.setSelectionRange(0,0);
-      Editor.query().textarea.focus();
-    },10);
-    if (Editor.view() == "preview") setView({ type: "split" });
-  }
   function addQueryParameters(entries){
     var parameters = new URLSearchParams(window.location.search);
     entries.forEach(entry => parameters.set(entry,true));
@@ -2771,16 +2858,10 @@
     });
   }
   function clearSiteCaches(){
-    if (confirm("Are you sure you would like to clear all cache?\n\nSmart Text Editor will no longer work offline until an Internet connection is available.")) navigator.serviceWorker.controller.postMessage({ action: "clear-site-caches" });
+    if (confirm("Are you sure you would like to clear all cache?\nThe app will no longer work offline until an Internet connection is available.")) navigator.serviceWorker.controller.postMessage({ action: "clear-site-caches" });
   }
   function setScaling(event){
-    var { safe_area_insets: safeAreaInsets } = Editor.appearance(),
-      scalingOffset,
-      scalingRange = {
-        minimum: ((Editor.orientation() == "vertical") ? workspace_tabs.offsetHeight : safeAreaInsets.left) + 80,
-        maximum: ((Editor.orientation() == "horizontal") ? window.innerWidth - safeAreaInsets.right : (Editor.orientation() == "vertical") ? (window.innerHeight - header.offsetHeight - safeAreaInsets.bottom) : 0) - 80
-      },
-      touchEvent = (Editor.environment().touch_device && event instanceof TouchEvent);
+    var { safe_area_insets: safeAreaInsets } = Editor.appearance(), scalingOffset, scalingRange = { minimum: ((Editor.orientation() == "vertical") ? workspace_tabs.offsetHeight : safeAreaInsets.left) + 80, maximum: ((Editor.orientation() == "horizontal") ? window.innerWidth - safeAreaInsets.right : (Editor.orientation() == "vertical") ? (window.innerHeight - header.offsetHeight - safeAreaInsets.bottom) : 0) - 80 }, touchEvent = (Editor.environment().touch_device && event instanceof TouchEvent);
     if (Editor.orientation() == "horizontal") scalingOffset = (!touchEvent) ? event.pageX : event.touches[0].pageX;
     if (Editor.orientation() == "vertical") scalingOffset = (!touchEvent) ? event.pageY - header.offsetHeight : event.touches[0].pageY - header.offsetHeight;
     if (scalingOffset < scalingRange.minimum) scalingOffset = scalingRange.minimum;
