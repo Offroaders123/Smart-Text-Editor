@@ -2885,6 +2885,396 @@
     document.body.removeAttribute("data-scaling-offset");
     document.body.style.removeProperty("--scaling-offset");
   }
+  window.addEventListener('load', () => {
+				document.querySelectorAll('[formatted]').forEach(enableFormatting);
+			});
+			function enableFormatting(ta) {
+				let editor;
+				if (ta.tagName.toLowerCase() === "num-text") (editor = ta),(ta = ta.editor);
+				if (!ta || ta.value == undefined) return;
+
+				let indent = "\t",
+					stack = [{ value: "", caret: 0 }],
+					stackIndex = stack.length - 1;
+
+				const type = {
+					plain: -1,
+					script: {
+						js: 0,
+						ts: 1,
+					},
+					html: 2,
+					md: 3,
+					json: 4,
+					misc: 5,
+				};
+
+				function str_repeat(str, n) {
+					var out = "";
+					while (n--) out += str;
+					return out;
+				}
+
+				function isIndented(line) {
+					var regex = new RegExp("^(" + indent + "+)", "g"),
+						match = line.match(regex);
+					return (match && match[0].length / indent.length) || 0;
+				}
+
+				function getPrevLine(before) {
+					var lines = ta.value.split(/\n/g),
+						line = before.split(/\n/g).length - 1;
+					return lines[line] || "";
+				}
+
+				function refresh() {
+					editor.refreshLineNumbers();
+					editor.refreshScrollPosition();
+					Editor.query().tab.setAttribute("data-editor-unsaved", true);
+					refreshPreview({ force: true });
+				}
+
+				function getFileType() {
+					return type.script.js;
+					let ext = Editor.query().getName().split(".")[
+						Editor.query().getName().split(".").length - 1
+					];
+					if (Editor.query().getName().indexOf(".") == -1) return type.misc;
+					if (ext.match(/(j|t)s/gis)) {
+						return type.script[ext];
+					}
+					if (ext.match(/htm(l)/gis)) {
+						return type.html;
+					}
+					if (ext.match(/md/gis)) {
+						return type.md;
+					}
+					if (ext.match(/json/gis)) {
+						return type.json;
+					}
+					if (ext.match(/txt/gis)) {
+						return type.plain;
+					}
+					return type.misc;
+				}
+
+				function formatter(e) {
+					e.preventDefault();
+					e.cancelled = false;
+					e.cancel = (bool = true) => {
+						e.cancelled = bool;
+					};
+					let added = e.data,
+						addedRaw = added,
+						value = ta.value,
+						extra = 0,
+						selection = {
+							start: ta.selectionStart,
+							end: ta.selectionEnd,
+						},
+						removed = value.substr(selection.start, selection.end),
+						before = value.substr(0, selection.start),
+						after = value.substr(selection.end),
+						keyType = null,
+						lastChar = before.slice(-1),
+						lastCharTrimmed = before.trim().slice(-1),
+						nextChar = after.substr(0, 1),
+						fileType = getFileType(),
+                                                fileChange = false,
+                                                fileOrigin = fileType;
+
+					if (added == null) added = "";
+
+					if (e.inputType.match(/delete/gis) && e.inputType.match(/back/gis)) {
+						added = addedRaw = "";
+						before = before.substr(
+							0,
+							before.length - (selection.start == selection.end ? 1 : 0)
+						);
+						removed =
+							selection.start == selection.end
+								? value.substr(selection.start - 1, selection.end)
+								: value.substr(selection.start, selection.end);
+						keyType = "BACKSPACE";
+					}
+					if (e.inputType.match(/delete/gis) && e.inputType.match(/for/gis)) {
+						added = addedRaw = "";
+						before = before.substr(
+							0,
+							before.length - (selection.start == selection.end ? 1 : 0)
+						);
+						removed =
+							selection.start == selection.end
+								? value.substr(selection.start - 1, selection.end)
+								: value.substr(selection.start, selection.end);
+						keyType = "DELETE";
+					}
+					if (e.inputType.match(/linebreak/gis)) {
+						added = addedRaw = "\n";
+						keyType = "ENTER";
+					}
+					if (e.inputType.match(/paste/gis)) {
+						keyType = "PASTE";
+						if (stack[stackIndex].value != ta.value) {
+							if (stackIndex < stack.length - 1) stack = stack.slice(0, stackIndex);
+							stack.push({ value: ta.value, caret: ta.selectionStart });
+							stackIndex = stack.length - 1;
+						}
+					}
+
+          if (before.lastIndexOf(decodeURI('%3Cscript%3E')) > before.lastIndexOf(decodeURI('%3C/script%3E')) && lastChar != '>' && nextChar != '<') fileType = type.script.js;
+
+          if (fileType !== fileOrigin) fileChange = true;
+
+					((autoBracketting, autoQuotes) => {
+						if (added == "}" && nextChar == "}") {
+							added = "";
+							extra = 1;
+						}
+						if (added == "{") {
+							added = "{}";
+							extra = -1;
+						}
+						if (added == '"' && nextChar == '"') {
+							added = "";
+							extra = 1;
+						}
+						if (added == '"') {
+							added = '""';
+							extra = -1;
+						}
+						if (added == "'" && nextChar == "'") {
+							added = "";
+							extra = 1;
+						}
+						if (added == "'") {
+							added = "''";
+							extra = -1;
+						}
+						if (added == "`" && nextChar == "`") {
+							added = "";
+							extra = 1;
+						}
+						if (added == "`") {
+							added = "``";
+							extra = -1;
+						}
+
+						if (added == ")" && nextChar == ")") {
+							added = "";
+							extra = 1;
+						}
+						if (added == "(") {
+							added = "()";
+							extra = -1;
+						}
+						if (added == "]" && nextChar == "]") {
+							added = "";
+							extra = 1;
+						}
+						if (added == "[") {
+							added = "[]";
+							extra = -1;
+						}
+					})();
+
+					((commands) => {
+						var indents = isIndented(getPrevLine(before));
+						if (indents < 0) indents = 0;
+                                                if (fileChange) indents++;
+						if (addedRaw == ")" && fileType == type.script.js) {
+							var anon = before.slice(-"(--anon".length) == "(--anon";
+
+							if (anon) {
+								before = before.substr(0, before.length - "(--anon".length);
+								after = after.substr(1);
+								if (fileChange) indents--;
+								added =
+									"(() => {\n" +
+									str_repeat("\t", indents + 1) +
+									"\n" +
+									str_repeat("\t", indents) +
+									"})();";
+								extra = -("\n" + str_repeat("\t", indents) + "})();").length;
+							}
+						}
+						if (addedRaw == ">") {
+							var template = before.slice(-"<--template".length) == "<--template";
+
+							if (template) {
+								renameEditor({ name: Editor.query().getName().split('.')[0] + '.html', identifier: Editor.active_editor });
+								(before = ""),
+									(after = ""),
+									(added = decodeURI(
+										`%3C!DOCTYPE%20html%3E%0A%3Chtml%20lang='${navigator.language}'%3E%0A%09%3Chead%3E%0A%09%09%0A%09%09%3Ctitle%3E%3C/title%3E%0A%09%09%3Cmeta%20charset=%22UTF-8%22%3E%0A%09%09%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%09%09%09%0A%09%09%3Cstyle%3E%0A%09%09%09*,%20*::before,%20*::after%20%7B%0A%09%09%09%09box-sizing:%20border-box;%0A%09%09%09%7D%0A%09%09%09body%20%7B%0A%09%09%09%09font-family:%20sans-serif;%0A%09%09%09%7D%0A%09%09%3C/style%3E%0A%09%3C/head%3E%0A%09%3Cbody%3E%0A%09%09%0A%09%09%0A%09%09%0A%09%09%3Cscript%3E%0A%09%09%09%0A%09%09%3C/script%3E%0A%09%09%0A%09%3C/body%3E%0A%3C/html%3E`
+									));
+							}
+						}
+					})();
+
+					((htmlAutoComplete) => {
+						if (fileType !== type.html) return;
+
+						if (added == ">") {try{
+							var tag = before.substr(before.lastIndexOf("<") + 1, before.length);
+							if (tag.match(/ +/gis)) {
+								tag = tag.substr(0, tag.indexOf(' '));
+							}
+							var checkerElm = document.createElement("div");
+							var tagElm = document.createElement(tag);
+							checkerElm.appendChild(tagElm);
+							if (checkerElm.innerHTML.match("</")) {
+								added = `></${tag}>`;
+								extra = -`</${tag}>`.length;
+							} else {
+								added = " />";
+							}
+						}catch(e){}}
+					})();
+
+                                        if (added == '*' && lastChar == '/' && fileType === type.script.js) {
+                                          added = '**/';
+                                          extra = -2;
+                                        }
+
+                                        if (added == ' ' && before.slice(-2) == '/*' && after.substr(0,2) == '*/' && fileType === type.script.js) {
+                                          added = '  ';
+                                          extra = -1
+                                        }
+
+					if (keyType == "ENTER") {
+						var indents =
+							isIndented(getPrevLine(before)) - (fileType != type.html ? 1 : 0);
+						if (indents < 0) indents = 0;
+                                                if (fileChange) indents++;
+						added = "\n" + str_repeat("\t", indents);
+						if (fileType == type.script.js) {
+							if (lastCharTrimmed == "{") indents++;
+							added = "\n" + str_repeat("\t", indents);
+							if (lastChar == "{" && nextChar == '}') {
+								indents--;
+								added =
+									"\n" +
+									str_repeat("\t", indents + 1) +
+									"\n" +
+									str_repeat("\t", indents);
+								extra = -1 - indents;
+							}
+                                                        if (before.slice(-2) == '/*' && after.substr(0,2) == '*/') {
+                                                          indents++;
+                                                          added = "\n" + str_repeat("\t", indents) + "\n" + str_repeat("\t", indents - 1);
+                                                          extra = -indents;
+                                                        }
+						}
+						if (fileType == type.html) {
+							if (lastChar == ">" && after.substr(0, 2) == "</") {
+								added =
+									"\n" +
+									str_repeat("\t", indents + 1) +
+									"\n" +
+									str_repeat("\t", indents);
+								extra = -("\n" + str_repeat("\t", indents)).length;
+							}
+						}
+					}
+
+					if (keyType == "BACKSPACE") {
+						if (
+							(removed == '"' && nextChar == '"') ||
+							(removed == "'" && nextChar == "'") ||
+							(removed == "(" && nextChar == ")")
+						) {
+							after = after.substr(1);
+						}
+					}
+
+					if (e.cancelled)
+						return (() => {
+							ta.value = value;
+							ta.selectionStart = selection.start;
+							ta.selectionEnd = selection.end;
+						})();
+
+					if (
+						added === "" &&
+						!(keyType == "BACKSPACE" || keyType == "DELETE" || keyType == "ENTER")
+					)
+						return ta.selectionStart = ta.selectionEnd = before.length + added.length + extra;;
+
+					ta.lastValue = value;
+					ta.value = before + added + after;
+					ta.selectionStart = ta.selectionEnd = before.length + added.length + extra;
+					refresh();
+				}
+
+				let repeating = {};
+
+				ta.addEventListener("keydown", (event) => {
+					if (event.keyCode == 9) {
+						event.preventDefault();
+						var before = ta.value.substr(0, ta.selectionStart),
+							after = ta.value.substr(ta.selectionEnd);
+						indents =
+							isIndented(getPrevLine(before)) -
+							isIndented(
+								before.substr(before.lastIndexOf("\n") + 1) +
+									after.substr(0, after.indexOf("\n"))
+							);
+						if (indents <= 0) indents = 1;
+						return formatter({
+							data: str_repeat("\t", indents),
+							inputType: "insertText",
+							preventDefault: () => {},
+						});
+					}
+					if (event.ctrlKey && event.key.toLowerCase().match(/z|v/gis)) {
+						if (stack[stackIndex].value != ta.value) {
+							if (stackIndex < stack.length - 1) stack = stack.slice(0, stackIndex);
+							stack.push({ value: ta.value, caret: ta.selectionStart });
+							stackIndex = stack.length - 1;
+						}
+					}
+					if (event.ctrlKey && event.key.toLowerCase() == "z") {
+						if (event.key == "Z") {
+							stackIndex++;
+							if (stackIndex > stack.length - 1) stackIndex = stack.length - 1;
+							ta.value = stack[stackIndex].value;
+							ta.selectionStart = ta.selectionEnd = stack[stackIndex].caret;
+						} else {
+							stackIndex--;
+							if (stackIndex < 0) stackIndex = 0;
+							ta.value = stack[stackIndex].value;
+							ta.selectionStart = ta.selectionEnd = stack[stackIndex].caret;
+						}
+						refresh();
+					}
+					if (event.repeat) return (repeating[event.keyCode] = true);
+					if (
+						event.key.toLowerCase() == "enter" ||
+						event.keyCode == 32 ||
+						event.keyCode == 8
+					) {
+						if (stack[stackIndex].value != ta.value) {
+							if (stackIndex < stack.length - 1) stack = stack.slice(0, stackIndex);
+							stack.push({ value: ta.value, caret: ta.selectionStart });
+							stackIndex = stack.length - 1;
+						}
+					}
+				});
+
+				ta.addEventListener("keyup", (event) => {
+					if (repeating[event.keyCode]) {
+						delete repeating[event.keyCode];
+						if (stack[stackIndex].value != ta.value) {
+							if (stackIndex < stack.length - 1) stack = stack.slice(0, stackIndex);
+							stack.push({ value: ta.value, caret: ta.selectionStart });
+							stackIndex = stack.length - 1;
+						}
+					}
+				});
+
+				ta.addEventListener("beforeinput", (e) => formatter(e));
+			}
 </script>
 
 </body>
