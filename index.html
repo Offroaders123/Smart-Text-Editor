@@ -2889,8 +2889,8 @@
 				document.querySelectorAll('[formatted]').forEach(enableFormatting);
 			});
 			function enableFormatting(ta) {
-				let editor;
-				if (ta.tagName.toLowerCase() === "num-text") (editor = ta),(ta = ta.editor);
+				let ed;
+				if (ta.tagName.toLowerCase() === "num-text") (ed = ta),(ta = ta.editor);
 				if (!ta || ta.value == undefined) return;
 
 				let indent = "\t",
@@ -2928,14 +2928,13 @@
 				}
 
 				function refresh() {
-					editor.refreshLineNumbers();
-					editor.refreshScrollPosition();
+					ed.refreshLineNumbers();
+					ed.refreshScrollPosition();
 					Editor.query().tab.setAttribute("data-editor-unsaved", true);
 					refreshPreview({ force: true });
 				}
 
 				function getFileType() {
-					return type.script.js;
 					let ext = Editor.query().getName().split(".")[
 						Editor.query().getName().split(".").length - 1
 					];
