@@ -2375,6 +2375,7 @@
     tab.appendChild(editorClose);
     workspace_tabs.appendChild(tab);
     workspace_editors.appendChild(container);
+    enableFormatting(container);
     container.editor.addEventListener("input",() => {
       if (tab.hasAttribute("data-editor-auto-created")) tab.removeAttribute("data-editor-auto-created");
       if (!tab.hasAttribute("data-editor-refresh")) tab.setAttribute("data-editor-refresh",true);
