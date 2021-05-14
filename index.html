@@ -87,7 +87,7 @@
         container = workspace_editors.querySelector(`.editor[data-editor-identifier="${identifier}"]`),
         textarea = (container) ? container.editor : null,
         getName = section => {
-          if ((document.querySelectorAll(`[data-editor-identifier="${identifier}"]`).length == 0) && (identifier != Editor.active_editor)) return null;
+          if ((document.querySelectorAll(`[data-editor-identifier="${identifier}"]:not([data-editor-change])`).length == 0) && (identifier != Editor.active_editor)) return null;
           var name = workspace_tabs.querySelector(`.tab[data-editor-identifier="${identifier}"] [data-editor-name]`).innerText;
           if (!section || (!name.includes(".") && section == "base")) return name;
           if (section == "base"){
@@ -107,7 +107,7 @@
     orientation: () => document.body.getAttribute("data-orientation"),
     orientation_change: () => (document.body.hasAttribute("data-orientation-change")),
     scaling_change: () => (document.body.hasAttribute("data-scaling-change")),
-    unsaved_work: () => (!Editor.appearance().parent_window || (workspace_tabs.querySelectorAll(".tab[data-editor-unsaved]").length == 0)),
+    unsaved_work: () => (!Editor.appearance().parent_window || (workspace_tabs.querySelectorAll(".tab:not([data-editor-change])[data-editor-unsaved]").length == 0)),
     preapproved_extensions: ["txt","html","css","js","php","json","webmanifest","xml","yaml","yml","dist","config","ini","md","markdown","mcmeta","lang","properties","uidx","material","h","fragment","vertex","fxh","hlsl","ihlsl","svg"],
     active_editor: null,
     preview_editor: "active-editor",
@@ -115,7 +115,6 @@
     child_windows: [],
     storage: (window.location.protocol != "blob:") ? window.localStorage : null,
     refresh: true,
-    active_editing_tools: false,
     active_dialog: null,
     dialog_previous: null,
     active_widget: null,
@@ -334,9 +333,15 @@
   header .app-github a:hover > svg {
     background-color: #ffffff14;
   }
+
   header .app-github a:where(:active,:focus-visible) > svg {
     background-color: #ffffff22;
   }
+/* Temp Where */
+  header .app-github a:-webkit-any(:active,:focus-visible) > svg {
+    background-color: #ffffff22;
+  }
+
   main {
     padding: 0 var(--safe-area-inset-right) var(---safe-area-inset-bottom) var(---safe-area-inset-left);
     position: relative;
@@ -409,6 +414,8 @@
     overflow-x: auto;
     scroll-behavior: smooth;
     scrollbar-width: none;
+    transition: calc(var(--main-transition-duration) * 0.5);
+    transition-property: none;
   }
   main .workspace .workspace-tabs::before, main .workspace .workspace-tabs::after {
     content: "";
@@ -461,6 +468,15 @@
     border-left-color: var(--workspace-accent);
     border-top-color: var(--workspace-accent);
     border-right-color: var(--workspace-accent);
+  }
+  body[data-editor-change] main .workspace .workspace-tabs .tab[data-editor-change] {
+    margin-right: var(--tab-margin-right);
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0);
+    transform-origin: left center;
+    transition: inherit;
+    transition-property: margin-right, opacity, transform;
   }
   main .workspace .workspace-tabs .tab[data-editor-unsaved] {
     font-style: italic;
@@ -1063,9 +1079,15 @@
     gap: 6px;
     transition: color var(--transition-fast);
   }
+
   .select:where(:hover,:focus-within,.active) {
     color: #ffffff;
   }
+/* Temp Where */
+  .select:-webkit-any(:hover,:focus-within,.active) {
+    color: #ffffff;
+  }
+
   .select label {
     display: flex;
     align-items: center;
@@ -1103,9 +1125,15 @@
     transition: var(--transition-fast);
     transition-property: color, border-color, opacity;
   }
+
   .checkbox:where(:hover,:focus-visible) {
     color: #ffffff;
   }
+/* Temp Where */
+  .checkbox:-webkit-any(:hover,:focus-visible) {
+    color: #ffffff;
+  }
+
   .checkbox:active {
     opacity: 0.85;
   }
@@ -1133,9 +1161,15 @@
     border-radius: calc(var(--check-padding) + calc(var(--checkbox-check-border-width) * 2));
     transition: background-color var(--transition-fast);
   }
+
   .checkbox:where(:hover,:focus-visible) label::before {
     background: #ffffff1c;
   }
+/* Temp Where */
+  .checkbox:-webkit-any(:hover,:focus-visible) label::before {
+    background: #ffffff1c;
+  }
+
   .checkbox label .check {
     padding: calc(var(--check-padding) + var(--checkbox-check-border-width));
     position: absolute;
@@ -1160,10 +1194,14 @@
     border-radius: 8px;
     box-shadow: 0 8px 15px #00000050;
     visibility: hidden;
+    opacity: 0;
     overflow: hidden;
+    transition: calc(var(--main-transition-duration) * 0.5);
+    transition-property: visibility, opacity;
   }
   .card.active {
     visibility: visible;
+    opacity: 1;
   }
   .card.alert {
     position: absolute;
@@ -1347,10 +1385,17 @@
     transition: var(--transition-fast);
     transition-property: color, background-color, border-color;
   }
+
   .card .main button:where(:hover,:focus-visible), .select .menu.active .opener {
     color: #ffffff;
     background: #4b4b4b;
   }
+/* Temp Where */
+  .card .main button:-webkit-any(:hover,:focus-visible), .select .menu.active .opener {
+    color: #ffffff;
+    background: #4b4b4b;
+  }
+
   .card .main button:focus-visible {
     border-color: #c0c0c0;
   }
@@ -1384,6 +1429,7 @@
   }
   .card input[type="text"] {
     border-radius: 6px;
+    box-shadow: 0 2px 4px #000000bf inset;
   }
   .card-backdrop {
     position: fixed;
@@ -1393,10 +1439,14 @@
     height: 100%;
     background: #1e1e1e60;
     visibility: hidden;
+    opacity: 0;
     z-index: 2;
+    transition: calc(var(--main-transition-duration) * 0.5);
+    transition-property: visibility, opacity;
   }
   .card-backdrop.active {
     visibility: visible;
+    opacity: 1;
   }
   #symbol_definitions {
     display: none;
@@ -1406,6 +1456,10 @@
   }
   #install_button.hidden + button::before {
     content: "Customize Theme";
+  }
+  #generator_output {
+    width: 220px;
+    cursor: copy;
   }
 </style>
 
@@ -1514,11 +1568,11 @@
     <div class="menu">
       <button class="opener">Tools</button>
       <ul class="list">
-        <li class="list-item" onclick="openCard(editing_tools_card);">Editing Tools<span class="info shortcut ctrl-shift shift-command">E</span></li>
         <li class="list-item" onclick="openCard(replace_text_card);">Replace Text<span class="info shortcut ctrl-shift shift-command">F</span></li>
         <li class="list-item" onclick="openCard(color_picker_card);">Color Picker<span class="info shortcut ctrl-shift shift-command">K</span></li>
         <li class="list-item" onclick="openCard(json_formatter_card);">JSON Formatter<span class="info shortcut ctrl-shift shift-command">G</span></li>
         <li class="list-item" onclick="openCard(uri_encoder_card);">URI Encoder<span class="info shortcut ctrl-shift shift-command">Y</span></li>
+        <li class="list-item" onclick="openCard(uuid_generator_card);">UUID Generator<span class="info shortcut ctrl-shift shift-command">O</span></li>
         <li class="list-item" onclick="Tools.insertTemplate({ type: 'html' });">Insert HTML Template<span class="info shortcut ctrl-shift shift-command">H</span></li>
         <li class="list-item list-parent">Online Resources...<svg class="info"><use href="#arrow_icon"/></svg>
           <ul class="list">
@@ -1530,7 +1584,6 @@
             <a class="list-item" href="https://realfavicongenerator.net/"><img class="rounded" src="resources/real-favicon-generator.svg">Favicon Generator</a>
             <a class="list-item" href="https://appsco.pe/developer/splash-screens/"><img class="invert" src="resources/appscope.svg">Splash Generator</a>
             <a class="list-item" href="https://www.svgminify.com/"><img src="resources/svgminify.svg">SVG Simplifier</a>
-            <a class="list-item" href="https://www.uuidgenerator.net/"><img src="resources/online-uuid-generator.svg">UUID Generator</a>
             <a class="list-item" href="https://cryptii.com/"><img src="resources/cryptii.svg">Text Encryptor</a>
           </ul>
         </li>
@@ -1595,10 +1648,6 @@
             <input id="refresh_setting" type="checkbox" oninput="updateCheckbox('refresh');" checked>
             <label for="refresh_setting"><svg class="check"><use href="#check_icon"/></svg>Automatically Refresh Preview</label>
           </div>
-          <div class="checkbox">
-            <input id="editing_tools_setting" type="checkbox" oninput="updateCheckbox('editing_tools');">
-            <label for="editing_tools_setting"><svg class="check"><use href="#check_icon"/></svg>Open Editing Tools</label>
-          </div>
         </div>
       </div>
       <div class="options">
@@ -1650,17 +1699,6 @@
     <section class="main">
       <div class="content">
         <div class="item">Successfully cleared offline cache!</div>
-      </div>
-    </section>
-  </section>
-  <section id="editing_tools_card" class="card widget" data-card="widget">
-    <section class="main">
-      <div class="content">
-        <div class="options">
-          <button id="undo_tool" onclick="callCommand(Editor.query().textarea,'undo'); this.focus();"><svg><use href="#undo_icon"/></svg></button>
-          <button id="redo_tool" onclick="callCommand(Editor.query().textarea,'redo'); this.focus();"><svg><use href="#redo_icon"/></svg></button>
-          <button id="refresh_tool" onclick="forceRefresh();" disabled><svg><use href="#refresh_icon"/></svg></button>
-        </div>
       </div>
     </section>
   </section>
@@ -1765,6 +1803,26 @@
           <input id="encoder_type" type="checkbox">
           <label for="encoder_type"><svg class="check"><use href="#check_icon"/></svg>Enable URI Component</label>
         </div>
+      </div>
+    </section>
+  </section>
+  <section id="uuid_generator_card" class="card widget" data-card="widget">
+    <section class="header">
+      <button class="card-back"><svg><use href="#back_icon"/></svg></button>
+      <span class="title">UUID Generator</span>
+      <section class="card-controls">
+        <button class="control" data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
+        <button class="control" data-control="close"><svg><use href="#close_icon"/></svg></button>
+      </section>
+    </section>
+    <section class="main">
+      <div class="content">
+        <div class="item expand">
+          <input id="generator_output" type="text" placeholder="Result..." readonly>
+        </div>
+      </div>
+      <div class="options">
+        <button onclick="generator_output.value = Tools.uuidGenerator.generate();">Generate</button>
       </div>
     </section>
   </section>
@@ -2018,6 +2076,16 @@
       },
       clear: () => encoder_input.value = ""
     },
+    uuidGenerator: (() => {
+      var lut = [];
+      for (var i = 0; i < 256; i++) lut[i] = ((i < 16) ? "0" : "") + i.toString(16);
+      return {
+        generate: () => {
+          var d0 = (Math.random() * 0xffffffff) | 0, d1 = (Math.random() * 0xffffffff) | 0, d2 = (Math.random() * 0xffffffff) | 0, d3 = (Math.random() * 0xffffffff) | 0;
+          return `${lut[d0 & 0xff]}${lut[(d0 >> 8) & 0xff]}${lut[(d0 >> 16) & 0xff]}${lut[(d0 >> 24) & 0xff]}-${lut[d1 & 0xff]}${lut[(d1 >> 8) & 0xff]}-${lut[((d1 >> 16) & 0x0f) | 0x40]}${lut[(d1 >> 24) & 0xff]}-${lut[(d2 & 0x3f) | 0x80]}${lut[(d2 >> 8) & 0xff]}-${lut[(d2 >> 16) & 0xff]}${lut[(d2 >> 24) & 0xff]}${lut[d3 & 0xff]}${lut[(d3 >> 8) & 0xff]}${lut[(d3 >> 16) & 0xff]}${lut[(d3 >> 24) & 0xff]}`;
+        }
+      };
+    })(),
     insertTemplate: ({ type } = {}) => {
       var template, editor = Editor.query(), name;
       if (type == "html"){
@@ -2025,6 +2093,10 @@
         if (language.includes("-")) language = language.replace(/[^-]+$/g,code => code.toUpperCase());
         name = "index.html";
         template = decodeURI(`%3C!DOCTYPE%20html%3E%0A%3Chtml%20lang=%22${language}%22%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E`);
+      }
+      if (type == "pack-manifest-bedrock"){
+        var hey;
+        template = decodeURI(`%7B%0A%20%20%22format_version%22:%202,%0A%0A%20%20%22header%22:%20%7B%0A%20%20%20%20%22name%22:%20%22Pack%20Manifest%20Template%20-%20Bedrock%20Edition%22,%0A%20%20%20%20%22description%22:%20%22Your%20resource%20pack%20description%22,%0A%20%20%20%20%22uuid%22:%20%22${Tools.uuidGenerator.generate()}%22,%0A%20%20%20%20%22version%22:%20%5B%201,%200,%200%20%5D,%0A%20%20%20%20%22min_engine_version%22:%20%5B%201,%2013,%200%20%5D%0A%20%20%7D,%0A%20%20%22modules%22:%20%5B%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%22description%22:%20%22Your%20resource%20pack%20description%22,%0A%20%20%20%20%20%20%22type%22:%20%22resources%22,%0A%20%20%20%20%20%20%22uuid%22:%20%22${Tools.uuidGenerator.generate()}%22,%0A%20%20%20%20%20%20%22version%22:%20%5B%201,%200,%200%20%5D%0A%20%20%20%20%7D%0A%20%20%5D,%0A%20%20%22metadata%22:%20%7B%0A%20%20%20%20%22authors%22:%20%5B%0A%20%20%20%20%20%20%22Add%20author%20names%20here%20(optional,%20'metadata'%20can%20be%20removed%20altogether)%22%0A%20%20%20%20%5D%0A%20%20%7D%0A%7D`);
       }
       if (!template) return;
       if (editor.container && !editor.tab.hasAttribute("data-editor-auto-created")){
@@ -2110,24 +2182,25 @@
     if ((controlShift || shiftCommand) && pressed("d")){
       event.preventDefault();
       if (event.repeat) return;
+      /* Future feature: If an editor tab is focused, close that editor instead of only the active editor */
       closeEditor();
     }
     if ((controlShift || controlCommand) && (pressed("[") || pressed("{"))){
       event.preventDefault();
       if (event.repeat) return;
-      openPreviousEditor();
+      openEditor({ identifier: getPreviousEditor() });
     }
     if ((controlShift || controlCommand) && (pressed("]") || pressed("}"))){
       event.preventDefault();
       if (event.repeat) return;
-      openNextEditor();
+      openEditor({ identifier: getNextEditor() });
     }
     if ((controlShift || shiftCommand) && pressed("c")){
       event.preventDefault();
       if (event.repeat) return;
       createWindow();
     }
-    if ((control || command) && pressed("o")){
+    if ((control || command) && !shift && pressed("o")){
       event.preventDefault();
       if (event.repeat) return;
       openFiles();
@@ -2137,7 +2210,7 @@
       if (event.repeat) return;
       renameEditor();
     }
-    if ((control || command) && pressed("s")){
+    if ((control || command) && !shift && pressed("s")){
       event.preventDefault();
       if (event.repeat) return;
       saveFile();
@@ -2172,11 +2245,6 @@
       if (event.repeat) return;
       refreshPreview({ force: true });
     }
-    if ((controlShift || shiftCommand) && pressed("e")){
-      event.preventDefault();
-      if (event.repeat) return;
-      openCard(editing_tools_card);
-    }
     if ((controlShift || shiftCommand) && pressed("f")){
       event.preventDefault();
       if (event.repeat) return;
@@ -2196,6 +2264,11 @@
       event.preventDefault();
       if (event.repeat) return;
       openCard(uri_encoder_card);
+    }
+    if ((controlShift || shiftCommand) && pressed("o")){
+      event.preventDefault();
+      if (event.repeat) return;
+      openCard(uuid_generator_card);
     }
     if ((controlShift || shiftCommand) && pressed("h")){
       event.preventDefault();
@@ -2229,6 +2302,16 @@
       if (toolbar.querySelectorAll(".menu:not(.alternate).active").length == 0 || menu.classList.contains("alternate") || menu.classList.contains("active")) return;
       openMenu(menu);
     });
+  });
+  workspace_tabs.addEventListener("keydown",event => {
+    if (event.key != "ArrowLeft" && event.key != "ArrowRight") return;
+    if (!workspace_tabs.contains(document.activeElement)) return;
+    var identifier = document.activeElement.getAttribute("data-editor-identifier"),
+      previousEditor = getPreviousEditor({ identifier }),
+      nextEditor = getNextEditor({ identifier });
+    event.preventDefault();
+    if (event.key == "ArrowLeft") Editor.query(previousEditor).tab.focus();
+    if (event.key == "ArrowRight") Editor.query(nextEditor).tab.focus();
   });
   workspace_tabs.addEventListener("dragover",event => {
     event.preventDefault();
@@ -2269,6 +2352,8 @@
     document.addEventListener("touchend",disableScaling,{ passive: true });
   },{ passive: true });
   card_backdrop.addEventListener("click",() => closeCard(Editor.active_dialog));
+  generator_output.addEventListener("click",() => generator_output.select());
+  generator_output.addEventListener("keydown",() => generator_output.click());
 
   createEditor({ auto_created: true });
   if (Editor.support().file_handling && Editor.support().file_system){
@@ -2282,10 +2367,6 @@
   }
   if (Editor.appearance().parent_window) window.setTimeout(() => document.documentElement.classList.remove("startup-fade"),50);
   refreshWindowControlsOverlay();
-  if (Editor.support().editing_commands){
-    undo_tool.classList.add("hidden");
-    redo_tool.classList.add("hidden");
-  }
   var queryParameters = new URLSearchParams(window.location.search);
   if (queryParameters.get("template")){
     Tools.insertTemplate({ type: "html" });
@@ -2296,13 +2377,20 @@
     removeQueryParameters(["settings"]);
   }
   function createEditor({ name = "Untitled.txt", value = "", open = true, auto_created = false, auto_replace = true } = {}){
-    var identifier = Math.random().toString(), tab = document.createElement("button"), editorName = document.createElement("span"), editorClose = document.createElement("button"), container = document.createElement("num-text"), previewOption = document.createElement("li"), focused_override;
+    var identifier = Math.random().toString(), tab = document.createElement("button"), editorName = document.createElement("span"), editorClose = document.createElement("button"), container = document.createElement("num-text"), previewOption = document.createElement("li"), focused_override, changeIdentifier = Math.random().toString();
+    document.body.setAttribute("data-editor-change",changeIdentifier);
+    var transitionDuration = parseInt(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
     if (!name.includes(".")) name = `${name}.txt`;
     tab.classList.add("tab");
     tab.setAttribute("data-editor-identifier",identifier);
     if (value) tab.setAttribute("data-editor-refresh",true);
     tab.addEventListener("mousedown",event => {
       if (event.button != 0 || document.activeElement.matches("[data-editor-rename]")) return;
+      event.preventDefault();
+      if (tab != Editor.query().tab) openEditor({ identifier });
+    });
+    tab.addEventListener("keydown",event => {
+      if (event.key != " " && event.key != "Enter") return;
       event.preventDefault();
       if (tab != Editor.query().tab) openEditor({ identifier });
     });
@@ -2384,6 +2472,9 @@
     preview_options.appendChild(previewOption);
     applyEditingBehavior({ element: container });
     if (open || !Editor.active_editor) openEditor({ identifier, auto_created, focused_override });
+    window.setTimeout(() => {
+      if (document.body.getAttribute("data-editor-change") == changeIdentifier) document.body.removeAttribute("data-editor-change");
+    },transitionDuration);
     return identifier;
   }
   function openEditor({ identifier, auto_created = false, focused_override = false } = {}){
@@ -2396,18 +2487,28 @@
     container.classList.add("active");
     Editor.active_editor = identifier;
     setEditorTabsVisibility();
-    setTitle(getName());
+    setTitle({ content: getName() });
     if ((auto_created && !Editor.environment().touch_device && Editor.appearance().parent_window) || focused) textarea.focus({ preventScroll: true });
     if (Editor.preview_editor == "active-editor") refreshPreview({ force: true });
   }
   function closeEditor({ identifier = Editor.active_editor } = {}){
     if (!identifier) return;
-    var { tab, container, textarea, getName } = Editor.query(identifier), previewOption = preview_options.querySelector(`.list-item[data-editor-identifier="${identifier}"]`), active = (tab.classList.contains("active")), focused = (document.activeElement == container), editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab"));
+    var { tab, container, textarea, getName } = Editor.query(identifier), previewOption = preview_options.querySelector(`.list-item[data-editor-identifier="${identifier}"]`), active = (tab.classList.contains("active")), focused = (document.activeElement == container), editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])"));
     if (tab.hasAttribute("data-editor-unsaved")){
       if (!confirm(`Are you sure you would like to close "${getName()}"?\nRecent changes have not yet been saved.`)) return;
     }
+    var changeIdentifier = Math.random().toString();
+    if (editorTabs.length != 1){
+      document.body.setAttribute("data-editor-change",changeIdentifier);
+      tab.style.setProperty("--tab-margin-right",`-${tab.offsetWidth}px`);
+    } else if (document.body.hasAttribute("data-editor-change")){
+      document.body.removeAttribute("data-editor-change",changeIdentifier);
+      workspace_tabs.querySelectorAll(".tab[data-editor-change]").forEach(tab => workspace_tabs.removeChild(tab));
+    }
+    var transitionDuration = (document.body.hasAttribute("data-editor-change")) ? parseInt(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000) : 0;
     if (tab == editorTabs[0] && editorTabs.length == 1){
       Editor.active_editor = null;
+      setTitle({ reset: true });
       preview.src = "about:blank";
     }
     if (Editor.preview_editor == identifier) setPreviewSource({ active_editor: true });
@@ -2415,10 +2516,18 @@
     if (tab == editorTabs[editorTabs.length - 1] && tab != editorTabs[0] && tab.classList.contains("active")) openEditor({ identifier: editorTabs[editorTabs.length - 2].getAttribute("data-editor-identifier") });
     if (tab != editorTabs[0] && tab.classList.contains("active")) openEditor({ identifier: editorTabs[editorTabs.indexOf(tab) + 1].getAttribute("data-editor-identifier") });
     if (focused && Editor.query().textarea) Editor.query().textarea.focus();
-    workspace_tabs.removeChild(tab);
+    tab.setAttribute("data-editor-change",true);
+    if (tab == document.activeElement) tab.blur();
+    tab.tabIndex = -1;
+    if (tab.classList.contains("active")) tab.classList.remove("active");
     workspace_editors.removeChild(container);
     preview_options.removeChild(previewOption);
+    (transitionDuration) ? window.setTimeout(removeEditorTab,transitionDuration) : removeEditorTab();
     if (Editor.file_handles[identifier]) delete Editor.file_handles[identifier];
+    function removeEditorTab(){
+      if (workspace_tabs.contains(tab)) workspace_tabs.removeChild(tab);
+      if (document.body.getAttribute("data-editor-change") == changeIdentifier) document.body.removeAttribute("data-editor-change");
+    }
   }
   function renameEditor({ name, identifier = Editor.active_editor } = {}){
     var { tab, getName } = Editor.query(identifier), editorName = tab.querySelector("[data-editor-name]"), previewOption = preview_options.querySelector(`.list-item[data-editor-identifier="${identifier}"]`), currentName = getName(), base = getName("base"), extension = getName("extension"), rename = (name) ? name : prompt(`Enter a new file name for "${currentName}".`,currentName);
@@ -2429,17 +2538,18 @@
     editorName.innerText = rename;
     previewOption.innerText = rename;
     if (tab.hasAttribute("data-editor-auto-created")) tab.removeAttribute("data-editor-auto-created");
-    if (tab == Editor.query().tab) setTitle(rename);
+    if (tab == Editor.query().tab) setTitle({ content: rename });
     if ((Editor.preview_editor == "active-editor" && Editor.active_editor == identifier) || Editor.preview_editor == identifier) refreshPreview({ force: true });
     return rename;
   }
-  function openPreviousEditor({ identifier = Editor.active_editor } = {}){
-    var { tab } = Editor.query(identifier), editorTabs = workspace_tabs.querySelectorAll(".tab"), previousTab = (tab.previousElementSibling) ? tab.previousElementSibling : editorTabs[editorTabs.length - 1], previousEditor = previousTab.getAttribute("data-editor-identifier");
-    openEditor({ identifier: previousEditor });
+  /* Future feature: Add support to disable the wrapping behavior */
+  function getPreviousEditor({ identifier = Editor.active_editor, wrap = true } = {}){
+    var { tab } = Editor.query(identifier), editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")), previousTab = editorTabs[(editorTabs.indexOf(tab) || editorTabs.length) - 1], previousEditor = previousTab.getAttribute("data-editor-identifier");
+    return previousEditor;
   }
-  function openNextEditor({ identifier = Editor.active_editor } = {}){
-    var { tab } = Editor.query(identifier), editorTabs = workspace_tabs.querySelectorAll(".tab"), nextTab = (tab.nextElementSibling) ? tab.nextElementSibling : editorTabs[0], nextEditor = nextTab.getAttribute("data-editor-identifier");
-    openEditor({ identifier: nextEditor });
+  function getNextEditor({ identifier = Editor.active_editor, wrap = true } = {}){
+    var { tab } = Editor.query(identifier), editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")), nextTab = editorTabs[(editorTabs.indexOf(tab) != editorTabs.length - 1) ? editorTabs.indexOf(tab) + 1 : 0], nextEditor = nextTab.getAttribute("data-editor-identifier");
+    return nextEditor;
   }
   function setEditorTabsVisibility({ identifier = Editor.active_editor } = {}){
     if (!Editor.active_editor) return;
@@ -2463,18 +2573,10 @@
     document.body.classList.add(Editor.view());
     removeScaling();
     if (type != "preview") window.setTimeout(setEditorTabsVisibility,transitionDuration);
-    if (type == "code") setEditingToolVisibility({ undo: true, redo: true, refresh: false });
-    if (type == "split") setEditingToolVisibility({ undo: true, redo: true, refresh: true });
-    if (type == "preview") setEditingToolVisibility({ undo: false, redo: false, refresh: true });
     window.setTimeout(() => {
       if (document.body.getAttribute("data-view-change") == changeIdentifier) document.body.removeAttribute("data-view-change");
     },transitionDuration);
     refreshPreview();
-    function setEditingToolVisibility({ undo, redo, refresh } = {}){
-      undo_tool.disabled = !undo;
-      redo_tool.disabled = !redo;
-      refresh_tool.disabled = !refresh;
-    }
   }
   function setOrientation(orientation){
     if (Editor.orientation_change() || Editor.scaling_change()) return;
@@ -2540,7 +2642,6 @@
         closeCard(card);
       },4000);
     }
-    if (card == editing_tools_card) Editor.active_editing_tools = true;
     if (type == "dialog"){
       document.body.addEventListener("keydown",catchCardNavigation);
       card_backdrop.classList.add("active");
@@ -2583,7 +2684,6 @@
         Editor.dialog_previous = null;
       }
     }
-    if (card == editing_tools_card) Editor.active_editing_tools = false;
     if (type == "widget") Editor.active_widget = null;
   }
   function minimizeCard(card){
@@ -2642,7 +2742,7 @@
     } else {
       var identifier = Editor.active_editor, handle;
       if (!Editor.file_handles[identifier]){
-        handle = await window.showSaveFilePicker().catch(error => {
+        handle = await window.showSaveFilePicker({ suggestedName: Editor.query().getName(), startIn: (Editor.file_handles[identifier]) ? Editor.file_handles[identifier] : "desktop" }).catch(error => {
           if (error.message.toLowerCase().includes("abort")) return;
         });
         if (!handle) return;
@@ -2658,8 +2758,8 @@
       var currentName = Editor.query().getName(), file = await handle.getFile(), rename = await file.name;
       if (currentName != rename) renameEditor({ name: rename });
     }
-    if (tab.hasAttribute("data-editor-auto-created")) Editor.query().tab.removeAttribute("data-editor-auto-created");
-    if (tab.hasAttribute("data-editor-unsaved")) Editor.query().tab.removeAttribute("data-editor-unsaved");
+    if (Editor.query().tab.hasAttribute("data-editor-auto-created")) Editor.query().tab.removeAttribute("data-editor-auto-created");
+    if (Editor.query().tab.hasAttribute("data-editor-unsaved")) Editor.query().tab.removeAttribute("data-editor-unsaved");
     refreshPreview({ force: true });
   }
   function createDisplay(){
@@ -2820,7 +2920,7 @@
     if (Editor.view() == "code") return;
     var source = (Editor.preview_editor == "active-editor") ? Editor.query() : Editor.query(Editor.preview_editor);
     if (!source.textarea) return;
-    var change = (source.tab.hasAttribute("data-editor-refresh"));
+    var change = source.tab.hasAttribute("data-editor-refresh");
     if (!change && !force) return;
     preview.addEventListener("load",() => {
       preview.contentWindow.document.open();
@@ -2830,8 +2930,8 @@
     preview.src = "about:blank";
     if (change) source.tab.removeAttribute("data-editor-refresh");
   }
-  function setTitle(name){
-    document.title = `${name} - Smart Text Editor`;
+  function setTitle({ content, reset = false } = {}){
+    document.title = `${(content && !reset) ? content : ""}${(content && !reset) ? " - " : ""}Smart Text Editor`;
   }
   function addQueryParameters(entries){
     var parameters = new URLSearchParams(window.location.search);
