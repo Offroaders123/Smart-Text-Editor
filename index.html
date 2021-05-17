@@ -70,6 +70,7 @@
       return { parent_window, standalone, apple_home_screen, hidden_chrome, window_controls_overlay, fullscreen, safe_area_insets };
     },
     environment: () => ({
+      file_protocol: (window.location.protocol == "file:"),
       touch_device: ("ontouchstart" in window),
       apple_device: (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform)),
       macOS_device: (/(Mac)/i.test(navigator.platform) && navigator.standalone == undefined),
@@ -108,7 +109,7 @@
     orientation_change: () => (document.body.hasAttribute("data-orientation-change")),
     scaling_change: () => (document.body.hasAttribute("data-scaling-change")),
     unsaved_work: () => (!Editor.appearance().parent_window || (workspace_tabs.querySelectorAll(".tab:not([data-editor-change])[data-editor-unsaved]").length == 0)),
-    preapproved_extensions: ["txt","html","css","js","php","json","webmanifest","xml","yaml","yml","dist","config","ini","md","markdown","mcmeta","lang","properties","uidx","material","h","fragment","vertex","fxh","hlsl","ihlsl","svg"],
+    preapproved_extensions: ["txt","html","css","js","php","json","webmanifest","bbmodel","xml","yaml","yml","dist","config","ini","md","markdown","mcmeta","lang","properties","uidx","material","h","fragment","vertex","fxh","hlsl","ihlsl","svg"],
     active_editor: null,
     preview_editor: "active-editor",
     file_handles: {},
@@ -451,7 +452,7 @@
     margin-top: 3px;
     padding: calc(6px - var(--tab-border-width));
     padding-left: calc(10px - var(--tab-border-width));
-    padding-bottom: calc(7px - var(--tab-border-width));
+    padding-bottom: calc(8px - var(--tab-border-width));
     flex-shrink: 0;
     gap: 6px;
     color: #aaaaaa;
@@ -2111,6 +2112,7 @@
     }
   };
   window.addEventListener("load",() => {
+    if (Editor.environment().file_protocol) return;
     if (window.location.href.includes("index.html")) history.pushState(null,"",window.location.href.replace(/index.html/,""));
     if (!("serviceWorker" in navigator) || !Editor.appearance().parent_window) return;
     navigator.serviceWorker.register("service-worker.js").then(() => {
@@ -2292,9 +2294,30 @@
     event.stopPropagation();
   });
   document.body.addEventListener("contextmenu",event => event.preventDefault());
-  document.body.addEventListener("drop",() => menus.forEach(menu => {
-    if (menu.classList.contains("active")) closeMenu(menu);
-  }));
+  document.body.addEventListener("dragover",event => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+  });
+  document.body.addEventListener("drop",event => {
+    event.preventDefault();
+    menus.forEach(menu => {
+      if (menu.classList.contains("active")) closeMenu(menu);
+    });
+    Array.from(event.dataTransfer.items).forEach(async (item,index) => {
+      if (item.kind == "file"){
+        if (!Editor.support().file_system || !("getAsFileSystemHandle")){
+          var file = item.getAsFile(), reader = new FileReader();
+          reader.readAsText(file,"UTF-8");
+          reader.addEventListener("loadend",() => createEditor({ name: file.name, value: reader.result }));
+        } else {
+          var handle = await item.getAsFileSystemHandle();
+          if (handle.kind != "file") return;
+          var file = await handle.getFile(), identifier = createEditor({ name: await file.name, value: await file.text() });
+          Editor.file_handles[identifier] = await handle;
+        }
+      } else if (item.kind == "string" && index == 0 && event.dataTransfer.getData("text") != "") createEditor({ value: event.dataTransfer.getData("text") });
+    });
+  });
   //document.body.addEventListener("dragend",() => document.querySelectorAll("textarea").forEach(textarea => textarea.num_refreshLineCount()));
   var toolbar = document.querySelector("header .app-menubar");
   toolbar.querySelectorAll(".menu").forEach(menu => {
@@ -2312,30 +2335,6 @@
     event.preventDefault();
     if (event.key == "ArrowLeft") Editor.query(previousEditor).tab.focus();
     if (event.key == "ArrowRight") Editor.query(nextEditor).tab.focus();
-  });
-  workspace_tabs.addEventListener("dragover",event => {
-    event.preventDefault();
-    workspace_tabs.classList.add("drag");
-    event.dataTransfer.dropEffect = "copy";
-  });
-  workspace_tabs.addEventListener("dragleave",() => workspace_tabs.classList.remove("drag"));
-  workspace_tabs.addEventListener("drop",event => {
-    event.preventDefault();
-    workspace_tabs.classList.remove("drag");
-    Array.from(event.dataTransfer.items).forEach(async item => {
-      if (item.kind == "file"){
-        if (!Editor.support.file_system || !("getAsFileSystemHandle" in item)){
-          var file = item.getAsFile(), reader = new FileReader();
-          reader.readAsText(file,"UTF-8");
-          reader.addEventListener("loadend",() => createEditor({ name: file.name, value: reader.result }));
-        } else {
-          var handle = await item.getAsFileSystemHandle();
-          if (handle.kind != "file") return;
-          var file = await handle.getFile(), identifier = createEditor({ name: await file.name, value: await file.text() });
-          Editor.file_handles[identifier] = await handle;
-        }
-      } else if (item.kind == "string") createEditor({ value: event.dataTransfer.getData("text") });
-    });
   });
   scaler.addEventListener("mousedown",event => {
     if (event.button != 0) return;
@@ -2430,10 +2429,6 @@
       event.stopPropagation();
       event.dataTransfer.dropEffect = "copy";
       if (tab != Editor.query().tab) openEditor({ identifier });
-    });
-    tab.addEventListener("drop",event => {
-      event.preventDefault();
-      event.stopPropagation();
     });
     editorName.setAttribute("data-editor-name",name);
     editorName.innerText = name;
@@ -2859,6 +2854,17 @@
   }
   function applyEditingBehavior({ element, advanced = true } = {}){
     var type = element.tagName.toLowerCase();
+    element.addEventListener("dragover",event => {
+      event.stopPropagation();
+      event.dataTransfer.dropEffect = "copy";
+    });
+    element.addEventListener("drop",event => {
+      if (Array.from(event.dataTransfer.items)[0].kind == "file") return;
+      event.stopPropagation();
+      menus.forEach(menu => {
+        if (menu.classList.contains("active")) closeMenu(menu);
+      });
+    });
     if (type == "input"){
       element.spellcheck = false;
       element.autocomplete = "off";
@@ -2871,17 +2877,6 @@
       scrollbarStyles.textContent = scrollbar_styles.textContent;
       element.container.insertBefore(scrollbarStyles,element.styles.nextElementSibling);
       if (!advanced) return;
-      element.addEventListener("dragover",event => {
-        element.classList.add("drag");
-        event.dataTransfer.dropEffect = "copy";
-      });
-      element.addEventListener("dragleave",() => element.classList.remove("drag"));
-      element.addEventListener("drop",event => {
-        element.classList.remove("drag");
-        if (Array.from(event.dataTransfer.items)[0].kind == "string"){
-          window.setTimeout(() => element.refreshLineNumbers(),5);
-        } else preventDefault();
-      });
       attachContextMenu({ element, type: "editing" });
     }
   }
