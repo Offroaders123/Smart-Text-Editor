@@ -60,14 +60,28 @@
         fullscreen = (window.matchMedia("(display-mode: fullscreen)").matches || (!window.screenY && !window.screenTop && hidden_chrome) || (!window.screenY && !window.screenTop && standalone)),
         safe_area_insets = {
           left: getSafeAreaInset("left"),
-          top: getSafeAreaInset("top"),
           right: getSafeAreaInset("right"),
+          top: getSafeAreaInset("top"),
           bottom: getSafeAreaInset("bottom"),
+        },
+        titlebar_area_insets = {
+          top: getTitlebarAreaInset("top"),
+          width_left: getTitlebarAreaInset("width-left"),
+          width_right: getTitlebarAreaInset("width-right"),
+          height: getTitlebarAreaInset("height"),
         };
-        function getSafeAreaInset(side){
-          return parseInt(window.getComputedStyle(document.documentElement).getPropertyValue(`--safe-area-inset-${side}`),10);
+        function getSafeAreaInset(section){
+          return parseInt(getRootStyleProperty(`--safe-area-inset-${section}`),10);
         }
-      return { parent_window, standalone, apple_home_screen, hidden_chrome, window_controls_overlay, fullscreen, safe_area_insets };
+        function getTitlebarAreaInset(section){
+          var value = getRootStyleProperty(`--titlebar-area-inset-${section}`);
+          if (value.includes("calc")) value = Function(`"use strict"; return (${value.replace(/calc/g,"").replace(/100vw/g,`${window.innerWidth}px`).replace(/px/g,"")})`)();
+          return parseInt(value,10);
+        }
+        function getRootStyleProperty(template){
+          return window.getComputedStyle(document.documentElement).getPropertyValue(template);
+        }
+      return { parent_window, standalone, apple_home_screen, hidden_chrome, window_controls_overlay, fullscreen, safe_area_insets, titlebar_area_insets };
     },
     environment: () => ({
       file_protocol: (window.location.protocol == "file:"),
@@ -77,6 +91,7 @@
       mozilla_browser: (CSS.supports("-moz-appearance: none"))
     }),
     support: () => ({
+      local_storage: (window.location.protocol != "blob:") ? window.localStorage : null,
       file_system: ("showOpenFilePicker" in window),
       file_handling: ("launchQueue" in window && "LaunchParams" in window),
       window_controls_overlay: ("windowControlsOverlay" in navigator),
@@ -114,8 +129,34 @@
     preview_editor: "active-editor",
     file_handles: {},
     child_windows: [],
-    storage: (window.location.protocol != "blob:") ? window.localStorage : null,
-    refresh: true,
+    settings: {
+      entries: JSON.parse(window.localStorage.getItem("settings")) || {},
+      set: (key,value) => {
+        if (!Editor.support().local_storage) return;
+        Editor.settings.entries[key] = value;
+        window.localStorage.setItem("settings",JSON.stringify(Editor.settings.entries,null,"  "));
+        return value;
+      },
+      remove: key => {
+        if (!Editor.support().local_storage) return;
+        delete Editor.settings.entries[key];
+        window.localStorage.setItem("settings",JSON.stringify(Editor.settings.entries,null,"  "));
+        return true;
+      },
+      get: key => {
+        if (!Editor.support().local_storage) return;
+        if (!(key in Editor.settings.entries)) return;
+        return Editor.settings.entries[key];
+      },
+      reset: () => {
+        if (!Editor.support().local_storage) return;
+        if (!confirm("Are you sure you would like to reset all settings?")) return;
+        Editor.settings.entries = {};
+        window.localStorage.removeItem("settings");
+        openCard(reset_settings_card);
+        return true;
+      }
+    },
     active_dialog: null,
     dialog_previous: null,
     active_widget: null,
@@ -141,20 +182,20 @@
   }
   :root {
     --safe-area-inset-left: env(safe-area-inset-left,0px);
-    --safe-area-inset-top: env(safe-area-inset-top,0px);
     --safe-area-inset-right: env(safe-area-inset-right,0px);
+    --safe-area-inset-top: env(safe-area-inset-top,0px);
     --safe-area-inset-bottom: env(safe-area-inset-bottom,0px);
 
+    --titlebar-area-inset-top: env(titlebar-area-y,0px);
     --titlebar-area-inset-width-left: env(titlebar-area-x,0px);
     --titlebar-area-inset-width-right: calc(100vw - env(titlebar-area-width,100vw) - var(--titlebar-area-inset-width-left));
-    --titlebar-area-inset-top: env(titlebar-area-y,0px);
     --titlebar-area-inset-height: env(titlebar-area-height,0px);
 
     --transition-fast: 80ms;
 
-    --selection-color: #0a0a0a;
-    --selection-background: #b4d5ffbf;
-    --selection-background-inactive: #ccccccbf;
+    --selection-color: inherit;
+    --selection-background: #75b1ff38;
+    --selection-background-inactive: #a1a1a138;
 
     --scrollbar-width: 16px;
     --scrollbar-height: 16px;
@@ -1192,7 +1233,6 @@
     flex-direction: column;
     background: #212121;
     border: 1px solid #ffffff24;
-    border-radius: 8px;
     box-shadow: 0 8px 15px #00000050;
     visibility: hidden;
     opacity: 0;
@@ -1205,20 +1245,25 @@
     opacity: 1;
   }
   .card.alert {
+    margin: 8px;
     position: absolute;
     right: 0;
     bottom: 0;
+    border-radius: 10px;
+    pointer-events: none;
     z-index: 3;
   }
   .card.widget {
+    margin: 8px;
     position: absolute;
     right: 0;
     top: 0;
+    border-radius: 12px;
     z-index: 1;
   }
   .card.dialog {
     position: absolute;
-    border-radius: 12px;
+    border-radius: 14px;
     z-index: 2;
   }
   .card .header {
@@ -1230,7 +1275,7 @@
   }
   .card .header .card-back {
     margin-right: auto;
-    padding: 8px;
+    padding: 10px;
     display: flex;
     background: none;
     border: none;
@@ -1260,8 +1305,18 @@
     /*aspect-ratio: 1/1;*/
     fill: currentColor;
   }
-  .card .header .title {
+  .card .header .icon {
+    margin: 8px;
+    margin-left: 12px;
+    margin-right: 0;
+    width: 20px;height: 20px;
+    /*aspect-ratio: 1/1;*/
+  }
+  .card:not(.alert) .header .title {
     position: absolute;
+  }
+  .card.alert .header .title {
+    margin: 0 auto;
   }
   .card.dialog .header .title {
     font-size: 18px;
@@ -1285,7 +1340,7 @@
     outline: none;
   }
   :root:not(.macOS-device) .card .header .card-controls .control {
-    padding: 8px;
+    padding: 10px;
     --control-background: none;
   }
 
@@ -1300,9 +1355,15 @@
   }
 */
 
-  :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:hover {
+  :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:hover, :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:focus-visible {
     --control-background: #e81123;
   }
+/* -- Future Where
+  :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:where(:hover,:focus-visible) {
+    --control-background: #e81123;
+  }
+*/
+
   :root.macOS-device .card .header .card-controls .control {
     padding: 3px;
     border-radius: 50%;
@@ -1349,11 +1410,17 @@
 */
 
   .card .main {
-    padding: 12px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
     font-size: 14px;
+  }
+  .card:not(.widget) .main {
+    padding: 16px;
+    gap: 16px;
+  }
+  .card.widget .main {
+    padding: 14px;
+    gap: 14px;
   }
   .card .main .content {
     display: flex;
@@ -1363,7 +1430,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+  }
+  .card:not(.widget) .main .content .item {
+    gap: 16px;
+  }
+  .card.widget .main .content .item {
+    gap: 14px;
   }
   .card .main .content .item.start {
     align-items: flex-start;
@@ -1372,16 +1444,24 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 12px;
+  }
+  .card:not(.widget) .options {
+    gap: 16px;
+  }
+  .card.widget .options {
+    gap: 14px;
   }
   .card .main button {
     padding: 2px 8px;
+    min-width: 74px;
     display: flex;
+    justify-content: center;
     align-items: center;
     gap: 8px;
     background: #444444;
     border: 1px solid transparent;
     border-radius: 5px;
+    box-shadow: 0 1px 2px #00000028;
     outline: none;
     transition: var(--transition-fast);
     transition-property: color, background-color, border-color;
@@ -1418,19 +1498,22 @@
     --background: #2d2d2d;
     border-radius: 6px;
   }
+  .card num-text.expand {
+    height: 20ch;
+  }
   .card num-text::part(container)::before {
     content: "";
     position: absolute;
     width: 100%;
     height: 100%;
     border-radius: inherit;
-    box-shadow: 0 2px 4px #000000bf inset;
+    box-shadow: 0 2px 3px #00000090 inset;
     pointer-events: none;
     z-index: 2;
   }
   .card input[type="text"] {
     border-radius: 6px;
-    box-shadow: 0 2px 4px #000000bf inset;
+    box-shadow: 0 2px 3px #00000090 inset;
   }
   .card-backdrop {
     position: fixed;
@@ -1452,6 +1535,9 @@
   #symbol_definitions {
     display: none;
   }
+  #install_button, #theme_button {
+    padding: 3px 8px;
+  }
   #install_button + button::before {
     content: "Theme";
   }
@@ -1460,7 +1546,7 @@
   }
   #generator_output {
     width: 220px;
-    cursor: copy;
+    cursor: grab;
   }
 </style>
 
@@ -1596,7 +1682,7 @@
         <li id="install_option" class="list-item hidden" onclick="showInstallPrompt();"><img src="resources/icon.svg">Install</button>
         <li class="list-item" onclick="openCard(theme_card); Editor.dialog_previous = this.closest('.menu').querySelector('button');">Theme Settings</li>
         <li class="list-item" id="clear_site_caches_option" class="hidden" onclick="clearSiteCaches();">Clear Cache</li>
-        <li class="list-item" onclick="resetSettings();">Reset Settings</li>
+        <li class="list-item" onclick="Editor.settings.reset();">Reset Settings</li>
       </ul>
     </div>
   </section>
@@ -1626,16 +1712,6 @@
       <div class="content">
         <div class="item list start">
           <div class="select">
-            <label for="view_setting">Default View:</label>
-            <div class="menu">
-              <button id="view_setting" class="opener">Code<svg><use href="#back_icon"/></svg></button>
-              <ul class="list selectable">
-                <li class="list-item selected" onclick="updateSelect('view','code');">Code</li>
-                <li class="list-item" onclick="updateSelect('view','split');">Split</li>
-              </ul>
-            </div>
-          </div>
-          <div class="select">
             <label for="orientation_setting">Default Orientation:</label>
             <div class="menu">
               <button id="orientation_setting" class="opener">Horizontal<svg><use href="#back_icon"/></svg></button>
@@ -1646,7 +1722,7 @@
             </div>
           </div>
           <div class="checkbox">
-            <input id="refresh_setting" type="checkbox" oninput="updateCheckbox('refresh');" checked>
+            <input id="refresh_setting" type="checkbox" oninput="Editor.settings.set('automatic-refresh',this.checked);" checked>
             <label for="refresh_setting"><svg class="check"><use href="#check_icon"/></svg>Automatically Refresh Preview</label>
           </div>
         </div>
@@ -1657,7 +1733,7 @@
       </div>
       <div class="options">
         <button id="clear_site_caches_button" class="warning hidden" onclick="clearSiteCaches();">Clear Cache</button>
-        <button class="warning" onclick="resetSettings();">Reset Settings</button>
+        <button class="warning" onclick="Editor.settings.reset();">Reset Settings</button>
       </div>
     </section>
   </section>
@@ -2915,7 +2991,7 @@
     if (Editor.view() == "code") return;
     var source = (Editor.preview_editor == "active-editor") ? Editor.query() : Editor.query(Editor.preview_editor);
     if (!source.textarea) return;
-    var change = source.tab.hasAttribute("data-editor-refresh");
+    var change = (source.tab.hasAttribute("data-editor-refresh") && Editor.settings.get("automatic-refresh") != false);
     if (!change && !force) return;
     preview.addEventListener("load",() => {
       preview.contentWindow.document.open();
