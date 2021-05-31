@@ -232,6 +232,7 @@
     overflow: hidden;
     user-select: none;
     -webkit-user-select: none;
+    touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
   body::after {
@@ -385,7 +386,7 @@
   }
 
   main {
-    padding: 0 var(--safe-area-inset-right) var(---safe-area-inset-bottom) var(---safe-area-inset-left);
+    padding: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
     position: relative;
     flex-grow: 1;
     display: flex;
@@ -833,6 +834,7 @@
     border: none;
     border-radius: 0;
     outline: none;
+    appearance: none;
     -webkit-appearance: none;
   }
   ::selection, num-text::part(editor)::selection {
@@ -1217,61 +1219,92 @@
     position: absolute;
     width: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));height: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));
     /*aspect-ratio: 1/1;*/
-    fill: transparent;
+    fill: currentColor;
     transform: rotate(-45deg) scale(0);
     transform-origin: 45% 65%;
-    transition: 125ms ease-in;
-    transition-property: fill, transform;
+    transition: transform 125ms ease-in;
   }
   .checkbox input[type="checkbox"]:checked + label .check {
-    fill: currentColor;
     transform: rotate(0deg) scale(1);
     transition-timing-function: ease-out;
   }
   .card {
+    --card-header-padding-right: max(var(--safe-area-inset-right),8px);
     display: flex;
     flex-direction: column;
     background: #212121;
-    border: 1px solid #ffffff24;
+    border: var(--card-border-width) solid #ffffff24;
+    --card-border-width: 1px;
+    border-radius: var(--card-border-radius);
     box-shadow: 0 8px 15px #00000050;
+    overflow: hidden;
+    transition: var(--card-transition-duration);
+    --card-transition-duration: calc(var(--main-transition-duration) * 0.5);
+    transition-property: visibility, opacity, transform;
+  }
+  .card:not(.active) {
     visibility: hidden;
     opacity: 0;
-    overflow: hidden;
-    transition: calc(var(--main-transition-duration) * 0.5);
-    transition-property: visibility, opacity;
   }
   .card.active {
     visibility: visible;
     opacity: 1;
   }
+  .card:not(.dialog) {
+    --margin: 8px;
+    margin: var(--margin) max(var(--safe-area-inset-right),var(--margin)) max(var(--safe-area-inset-bottom),var(--margin)) max(var(--safe-area-inset-left),var(--margin));
+  }
   .card.alert {
-    margin: 8px;
     position: absolute;
     right: 0;
     bottom: 0;
-    border-radius: 10px;
+    --card-border-radius: 10px;
     pointer-events: none;
     z-index: 3;
   }
+  .card.alert:not(.active) {
+    transform: translateX(calc(100% + var(--margin) * 2));
+  }
   .card.widget {
-    margin: 8px;
     position: absolute;
     right: 0;
     top: 0;
-    border-radius: 12px;
+    --card-border-radius: 12px;
     z-index: 1;
+    transform-origin: center top;
+    transition-property: margin-right, border-top-right-radius, border-bottom-right-radius, visibility, opacity, transform;
+  }
+  .card.widget:not(.active) {
+    transform: scaleY(0.25);
+  }
+  .card.widget.minimize {
+    margin-right: calc(var(--card-border-width) * -1);
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
   }
   .card.dialog {
     position: absolute;
-    border-radius: 14px;
+    --card-border-radius: 14px;
     z-index: 2;
+  }
+  .card.dialog:not(.active) {
+    transform: scale(0.5);
   }
   .card .header {
     display: flex;
     justify-content: center;
     align-items: center;
     background: #ffffff12;
-    border-bottom: 1px solid #000000;
+    border-bottom: var(--card-header-border-width) solid #000000;
+    --card-header-border-width: 1px;
+  }
+  .card.widget .header {
+    transition: var(--card-transition-duration);
+    transition-property: margin-bottom, border-color;
+  }
+  .card.widget.minimize .header {
+    margin-bottom: calc(var(--card-header-border-width) * -1);
+    border-color: transparent;
   }
   .card .header .card-back {
     margin-right: auto;
@@ -1289,12 +1322,16 @@
     display: none;
   }
 
-  .card .header .card-back:hover, .card .header .card-back:focus-visible {
+  .card .header .card-back:hover, .card .header .card-back:active {
+    color: #ffffff;
+    background: #ffffff24;
+  }
+  .card .header .card-back:focus-visible {
     color: #ffffff;
     background: #ffffff24;
   }
 /* -- Future Where --
-  .card .header .card-back:where(:hover,:focus-visible) {
+  .card .header .card-back:where(:hover,:active,:focus-visible) {
     color: #ffffff;
     background: #ffffff24;
   }
@@ -1312,11 +1349,25 @@
     width: 20px;height: 20px;
     /*aspect-ratio: 1/1;*/
   }
+  .card .header .title {
+    white-space: pre;
+    z-index: -1;
+  }
   .card:not(.alert) .header .title {
     position: absolute;
   }
   .card.alert .header .title {
     margin: 0 auto;
+  }
+  .card.widget .header .title {
+    transform-origin: calc(50% - calc(var(--card-minimize-width) + var(--card-header-padding-right)) * 0.5) center;
+    transition: var(--card-transition-duration);
+    transition-property: visibility, opacity, transform;
+  }
+  .card.widget.minimize .header .title {
+    visibility: hidden;
+    opacity: 0;
+    transform: scale(0);
   }
   .card.dialog .header .title {
     font-size: 18px;
@@ -1339,27 +1390,59 @@
     border: none;
     outline: none;
   }
+  .card.widget .header .card-controls .control[data-control="minimize"] {
+    transition: border-radius var(--card-transition-duration);
+  }
+  .card.widget.minimize .header .card-controls .control[data-control="minimize"] {
+    border-radius: calc(var(--card-border-radius) - var(--card-border-width));
+  }
+  .card.widget.minimize .header .card-controls .control[data-control="minimize"] svg {
+    transform: rotateY(180deg);
+  }
+  .card.widget .header .card-controls .control[data-control="close"] {
+    transition: var(--card-transition-duration);
+    transition-property: margin-left, margin-right, visibility, opacity;
+  }
+  .card.widget.minimize .header .card-controls .control[data-control="close"] {
+    margin-left: var(--card-header-padding-right);
+    margin-right: calc(var(--card-minimize-width) * -1);
+    visibility: hidden;
+    opacity: 0;
+  }
+  .card.widget .header .card-controls .control[data-control="close"] svg {
+    transition: transform var(--card-transition-duration);
+  }
+  .card.widget.minimize .header .card-controls .control[data-control="close"] svg {
+    transform: scale(0);
+  }
   :root:not(.macOS-device) .card .header .card-controls .control {
     padding: 10px;
     --control-background: none;
   }
 
-  :root:not(.macOS-device) .card .header .card-controls .control:hover, :root:not(.macOS-device) .card .header .card-controls .control:focus-visible {
+  :root:not(.macOS-device) .card .header .card-controls .control:hover, :root:not(.macOS-device) .card .header .card-controls .control:active {
+    color: #ffffff;
+    --control-background: #ffffff24;
+  }
+  :root:not(.macOS-device) .card .header .card-controls .control:focus-visible {
     color: #ffffff;
     --control-background: #ffffff24;
   }
 /* -- Future Where
-  :root:not(.macOS-device) .card .header .card-controls .control:where(:hover,:focus-visible) {
+  :root:not(.macOS-device) .card .header .card-controls .control:where(:hover,:active,:focus-visible) {
     color: #ffffff;
     --control-background: #ffffff24;
   }
 */
 
-  :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:hover, :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:focus-visible {
+  :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:hover, :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:active {
+    --control-background: #e81123;
+  }
+  :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:focus-visible {
     --control-background: #e81123;
   }
 /* -- Future Where
-  :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:where(:hover,:focus-visible) {
+  :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:where(:hover,:active,:focus-visible) {
     --control-background: #e81123;
   }
 */
@@ -1400,14 +1483,13 @@
     mix-blend-mode: luminosity;
   }
 
-  :root.macOS-device .card .header .card-controls:hover .control svg, :root.macOS-device .card .header .card-controls:focus-visible .control svg {
+  :root.macOS-device .card .header .card-controls:where(:hover,:active) .control svg, :root.macOS-device .card .header .card-controls:focus-within .control:focus-visible svg {
     color: #202020bf;
   }
-/* -- Future Where --
-  :root.macOS-device .card .header .card-controls:where(:hover,:active) .control svg {
+/* Temp Where */
+  :root.macOS-device .card .header .card-controls:-webkit-any(:hover,:active) .control svg, :root.macOS-device .card .header .card-controls:focus-within .control:focus-visible svg {
     color: #202020bf;
   }
-*/
 
   .card .main {
     display: flex;
@@ -1421,6 +1503,16 @@
   .card.widget .main {
     padding: 14px;
     gap: 14px;
+    transform-origin: calc(100% - calc(var(--card-minimize-width) + var(--card-header-padding-right)) * 0.5) top;
+    transition: var(--card-transition-duration);
+    transition-property: margin-left, margin-bottom, visibility, opacity, transform;
+  }
+  .card.widget.minimize .main {
+    margin-left: calc(calc(var(--card-main-width) - var(--card-header-padding-right)) * -1 + var(--card-minimize-width));
+    margin-bottom: calc(var(--card-main-height) * -1);
+    visibility: hidden;
+    opacity: 0;
+    transform: scale(0);
   }
   .card .main .content {
     display: flex;
@@ -1467,12 +1559,12 @@
     transition-property: color, background-color, border-color;
   }
 
-  .card .main button:where(:hover,:focus-visible), .select .menu.active .opener {
+  .card .main button:where(:hover,:active,:focus-visible), .select .menu.active .opener {
     color: #ffffff;
     background: #4b4b4b;
   }
 /* Temp Where */
-  .card .main button:-webkit-any(:hover,:focus-visible), .select .menu.active .opener {
+  .card .main button:-webkit-any(:hover,:active,:focus-visible), .select .menu.active .opener {
     color: #ffffff;
     background: #4b4b4b;
   }
@@ -2113,7 +2205,7 @@
         try {
           var formatted = JSON.stringify(JSON.parse(formatter_input.value),null,spacing);
           if (formatted != formatter_input.value) formatter_input.value = formatted;
-        } catch (error){
+        } catch (error){/* Make matching for "position" optional, as Safari doesn't give JSON parsing error data, it only says that an error occurred. */
           var message = error.toString().match(/^(.+?)position /)[0],
             errorIndex = error.toString().match(/position (\d+)/)[1],
 
@@ -2758,9 +2850,23 @@
     if (type == "widget") Editor.active_widget = null;
   }
   function minimizeCard(card){
-    var minimize = card.querySelector(".header .card-controls .control[data-control='minimize']");
+    var minimize = card.querySelector(".header .card-controls .control[data-control='minimize']"), icon = minimize.querySelector("svg use"), main = card.querySelector(".main");
     card.classList.toggle("minimize");
-    if (card.classList.contains("minimize") && card.contains(document.activeElement) && document.activeElement != minimize) minimize.focus();
+    if (card.classList.contains("minimize")){
+      card.style.setProperty("--card-minimize-width",`${minimize.clientWidth}px`);
+      card.style.setProperty("--card-main-width",`${main.clientWidth}px`);
+      card.style.setProperty("--card-main-height",`${main.clientHeight}px`);
+      icon.setAttribute("href","#arrow_icon");
+      if (card.contains(document.activeElement) && document.activeElement != minimize) minimize.focus();
+    } else {
+      var transitionDuration = parseInt(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
+      window.setTimeout(() => {
+        if (!card.classList.contains("minimize")) card.style.removeProperty("--card-minimize-width");
+      },transitionDuration);
+      card.style.removeProperty("--card-main-width");
+      card.style.removeProperty("--card-main-height");
+      icon.setAttribute("href","#minimize_icon");
+    }
   }
   function catchCardNavigation(){
     if (!Editor.active_dialog || context_menu.classList.contains("active") || event.key != "Tab" || document.activeElement != document.body) return;
