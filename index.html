@@ -57,6 +57,10 @@
         apple_home_screen = (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform) && "standalone" in navigator && navigator.standalone),
         hidden_chrome = (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight),
         window_controls_overlay = ((("windowControlsOverlay" in navigator) ? navigator.windowControlsOverlay.visible : false) && standalone),
+        refresh_window_controls_overlay = () => {
+          var visibility = window_controls_overlay, styling = document.documentElement.classList.contains("window-controls-overlay");
+          if (visibility != styling) (visibility) ? document.documentElement.classList.add("window-controls-overlay") : document.documentElement.classList.remove("window-controls-overlay");
+        },
         fullscreen = (window.matchMedia("(display-mode: fullscreen)").matches || (!window.screenY && !window.screenTop && hidden_chrome) || (!window.screenY && !window.screenTop && standalone)),
         safe_area_insets = {
           left: getSafeAreaInset("left"),
@@ -81,7 +85,7 @@
         function getRootStyleProperty(template){
           return window.getComputedStyle(document.documentElement).getPropertyValue(template);
         }
-      return { parent_window, standalone, apple_home_screen, hidden_chrome, window_controls_overlay, fullscreen, safe_area_insets, titlebar_area_insets };
+      return { parent_window, standalone, apple_home_screen, hidden_chrome, window_controls_overlay, refresh_window_controls_overlay, fullscreen, safe_area_insets, titlebar_area_insets };
     },
     environment: () => ({
       file_protocol: (window.location.protocol == "file:"),
@@ -172,6 +176,7 @@
   if (Editor.environment().apple_device) document.documentElement.classList.add("apple-device");
   if (Editor.environment().macOS_device) document.documentElement.classList.add("macOS-device");
   if (Editor.support().web_sharing) document.documentElement.classList.add("web-sharing");
+  Editor.appearance().refresh_window_controls_overlay();
 </script>
 
 <style>
@@ -286,7 +291,7 @@
   header .app-region {
     margin: var(--app-region-margin);
     margin-bottom: 0;
-    --app-region-margin: 2px;
+    --app-region-margin: 4px;
     position: absolute;
     left: 0;
     top: 0;
@@ -294,6 +299,9 @@
     height: calc(100% - var(--app-region-margin));
     z-index: -1;
     -webkit-app-region: drag;
+  }
+  :root.window-controls-overlay header .app-region {
+    --app-region-margin: calc(var(--titlebar-area-inset-height) * 0.12);
   }
   header .app-icon {
     flex-shrink: 0;
@@ -345,43 +353,61 @@
   }
 */
 
-  header .app-github {
+  header .app-omnibox {
     margin-left: auto;
+    height: var(--header-height);
     align-self: flex-start;
     flex-shrink: 0;
     display: flex;
+    align-items: center;
+    gap: var(--omnibox-gap);
+    --omnibox-gap: var(--header-gap);
+    color: #ffffff;
     -webkit-app-region: no-drag;
   }
-  :root.window-controls-overlay header .app-github {
+  :root.window-controls-overlay header .app-omnibox {
     margin-right: calc(var(--header-gap) * -1);
+    height: var(--titlebar-area-inset-height);
+    /*--omnibox-gap: calc(var(--titlebar-area-inset-height) * 0.24);*/
+    z-index: 4;
   }
-  header .app-github a {
-    height: var(--header-height);
-    display: flex;
-    align-items: center;
+  header .app-omnibox button {
+    background: none;
+    border: none;
     outline: none;
   }
-  :root.window-controls-overlay header .app-github a {
-    height: var(--titlebar-area-inset-height);
+  header .app-omnibox a {
+    cursor: default;
   }
-  header .app-github svg {
-    padding: 4px;
+  header .app-omnibox .option {
+    padding: 5px;
     box-sizing: content-box;
     width: 14px;height: 14px;
     /*aspect-ratio: 1/1;*/
-    fill: #ffffff;
+    display: flex;
+    align-items: center;
     border-radius: 50%;
-    transition: background-color 0.25s linear;
+    outline: none;
+    transition: background-color 250ms linear;
+  }/*
+  :root.window-controls-overlay header .app-omnibox .option {
+    padding: calc(var(--titlebar-area-inset-height) * 0.15);
+    width: calc(var(--titlebar-area-inset-height) * 0.44);height: calc(var(--titlebar-area-inset-height) * 0.44);
+  }*/
+  header .app-omnibox .option svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
   }
-  header .app-github a:hover > svg {
+  header .app-omnibox .option:hover {
     background-color: #ffffff14;
   }
 
-  header .app-github a:where(:active,:focus-visible) > svg {
+  header .app-omnibox .option:where(:active,:focus-visible) {
     background-color: #ffffff22;
   }
 /* Temp Where */
-  header .app-github a:-webkit-any(:active,:focus-visible) > svg {
+  header .app-omnibox .option:-webkit-any(:active,:focus-visible) {
     background-color: #ffffff22;
   }
 
@@ -429,10 +455,10 @@
     width: 100%;
     height: calc(50% - calc(var(--scaler-size) * 0.5) - calc(var(--safe-area-inset-bottom) * 0.5));
   }
-  body.split.horizontal[data-scaling-offset] main .workspace {
+  body.split.horizontal[data-scaling-active] main .workspace {
     width: calc(var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
   }
-  body.split.vertical[data-scaling-offset] main .workspace {
+  body.split.vertical[data-scaling-active] main .workspace {
     height: calc(var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
   }
   body.preview main .workspace {
@@ -672,8 +698,10 @@
     position: absolute;
     background: #424242;
     border: 0 solid transparent;
+    box-shadow: 0 0 2px 1px #00000028;
     touch-action: none;
     z-index: 1;
+    transition: background-color var(--transition-fast);
   }
 
   body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .scaler {
@@ -727,10 +755,10 @@
   body.split.vertical main .scaler {
     top: calc(50% - calc(var(--scaler-size) * 0.5) - calc(var(--safe-area-inset-bottom) * 0.5));
   }
-  body.split.horizontal[data-scaling-offset] main .scaler {
+  body.split.horizontal[data-scaling-active] main .scaler {
     left: calc(var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
   }
-  body.split.vertical[data-scaling-offset] main .scaler {
+  body.split.vertical[data-scaling-active] main .scaler {
     top: calc(var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
   }
   body.preview.horizontal main .scaler {
@@ -748,6 +776,7 @@
     background: #ffffff;
     border: solid var(--preview-border-color);
     border-width: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
+    z-index: 1;
   }
 
   body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .preview {
@@ -782,10 +811,10 @@
     width: 100%;
     height: calc(50% - calc(var(--scaler-size) * 0.5) + var(--safe-area-inset-bottom) * 0.5);
   }
-  body.split.horizontal[data-scaling-offset] main .preview {
+  body.split.horizontal[data-scaling-active] main .preview {
     width: calc(100% - var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
   }
-  body.split.vertical[data-scaling-offset] main .preview {
+  body.split.vertical[data-scaling-active] main .preview {
     height: calc(100% - var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
   }
   body.preview main .preview {
@@ -1778,8 +1807,9 @@
       </ul>
     </div>
   </section>
-  <section class="app-github">
-    <a href="https://github.com/Offroaders123/Smart-Text-Editor" title="Smart Text Editor on GitHub"><svg><use href="#github_mark"/></svg></a>
+  <section class="app-omnibox">
+    <button class="option" title="Refresh Preview" onclick="refreshPreview({ force: true });"><svg><use href="#refresh_icon"/></svg></button>
+    <a class="option" href="https://github.com/Offroaders123/Smart-Text-Editor" title="Smart Text Editor on GitHub"><svg><use href="#github_mark"/></svg></a>
   </section>
 </header>
 
@@ -2189,6 +2219,10 @@
       }
     });
   });
+  document.querySelectorAll("header .app-omnibox .option").forEach(option => {
+    option.tabIndex = -1;
+    option.addEventListener("mousedown",event => event.preventDefault());
+  });
   window.Tools = {
     replaceText: {
       replace: () => {
@@ -2322,14 +2356,10 @@
   });
   window.addEventListener("unload",() => Editor.child_windows.forEach(win => win.close()));
   window.addEventListener("resize",event => {
-    refreshWindowControlsOverlay();
+    Editor.appearance().refresh_window_controls_overlay();
     if (context_menu.classList.contains("active")) closeMenu(context_menu);
     if (Editor.view() != "preview") setEditorTabsVisibility();
-    if (Editor.view() != "split" || !document.body.hasAttribute("data-scaling-offset")) return;
-    var previousWidth = window.innerWidth, previousHeight = window.innerHeight;
-    window.setTimeout(() => {
-      if ((Editor.orientation() == "horizontal" && window.innerWidth != previousWidth) || (Editor.orientation() == "vertical" && window.innerHeight != previousHeight)) setView({ type: "split" });
-    },100);
+    if (Editor.view() == "split" && document.body.hasAttribute("data-scaling-active")) setView({ type: "split" });
   });
   window.addEventListener("blur",() => {
     if (Editor.appearance().parent_window) menus.forEach(menu => {
@@ -2533,7 +2563,6 @@
     });
   }
   if (Editor.appearance().parent_window) window.setTimeout(() => document.documentElement.classList.remove("startup-fade"),50);
-  refreshWindowControlsOverlay();
   var queryParameters = new URLSearchParams(window.location.search);
   if (queryParameters.get("template")){
     Tools.insertTemplate({ type: "html" });
@@ -2652,7 +2681,7 @@
     setEditorTabsVisibility();
     setTitle({ content: getName() });
     if ((auto_created && !Editor.environment().touch_device && Editor.appearance().parent_window) || focused) textarea.focus({ preventScroll: true });
-    if (Editor.preview_editor == "active-editor") refreshPreview({ force: true });
+    if (Editor.preview_editor == "active-editor") refreshPreview({ force: (Editor.settings.get("automatic-refresh") != false) });
   }
   function closeEditor({ identifier = Editor.active_editor } = {}){
     if (!identifier) return;
@@ -3016,13 +3045,6 @@
       });
     },transitionDuration);
   }
-  function refreshWindowControlsOverlay(){
-    var visibility = Editor.appearance().window_controls_overlay, styling = document.documentElement.classList.contains("window-controls-overlay");
-    if (visibility == styling) return;
-    if (visibility){
-      document.documentElement.classList.add("window-controls-overlay");
-    } else document.documentElement.classList.remove("window-controls-overlay");
-  }
   function catchMenuNavigation(){
   }
 
@@ -3143,8 +3165,10 @@
     if (Editor.orientation() == "vertical") scalingOffset = (!touchEvent) ? event.pageY - header.offsetHeight : event.touches[0].pageY - header.offsetHeight;
     if (scalingOffset < scalingRange.minimum) scalingOffset = scalingRange.minimum;
     if (scalingOffset > scalingRange.maximum) scalingOffset = scalingRange.maximum;
-    document.body.setAttribute("data-scaling-offset",scalingOffset);
-    document.body.style.setProperty("--scaling-offset",`${scalingOffset}px`);
+    document.body.setAttribute("data-scaling-active",true);
+    workspace.style.setProperty("--scaling-offset",`${scalingOffset}px`);
+    scaler.style.setProperty("--scaling-offset",`${scalingOffset}px`);
+    preview.style.setProperty("--scaling-offset",`${scalingOffset}px`);
   }
   function disableScaling(event){
     var touchEvent = (Editor.environment().touch_device && event instanceof TouchEvent);
@@ -3158,9 +3182,11 @@
     document.body.removeAttribute("data-scaling-change");
   }
   function removeScaling(){
-    if (!document.body.hasAttribute("data-scaling-offset")) return;
-    document.body.removeAttribute("data-scaling-offset");
-    document.body.style.removeProperty("--scaling-offset");
+    if (!document.body.hasAttribute("data-scaling-active")) return;
+    document.body.removeAttribute("data-scaling-active");
+    workspace.style.removeProperty("--scaling-offset");
+    scaler.style.removeProperty("--scaling-offset");
+    preview.style.removeProperty("--scaling-offset");
   }
 </script>
 
