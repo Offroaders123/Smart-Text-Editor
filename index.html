@@ -1777,7 +1777,7 @@
       <button class="opener">Tools</button>
       <ul class="list">
         <li class="list-item" onclick="openCard(replace_text_card);">Replace Text<span class="info shortcut ctrl-shift shift-command">F</span></li>
-        <li class="list-item" onclick="openCard(color_picker_card);">Color Picker<span class="info shortcut ctrl-shift shift-command">K</span></li>
+        <!--li class="list-item" onclick="openCard(color_picker_card);">Color Picker<span class="info shortcut ctrl-shift shift-command">K</span></li-->
         <li class="list-item" onclick="openCard(json_formatter_card);">JSON Formatter<span class="info shortcut ctrl-shift shift-command">G</span></li>
         <li class="list-item" onclick="openCard(uri_encoder_card);">URI Encoder<span class="info shortcut ctrl-shift shift-command">Y</span></li>
         <li class="list-item" onclick="openCard(uuid_generator_card);">UUID Generator<span class="info shortcut ctrl-shift shift-command">O</span></li>
@@ -2449,12 +2449,12 @@
       event.preventDefault();
       if (event.repeat) return;
       openCard(replace_text_card);
-    }
+    }/*
     if ((controlShift || shiftCommand) && pressed("k")){
       event.preventDefault();
       if (event.repeat) return;
       openCard(color_picker_card);
-    }
+    }*/
     if ((controlShift || shiftCommand) && pressed("g")){
       event.preventDefault();
       if (event.repeat) return;
@@ -2480,7 +2480,7 @@
       if (event.repeat || !Editor.active_widget) return;
       minimizeCard(Editor.active_widget);
     }
-    if ((controlShift || shiftCommand) && (pressed(".") || pressed(">"))){
+    if ((control || command) && (pressed(",") || pressed("<"))){
       event.preventDefault();
       if (event.repeat) return;
       openCard(settings_card);
