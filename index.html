@@ -48,6 +48,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cousine&family=Rubik&display=swap">
 <script src="https://offroaders123.github.io/Num-Text-Component/script.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js" data-manual></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-json.min.js"></script>
 
 <script>
   window.Editor = {
@@ -206,7 +208,7 @@
     --scrollbar-height: 16px;
     --scrollbar-border-width: 4px;
   }
-  :root:-moz-window-inactive, :root:-moz-window-inactive num-text::part(editor) {
+  :root:-moz-window-inactive {
     --selection-background: var(--selection-background-inactive);
   }
   :root:not(.window-controls-overlay) {
@@ -690,10 +692,6 @@
   main .workspace .editor.active {
     visibility: visible;
   }
-  main .workspace .editor::part(content) {
-    min-width: 0;
-    min-height: 0;
-  }
   main .scaler {
     position: absolute;
     background: #424242;
@@ -837,27 +835,22 @@
     --padding: 8px;
     --color: #eaeaea;
     caret-color: var(--color);
-    font-family: "Cousine", monospace;
-    line-height: 1.4;
+    font-family: ui-monospace, "Cousine", monospace;
+    --selection-background: inherit;
+    --selection-background-inactive: inherit;
+    background: var(--background);
     --background: #2d2d2d;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
     scrollbar-color: #808080 var(--background);
-    transition: none;
   }
   num-text::part(container) {
     border-radius: inherit;
-  }
-  num-text::part(editor) {
-    resize: none;
   }
   input[type="text"] {
     padding: 8px;
     color: #eaeaea;
     caret-color: #eaeaea;
     font-size: 13px;
-    font-family: "Cousine", monospace;
+    font-family: ui-monospace, "Cousine", monospace;
     line-height: 1.4;
     background: #2d2d2d;
     border: none;
@@ -866,17 +859,16 @@
     appearance: none;
     -webkit-appearance: none;
   }
-  ::selection, num-text::part(editor)::selection {
+  ::selection {
     color: var(--selection-color);
     background: var(--selection-background);
   }
-  ::selection:window-inactive, num-text::part(editor)::selection:window-inactive {
+  ::selection:window-inactive {
     background: var(--selection-background-inactive);
   }
 </style>
 
 <style id="scrollbar_styles">
-/* Todo: Figure out how to add custom scrollbar styles to Shadow DOM content from the main document *edit: Almost have it figured it out now! :P **edit: Temporarily adding these styles to each <num-text> using JavaScript */
   ::-webkit-scrollbar {
     width: var(--scrollbar-width);
     height: var(--scrollbar-height);
@@ -3010,7 +3002,7 @@
     }
     if (!menu.classList.contains("context-menu")) return;
     if (Editor.context_menu_timeout) Editor.context_menu_timeout = null;
-    Editor.context_menu_previous = event.target;
+    Editor.context_menu_previous = event.composedPath()[0];
     menu.classList.add(type);
     var location = {};
     if (!Editor.environment.touch_device && !(event instanceof TouchEvent)){
@@ -3036,7 +3028,7 @@
     });
     if (opener && opener != document.activeElement) opener.focus();
     if (!menu.classList.contains("context-menu")) return;
-    Editor.context_menu_previous.focus();
+    if (Editor.context_menu_previous) Editor.context_menu_previous.focus();
     var types = ["link","editing"], transitionDuration = parseInt(getElementStyle({ element: list, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
     window.setTimeout(() => {
       var types = ["link","editing"];
@@ -3072,14 +3064,16 @@
     if (type == "input"){
       element.spellcheck = false;
       element.autocomplete = "off";
-      element.autocapitalize = "off";
+      element.autocapitalize = "none";
       element.setAttribute("autocorrect","off");
       if (advanced) attachContextMenu({ element, type: "editing" });
     }
     if (type == "num-text"){
+      element.colorScheme.set("dark");
+      element.themes.remove("default-appearance");
       var scrollbarStyles = document.createElement("style");
       scrollbarStyles.textContent = scrollbar_styles.textContent;
-      element.container.insertBefore(scrollbarStyles,element.styles.nextElementSibling);
+      element.container.insertBefore(scrollbarStyles,element.container.firstChild);
       if (!advanced) return;
       attachContextMenu({ element, type: "editing" });
     }
@@ -3094,6 +3088,7 @@
       } else if (Editor.support().editing_commands){
         openMenu(context_menu,type);
       } else {
+        event.stopPropagation();
         menus.forEach(menu => closeMenu(menu));
       }
     });
