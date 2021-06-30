@@ -320,7 +320,7 @@
     min-width: 0;
     align-self: stretch;
     display: flex;
-    z-index: 2;
+    z-index: 3;
     -webkit-app-region: no-drag;
   }
   header .app-menubar .menu {
@@ -965,9 +965,11 @@
     --list-border-width: 1px;
     border-radius: calc(var(--list-padding-y) + var(--list-border-width));
     box-shadow: 0 5px 10px #00000060;
-    visibility: hidden;
     z-index: 1;
     list-style: none;
+    transform-origin: center top;
+    transition: ease-in;
+    transition-property: visibility, opacity, transform;
   }
   :root.apple-device .menu .list {
     --list-padding-x: 5px;
@@ -1117,8 +1119,13 @@
   :root.apple-device .menu .list .list {
     left: calc(100% + var(--list-item-border-width));
   }
+  .menu:not(.active) > .list, .menu .list-parent:not(.active) > .list {
+    visibility: hidden;
+    opacity: 0.25;
+    transform: scaleY(0.5);
+  }
   .menu.active > .list, .menu .list-parent.active > .list {
-    visibility: visible;
+    transition-duration: 125ms;
   }
   :root:not(.apple-device) .shortcut.ctrl::before {
     content: "Ctrl + ";
@@ -1259,17 +1266,22 @@
     border-radius: var(--card-border-radius);
     box-shadow: 0 8px 15px #00000050;
     overflow: hidden;
-    transition: var(--card-transition-duration);
+    z-index: var(--card-z-index);
+    --card-z-index: 1;
+    transition: var(--card-transition-duration) ease-in;
     --card-transition-duration: calc(var(--main-transition-duration) * 0.5);
     transition-property: visibility, opacity, transform;
   }
   .card:not(.active) {
     visibility: hidden;
     opacity: 0;
+    pointer-events: none;
   }
   .card.active {
     visibility: visible;
     opacity: 1;
+    z-index: calc(var(--card-z-index) + 1);
+    transition-timing-function: ease-out;
   }
   .card:not(.dialog) {
     --margin: 8px;
@@ -1281,7 +1293,7 @@
     bottom: 0;
     --card-border-radius: 10px;
     pointer-events: none;
-    z-index: 3;
+    --card-z-index: 5;
   }
   .card.alert:not(.active) {
     transform: translateX(calc(100% + var(--margin) * 2));
@@ -1291,22 +1303,23 @@
     right: 0;
     top: 0;
     --card-border-radius: 12px;
-    z-index: 1;
     transform-origin: center top;
-    transition-property: margin-right, border-top-right-radius, border-bottom-right-radius, visibility, opacity, transform;
+    transition-property: margin-right, margin-top, border-top-right-radius, border-bottom-right-radius, box-shadow, visibility, opacity, transform;
   }
   .card.widget:not(.active) {
     transform: scaleY(0.25);
   }
   .card.widget.minimize {
     margin-right: calc(var(--card-border-width) * -1);
+    margin-top: 3px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
+    box-shadow: 0 4px 7px #00000050;
   }
   .card.dialog {
     position: absolute;
     --card-border-radius: 14px;
-    z-index: 2;
+    --card-z-index: 3;
   }
   .card.dialog:not(.active) {
     transform: scale(0.5);
@@ -1635,15 +1648,19 @@
     width: 100%;
     height: 100%;
     background: #1e1e1e60;
+    z-index: 3;
+    transition: calc(var(--main-transition-duration) * 0.5) ease-in;
+    transition-property: visibility, opacity;
+  }
+  .card-backdrop:not(.active) {
     visibility: hidden;
     opacity: 0;
-    z-index: 2;
-    transition: calc(var(--main-transition-duration) * 0.5);
-    transition-property: visibility, opacity;
+    pointer-events: none;
   }
   .card-backdrop.active {
     visibility: visible;
     opacity: 1;
+    transition-timing-function: ease-out;
   }
   #symbol_definitions {
     display: none;
