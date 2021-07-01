@@ -1,7 +1,7 @@
 <table>
   <tr>
     <td>
-      <img width="64" src="https://offroaders123.github.io/Smart-Text-Editor/resources/icon.svg">
+      <img width="64" src="https://stedit.app/resources/icon.svg">
     </td>
     <td>
       <h1>Smart Text Editor</h1>
@@ -19,7 +19,7 @@ This project can be opened with GitHub Pages, as well as installed to your devic
 
 *A note ahead of time: If you are using Grammarly or another text editing-focused extension on lower-end hardware, I have run into performance issues when editing large files with Smart Text Editor, so I recommend disabling it for use with Smart Text Editor if it isn't neccesary for your task at hand (If you aren't writing an essay or something with normal grammar/spelling). However, this is just for performance concerns, so if your device can handle it, it is perfectly fine to leave such extensions enabled!*
 
-### [Open Smart Text Editor with GitHub Pages](https://offroaders123.github.io/Smart-Text-Editor/)
+### [Open Smart Text Editor with GitHub Pages](https://stedit.app)
 
 A list of instructions to add a shortcut for Smart Text Editor to your device can be found below:
 
