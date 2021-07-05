@@ -1,5 +1,5 @@
 self.Editor = {
-  version: 2.71,
+  version: 2.72,
   environment: () => ({
     macOS_device: (/(Mac)/i.test(navigator.platform) && navigator.standalone == undefined)
   })
