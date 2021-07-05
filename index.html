@@ -366,12 +366,10 @@
     gap: var(--omnibox-gap);
     --omnibox-gap: var(--header-gap);
     color: #ffffff;
-    -webkit-app-region: no-drag;
   }
   :root.window-controls-overlay header .app-omnibox {
     margin-right: calc(var(--header-gap) * -1);
     height: var(--titlebar-area-inset-height);
-    /*--omnibox-gap: calc(var(--titlebar-area-inset-height) * 0.24);*/
     z-index: 4;
   }
   header .app-omnibox button {
@@ -392,11 +390,8 @@
     border-radius: 50%;
     outline: none;
     transition: background-color 250ms linear;
-  }/*
-  :root.window-controls-overlay header .app-omnibox .option {
-    padding: calc(var(--titlebar-area-inset-height) * 0.15);
-    width: calc(var(--titlebar-area-inset-height) * 0.44);height: calc(var(--titlebar-area-inset-height) * 0.44);
-  }*/
+    -webkit-app-region: no-drag;
+  }
   header .app-omnibox .option svg {
     width: 100%;
     height: 100%;
@@ -969,7 +964,6 @@
     z-index: 1;
     list-style: none;
     transform-origin: center top;
-    transition: ease-in;
     transition-property: visibility, opacity, transform;
   }
   :root.apple-device .menu .list {
@@ -1126,7 +1120,7 @@
     transform: scaleY(0.5);
   }
   .menu.active > .list, .menu .list-parent.active > .list {
-    transition-duration: 125ms;
+    transition-duration: 130ms;
   }
   :root:not(.apple-device) .shortcut.ctrl::before {
     content: "Ctrl + ";
@@ -1269,7 +1263,7 @@
     overflow: hidden;
     z-index: var(--card-z-index);
     --card-z-index: 1;
-    transition: var(--card-transition-duration) ease-in;
+    transition: var(--card-transition-duration);
     --card-transition-duration: calc(var(--main-transition-duration) * 0.5);
     transition-property: visibility, opacity, transform;
   }
@@ -1282,7 +1276,6 @@
     visibility: visible;
     opacity: 1;
     z-index: calc(var(--card-z-index) + 1);
-    transition-timing-function: ease-out;
   }
   .card:not(.dialog) {
     --margin: 8px;
@@ -1650,7 +1643,7 @@
     height: 100%;
     background: #1e1e1e60;
     z-index: 3;
-    transition: calc(var(--main-transition-duration) * 0.5) ease-in;
+    transition: calc(var(--main-transition-duration) * 0.5);
     transition-property: visibility, opacity;
   }
   .card-backdrop:not(.active) {
@@ -1661,7 +1654,6 @@
   .card-backdrop.active {
     visibility: visible;
     opacity: 1;
-    transition-timing-function: ease-out;
   }
   #symbol_definitions {
     display: none;
@@ -1843,7 +1835,7 @@
     <section class="main">
       <div class="content">
         <div class="item list start">
-          <div class="select">
+          <!--div class="select">
             <label for="orientation_setting">Default Orientation:</label>
             <div class="menu">
               <button id="orientation_setting" class="opener">Horizontal<svg><use href="#back_icon"/></svg></button>
@@ -1852,7 +1844,7 @@
                 <li class="list-item" onclick="updateSelect('orientation','vertical');">Vertical</li>
               </ul>
             </div>
-          </div>
+          </div-->
           <div class="checkbox">
             <input id="refresh_setting" type="checkbox" oninput="Editor.settings.set('automatic-refresh',this.checked);" checked>
             <label for="refresh_setting"><svg class="check"><use href="#check_icon"/></svg>Automatically Refresh Preview</label>
@@ -1880,13 +1872,16 @@
     </section>
     <section class="main">
       <div class="content">
-        <div class="item list expand">
-          <num-text id="theme_setting" placeholder="CSS to modify..."></num-text>
+        <div class="item list">
+          <span style="font-size: 13px; line-height: 1.6;">Custom workspace theme settings<br>will be featured in a later update.</span>
         </div>
+        <!--div class="item list expand">
+          <num-text id="theme_setting" placeholder="CSS to modify..."></num-text>
+        </div-->
       </div>
-      <div class="options">
+      <!--div class="options">
         <button onclick="resetTheme();">Reset Theme</button>
-      </div>
+      </div-->
     </section>
   </section>
   <section id="reset_settings_card" class="card alert" data-card="alert">
