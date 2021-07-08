@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="author" content="Brandon Bennett">
-<meta name="description" content="The text editor that requires only a browser and a keyboard!">
+<meta name="description" content="Smart Text Editor is a vanilla JavaScript PWA that allows you to work on your coding projects from any device, in any browser, even if you don't have Internet access.">
 <meta name="google-site-verification" content="_LrfHy7pIualH1TolkQ5b3Po0dtjYrx-QQsiXelwx20">
 <meta property="og:title" content="Smart Text Editor">
 <meta property="og:description" content="The text editor that requires only a browser and a keyboard!">
@@ -3083,7 +3083,7 @@
     }
     if (type == "num-text"){
       element.colorScheme.set("dark");
-      element.themes.remove("default-appearance");
+      element.themes.remove("vanilla-appearance");
       var scrollbarStyles = document.createElement("style");
       scrollbarStyles.textContent = scrollbar_styles.textContent;
       element.container.insertBefore(scrollbarStyles,element.container.firstChild);
