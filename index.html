@@ -48,6 +48,9 @@
 <link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="resources/startup-ipadpro2-portrait.png">
 <link rel="preconnect" href="https://fonts.gstatic.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cousine&family=Rubik&display=swap">
+<link rel="preload" as="style" href="https://offroaders123.github.io/Num-Text-Component/vanilla-layout.css">
+<link rel="preload" as="style" href="https://offroaders123.github.io/Num-Text-Component/vanilla-appearance.css">
+<link rel="preload" as="style" href="https://offroaders123.github.io/Num-Text-Component/vanilla-highlighting.css">
 <script src="https://offroaders123.github.io/Num-Text-Component/script.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js" data-manual></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-json.min.js"></script>
@@ -76,6 +79,11 @@
           width_left: getTitlebarAreaInset("width-left"),
           width_right: getTitlebarAreaInset("width-right"),
           height: getTitlebarAreaInset("height"),
+        },
+        device_pixel_ratio = window.devicePixelRatio.toFixed(2),
+        refresh_device_pixel_ratio = () => {
+          var ratio = Editor.appearance().device_pixel_ratio, styling = getRootStyleProperty("--device-pixel-ratio");
+          if (ratio != styling) document.documentElement.style.setProperty("--device-pixel-ratio",ratio);
         };
         function getSafeAreaInset(section){
           return parseInt(getRootStyleProperty(`--safe-area-inset-${section}`),10);
@@ -88,7 +96,7 @@
         function getRootStyleProperty(template){
           return window.getComputedStyle(document.documentElement).getPropertyValue(template);
         }
-      return { parent_window, standalone, apple_home_screen, hidden_chrome, window_controls_overlay, refresh_window_controls_overlay, fullscreen, safe_area_insets, titlebar_area_insets };
+      return { parent_window, standalone, apple_home_screen, hidden_chrome, window_controls_overlay, refresh_window_controls_overlay, fullscreen, safe_area_insets, titlebar_area_insets, device_pixel_ratio, refresh_device_pixel_ratio };
     },
     environment: () => ({
       file_protocol: (window.location.protocol == "file:"),
@@ -158,7 +166,12 @@
       reset: () => {
         if (!Editor.support().local_storage) return;
         if (!confirm("Are you sure you would like to reset all settings?")) return;
+        var active = document.activeElement;
         Editor.settings.entries = {};
+        default_orientation_setting.closest(".menu").querySelector("[data-option='horizontal']").click();/* Temporary! Look at note below */
+        syntax_highlighting_setting.checked = false;
+        automatic_refresh_setting.checked = true;
+        active.focus({ preventScroll: true });/* Temporary! Changing select dropdown options currently requires them to be clicked programmatically, so it will remove focus from the current element. This will be addressed with MenuDrop once that is out. I can't wait for it to be ready! :) */
         window.localStorage.removeItem("settings");
         openCard(reset_settings_card);
         return true;
@@ -180,6 +193,7 @@
   if (Editor.environment().macOS_device) document.documentElement.classList.add("macOS-device");
   if (Editor.support().web_sharing) document.documentElement.classList.add("web-sharing");
   Editor.appearance().refresh_window_controls_overlay();
+  Editor.appearance().refresh_device_pixel_ratio();
 </script>
 
 <style>
@@ -238,8 +252,8 @@
     font-family: -apple-system, BlinkMacSystemFont, "Rubik", sans-serif;
     background: #121212;
     overflow: hidden;
-    user-select: none;
     -webkit-user-select: none;
+    user-select: none;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
@@ -286,7 +300,7 @@
     width: calc(var(--safe-area-inset-left) + var(--titlebar-area-inset-width-left));
   }
   header::after {
-    width: calc(var(--safe-area-inset-left) + var(--titlebar-area-inset-width-right));
+    width: calc(var(--safe-area-inset-right) + var(--titlebar-area-inset-width-right));
   }
   body[data-scaling-change] header {
     pointer-events: none;
@@ -363,13 +377,13 @@
     flex-shrink: 0;
     display: flex;
     align-items: center;
-    gap: var(--omnibox-gap);
-    --omnibox-gap: var(--header-gap);
+    gap: var(--header-gap);
     color: #ffffff;
   }
   :root.window-controls-overlay header .app-omnibox {
     margin-right: calc(var(--header-gap) * -1);
     height: var(--titlebar-area-inset-height);
+    gap: calc(var(--header-gap) / var(--device-pixel-ratio));
     z-index: 4;
   }
   header .app-omnibox button {
@@ -391,6 +405,10 @@
     outline: none;
     transition: background-color 250ms linear;
     -webkit-app-region: no-drag;
+  }
+  :root.window-controls-overlay header .app-omnibox .option {
+    padding: calc(5px / var(--device-pixel-ratio));
+    width: calc(14px / var(--device-pixel-ratio));height: calc(14px / var(--device-pixel-ratio));
   }
   header .app-omnibox .option svg {
     width: 100%;
@@ -431,12 +449,12 @@
     flex-direction: column;
   }
 
-  body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace {
+/* Temp Where */
+  body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace {
     transition: var(--main-transition-duration);
     transition-property: width, height, opacity;
   }
-/* Temp Where */
-  body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace {
+  body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace {
     transition: var(--main-transition-duration);
     transition-property: width, height, opacity;
   }
@@ -490,11 +508,11 @@
     pointer-events: none;
   }
 
-  body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-tabs::before, body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-tabs::after {
-    transition: width var(--main-transition-duration);
-  }
 /* Temp Where */
   body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-tabs::before, body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-tabs::after {
+    transition: width var(--main-transition-duration);
+  }
+  body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-tabs::before, body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-tabs::after {
     transition: width var(--main-transition-duration);
   }
 
@@ -503,7 +521,10 @@
   }
   main .workspace .workspace-tabs::after {
     margin-left: auto;
-    width: calc(var(--safe-area-inset-right) + var(--workspace-tabs-padding));
+    width: calc(var(--safe-area-inset-right) + var(--workspace-tabs-padding) + var(--minimize-tab-width,0px));
+  }
+  main .workspace .workspace-tabs[data-minimize-change]::after {
+    transition: width calc(var(--main-transition-duration) * 0.55);
   }
   body.split.horizontal main .workspace .workspace-tabs::after {
     width: var(--workspace-tabs-padding);
@@ -589,12 +610,12 @@
     border-width: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
   }
 
-  :root:not(.startup-fade) body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-editors:empty {
+/* Temp Where */
+  :root:not(.startup-fade) body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-editors:empty {
     transition: var(--main-transition-duration);
     transition-property: border-width, border-color;
   }
-/* Temp Where */
-  :root:not(.startup-fade) body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-editors:empty {
+  :root:not(.startup-fade) body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-editors:empty {
     transition: var(--main-transition-duration);
     transition-property: border-width, border-color;
   }
@@ -605,14 +626,14 @@
     text-align: center;
   }
 
+/* Temp Where */
+  :root:not(.startup-fade) body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-editors:empty::before {
+    transition: transform var(--main-transition-duration);
+  }
   :root:not(.startup-fade) body[data-view-change] main .workspace .workspace-editors:empty::before {
     white-space: nowrap;
   }
   :root:not(.startup-fade) body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-editors:empty::before {
-    transition: transform var(--main-transition-duration);
-  }
-/* Temp Where */
-  :root:not(.startup-fade) body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-editors:empty::before {
     transition: transform var(--main-transition-duration);
   }
 
@@ -652,12 +673,12 @@
     --scrollbar-border-width: 5px;
   }
 
-  body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .editor {
+/* Temp Where */
+  body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .editor {
     transition: var(--main-transition-duration);
     transition-property: border-width, border-color;
   }
-/* Temp Where */
-  body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .editor {
+  body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .editor {
     transition: var(--main-transition-duration);
     transition-property: border-width, border-color;
   }
@@ -698,18 +719,18 @@
     transition: background-color var(--transition-fast);
   }
 
-  body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .scaler {
-    transition: var(--main-transition-duration);
-    transition-property: left, top, width, height, border-width, border-color, opacity;
-  }
 /* Temp Where */
   body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .scaler {
     transition: var(--main-transition-duration);
     transition-property: left, top, width, height, border-width, border-color, opacity;
   }
+  body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .scaler {
+    transition: var(--main-transition-duration);
+    transition-property: left, top, width, height, border-width, border-color, opacity;
+  }
 
   main .scaler:hover, body[data-scaling-change] main .scaler {
-    background: #4b4b4b;
+    background: #4f4f4f;
   }
   body.code main .scaler {
     --scaler-size: 0px;
@@ -773,12 +794,12 @@
     z-index: 1;
   }
 
-  body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .preview {
+/* Temp Where */
+  body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .preview {
     transition: var(--main-transition-duration);
     transition-property: width, height, border-width, visibility, opacity;
   }
-/* Temp Where */
-  body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .preview {
+  body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .preview {
     transition: var(--main-transition-duration);
     transition-property: width, height, border-width, visibility, opacity;
   }
@@ -852,8 +873,8 @@
     border: none;
     border-radius: 0;
     outline: none;
-    appearance: none;
     -webkit-appearance: none;
+    appearance: none;
   }
   ::selection {
     color: var(--selection-color);
@@ -1026,13 +1047,10 @@
     width: var(--list-item-selected-icon-size);
     height: var(--list-item-selected-icon-size);
     background: currentColor;
-    mask: var(--list-item-selected-icon-source);
     -webkit-mask: var(--list-item-selected-icon-source);
+    mask: var(--list-item-selected-icon-source);
     --list-item-selected-icon-source: url("data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%20512%20512%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%3Cpath%20d%3D%22m63.346%20191.15%20192.72%20192.72-63.402%2063.402-192.72-192.72z%22%2F%3E%0A%20%20%3Cpath%20d%3D%22m129.5%20383.87%20319.15-319.15%2063.402%2063.402-319.15%20319.15z%22%2F%3E%0A%3C%2Fsvg%3E");
     pointer-events: none;
-  }
-  .menu .list-item.hidden {
-    display: none;
   }
   .menu.context-menu.link > .list .list-item:not(.link):not(.global), .menu.context-menu.editing > .list .list-item:not(.editing):not(.global), :root:not(.web-sharing) .menu.context-menu > .list .list-item.web-sharing:not(.global), :root.web-sharing .menu.context-menu > .list .list-item.web-sharing-alt:not(.global) {
     display: none;
@@ -1110,6 +1128,7 @@
   .menu .list .list {
     left: calc(100% + var(--list-padding-x) + var(--list-border-width) + var(--list-item-border-width));
     top: calc(calc(var(--list-padding-y) + var(--list-border-width) + var(--list-item-border-width)) * -1);
+    transform-origin: left top;
   }
   :root.apple-device .menu .list .list {
     left: calc(100% + var(--list-item-border-width));
@@ -1118,6 +1137,9 @@
     visibility: hidden;
     opacity: 0.25;
     transform: scaleY(0.5);
+  }
+  .menu .list-parent:not(.active) > .list {
+    transform: scale(0.5);
   }
   .menu.active > .list, .menu .list-parent.active > .list {
     transition-duration: 130ms;
@@ -1147,11 +1169,11 @@
     transition: color var(--transition-fast);
   }
 
-  .select:where(:hover,:focus-within,.active) {
-    color: #ffffff;
-  }
 /* Temp Where */
   .select:-webkit-any(:hover,:focus-within,.active) {
+    color: #ffffff;
+  }
+  .select:where(:hover,:focus-within,.active) {
     color: #ffffff;
   }
 
@@ -1160,14 +1182,15 @@
     align-items: center;
   }
   .select:hover .menu .opener {
-    background: #4b4b4b;
+    background: #4f4f4f;
   }
   .select .menu.active .opener {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
   }
   .select .menu .opener svg {
-    width: 12px;height: 12px;
+    margin-left: auto;
+    width: 10px;height: 10px;
     /*aspect-ratio: 1/1;*/
     fill: currentColor;
     transform: rotate(270deg);
@@ -1187,17 +1210,17 @@
     --checkbox-check-border-width: 2px;
     border-radius: calc(var(--checkbox-padding) + var(--checkbox-border-width) + var(--checkbox-check-border-width));
     outline: none;
-    backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
     transition: var(--transition-fast);
     transition-property: color, border-color, opacity;
   }
 
-  .checkbox:where(:hover,:focus-visible) {
+/* Temp Where */
+  .checkbox:-webkit-any(:hover,:active,:focus-visible) {
     color: #ffffff;
   }
-/* Temp Where */
-  .checkbox:-webkit-any(:hover,:focus-visible) {
+  .checkbox:where(:hover,:active,:focus-visible) {
     color: #ffffff;
   }
 
@@ -1229,11 +1252,11 @@
     transition: background-color var(--transition-fast);
   }
 
-  .checkbox:where(:hover,:focus-visible) label::before {
+/* Temp Where */
+  .checkbox:-webkit-any(:hover,:active,:focus-visible) label::before {
     background: #ffffff1c;
   }
-/* Temp Where */
-  .checkbox:-webkit-any(:hover,:focus-visible) label::before {
+  .checkbox:where(:hover,:active,:focus-visible) label::before {
     background: #ffffff1c;
   }
 
@@ -1264,7 +1287,7 @@
     z-index: var(--card-z-index);
     --card-z-index: 1;
     transition: var(--card-transition-duration);
-    --card-transition-duration: calc(var(--main-transition-duration) * 0.5);
+    --card-transition-duration: calc(var(--main-transition-duration) * 0.55);
     transition-property: visibility, opacity, transform;
   }
   .card:not(.active) {
@@ -1298,14 +1321,17 @@
     top: 0;
     --card-border-radius: 12px;
     transform-origin: center top;
-    transition-property: margin-right, margin-top, border-top-right-radius, border-bottom-right-radius, box-shadow, visibility, opacity, transform;
   }
   .card.widget:not(.active) {
     transform: scaleY(0.25);
   }
+  .card.widget[data-minimize-change] {
+    transition-property: margin-right, margin-top, border-top-right-radius, border-bottom-right-radius, box-shadow, visibility, opacity, transform;
+  }
   .card.widget.minimize {
     margin-right: calc(var(--card-border-width) * -1);
     margin-top: 3px;
+    --card-border-radius: 10px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     box-shadow: 0 4px 7px #00000050;
@@ -1326,7 +1352,8 @@
     border-bottom: var(--card-header-border-width) solid #000000;
     --card-header-border-width: 1px;
   }
-  .card.widget .header {
+  .card.widget[data-minimize-change] .header {
+    background-clip: content-box;
     transition: var(--card-transition-duration);
     transition-property: margin-bottom, border-color;
   }
@@ -1387,7 +1414,7 @@
   .card.alert .header .title {
     margin: 0 auto;
   }
-  .card.widget .header .title {
+  .card.widget[data-minimize-change] .header .title {
     transform-origin: calc(50% - calc(var(--card-minimize-width) + var(--card-header-padding-right)) * 0.5) center;
     transition: var(--card-transition-duration);
     transition-property: visibility, opacity, transform;
@@ -1413,38 +1440,14 @@
     margin-right: auto;
   }
   .card .header .card-controls .control {
+    padding: var(--control-padding,0px);
     display: flex;
     background: var(--control-background);
     border: none;
     outline: none;
   }
-  .card.widget .header .card-controls .control[data-control="minimize"] {
-    transition: border-radius var(--card-transition-duration);
-  }
-  .card.widget.minimize .header .card-controls .control[data-control="minimize"] {
-    border-radius: calc(var(--card-border-radius) - var(--card-border-width));
-  }
-  .card.widget.minimize .header .card-controls .control[data-control="minimize"] svg {
-    transform: rotateY(180deg);
-  }
-  .card.widget .header .card-controls .control[data-control="close"] {
-    transition: var(--card-transition-duration);
-    transition-property: margin-left, margin-right, visibility, opacity;
-  }
-  .card.widget.minimize .header .card-controls .control[data-control="close"] {
-    margin-left: var(--card-header-padding-right);
-    margin-right: calc(var(--card-minimize-width) * -1);
-    visibility: hidden;
-    opacity: 0;
-  }
-  .card.widget .header .card-controls .control[data-control="close"] svg {
-    transition: transform var(--card-transition-duration);
-  }
-  .card.widget.minimize .header .card-controls .control[data-control="close"] svg {
-    transform: scale(0);
-  }
   :root:not(.macOS-device) .card .header .card-controls .control {
-    padding: 10px;
+    --control-padding: 10px;
     --control-background: none;
   }
 
@@ -1464,19 +1467,19 @@
 */
 
   :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:hover, :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:active {
-    --control-background: #e81123;
+    --control-background: #cc2a24;
   }
   :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:focus-visible {
-    --control-background: #e81123;
+    --control-background: #cc2a24;
   }
 /* -- Future Where
   :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:where(:hover,:active,:focus-visible) {
-    --control-background: #e81123;
+    --control-background: #cc2a24;
   }
 */
 
   :root.macOS-device .card .header .card-controls .control {
-    padding: 3px;
+    --control-padding: 3px;
     border-radius: 50%;
   }
   :root.macOS-device .card .header .card-controls .control[data-control="minimize"] {
@@ -1493,6 +1496,28 @@
   }
   .card:not(.widget) .header .card-controls .control[data-control="minimize"] {
     display: none;
+  }
+  :root:not(.macOS-device) .card.widget.minimize .header .card-controls .control {
+    --control-padding: 6px;
+  }
+  .card.widget.minimize .header .card-controls .control[data-control="minimize"] {
+    border-radius: calc(var(--card-border-radius) - var(--card-border-width));
+  }
+  .card.widget.minimize .header .card-controls .control[data-control="close"] {
+    margin-left: var(--card-header-padding-right);
+    margin-right: calc(var(--card-minimize-width) * -1);
+    visibility: hidden;
+    opacity: 0;
+  }
+  .card.widget[data-minimize-change] .header .card-controls .control {
+    transition: var(--card-transition-duration);
+    transition-property: padding;
+  }
+  .card.widget[data-minimize-change] .header .card-controls .control[data-control="minimize"] {
+    transition-property: padding, border-radius;
+  }
+  .card.widget[data-minimize-change] .header .card-controls .control[data-control="close"] {
+    transition-property: margin-left, margin-right, padding, visibility, opacity;
   }
   .card .header .card-controls .control svg {
     fill: currentColor;
@@ -1511,14 +1536,23 @@
     mix-blend-mode: luminosity;
   }
 
-  :root.macOS-device .card .header .card-controls:where(:hover,:active) .control svg, :root.macOS-device .card .header .card-controls:focus-within .control:focus-visible svg {
-    color: #202020bf;
-  }
 /* Temp Where */
   :root.macOS-device .card .header .card-controls:-webkit-any(:hover,:active) .control svg, :root.macOS-device .card .header .card-controls:focus-within .control:focus-visible svg {
     color: #202020bf;
   }
+  :root.macOS-device .card .header .card-controls:where(:hover,:active) .control svg, :root.macOS-device .card .header .card-controls:focus-within .control:focus-visible svg {
+    color: #202020bf;
+  }
 
+  .card.widget.minimize .header .card-controls .control[data-control="minimize"] svg {
+    transform: rotateY(180deg);
+  }
+  .card.widget[data-minimize-change] .header .card-controls .control[data-control="close"] svg {
+    transition: transform var(--card-transition-duration);
+  }
+  .card.widget.minimize .header .card-controls .control[data-control="close"] svg {
+    transform: scale(0);
+  }
   .card .main {
     display: flex;
     flex-direction: column;
@@ -1532,6 +1566,8 @@
     padding: 14px;
     gap: 14px;
     transform-origin: calc(100% - calc(var(--card-minimize-width) + var(--card-header-padding-right)) * 0.5) top;
+  }
+  .card.widget[data-minimize-change] .main {
     transition: var(--card-transition-duration);
     transition-property: margin-left, margin-bottom, visibility, opacity, transform;
   }
@@ -1584,25 +1620,31 @@
     box-shadow: 0 1px 2px #00000028;
     outline: none;
     transition: var(--transition-fast);
-    transition-property: color, background-color, border-color;
+    transition-property: color, background-color, border-color, border-radius;
   }
 
-  .card .main button:where(:hover,:active,:focus-visible), .select .menu.active .opener {
-    color: #ffffff;
-    background: #4b4b4b;
-  }
 /* Temp Where */
-  .card .main button:-webkit-any(:hover,:active,:focus-visible), .select .menu.active .opener {
+  .card .main button:-webkit-any(:hover,:active,:focus-visible), .select:focus-within .menu .opener, .select .menu.active .opener {
     color: #ffffff;
-    background: #4b4b4b;
+    background: #4f4f4f;
+  }
+  .card .main button:where(:hover,:active,:focus-visible), .select:focus-within .menu .opener, .select .menu.active .opener {
+    color: #ffffff;
+    background: #4f4f4f;
   }
 
   .card .main button:focus-visible {
     border-color: #c0c0c0;
   }
-  .card .options button.hidden {
-    display: none;
+
+/* Temp Where */
+  .card .main button.warning:-webkit-any(:hover,:active,:focus-visible) {
+    background: #b12f25;
   }
+  .card .main button.warning:where(:hover,:active,:focus-visible) {
+    background: #b12f25;
+  }
+
   .card .options button > img {
     width: 16px;height: 16px;
     /*aspect-ratio: 1/1;*/
@@ -1658,14 +1700,17 @@
   #symbol_definitions {
     display: none;
   }
+  :root.apple-home-screen #create_window_option {
+    display: none;
+  }
   #install_button, #theme_button {
     padding: 3px 8px;
   }
-  #install_button + button::before {
-    content: "Theme";
+  :root:not(.install-prompt-available) #install_option, :root:not(.install-prompt-available) #install_button {
+    display: none;
   }
-  #install_button.hidden + button::before {
-    content: "Customize Theme";
+  :root:not(.service-worker-activated) #clear_site_caches_option, :root:not(.service-worker-activated) #clear_site_caches_button {
+    display: none;
   }
   #generator_output {
     width: 220px;
@@ -1718,7 +1763,7 @@
     <path d="m510.27 285.75c-13.893 118.73-108.1 212.04-226.96 224.79-118.86 12.751-230.71-58.451-269.47-171.53-38.761-113.08 5.8941-237.93 107.58-300.78 101.68-62.846 233.32-46.955 317.13 38.282l-37.067 36.446c-66.79-67.929-171.7-80.593-252.74-30.508-81.036 50.084-116.62 149.58-85.733 239.7 30.89 90.117 120.03 146.86 214.75 136.7 94.721-10.161 169.8-84.522 180.87-179.14z"/>
     <path d="m512 189.01v-189.01l-188.98 189.01z"/>
   </symbol>
-  <symbol id="github_mark" viewBox="0 0 512 512">
+  <symbol id="github_icon" viewBox="0 0 512 512">
     <path d="m255.95 6c-141.33 0-255.95 114.62-255.95 256.05 0 113.04 73.338 209.01 175.07 242.85 12.782 2.357 17.496-5.553 17.496-12.31 0-6.077-0.262-22.211-0.367-43.531-47.459 10.319-76.218-1.153-86.223-34.312-7.7532-19.748-17.235-32.216-28.445-37.454-15.506-10.582-14.877-15.768 1.7811-15.558 17.13 1.205 30.173 10.005 39.183 26.349 22.84 39.131 59.927 27.816 74.543 21.268 2.304-16.501 8.905-27.816 16.239-34.207-56.837-6.443-116.61-28.444-116.61-126.51 0-27.973 9.9529-50.812 26.349-68.727-2.619-6.444-11.419-32.478 2.515-67.733 14.3-4.557 37.768 4.191 70.404 26.245 20.377-5.658 42.326-8.487 64.065-8.591 21.739 0.104 43.636 2.933 64.118 8.591 32.583-22.054 55.998-30.802 70.299-26.245 13.986 35.255 5.186 61.289 2.567 67.733 16.396 17.915 26.297 40.754 26.297 68.727 0 98.325-59.875 119.96-116.87 126.3 9.167 7.91 17.392 23.52 17.392 47.407 0 34.259-0.315 61.865-0.315 70.247 0 6.81 4.61 14.824 17.601 12.31 101.62-33.945 174.91-129.81 174.91-242.85 0-141.44-114.67-256.05-256.05-256.05z"/>
   </symbol>
 </svg>
@@ -1733,7 +1778,7 @@
       <button class="opener">File</button>
       <ul class="list">
         <li class="list-item" onclick="createEditor({ auto_replace: false });">New Editor<span class="info shortcut ctrl-shift shift-command">X</span></li>
-        <li class="list-item" onclick="createWindow();">New Window<span class="info shortcut ctrl-shift shift-command">C</span></li>
+        <li id="create_window_option" class="list-item" onclick="createWindow();">New Window<span class="info shortcut ctrl-shift shift-command">C</span></li>
         <li class="list-item" onclick="openFiles();">Open<span class="info shortcut ctrl command">O</span></li>
         <li class="list-item" onclick="window.setTimeout(renameEditor,10);">Rename<span class="info shortcut ctrl-shift shift-command">R</span></li>
         <li class="list-item" onclick="saveFile();">Save<span class="info shortcut ctrl command">S</span></li>
@@ -1802,16 +1847,16 @@
     <div class="menu alternate">
       <button class="opener" onclick="openCard(settings_card);">Settings</button>
       <ul class="list">
-        <li id="install_option" class="list-item hidden" onclick="showInstallPrompt();"><img src="resources/icon.svg">Install</button>
+        <li id="install_option" class="list-item" onclick="showInstallPrompt();"><img src="resources/icon.svg">Install</button>
         <li class="list-item" onclick="openCard(theme_card); Editor.dialog_previous = this.closest('.menu').querySelector('button');">Theme Settings</li>
-        <li class="list-item" id="clear_site_caches_option" class="hidden" onclick="clearSiteCaches();">Clear Cache</li>
+        <li class="list-item" id="clear_site_caches_option" onclick="clearSiteCaches();">Clear Cache</li>
         <li class="list-item" onclick="Editor.settings.reset();">Reset Settings</li>
       </ul>
     </div>
   </section>
   <section class="app-omnibox">
     <button class="option" title="Refresh Preview" onclick="refreshPreview({ force: true });"><svg><use href="#refresh_icon"/></svg></button>
-    <a class="option" href="https://github.com/Offroaders123/Smart-Text-Editor" title="Smart Text Editor on GitHub"><svg><use href="#github_mark"/></svg></a>
+    <a class="option" href="https://github.com/Offroaders123/Smart-Text-Editor" title="Smart Text Editor on GitHub"><svg><use href="#github_icon"/></svg></a>
   </section>
 </header>
 
@@ -1835,28 +1880,32 @@
     <section class="main">
       <div class="content">
         <div class="item list start">
-          <!--div class="select">
-            <label for="orientation_setting">Default Orientation:</label>
+          <div class="select">
+            <label for="default_orientation_setting">Default Orientation:</label>
             <div class="menu">
-              <button id="orientation_setting" class="opener">Horizontal<svg><use href="#back_icon"/></svg></button>
+              <button id="default_orientation_setting" class="opener">Horizontal<svg><use href="#back_icon"/></svg></button>
               <ul class="list selectable">
-                <li class="list-item selected" onclick="updateSelect('orientation','horizontal');">Horizontal</li>
-                <li class="list-item" onclick="updateSelect('orientation','vertical');">Vertical</li>
+                <li class="list-item selected" data-option="horizontal" onclick="Editor.settings.set('default-orientation','horizontal');">Horizontal</li>
+                <li class="list-item" data-option="vertical" onclick="Editor.settings.set('default-orientation','vertical');">Vertical</li>
               </ul>
             </div>
-          </div-->
+          </div>
           <div class="checkbox">
-            <input id="refresh_setting" type="checkbox" oninput="Editor.settings.set('automatic-refresh',this.checked);" checked>
-            <label for="refresh_setting"><svg class="check"><use href="#check_icon"/></svg>Automatically Refresh Preview</label>
+            <input id="syntax_highlighting_setting" type="checkbox" oninput="Editor.settings.set('syntax-highlighting',this.checked);">
+            <label for="syntax_highlighting_setting"><svg class="check"><use href="#check_icon"/></svg>Syntax Highlighting (Beta)</label>
+          </div>
+          <div class="checkbox">
+            <input id="automatic_refresh_setting" type="checkbox" oninput="Editor.settings.set('automatic-refresh',this.checked);" checked>
+            <label for="automatic_refresh_setting"><svg class="check"><use href="#check_icon"/></svg>Automatically Refresh Preview</label>
           </div>
         </div>
       </div>
       <div class="options">
-        <button id="install_button" class="hidden" onclick="showInstallPrompt();"><img src="resources/icon.svg">Install</button>
-        <button id="theme_button" onclick="openCard(theme_card);" data-card-previous="theme_card"><svg><use href="#arrow_icon"/></svg></button>
+        <button id="install_button" onclick="showInstallPrompt();"><img src="resources/icon.svg">Install</button>
+        <button id="theme_button" onclick="openCard(theme_card);" data-card-previous="theme_card">Customize Theme<svg><use href="#arrow_icon"/></svg></button>
       </div>
       <div class="options">
-        <button id="clear_site_caches_button" class="warning hidden" onclick="clearSiteCaches();">Clear Cache</button>
+        <button id="clear_site_caches_button" class="warning" onclick="clearSiteCaches();">Clear Cache</button>
         <button class="warning" onclick="Editor.settings.reset();">Reset Settings</button>
       </div>
     </section>
@@ -2090,6 +2139,7 @@
       }
     });
     if (opener){
+      if (menu.closest(".select")) menu.querySelector(".opener").style.minWidth = getElementStyle({ element: menu.querySelector(".list"), property: "width" });
       if (!menu.classList.contains("alternate")){
         opener.addEventListener("mousedown",event => {
           if (event.button == 0) openMenu(menu);
@@ -2116,6 +2166,7 @@
           if (listItem.classList.contains("selected")) listItem.classList.remove("selected");
         });
         event.target.classList.add("selected");
+        if (event.target.closest(".select")) event.target.closest(".menu").querySelector(".opener").childNodes[0].textContent = event.target.textContent;
       });
       list.addEventListener("mousedown",event => {
         var navigable = getNavigableElements({ container: list, scope: true });
@@ -2341,8 +2392,7 @@
 
         if (event.data.action == "clear-site-caches-complete") openCard(cleared_cache_card);
       });
-      clear_site_caches_option.classList.remove("hidden");
-      clear_site_caches_button.classList.remove("hidden");
+      document.documentElement.classList.add("service-worker-activated");
     });
     function activateManifest(){
       document.querySelector("link[rel='manifest']").href = "manifest.webmanifest";
@@ -2351,17 +2401,18 @@
   window.addEventListener("beforeinstallprompt",event => {
     event.preventDefault();
     Editor.install_prompt = event;
-    install_option.classList.remove("hidden");
-    install_button.classList.remove("hidden");
+    document.documentElement.classList.add("install-prompt-available");
+    theme_button.childNodes[0].textContent = "Theme";
   });
   window.addEventListener("beforeunload",event => {
     if (Editor.unsaved_work()) return;
     event.preventDefault();
     event.returnValue = "";
   });
-  window.addEventListener("unload",() => Editor.child_windows.forEach(win => win.close()));
+  window.addEventListener("unload",() => Editor.child_windows.forEach(window => window.close()));
   window.addEventListener("resize",event => {
     Editor.appearance().refresh_window_controls_overlay();
+    Editor.appearance().refresh_device_pixel_ratio();
     if (context_menu.classList.contains("active")) closeMenu(context_menu);
     if (Editor.view() != "preview") setEditorTabsVisibility();
     if (Editor.view() == "split" && document.body.hasAttribute("data-scaling-active")) setView({ type: "split" });
@@ -2567,7 +2618,17 @@
       if (!Editor.environment().touch_device) Editor.query().textarea.focus();
     });
   }
-  if (Editor.appearance().parent_window) window.setTimeout(() => document.documentElement.classList.remove("startup-fade"),50);
+  if (Editor.appearance().parent_window){
+    if (Editor.settings.get("default-orientation")){
+      var value = Editor.settings.get("default-orientation"), active = document.activeElement;
+      default_orientation_setting.closest(".menu").querySelector(`[data-option="${value}"]`).click();
+      setOrientation(value);
+      active.focus({ preventScroll: true });/* Temporary! Will be addressed with MenuDrop in the future */
+    }
+    if (Editor.settings.get("syntax-highlighting") != undefined) syntax_highlighting_setting.checked = Editor.settings.get("syntax-highlighting");
+    if (Editor.settings.get("automatic-refresh") != undefined) automatic_refresh_setting.checked = Editor.settings.get("automatic-refresh");
+    window.setTimeout(() => document.documentElement.classList.remove("startup-fade"),50);
+  }
   var queryParameters = new URLSearchParams(window.location.search);
   if (queryParameters.get("template")){
     Tools.insertTemplate({ type: "html" });
@@ -2660,6 +2721,7 @@
     tab.appendChild(editorClose);
     workspace_tabs.appendChild(tab);
     workspace_editors.appendChild(container);
+    setEditorSyntaxHighlighting({ identifier });
     container.editor.addEventListener("input",() => {
       if (tab.hasAttribute("data-editor-auto-created")) tab.removeAttribute("data-editor-auto-created");
       if (!tab.hasAttribute("data-editor-refresh")) tab.setAttribute("data-editor-refresh",true);
@@ -2734,6 +2796,7 @@
     } else if (rename.charAt(0) == ".") rename = `${base}${rename}`;
     editorName.innerText = rename;
     previewOption.innerText = rename;
+    setEditorSyntaxHighlighting({ identifier });
     if (tab.hasAttribute("data-editor-auto-created")) tab.removeAttribute("data-editor-auto-created");
     if (tab == Editor.query().tab) setTitle({ content: rename });
     if ((Editor.preview_editor == "active-editor" && Editor.active_editor == identifier) || Editor.preview_editor == identifier) refreshPreview({ force: true });
@@ -2747,6 +2810,13 @@
   function getNextEditor({ identifier = Editor.active_editor, wrap = true } = {}){
     var { tab } = Editor.query(identifier), editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")), nextTab = editorTabs[(editorTabs.indexOf(tab) != editorTabs.length - 1) ? editorTabs.indexOf(tab) + 1 : 0], nextEditor = nextTab.getAttribute("data-editor-identifier");
     return nextEditor;
+  }
+  function setEditorSyntaxHighlighting({ identifier = Editor.active_editor } = {}){
+    if (!Editor.settings.get("syntax-highlighting")) return;
+    var { container, getName } = Editor.query(identifier), language = getName("extension");
+    container.syntaxLanguage = language;
+    if (!(language in Prism.languages)) return container.syntaxHighlight.disable();
+    if (!container.syntaxHighlight.active()) container.syntaxHighlight.enable();
   }
   function setEditorTabsVisibility({ identifier = Editor.active_editor } = {}){
     if (!Editor.active_editor) return;
@@ -2884,23 +2954,35 @@
     if (type == "widget") Editor.active_widget = null;
   }
   function minimizeCard(card){
-    var minimize = card.querySelector(".header .card-controls .control[data-control='minimize']"), icon = minimize.querySelector("svg use"), main = card.querySelector(".main");
-    card.classList.toggle("minimize");
-    if (card.classList.contains("minimize")){
-      card.style.setProperty("--card-minimize-width",`${minimize.clientWidth}px`);
+    var minimize = card.querySelector(".header .card-controls .control[data-control='minimize']"), icon = minimize.querySelector("svg use"), main = card.querySelector(".main"), changeIdentifier = Math.random().toString();
+    card.setAttribute("data-minimize-change",changeIdentifier);
+    workspace_tabs.setAttribute("data-minimize-change",changeIdentifier);
+    var transitionDuration = parseInt(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
+    if (!card.classList.contains("minimize")){
+      card.classList.add("minimize");
+      card.style.setProperty("--card-minimize-width",`${minimize.querySelector("svg").clientWidth + parseInt(getElementStyle({ element: minimize, property: "--control-padding" }),10) * 2}px`);
       card.style.setProperty("--card-main-width",`${main.clientWidth}px`);
       card.style.setProperty("--card-main-height",`${main.clientHeight}px`);
       icon.setAttribute("href","#arrow_icon");
+      window.setTimeout(() => {
+        workspace_tabs.style.setProperty("--minimize-tab-width",getElementStyle({ element: card, property: "width" }));
+        setEditorTabsVisibility();
+      },transitionDuration);
       if (card.contains(document.activeElement) && document.activeElement != minimize) minimize.focus();
     } else {
-      var transitionDuration = parseInt(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
+      card.classList.remove("minimize");
       window.setTimeout(() => {
-        if (!card.classList.contains("minimize")) card.style.removeProperty("--card-minimize-width");
+        if (card.getAttribute("data-minimize-change") == changeIdentifier) card.style.removeProperty("--card-minimize-width");
       },transitionDuration);
       card.style.removeProperty("--card-main-width");
       card.style.removeProperty("--card-main-height");
       icon.setAttribute("href","#minimize_icon");
+      workspace_tabs.style.removeProperty("--minimize-tab-width");
     }
+    window.setTimeout(() => {
+      if (card.getAttribute("data-minimize-change") == changeIdentifier) card.removeAttribute("data-minimize-change");
+      if (workspace_tabs.getAttribute("data-minimize-change") == changeIdentifier) workspace_tabs.removeAttribute("data-minimize-change");
+    },transitionDuration);
   }
   function catchCardNavigation(){
     if (!Editor.active_dialog || context_menu.classList.contains("active") || event.key != "Tab" || document.activeElement != document.body) return;
@@ -3017,14 +3099,7 @@
     if (Editor.context_menu_timeout) Editor.context_menu_timeout = null;
     Editor.context_menu_previous = event.composedPath()[0];
     menu.classList.add(type);
-    var location = {};
-    if (!Editor.environment.touch_device && !(event instanceof TouchEvent)){
-      location.left = event.pageX;
-      location.top = event.pageY;
-    } else {
-      location.left = event.touches[0].pageX;
-      location.top = event.touches[0].pageY;
-    }
+    var location = { left: event.pageX, top: event.pageY };
     if (location.left + list.offsetWidth > window.innerWidth) location.left = window.innerWidth - list.offsetWidth;
     if (location.top + list.offsetHeight > window.innerHeight) location.top -= list.offsetHeight;
     menu.style.left = `${location.left}px`;
@@ -3052,7 +3127,13 @@
   }
   function catchMenuNavigation(){
   }
-
+  async function callCommand(element,action){/* I think I may remove this, or do something else with it. document.execCommand() is broken in so many ways, what a shame */
+    element.focus({ preventScroll: true });
+    if (action == "paste"){
+      var clipboard = await navigator.clipboard.readText().catch(error => alert("Could not access the clipboard, please check site permissions for clipboard use."));
+      document.execCommand("insertText",false,await clipboard);
+    } else document.execCommand(action);
+  }
   function getNavigableElements({ container, scope = false } = {}){
     scope = (scope) ? "" : ":scope > ";
     var navigable = container.querySelectorAll(`${scope}button:not([disabled]), ${scope}textarea:not([disabled]), ${scope}input:not([disabled]), ${scope}select:not([disabled]), ${scope}a[href]:not([disabled]), ${scope}[tabindex]:not([tabindex="-1"])`);
@@ -3138,7 +3219,7 @@
     if (change) source.tab.removeAttribute("data-editor-refresh");
   }
   function setTitle({ content, reset = false } = {}){
-    document.title = `${(content && !reset) ? content : ""}${(content && !reset) ? " - " : ""}Smart Text Editor`;
+    document.title = `${(content && !reset) ? `${content} - ` : ""}Smart Text Editor`;
   }
   function addQueryParameters(entries){
     var parameters = new URLSearchParams(window.location.search);
@@ -3160,12 +3241,12 @@
     Editor.install_prompt.prompt();
     Editor.install_prompt.userChoice.then(result => {
       if (result.outcome != "accepted") return;
-      install_option.classList.add("hidden");
-      install_button.classList.add("hidden");
+      document.documentElement.classList.remove("install-prompt-available");
+      theme_button.childNodes[0].textContent = "Customize Theme";
     });
   }
   function clearSiteCaches(){
-    if (confirm("Are you sure you would like to clear all cache?\nThe app will no longer work offline until an Internet connection is available.")) navigator.serviceWorker.controller.postMessage({ action: "clear-site-caches" });
+    if (confirm("Are you sure you would like to clear all app caches?\nSmart Text Editor will no longer work offline until an Internet connection is available.")) navigator.serviceWorker.controller.postMessage({ action: "clear-site-caches" });
   }
   function setScaling(event){
     var { safe_area_insets: safeAreaInsets } = Editor.appearance(), scalingOffset, scalingRange = { minimum: ((Editor.orientation() == "vertical") ? workspace_tabs.offsetHeight : safeAreaInsets.left) + 80, maximum: ((Editor.orientation() == "horizontal") ? window.innerWidth - safeAreaInsets.right : (Editor.orientation() == "vertical") ? (window.innerHeight - header.offsetHeight - safeAreaInsets.bottom) : 0) - 80 }, touchEvent = (Editor.environment().touch_device && event instanceof TouchEvent);
