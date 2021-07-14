@@ -43,9 +43,15 @@
       "sizes": "1024x1024"
     },
     {
-      "src": "resources/app-maskable.png",
+      "src": "resources/app-maskable-512.png",
       "type": "image/png",
       "sizes": "512x512",
+      "purpose": "maskable"
+    },
+    {
+      "src": "resources/app-maskable-1024.png",
+      "type": "image/png",
+      "sizes": "1024x1024",
       "purpose": "maskable"
     }
   ],
