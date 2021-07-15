@@ -48,9 +48,9 @@
 <link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="resources/startup-ipadpro2-portrait.png">
 <link rel="preconnect" href="https://fonts.gstatic.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cousine&family=Rubik&display=swap">
-<link rel="preload" as="style" href="https://offroaders123.github.io/Num-Text-Component/vanilla-layout.css">
-<link rel="preload" as="style" href="https://offroaders123.github.io/Num-Text-Component/vanilla-appearance.css">
-<link rel="preload" as="style" href="https://offroaders123.github.io/Num-Text-Component/vanilla-highlighting.css">
+<link rel="preload" as="fetch" crossorigin href="https://offroaders123.github.io/Num-Text-Component/vanilla-layout.css">
+<link rel="preload" as="fetch" crossorigin href="https://offroaders123.github.io/Num-Text-Component/vanilla-appearance.css">
+<link rel="preload" as="fetch" crossorigin href="https://offroaders123.github.io/Num-Text-Component/vanilla-highlighting.css">
 <script src="https://offroaders123.github.io/Num-Text-Component/script.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js" data-manual></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-json.min.js"></script>
@@ -850,7 +850,6 @@
   }
   num-text {
     --padding: 8px;
-    --color: #eaeaea;
     caret-color: var(--color);
     font-family: ui-monospace, "Cousine", monospace;
     --selection-background: inherit;
@@ -3167,7 +3166,7 @@
       element.themes.remove("vanilla-appearance");
       var scrollbarStyles = document.createElement("style");
       scrollbarStyles.textContent = scrollbar_styles.textContent;
-      element.container.insertBefore(scrollbarStyles,element.container.firstChild);
+      element.shadowRoot.insertBefore(scrollbarStyles,element.container);
       if (!advanced) return;
       attachContextMenu({ element, type: "editing" });
     }
