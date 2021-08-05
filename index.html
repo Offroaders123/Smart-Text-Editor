@@ -1434,8 +1434,13 @@
     margin: 7px;
     padding: 4px;
     gap: 8px;
+    transition: margin var(--card-transition-duration);
   }
   :root.macOS-device .card .header:not([data-card-parent]) .card-controls {
+    margin-right: auto;
+  }
+  :root.macOS-device .card.minimize .header .card-controls {
+    margin: 1px;
     margin-right: auto;
   }
   .card .header .card-controls .control {
@@ -1499,14 +1504,19 @@
   :root:not(.macOS-device) .card.widget.minimize .header .card-controls .control {
     --control-padding: 6px;
   }
-  .card.widget.minimize .header .card-controls .control[data-control="minimize"] {
+  :root:not(.macOS-device) .card.widget.minimize .header .card-controls .control[data-control="minimize"] {
     border-radius: calc(var(--card-border-radius) - var(--card-border-width));
   }
   .card.widget.minimize .header .card-controls .control[data-control="close"] {
-    margin-left: var(--card-header-padding-right);
-    margin-right: calc(var(--card-minimize-width) * -1);
     visibility: hidden;
     opacity: 0;
+  }
+  :root:not(.macOS-device) .card.widget.minimize .header .card-controls .control[data-control="close"] {
+    margin-left: var(--card-header-padding-right);
+    margin-right: calc(var(--card-minimize-width) * -1);
+  }
+  :root.macOS-device .card.widget.minimize .header .card-controls .control[data-control="close"] {
+    margin-left: calc(var(--card-minimize-width) * -1 - 8px);
   }
   .card.widget[data-minimize-change] .header .card-controls .control {
     transition: var(--card-transition-duration);
@@ -1890,7 +1900,7 @@
             </div>
           </div>
           <div class="checkbox">
-            <input id="syntax_highlighting_setting" type="checkbox" oninput="Editor.settings.set('syntax-highlighting',this.checked);">
+            <input id="syntax_highlighting_setting" type="checkbox" oninput="setSyntaxHighlighting(this.checked);">
             <label for="syntax_highlighting_setting"><svg class="check"><use href="#check_icon"/></svg>Syntax Highlighting (Beta)</label>
           </div>
           <div class="checkbox">
@@ -2020,7 +2030,7 @@
     <section class="main">
       <div class="content">
         <div class="item expand">
-          <num-text id="formatter_input" class="expand" placeholder="JSON data to format..."></num-text>
+          <num-text id="formatter_input" class="expand" syntax-language="json" placeholder="JSON data to format..."></num-text>
         </div>
       </div>
       <div class="options">
@@ -2624,7 +2634,11 @@
       setOrientation(value);
       active.focus({ preventScroll: true });/* Temporary! Will be addressed with MenuDrop in the future */
     }
-    if (Editor.settings.get("syntax-highlighting") != undefined) syntax_highlighting_setting.checked = Editor.settings.get("syntax-highlighting");
+    if (Editor.settings.get("syntax-highlighting") != undefined){
+      var state = Editor.settings.get("syntax-highlighting");
+      setSyntaxHighlighting(state);
+      syntax_highlighting_setting.checked = state;
+    }
     if (Editor.settings.get("automatic-refresh") != undefined) automatic_refresh_setting.checked = Editor.settings.get("automatic-refresh");
     window.setTimeout(() => document.documentElement.classList.remove("startup-fade"),50);
   }
@@ -2720,7 +2734,6 @@
     tab.appendChild(editorClose);
     workspace_tabs.appendChild(tab);
     workspace_editors.appendChild(container);
-    setEditorSyntaxHighlighting({ identifier });
     container.editor.addEventListener("input",() => {
       if (tab.hasAttribute("data-editor-auto-created")) tab.removeAttribute("data-editor-auto-created");
       if (!tab.hasAttribute("data-editor-refresh")) tab.setAttribute("data-editor-refresh",true);
@@ -2730,6 +2743,8 @@
     preview_options.appendChild(previewOption);
     applyEditingBehavior({ element: container });
     if (open || !Editor.active_editor) openEditor({ identifier, auto_created, focused_override });
+    container.syntaxLanguage = Editor.query(identifier).getName("extension");
+    if ((Editor.settings.get("syntax-highlighting") == true) && (container.syntaxLanguage in Prism.languages)) container.syntaxHighlight.enable();
     window.setTimeout(() => {
       if (document.body.getAttribute("data-editor-change") == changeIdentifier) document.body.removeAttribute("data-editor-change");
     },transitionDuration);
@@ -2788,14 +2803,17 @@
     }
   }
   function renameEditor({ name, identifier = Editor.active_editor } = {}){
-    var { tab, getName } = Editor.query(identifier), editorName = tab.querySelector("[data-editor-name]"), previewOption = preview_options.querySelector(`.list-item[data-editor-identifier="${identifier}"]`), currentName = getName(), base = getName("base"), extension = getName("extension"), rename = (name) ? name : prompt(`Enter a new file name for "${currentName}".`,currentName);
+    var { tab, container, getName } = Editor.query(identifier), editorName = tab.querySelector("[data-editor-name]"), previewOption = preview_options.querySelector(`.list-item[data-editor-identifier="${identifier}"]`), currentName = getName(), base = getName("base"), extension = getName("extension"), rename = (name) ? name : prompt(`Enter a new file name for "${currentName}".`,currentName);
     if (!rename) return;
     if (!rename.includes(".")){
       rename = `${rename}.${extension}`;
     } else if (rename.charAt(0) == ".") rename = `${base}${rename}`;
     editorName.innerText = rename;
     previewOption.innerText = rename;
-    setEditorSyntaxHighlighting({ identifier });
+    var syntaxLanguage = Editor.query(identifier).getName("extension");
+    if (syntaxLanguage in Prism.languages) container.syntaxLanguage = syntaxLanguage;
+    ((Editor.settings.get("syntax-highlighting") == true) && (syntaxLanguage in Prism.languages)) ? container.syntaxHighlight.enable() : container.syntaxHighlight.disable();
+    if (syntaxLanguage != container.syntaxLanguage) container.syntaxLanguage = syntaxLanguage;
     if (tab.hasAttribute("data-editor-auto-created")) tab.removeAttribute("data-editor-auto-created");
     if (tab == Editor.query().tab) setTitle({ content: rename });
     if ((Editor.preview_editor == "active-editor" && Editor.active_editor == identifier) || Editor.preview_editor == identifier) refreshPreview({ force: true });
@@ -2809,13 +2827,6 @@
   function getNextEditor({ identifier = Editor.active_editor, wrap = true } = {}){
     var { tab } = Editor.query(identifier), editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")), nextTab = editorTabs[(editorTabs.indexOf(tab) != editorTabs.length - 1) ? editorTabs.indexOf(tab) + 1 : 0], nextEditor = nextTab.getAttribute("data-editor-identifier");
     return nextEditor;
-  }
-  function setEditorSyntaxHighlighting({ identifier = Editor.active_editor } = {}){
-    if (!Editor.settings.get("syntax-highlighting")) return;
-    var { container, getName } = Editor.query(identifier), language = getName("extension");
-    container.syntaxLanguage = language;
-    if (!(language in Prism.languages)) return container.syntaxHighlight.disable();
-    if (!container.syntaxHighlight.active()) container.syntaxHighlight.enable();
   }
   function setEditorTabsVisibility({ identifier = Editor.active_editor } = {}){
     if (!Editor.active_editor) return;
@@ -2882,6 +2893,13 @@
       Editor.preview_editor = "active-editor";
     } else Editor.preview_editor = identifier;
     refreshPreview({ force: true });
+  }
+  function setSyntaxHighlighting(state){
+    state = (state != undefined) ? state : (Editor.settings.get("syntax-highlighting") != undefined);
+    document.querySelectorAll("num-text").forEach(editor => {
+      if (editor.syntaxLanguage in Prism.languages) (state) ? editor.syntaxHighlight.enable() : editor.syntaxHighlight.disable();
+    });
+    Editor.settings.set("syntax-highlighting",state);
   }
   function openCard(card,previous){
     if (card.classList.contains("active") && !card.hasAttribute("data-alert-timeout")) return closeCard(card);
