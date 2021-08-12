@@ -381,10 +381,15 @@
     color: #ffffff;
   }
   :root.window-controls-overlay header .app-omnibox {
-    margin-right: calc(var(--header-gap) * -1);
     height: var(--titlebar-area-inset-height);
     gap: calc(var(--header-gap) / var(--device-pixel-ratio));
     z-index: 4;
+  }
+  :root:not(.macOS-device).window-controls-overlay header .app-omnibox {
+    margin-right: calc(var(--header-gap) * -1);
+  }
+  :root.macOS-device.window-controls-overlay header .app-omnibox {
+    margin-right: -4px;
   }
   header .app-omnibox button {
     background: none;
