@@ -1,7 +1,7 @@
 <table>
   <tr>
     <td>
-      <img width="64" src="https://stedit.app/resources/icon.svg">
+      <img width="64" height="64" src="https://stedit.app/resources/icon.svg" alt="Smart Text Editor">
     </td>
     <td>
       <h1>Smart Text Editor</h1>
@@ -17,7 +17,7 @@ I have started to implement features similar to that of a Progressive Web App, s
 ## How to Use
 This project can be opened with GitHub Pages, as well as installed to your device's desktop, app drawer, toolbar, or home screen!
 
-*A note ahead of time: If you are using Grammarly or another text editing-focused extension on lower-end hardware, I have run into performance issues when editing large files with Smart Text Editor, so I recommend disabling it for use with Smart Text Editor if it isn't neccesary for your task at hand (If you aren't writing an essay or something with normal grammar/spelling). However, this is just for performance concerns, so if your device can handle it, it is perfectly fine to leave such extensions enabled!*
+*A note ahead of time: If you are using Grammarly or another text editing-focused extension on lower-end hardware, I have run into performance issues when editing large files with Smart Text Editor, so I recommend disabling it for use with Smart Text Editor if it isn't necessary for your task at hand (If you aren't writing an essay or something with normal grammar/spelling). However, this is just for performance concerns, so if your device can handle it, it is perfectly fine to leave such extensions enabled!*
 
 ### [Open Smart Text Editor with GitHub Pages](https://stedit.app)
 
@@ -40,7 +40,6 @@ A list of instructions to add a shortcut for Smart Text Editor to your device ca
 
 ### Google Chrome on Android
 - I am not able to try this process out myself as I don't have an Android device to test it on, but I have added support for this if you would like to try it out! Any feedback on this would be helpful!
-
 
 ## Thanks for checking out Smart Text Editor!
 This is a very fun project to work on, and I can't wait to see what it grows into as the development moves along!
