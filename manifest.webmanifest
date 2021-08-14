@@ -89,18 +89,5 @@
         "image/svg+xml": [".svg"]
       }
     }
-  ],
-  "share_target": {
-    "action": "./",
-    "method": "POST",
-    "enctype": "multipart/form-data",
-    "params": {
-      "files": [
-        {
-          "name": "media",
-          "accept": ["text/*",".txt",".html",".css",".js",".php",".json",".webmanifest",".bbmodel",".xml",".yaml",".yml",".dist",".config",".ini",".md",".markdown",".mcmeta",".lang",".properties",".uidx",".material",".h",".fragment",".vertex",".fxh",".hlsl",".ihlsl","image/svg+xml",".svg"]
-        }
-      ]
-    }
-  }
+  ]
 }
