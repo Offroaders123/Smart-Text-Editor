@@ -173,7 +173,7 @@
         automatic_refresh_setting.checked = true;
         active.focus({ preventScroll: true });/* Temporary! Changing select dropdown options currently requires them to be clicked programmatically, so it will remove focus from the current element. This will be addressed with MenuDrop once that is out. I can't wait for it to be ready! :) */
         window.localStorage.removeItem("settings");
-        openCard(reset_settings_card);
+        reset_settings_card.open();
         return true;
       }
     },
@@ -1408,27 +1408,27 @@
     width: 20px;height: 20px;
     /*aspect-ratio: 1/1;*/
   }
-  .card .header .title {
+  .card .header .heading {
     white-space: pre;
     z-index: -1;
   }
-  .card:not(.alert) .header .title {
+  .card:not(.alert) .header .heading {
     position: absolute;
   }
-  .card.alert .header .title {
+  .card.alert .header .heading {
     margin: 0 auto;
   }
-  .card.widget[data-minimize-change] .header .title {
+  .card.widget[data-minimize-change] .header .heading {
     transform-origin: calc(50% - calc(var(--card-minimize-width) + var(--card-header-padding-right)) * 0.5) center;
     transition: var(--card-transition-duration);
     transition-property: visibility, opacity, transform;
   }
-  .card.widget.minimize .header .title {
+  .card.widget.minimize .header .heading {
     visibility: hidden;
     opacity: 0;
     transform: scale(0);
   }
-  .card.dialog .header .title {
+  .card.dialog .header .heading {
     font-size: 18px;
   }
   .card .header .card-controls {
@@ -1783,11 +1783,11 @@
 </svg>
 
 <header id="header">
-  <section class="app-region"></section>
-  <section class="app-icon">
-    <img src="resources/icon.svg">
-  </section>
-  <section class="app-menubar">
+  <div class="app-region"></div>
+  <div class="app-icon">
+    <img src="resources/icon.svg" alt="">
+  </div>
+  <div class="app-menubar">
     <div class="menu">
       <button class="opener">File</button>
       <ul class="list">
@@ -1837,61 +1837,61 @@
     <div class="menu">
       <button class="opener">Tools</button>
       <ul class="list">
-        <li class="list-item" onclick="openCard(replace_text_card);">Replace Text<span class="info shortcut ctrl-shift shift-command">F</span></li>
-        <!--li class="list-item" onclick="openCard(color_picker_card);">Color Picker<span class="info shortcut ctrl-shift shift-command">K</span></li-->
-        <li class="list-item" onclick="openCard(json_formatter_card);">JSON Formatter<span class="info shortcut ctrl-shift shift-command">G</span></li>
-        <li class="list-item" onclick="openCard(uri_encoder_card);">URI Encoder<span class="info shortcut ctrl-shift shift-command">Y</span></li>
-        <li class="list-item" onclick="openCard(uuid_generator_card);">UUID Generator<span class="info shortcut ctrl-shift shift-command">O</span></li>
-        <li class="list-item" onclick="Tools.insertTemplate({ type: 'html' });">Insert HTML Template<span class="info shortcut ctrl-shift shift-command">H</span></li>
+        <li class="list-item" onclick="replace_text_card.open();">Replace Text<span class="info shortcut ctrl-shift shift-command">F</span></li>
+        <!--li class="list-item" onclick="color_picker_card.open();">Color Picker<span class="info shortcut ctrl-shift shift-command">K</span></li-->
+        <li class="list-item" onclick="json_formatter_card.open();">JSON Formatter<span class="info shortcut ctrl-shift shift-command">G</span></li>
+        <li class="list-item" onclick="uri_encoder_card.open();">URI Encoder<span class="info shortcut ctrl-shift shift-command">Y</span></li>
+        <li class="list-item" onclick="uuid_generator_card.open();">UUID Generator<span class="info shortcut ctrl-shift shift-command">O</span></li>
+        <li class="list-item list-parent">Insert Templates...<svg class="info"><use href="#arrow_icon"/></svg>
+          <ul class="list">
+            <li class="list-item" onclick="Tools.insertTemplate({ type: 'html' });">HTML<span class="info shortcut ctrl-shift shift-command">H</span></li>
+            <li class="list-item" onclick="Tools.insertTemplate({ type: 'pack-manifest-bedrock' });">Pack Manifest - Bedrock</li>
+          </ul>
+        </li>
         <li class="list-item list-parent">Online Resources...<svg class="info"><use href="#arrow_icon"/></svg>
           <ul class="list">
-            <a class="list-item" href="https://webformatter.com"><img src="resources/web-formatter.svg">Code Formatter</a>
-            <a class="list-item" href="https://www.sharedrop.io"><img class="invert" src="resources/sharedrop.svg">File Transferer</a>
-            <a class="list-item" href="https://www.diffchecker.com/"><img src="resources/diffchecker.svg">Difference Finder</a>
-            <a class="list-item" href="https://caniuse.com/"><img src="resources/caniuse.svg">Compatibility Checker</a>
-            <a class="list-item" href="https://web.dev/measure/"><img src="resources/webdev.svg">Performance Tester</a>
-            <a class="list-item" href="https://realfavicongenerator.net/"><img class="rounded" src="resources/real-favicon-generator.svg">Favicon Generator</a>
-            <a class="list-item" href="https://appsco.pe/developer/splash-screens/"><img class="invert" src="resources/appscope.svg">Splash Generator</a>
-            <a class="list-item" href="https://www.svgminify.com/"><img src="resources/svgminify.svg">SVG Simplifier</a>
-            <a class="list-item" href="https://cryptii.com/"><img src="resources/cryptii.svg">Text Encryptor</a>
+            <a class="list-item" href="https://webformatter.com"><img src="resources/web-formatter.svg" alt="">Code Formatter</a>
+            <a class="list-item" href="https://www.sharedrop.io"><img class="invert" src="resources/sharedrop.svg" alt="">File Transferer</a>
+            <a class="list-item" href="https://www.diffchecker.com/"><img src="resources/diffchecker.svg" alt="">Difference Finder</a>
+            <a class="list-item" href="https://caniuse.com/"><img src="resources/caniuse.svg" alt="">Compatibility Checker</a>
+            <a class="list-item" href="https://web.dev/measure/"><img src="resources/webdev.svg" alt="">Performance Tester</a>
+            <a class="list-item" href="https://realfavicongenerator.net/"><img class="rounded" src="resources/real-favicon-generator.svg" alt="">Favicon Generator</a>
+            <a class="list-item" href="https://appsco.pe/developer/splash-screens/"><img class="invert" src="resources/appscope.svg" alt="">Splash Generator</a>
+            <a class="list-item" href="https://www.svgminify.com/"><img src="resources/svgminify.svg" alt="">SVG Simplifier</a>
+            <a class="list-item" href="https://cryptii.com/"><img src="resources/cryptii.svg" alt="">Text Encryptor</a>
           </ul>
         </li>
       </ul>
     </div>
     <div class="menu alternate">
-      <button class="opener" onclick="openCard(settings_card);">Settings</button>
+      <button class="opener" onclick="settings_card.open();">Settings</button>
       <ul class="list">
-        <li id="install_option" class="list-item" onclick="showInstallPrompt();"><img src="resources/icon.svg">Install</button>
-        <li class="list-item" onclick="openCard(theme_card); Editor.dialog_previous = this.closest('.menu').querySelector('button');">Theme Settings</li>
+        <li id="install_option" class="list-item" onclick="showInstallPrompt();"><img src="resources/icon.svg" alt="">Install</li>
+        <li class="list-item" onclick="theme_card.open(); Editor.dialog_previous = this.closest('.menu').querySelector('button');">Theme Settings</li>
         <li class="list-item" id="clear_site_caches_option" onclick="clearSiteCaches();">Clear Cache</li>
         <li class="list-item" onclick="Editor.settings.reset();">Reset Settings</li>
       </ul>
     </div>
-  </section>
-  <section class="app-omnibox">
+  </div>
+  <div class="app-omnibox">
     <button class="option" title="Refresh Preview" onclick="refreshPreview({ force: true });"><svg><use href="#refresh_icon"/></svg></button>
     <a class="option" href="https://github.com/Offroaders123/Smart-Text-Editor" title="Smart Text Editor on GitHub"><svg><use href="#github_icon"/></svg></a>
-  </section>
+  </div>
 </header>
 
 <main id="main">
-  <section id="workspace" class="workspace">
-    <section id="workspace_tabs" class="workspace-tabs"></section>
-    <section id="workspace_editors" class="workspace-editors"></section>
-  </section>
-  <section id="scaler" class="scaler"></section>
+  <div id="workspace" class="workspace">
+    <div id="workspace_tabs" class="workspace-tabs"></div>
+    <div id="workspace_editors" class="workspace-editors"></div>
+  </div>
+  <div id="scaler" class="scaler"></div>
   <iframe id="preview" class="preview" src="about:blank"></iframe>
-  <section id="card_backdrop" class="card-backdrop"></section>
-  <section id="settings_card" class="card dialog" data-card="dialog">
-    <section class="header">
-      <button class="card-back"><svg><use href="#back_icon"/></svg></button>
-      <span class="title">Settings</span>
-      <section class="card-controls">
-        <button class="control" data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
-        <button class="control" data-control="close"><svg><use href="#close_icon"/></svg></button>
-      </section>
-    </section>
-    <section class="main">
+  <div id="card_backdrop" class="card-backdrop"></div>
+  <ste-card id="settings_card" class="card dialog" data-type="dialog">
+    <div class="header">
+      <span class="heading">Settings</span>
+    </div>
+    <div class="main">
       <div class="content">
         <div class="item list start">
           <div class="select">
@@ -1915,25 +1915,20 @@
         </div>
       </div>
       <div class="options">
-        <button id="install_button" onclick="showInstallPrompt();"><img src="resources/icon.svg">Install</button>
-        <button id="theme_button" onclick="openCard(theme_card);" data-card-previous="theme_card">Customize Theme<svg><use href="#arrow_icon"/></svg></button>
+        <button id="install_button" onclick="showInstallPrompt();"><img src="resources/icon.svg" alt="">Install</button>
+        <button id="theme_button" onclick="theme_card.open();" data-card-previous="theme_card">Customize Theme<svg><use href="#arrow_icon"/></svg></button>
       </div>
       <div class="options">
         <button id="clear_site_caches_button" class="warning" onclick="clearSiteCaches();">Clear Cache</button>
         <button class="warning" onclick="Editor.settings.reset();">Reset Settings</button>
       </div>
-    </section>
-  </section>
-  <section id="theme_card" class="card dialog" data-card="dialog">
-    <section class="header" data-card-parent="settings_card">
-      <button class="card-back"><svg><use href="#back_icon"/></svg></button>
-      <span class="title">Theme</span>
-      <section class="card-controls">
-        <button class="control" data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
-        <button class="control" data-control="close"><svg><use href="#close_icon"/></svg></button>
-      </section>
-    </section>
-    <section class="main">
+    </div>
+  </ste-card>
+  <ste-card id="theme_card" class="card dialog" data-type="dialog">
+    <div class="header" data-card-parent="settings_card">
+      <span class="heading">Theme</span>
+    </div>
+    <div class="main">
       <div class="content">
         <div class="item list">
           <span style="font-size: 13px; line-height: 1.6;">Custom workspace theme settings<br>will be featured in a later update.</span>
@@ -1945,40 +1940,35 @@
       <!--div class="options">
         <button onclick="resetTheme();">Reset Theme</button>
       </div-->
-    </section>
-  </section>
-  <section id="reset_settings_card" class="card alert" data-card="alert">
-    <section class="header">
-      <img class="icon" src="resources/settings.svg">
-      <span class="title">Reset Settings</span>
-    </section>
-    <section class="main">
+    </div>
+  </ste-card>
+  <ste-card id="reset_settings_card" class="card alert" data-type="alert">
+    <div class="header">
+      <img class="icon" src="resources/settings.svg" alt="">
+      <span class="heading">Reset Settings</span>
+    </div>
+    <div class="main">
       <div class="content">
         <div class="item">Your settings have been reset!</div>
       </div>
-    </section>
-  </section>
-  <section id="cleared_cache_card" class="card alert" data-card="alert">
-    <section class="header">
-      <img class="icon" src="resources/template.svg">
-      <span class="title">Cleared Cache</span>
-    </section>
-    <section class="main">
+    </div>
+  </ste-card>
+  <ste-card id="cleared_cache_card" class="card alert" data-type="alert">
+    <div class="header">
+      <img class="icon" src="resources/template.svg" alt="">
+      <span class="heading">Cleared Cache</span>
+    </div>
+    <div class="main">
       <div class="content">
         <div class="item">Successfully cleared offline cache!</div>
       </div>
-    </section>
-  </section>
-  <section id="replace_text_card" class="card widget" data-card="widget">
-    <section class="header">
-      <button class="card-back"><svg><use href="#back_icon"/></svg></button>
-      <span class="title">Replace Text</span>
-      <section class="card-controls">
-        <button class="control" data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
-        <button class="control" data-control="close"><svg><use href="#close_icon"/></svg></button>
-      </section>
-    </section>
-    <section class="main">
+    </div>
+  </ste-card>
+  <ste-card id="replace_text_card" class="card widget" data-type="widget">
+    <div class="header">
+      <span class="heading">Replace Text</span>
+    </div>
+    <div class="main">
       <div class="content">
         <div class="item list expand">
           <num-text id="replacer_find" placeholder="Text to find..."></num-text>
@@ -1990,18 +1980,13 @@
         <button onclick="Tools.replaceText.flip();">Flip</button>
         <button onclick="Tools.replaceText.clear();">Clear</button>
       </div>
-    </section>
-  </section>
-  <section id="color_picker_card" class="card widget" data-card="widget">
-    <section class="header">
-      <button class="card-back"><svg><use href="#back_icon"/></svg></button>
-      <span class="title">Color Picker</span>
-      <section class="card-controls">
-        <button class="control" data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
-        <button class="control" data-control="close"><svg><use href="#close_icon"/></svg></button>
-      </section>
-    </section>
-    <section class="main">
+    </div>
+  </ste-card>
+  <ste-card id="color_picker_card" class="card widget" data-type="widget">
+    <div class="header">
+      <span class="heading">Color Picker</span>
+    </div>
+    <div class="main">
       <div class="content">
         <div class="item list">
           <div id="picker_preview"></div>
@@ -2021,18 +2006,13 @@
         <button onclick="insertPicker();">Insert</button>
         <button onclick="deletePicker();">Delete</button>
       </div>
-    </section>
-  </section>
-  <section id="json_formatter_card" class="card widget" data-card="widget">
-    <section class="header">
-      <button class="card-back"><svg><use href="#back_icon"/></svg></button>
-      <span class="title">JSON Formatter</span>
-      <section class="card-controls">
-        <button class="control" data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
-        <button class="control" data-control="close"><svg><use href="#close_icon"/></svg></button>
-      </section>
-    </section>
-    <section class="main">
+    </div>
+  </ste-card>
+  <ste-card id="json_formatter_card" class="card widget" data-type="widget">
+    <div class="header">
+      <span class="heading">JSON Formatter</span>
+    </div>
+    <div class="main">
       <div class="content">
         <div class="item expand">
           <num-text id="formatter_input" class="expand" syntax-language="json" placeholder="JSON data to format..."></num-text>
@@ -2043,18 +2023,13 @@
         <button onclick="Tools.jsonFormatter.collapse();">Collapse</button>
         <button onclick="Tools.jsonFormatter.clear();">Clear</button>
       </div>
-    </section>
-  </section>
-  <section id="uri_encoder_card" class="card widget" data-card="widget">
-    <section class="header">
-      <button class="card-back"><svg><use href="#back_icon"/></svg></button>
-      <span class="title">URI Encoder</span>
-      <section class="card-controls">
-        <button class="control" data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
-        <button class="control" data-control="close"><svg><use href="#close_icon"/></svg></button>
-      </section>
-    </section>
-    <section class="main">
+    </div>
+  </ste-card>
+  <ste-card id="uri_encoder_card" class="card widget" data-type="widget">
+    <div class="header">
+      <span class="heading">URI Encoder</span>
+    </div>
+    <div class="main">
       <div class="content">
         <div class="item expand">
           <num-text id="encoder_input" class="expand" placeholder="Text to encode..."></num-text>
@@ -2071,18 +2046,13 @@
           <label for="encoder_type"><svg class="check"><use href="#check_icon"/></svg>Enable URI Component</label>
         </div>
       </div>
-    </section>
-  </section>
-  <section id="uuid_generator_card" class="card widget" data-card="widget">
-    <section class="header">
-      <button class="card-back"><svg><use href="#back_icon"/></svg></button>
-      <span class="title">UUID Generator</span>
-      <section class="card-controls">
-        <button class="control" data-control="minimize"><svg><use href="#minimize_icon"/></svg></button>
-        <button class="control" data-control="close"><svg><use href="#close_icon"/></svg></button>
-      </section>
-    </section>
-    <section class="main">
+    </div>
+  </ste-card>
+  <ste-card id="uuid_generator_card" class="card widget" data-type="widget">
+    <div class="header">
+      <span class="heading">UUID Generator</span>
+    </div>
+    <div class="main">
       <div class="content">
         <div class="item expand">
           <input id="generator_output" type="text" placeholder="Result..." readonly>
@@ -2091,9 +2061,9 @@
       <div class="options">
         <button onclick="generator_output.value = Tools.uuidGenerator.generate();">Generate</button>
       </div>
-    </section>
-  </section>
-  <section id="context_menu" class="menu context-menu">
+    </div>
+  </ste-card>
+  <div id="context_menu" class="menu context-menu">
     <ul class="list">
       <li class="list-item global" onclick="window.location.reload();">Reload<span class="info shortcut ctrl command">R</span></li>
       <li class="list-item link" onclick="Editor.context_menu_previous.click();">Open in New Tab</li>
@@ -2106,19 +2076,173 @@
       <li class="list-item editing" onclick="callCommand(Editor.context_menu_previous,'paste');">Paste<span class="info shortcut ctrl command">V</span></li>
       <li class="list-item editing" onclick="Editor.context_menu_previous.select();">Select All<span class="info shortcut ctrl command">A</span></li>
     </ul>
-  </section>
+  </div>
 </main>
 
 <script>
+  class STECardElement extends HTMLElement {
+    constructor(){
+      super();
+      this.defined = false;
+    }
+    connectedCallback(){
+      if (this.defined || !this.isConnected) return;
+      this.defined = true;
+      this.addEventListener("keydown",event => {
+        if (this.getAttribute("data-type") != "dialog" || event.key != "Tab") return;
+        var navigable = getNavigableElements({ container: this, scope: true });
+        if (!event.shiftKey){
+          if (document.activeElement != navigable[navigable.length - 1]) return;
+          event.preventDefault();
+          navigable[0].focus();
+        } else if (document.activeElement == navigable[0]){
+          event.preventDefault();
+          navigable[navigable.length - 1].focus();
+        }
+      });
+      this.type = this.getAttribute("data-type");
+      this.header = this.querySelector(".header");
+      this.back = document.createElement("button");
+      this.back.classList.add("card-back");
+      this.back.innerHTML = `<svg><use href="#back_icon"/></svg>`;
+      this.back.addEventListener("click",() => document.querySelector(`#${this.header.getAttribute("data-card-parent")}`).open(this));
+      this.heading = this.header.querySelector(".heading");
+      this.controls = document.createElement("div");
+      this.controls.classList.add("card-controls");
+      this.controls.minimize = document.createElement("button");
+      this.controls.minimize.classList.add("control");
+      this.controls.minimize.setAttribute("data-control","minimize");
+      this.controls.minimize.innerHTML = `<svg><use href="#minimize_icon"/></svg>`;
+      this.controls.minimize.addEventListener("keydown",event => {
+        if (event.key != "Enter") return;
+        event.preventDefault();
+        if (event.repeat) return;
+        this.controls.minimize.click();
+      });
+      this.controls.minimize.addEventListener("click",() => this.minimize());
+      this.controls.close = document.createElement("button");
+      this.controls.close.classList.add("control");
+      this.controls.close.setAttribute("data-control","close");
+      this.controls.close.innerHTML = `<svg><use href="#close_icon"/></svg>`;
+      this.controls.close.addEventListener("click",() => this.close());
+      this.header.insertBefore(this.back,this.heading);
+      this.controls.appendChild(this.controls.minimize);
+      this.controls.appendChild(this.controls.close);
+      this.header.appendChild(this.controls);
+      if (Editor.environment().macOS_device){
+        this.controls.insertBefore(this.controls.close,this.controls.minimize);
+        this.header.insertBefore(this.controls,this.header.firstChild);
+      }
+    }
+    open(previous){
+      if (this.matches(".active") && !this.hasAttribute("data-alert-timeout")) return this.close();
+      if (this.type != "alert"){
+        document.querySelectorAll(`.card.active`).forEach(card => {
+          if (card.type != "dialog" && card.type != this.type) return;
+          card.close();
+          if (!card.matches(".minimize")) return;
+          var transitionDuration = parseInt(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
+          window.setTimeout(() => card.minimize(),transitionDuration);
+        });
+      }
+      this.classList.add("active");
+      if (this.type == "widget" && card_backdrop.matches(".active")) card_backdrop.classList.remove("active");
+      if (this.type == "alert"){
+        var timeoutIdentifier = Math.random().toString();
+        this.setAttribute("data-alert-timeout",timeoutIdentifier);
+        window.setTimeout(() => {
+          if (this.getAttribute("data-alert-timeout") != timeoutIdentifier) return;
+          this.removeAttribute("data-alert-timeout");
+          this.close();
+        },4000);
+      }
+      if (this.type == "dialog"){
+        document.body.addEventListener("keydown",catchCardNavigation);
+        card_backdrop.classList.add("active");
+        if (!Editor.active_dialog && !Editor.dialog_previous){
+          var menuItem = (document.activeElement.closest(".menu")), contextMenuItem = (document.activeElement.closest(".context-menu"));
+          if (!menuItem && !contextMenuItem){
+            Editor.dialog_previous = document.activeElement;
+          } else if (menuItem){
+            Editor.dialog_previous = document.activeElement.closest(".menu").querySelector(".opener");
+          } else if (contextMenuItem) Editor.dialog_previous = Editor.context_menu_previous;
+        }
+        menus.forEach(menu => {
+          if (menu.classList.contains("active")) closeMenu(menu);
+        });
+        var transitionDuration = parseInt(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 500);
+        window.setTimeout(() => {
+          document.activeElement.blur();
+          if (previous) this.querySelector(`[data-card-previous="${previous.id}"]`).focus();
+        },transitionDuration);
+        Editor.active_dialog = this;
+      }
+      if (this.type == "widget") Editor.active_widget = this;
+    }
+    minimize(){
+      var icon = this.controls.minimize.querySelector("svg use"), main = this.querySelector(".main"), changeIdentifier = Math.random().toString();
+      this.setAttribute("data-minimize-change",changeIdentifier);
+      workspace_tabs.setAttribute("data-minimize-change",changeIdentifier);
+      var transitionDuration = parseInt(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
+      if (!this.matches(".minimize")){
+        this.classList.add("minimize");
+        this.style.setProperty("--card-minimize-width",`${this.controls.minimize.querySelector("svg").clientWidth + parseInt(getElementStyle({ element: this.controls.minimize, property: "--control-padding" }),10) * 2}px`);
+        this.style.setProperty("--card-main-width",`${main.clientWidth}px`);
+        this.style.setProperty("--card-main-height",`${main.clientHeight}px`);
+        icon.setAttribute("href","#arrow_icon");
+        window.setTimeout(() => {
+          workspace_tabs.style.setProperty("--minimize-tab-width",getElementStyle({ element: this, property: "width" }));
+          setEditorTabsVisibility();
+        },transitionDuration);
+        if (this.contains(document.activeElement) && document.activeElement != this.controls.minimize) this.controls.minimize.focus();
+      } else {
+        this.classList.remove("minimize");
+        window.setTimeout(() => {
+          if (this.getAttribute("data-minimize-change") == changeIdentifier) this.style.removeProperty("--card-minimize-width");
+        },transitionDuration);
+        this.style.removeProperty("--card-main-width");
+        this.style.removeProperty("--card-main-height");
+        icon.setAttribute("href","#minimize_icon");
+        workspace_tabs.style.removeProperty("--minimize-tab-width");
+      }
+      window.setTimeout(() => {
+        if (this.getAttribute("data-minimize-change") == changeIdentifier) this.removeAttribute("data-minimize-change");
+        if (workspace_tabs.getAttribute("data-minimize-change") == changeIdentifier) workspace_tabs.removeAttribute("data-minimize-change");
+      },transitionDuration);
+    }
+    close(){
+      this.classList.remove("active");
+      if (this.matches(".minimize")){
+        var transitionDuration = parseInt(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
+        window.setTimeout(() => this.minimize(),transitionDuration);
+      }
+      if (this.type == "dialog"){
+        document.body.removeEventListener("keydown",catchCardNavigation);
+        card_backdrop.classList.remove("active");
+        Editor.active_dialog = null;
+        if (Editor.dialog_previous){
+          var hidden = (getElementStyle({ element: Editor.dialog_previous, property: "visibility" }) == "hidden");
+          (!workspace_editors.contains(Editor.dialog_previous) && !hidden) ? Editor.dialog_previous.focus({ preventScroll: true }) : Editor.query().container.focus({ preventScroll: true });
+          Editor.dialog_previous = null;
+        }
+      }
+      if (this.type == "widget") Editor.active_widget = null;
+    }
+  }
+  function catchCardNavigation(){
+    if (!Editor.active_dialog || context_menu.matches(".active") || event.key != "Tab" || document.activeElement != document.body) return;
+    var navigable = getNavigableElements({ container: Editor.active_dialog, scope: true });
+    event.preventDefault();
+    navigable[((!event.shiftKey) ? 0 : navigable.length - 1)].focus();
+  }
+  window.customElements.define("ste-card",STECardElement);
+
   document.querySelectorAll("a[href]").forEach(anchor => {
     anchor.rel = "noopener";
     anchor.target = "_blank";
     attachContextMenu({ element: anchor, type: "link" });
   });
-  document.querySelectorAll("img").forEach(image => {
-    if (!image.alt) image.alt = "";
-    image.draggable = false;
-  });
+  document.querySelectorAll("img").forEach(image => image.draggable = false);
   document.querySelectorAll("num-text").forEach(textarea => applyEditingBehavior({ element: textarea }));
   document.querySelectorAll("input[type='text']").forEach(input => applyEditingBehavior({ element: input }));
   var menus = document.querySelectorAll(".menu");
@@ -2259,36 +2383,6 @@
     checkbox.tabIndex = 0;
     input.addEventListener("click",event => event.stopPropagation());
   });
-  var cards = document.querySelectorAll(".card");
-  cards.forEach(card => {
-    if (!card.querySelector(".header .card-controls")) return;
-    var header = card.querySelector(".header"), back = header.querySelector(".card-back"), cardControls = header.querySelector(".card-controls"), minimize = cardControls.querySelector(".control[data-control='minimize']"), close = cardControls.querySelector(".control[data-control='close']");
-    back.addEventListener("click",() => openCard(document.querySelector(`#${back.closest(".header").getAttribute("data-card-parent")}`),card));
-    minimize.addEventListener("click",() => minimizeCard(card));
-    minimize.addEventListener("keydown",event => {
-      if (event.key != "Enter") return;
-      event.preventDefault();
-      if (event.repeat) return;
-      minimize.click();
-    });
-    close.addEventListener("click",() => closeCard(card));
-    if (Editor.environment().macOS_device){
-      cardControls.insertBefore(close,minimize);
-      header.insertBefore(cardControls,header.firstChild);
-    }
-    var navigable = getNavigableElements({ container: card, scope: true });
-    card.addEventListener("keydown",event => {
-      if (card.getAttribute("data-card") != "dialog" || event.key != "Tab") return;
-      if (!event.shiftKey){
-        if (document.activeElement != navigable[navigable.length - 1]) return;
-        event.preventDefault();
-        navigable[0].focus();
-      } else if (document.activeElement == navigable[0]){
-        event.preventDefault();
-        navigable[navigable.length - 1].focus();
-      }
-    });
-  });
   document.querySelectorAll("header .app-omnibox .option").forEach(option => {
     option.tabIndex = -1;
     option.addEventListener("mousedown",event => event.preventDefault());
@@ -2368,18 +2462,11 @@
         template = decodeURI(`%3C!DOCTYPE%20html%3E%0A%3Chtml%20lang=%22${language}%22%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E`);
       }
       if (type == "pack-manifest-bedrock"){
-        var hey;
+        name = "manifest.json";
         template = decodeURI(`%7B%0A%20%20%22format_version%22:%202,%0A%0A%20%20%22header%22:%20%7B%0A%20%20%20%20%22name%22:%20%22Pack%20Manifest%20Template%20-%20Bedrock%20Edition%22,%0A%20%20%20%20%22description%22:%20%22Your%20resource%20pack%20description%22,%0A%20%20%20%20%22uuid%22:%20%22${Tools.uuidGenerator.generate()}%22,%0A%20%20%20%20%22version%22:%20%5B%201,%200,%200%20%5D,%0A%20%20%20%20%22min_engine_version%22:%20%5B%201,%2013,%200%20%5D%0A%20%20%7D,%0A%20%20%22modules%22:%20%5B%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%22description%22:%20%22Your%20resource%20pack%20description%22,%0A%20%20%20%20%20%20%22type%22:%20%22resources%22,%0A%20%20%20%20%20%20%22uuid%22:%20%22${Tools.uuidGenerator.generate()}%22,%0A%20%20%20%20%20%20%22version%22:%20%5B%201,%200,%200%20%5D%0A%20%20%20%20%7D%0A%20%20%5D,%0A%20%20%22metadata%22:%20%7B%0A%20%20%20%20%22authors%22:%20%5B%0A%20%20%20%20%20%20%22Add%20author%20names%20here%20(optional,%20'metadata'%20can%20be%20removed%20altogether)%22%0A%20%20%20%20%5D%0A%20%20%7D%0A%7D`);
       }
       if (!template) return;
-      if (editor.container && !editor.tab.hasAttribute("data-editor-auto-created")){
-        if (template == editor.container.value) return;
-        editor.container.value = template;
-        if (!Editor.environment().touch_device) window.setTimeout(() => {
-          editor.textarea.setSelectionRange(0,0);
-          editor.textarea.focus();
-        },10);
-      } else createEditor({ name, value: template });
+      createEditor({ name, value: template });
       if (Editor.view() == "preview") setView({ type: "split" });
     }
   };
@@ -2404,7 +2491,7 @@
         }
       */
 
-        if (event.data.action == "clear-site-caches-complete") openCard(cleared_cache_card);
+        if (event.data.action == "clear-site-caches-complete") cleared_cache_card.open();
       });
       document.documentElement.classList.add("service-worker-activated");
     });
@@ -2442,14 +2529,15 @@
       event.preventDefault();
       if (event.repeat) return;
       if (context_menu.classList.contains("active")) return closeMenu(context_menu);
-      if (Editor.active_dialog) closeCard(Editor.active_dialog);
+      if (Editor.active_dialog) Editor.active_dialog.close();
     }
-    if ((controlShift || shiftCommand) && pressed("x")){
+    if (((control || command) && !shift && pressed("n")) || ((controlShift || shiftCommand) && pressed("x"))){
       event.preventDefault();
       if (event.repeat) return;
       createEditor({ auto_replace: false });
     }
-    if ((controlShift || shiftCommand) && pressed("d")){
+    if (((control || command) && pressed("w")) || ((controlShift || shiftCommand) && pressed("d"))){
+      if (shift && pressed("w")) return window.close();
       event.preventDefault();
       if (event.repeat) return;
       /* Future feature: If an editor tab is focused, close that editor instead of only the active editor */
@@ -2465,7 +2553,7 @@
       if (event.repeat) return;
       openEditor({ identifier: getNextEditor() });
     }
-    if ((controlShift || shiftCommand) && pressed("c")){
+    if (((controlShift || shiftCommand) && pressed("n")) || ((controlShift || shiftCommand) && pressed("c"))){
       event.preventDefault();
       if (event.repeat) return;
       createWindow();
@@ -2518,27 +2606,27 @@
     if ((controlShift || shiftCommand) && pressed("f")){
       event.preventDefault();
       if (event.repeat) return;
-      openCard(replace_text_card);
+      replace_text_card.open();
     }/*
     if ((controlShift || shiftCommand) && pressed("k")){
       event.preventDefault();
       if (event.repeat) return;
-      openCard(color_picker_card);
+      color_picker_card.open();
     }*/
     if ((controlShift || shiftCommand) && pressed("g")){
       event.preventDefault();
       if (event.repeat) return;
-      openCard(json_formatter_card);
+      json_formatter_card.open();
     }
     if ((controlShift || shiftCommand) && pressed("y")){
       event.preventDefault();
       if (event.repeat) return;
-      openCard(uri_encoder_card);
+      uri_encoder_card.open();
     }
     if ((controlShift || shiftCommand) && pressed("o")){
       event.preventDefault();
       if (event.repeat) return;
-      openCard(uuid_generator_card);
+      uuid_generator_card.open();
     }
     if ((controlShift || shiftCommand) && pressed("h")){
       event.preventDefault();
@@ -2548,12 +2636,12 @@
     if ((controlShift || shiftCommand) && pressed("m")){
       event.preventDefault();
       if (event.repeat || !Editor.active_widget) return;
-      minimizeCard(Editor.active_widget);
+      if (Editor.active_widget) Editor.active_widget.minimize();
     }
     if ((control || command) && (pressed(",") || pressed("<"))){
       event.preventDefault();
       if (event.repeat) return;
-      openCard(settings_card);
+      settings_card.open();
     }
   });
   document.body.addEventListener("mousedown",event => {
@@ -2618,7 +2706,7 @@
     document.addEventListener("touchmove",setScaling,{ passive: true });
     document.addEventListener("touchend",disableScaling,{ passive: true });
   },{ passive: true });
-  card_backdrop.addEventListener("click",() => closeCard(Editor.active_dialog));
+  card_backdrop.addEventListener("click",() => Editor.active_dialog.close());
   generator_output.addEventListener("click",() => generator_output.select());
   generator_output.addEventListener("keydown",() => generator_output.click());
 
@@ -2629,7 +2717,7 @@
         var file = await handle.getFile(), identifier = createEditor({ name: await file.name, value: await file.text() });
         Editor.file_handles[identifier] = await handle;
       });
-      if (!Editor.environment().touch_device) Editor.query().textarea.focus();
+      if (!Editor.environment().touch_device) Editor.query().container.focus({ preventScroll: true });
     });
   }
   if (Editor.appearance().parent_window){
@@ -2653,7 +2741,7 @@
     removeQueryParameters(["template"]);
   }
   if (queryParameters.get("settings")){
-    openCard(settings_card);
+    settings_card.open();
     removeQueryParameters(["settings"]);
   }
   function createEditor({ name = "Untitled.txt", value = "", open = true, auto_created = false, auto_replace = true } = {}){
@@ -2766,7 +2854,7 @@
     Editor.active_editor = identifier;
     setEditorTabsVisibility();
     setTitle({ content: getName() });
-    if ((auto_created && !Editor.environment().touch_device && Editor.appearance().parent_window) || focused) textarea.focus({ preventScroll: true });
+    if ((((document.activeElement == document.body && !Editor.active_dialog) || auto_created) && !Editor.environment().touch_device && Editor.appearance().parent_window) || focused) container.focus({ preventScroll: true });
     if (Editor.preview_editor == "active-editor") refreshPreview({ force: (Editor.settings.get("automatic-refresh") != false) });
   }
   function closeEditor({ identifier = Editor.active_editor } = {}){
@@ -2793,7 +2881,7 @@
     if (tab == editorTabs[0] && editorTabs[1] && tab.classList.contains("active")) openEditor({ identifier: editorTabs[1].getAttribute("data-editor-identifier") });
     if (tab == editorTabs[editorTabs.length - 1] && tab != editorTabs[0] && tab.classList.contains("active")) openEditor({ identifier: editorTabs[editorTabs.length - 2].getAttribute("data-editor-identifier") });
     if (tab != editorTabs[0] && tab.classList.contains("active")) openEditor({ identifier: editorTabs[editorTabs.indexOf(tab) + 1].getAttribute("data-editor-identifier") });
-    if (focused && Editor.query().textarea) Editor.query().textarea.focus();
+    if (focused && Editor.query().textarea) Editor.query().container.focus({ preventScroll: true });
     tab.setAttribute("data-editor-change",true);
     if (tab == document.activeElement) tab.blur();
     tab.tabIndex = -1;
@@ -2906,114 +2994,6 @@
     });
     Editor.settings.set("syntax-highlighting",state);
   }
-  function openCard(card,previous){
-    if (card.classList.contains("active") && !card.hasAttribute("data-alert-timeout")) return closeCard(card);
-    var type = card.getAttribute("data-card");
-    if (type != "alert"){
-      cards.forEach(openCard => {
-        if (!openCard.classList.contains("active")) return;
-        var openType = openCard.getAttribute("data-card");
-        if (openType != "dialog" && openType != type) return;
-        openCard.classList.remove("active");
-        if (!openCard.classList.contains("minimize")) return;
-        var transitionDuration = parseInt(getElementStyle({ element: openCard, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
-        window.setTimeout(() => minimizeCard(openCard),transitionDuration);
-      });
-    }
-    card.classList.add("active");
-    if (type == "widget") card_backdrop.classList.remove("active");
-    if (type == "alert"){
-      var timeoutIdentifier = Math.random().toString();
-      card.setAttribute("data-alert-timeout",timeoutIdentifier);
-      window.setTimeout(() => {
-        if (card.getAttribute("data-alert-timeout") != timeoutIdentifier) return;
-        card.removeAttribute("data-alert-timeout");
-        closeCard(card);
-      },4000);
-    }
-    if (type == "dialog"){
-      document.body.addEventListener("keydown",catchCardNavigation);
-      card_backdrop.classList.add("active");
-      if (!Editor.active_dialog && !Editor.dialog_previous){
-        var menuItem = (document.activeElement.closest(".menu")), contextMenuItem = (document.activeElement.closest(".context-menu"));
-        if (!menuItem && !contextMenuItem){
-          Editor.dialog_previous = document.activeElement;
-        } else if (menuItem){
-          Editor.dialog_previous = document.activeElement.closest(".menu").querySelector(".opener");
-        } else if (contextMenuItem) Editor.dialog_previous = Editor.context_menu_previous;
-      }
-      menus.forEach(menu => {
-        if (menu.classList.contains("active")) closeMenu(menu);
-      });
-      var transitionDuration = parseInt(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 500);
-      window.setTimeout(() => {
-        document.activeElement.blur();
-        if (previous) card.querySelector(`[data-card-previous="${previous.id}"]`).focus();
-      },transitionDuration);
-      Editor.active_dialog = card;
-    }
-    if (type == "widget") Editor.active_widget = card;
-  }
-  function closeCard(card){
-    var type = card.getAttribute("data-card");
-    card.classList.remove("active");
-    if (card.classList.contains("minimize")){
-      var transitionDuration = parseInt(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
-      window.setTimeout(() => minimizeCard(card),transitionDuration);
-    }
-    if (type == "dialog"){
-      document.body.removeEventListener("keydown",catchCardNavigation);
-      card_backdrop.classList.remove("active");
-      Editor.active_dialog = null;
-      if (Editor.dialog_previous){
-        var hidden = (getElementStyle({ element: Editor.dialog_previous, property: "visibility" }) == "hidden");
-        if (!workspace_editors.contains(Editor.dialog_previous) && !hidden){
-          Editor.dialog_previous.focus();
-        } else Editor.query().textarea.focus();
-        Editor.dialog_previous = null;
-      }
-    }
-    if (type == "widget") Editor.active_widget = null;
-  }
-  function minimizeCard(card){
-    var minimize = card.querySelector(".header .card-controls .control[data-control='minimize']"), icon = minimize.querySelector("svg use"), main = card.querySelector(".main"), changeIdentifier = Math.random().toString();
-    card.setAttribute("data-minimize-change",changeIdentifier);
-    workspace_tabs.setAttribute("data-minimize-change",changeIdentifier);
-    var transitionDuration = parseInt(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
-    if (!card.classList.contains("minimize")){
-      card.classList.add("minimize");
-      card.style.setProperty("--card-minimize-width",`${minimize.querySelector("svg").clientWidth + parseInt(getElementStyle({ element: minimize, property: "--control-padding" }),10) * 2}px`);
-      card.style.setProperty("--card-main-width",`${main.clientWidth}px`);
-      card.style.setProperty("--card-main-height",`${main.clientHeight}px`);
-      icon.setAttribute("href","#arrow_icon");
-      window.setTimeout(() => {
-        workspace_tabs.style.setProperty("--minimize-tab-width",getElementStyle({ element: card, property: "width" }));
-        setEditorTabsVisibility();
-      },transitionDuration);
-      if (card.contains(document.activeElement) && document.activeElement != minimize) minimize.focus();
-    } else {
-      card.classList.remove("minimize");
-      window.setTimeout(() => {
-        if (card.getAttribute("data-minimize-change") == changeIdentifier) card.style.removeProperty("--card-minimize-width");
-      },transitionDuration);
-      card.style.removeProperty("--card-main-width");
-      card.style.removeProperty("--card-main-height");
-      icon.setAttribute("href","#minimize_icon");
-      workspace_tabs.style.removeProperty("--minimize-tab-width");
-    }
-    window.setTimeout(() => {
-      if (card.getAttribute("data-minimize-change") == changeIdentifier) card.removeAttribute("data-minimize-change");
-      if (workspace_tabs.getAttribute("data-minimize-change") == changeIdentifier) workspace_tabs.removeAttribute("data-minimize-change");
-    },transitionDuration);
-  }
-  function catchCardNavigation(){
-    if (!Editor.active_dialog || context_menu.classList.contains("active") || event.key != "Tab" || document.activeElement != document.body) return;
-    var navigable = getNavigableElements({ container: Editor.active_dialog, scope: true });
-    event.preventDefault();
-    if (!event.shiftKey){
-      navigable[0].focus();
-    } else navigable[navigable.length - 1].focus();
-  }
   function createWindow(){
     var features = (Editor.appearance().standalone || Editor.appearance().fullscreen) ? "popup" : "", win = window.open(window.location.href,"_blank",features);
     if (Editor.appearance().fullscreen){
@@ -3119,7 +3099,7 @@
     }
     if (!menu.classList.contains("context-menu")) return;
     if (Editor.context_menu_timeout) Editor.context_menu_timeout = null;
-    Editor.context_menu_previous = event.composedPath()[0];
+    Editor.context_menu_previous = event.target;
     menu.classList.add(type);
     var location = { left: event.pageX, top: event.pageY };
     if (location.left + list.offsetWidth > window.innerWidth) location.left = window.innerWidth - list.offsetWidth;
@@ -3138,7 +3118,7 @@
     });
     if (opener && opener != document.activeElement) opener.focus();
     if (!menu.classList.contains("context-menu")) return;
-    if (Editor.context_menu_previous) Editor.context_menu_previous.focus();
+    if (Editor.context_menu_previous) Editor.context_menu_previous.focus({ preventScroll: true });
     var types = ["link","editing"], transitionDuration = parseInt(getElementStyle({ element: list, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
     window.setTimeout(() => {
       var types = ["link","editing"];
