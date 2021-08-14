@@ -2478,19 +2478,6 @@
       if ((navigator.serviceWorker.controller) ? (navigator.serviceWorker.controller.state == "activated") : false) activateManifest();
       navigator.serviceWorker.addEventListener("message",event => {
         if (event.data.action == "service-worker-activated") activateManifest();
-
-      /* Web Share Target hook - to be re-added at some point
-
-        if (event.data.action == "open-files"){
-          var files = Array.from(event.data.files);
-          files.forEach(file => {
-            var reader = new FileReader();
-            reader.readAsText(file,"UTF-8");
-            reader.addEventListener("loadend",() => createEditor({ name: file.name, value: reader.result }));
-          });
-        }
-      */
-
         if (event.data.action == "clear-site-caches-complete") cleared_cache_card.open();
       });
       document.documentElement.classList.add("service-worker-activated");
