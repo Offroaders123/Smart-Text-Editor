@@ -500,6 +500,7 @@
     --workspace-tabs-padding: 6px;
     flex-shrink: 0;
     display: flex;
+    align-items: center;
     box-shadow: 0 -1px 0 var(--workspace-accent) inset, 0 -1px 0 var(--workspace-background) inset;
     overflow-x: auto;
     scroll-behavior: smooth;
@@ -541,16 +542,35 @@
     display: none;
   }
   main .workspace .workspace-tabs .tab {
+    margin-right: 1px;
     margin-top: 3px;
     padding: calc(6px - var(--tab-border-width));
     padding-left: calc(10px - var(--tab-border-width));
     padding-bottom: calc(8px - var(--tab-border-width));
+    position: relative;
+    min-width: 80px;
     flex-shrink: 0;
     gap: 6px;
+    justify-content: space-between;
     color: #aaaaaa;
     font-size: 12px;
     background: none;
     outline: none;
+  }
+  main .workspace .workspace-tabs .tab:not([data-editor-change]):not(.active) + .tab:not([data-editor-change]):not(.active)::before, main .workspace .workspace-tabs > .tab:not([data-editor-change]):not(.active) + :nth-last-child(2):not([data-editor-change]):not(.active)::before, main .workspace .workspace-tabs > .tab + :nth-last-child(2):not([data-editor-change]):not(.active)::after {
+    content: "";
+    position: absolute;
+    right: calc(100% + 1px);
+    width: 1px;
+    height: 14px;
+    background: currentColor;
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 1;
+  }
+  main .workspace .workspace-tabs > .tab + :nth-last-child(2):not([data-editor-change]):not(.active)::after {
+    left: calc(100% + 2px);
+    right: unset;
   }
   main .workspace .workspace-tabs .tab:focus-visible {
     border-bottom-color: #ffffff80;
@@ -601,6 +621,45 @@
     font-size: 13px;
     font-style: normal;
     line-height: 12px;
+  }
+  main .workspace .workspace-tabs .create-editor-button {
+    margin-left: var(--workspace-tabs-padding);
+    margin-bottom: 1px;
+    padding: 6px;
+    position: sticky;
+    right: calc(var(--safe-area-inset-right) + var(--workspace-tabs-padding) + var(--minimize-tab-width,0px));
+    display: flex;
+    align-items: center;
+    color: #aaaaaa;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    outline: none;
+  }
+  main .workspace .workspace-tabs .create-editor-button:only-child {
+    display: none;
+  }
+
+  main .workspace .workspace-tabs .create-editor-button:hover, main .workspace .workspace-tabs .create-editor-button:active {
+    color: #ffffff;
+    background-color: #ffffff24;
+  }
+  main .workspace .workspace-tabs .create-editor-button:focus-visible {
+    color: #ffffff;
+    background-color: #ffffff24;
+  }
+/* -- Future Where --
+  main .workspace .workspace-tabs .create-editor-button:where(:hover,:active,:focus-visible) {
+    color: #ffffff;
+    background-color: #ffffff24;
+  }
+*/
+
+  main .workspace .workspace-tabs .create-editor-button svg {
+    width: 8px;height: 8px;
+    /*aspect-ratio: 1/1;*/
+    fill: currentColor;
+    transform: rotate(45deg);
   }
   main .workspace .workspace-editors {
     position: relative;
@@ -921,7 +980,6 @@
     border-radius: calc(6px + var(--tab-border-width));
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
-    overflow: hidden;
   }
   .tab .option {
     margin: calc(var(--option-border-width) * -1);
@@ -1881,7 +1939,9 @@
 
 <main id="main">
   <div id="workspace" class="workspace">
-    <div id="workspace_tabs" class="workspace-tabs"></div>
+    <div id="workspace_tabs" class="workspace-tabs">
+      <button id="create_editor_button" class="create-editor-button" title="New Editor"><svg><use href="#close_icon"/></svg></button>
+    </div>
     <div id="workspace_editors" class="workspace-editors"></div>
   </div>
   <div id="scaler" class="scaler"></div>
@@ -2679,6 +2739,12 @@
     if (event.key == "ArrowLeft") Editor.query(previousEditor).tab.focus();
     if (event.key == "ArrowRight") Editor.query(nextEditor).tab.focus();
   });
+  create_editor_button.addEventListener("keydown",event => {
+    if (event.key != "Enter") return;
+    if (event.repeat) event.preventDefault();
+  });
+  create_editor_button.addEventListener("mousedown",event => event.preventDefault());
+  create_editor_button.addEventListener("click",() => createEditor({ auto_replace: false }));
   scaler.addEventListener("mousedown",event => {
     if (event.button != 0) return;
     if (Editor.view() != "split") return;
@@ -2791,7 +2857,10 @@
     editorClose.classList.add("option");
     editorClose.tabIndex = -1;
     editorClose.innerHTML = "<svg><use href='#close_icon'/></svg>";
-    editorClose.addEventListener("mousedown",event => event.stopPropagation());
+    editorClose.addEventListener("mousedown",event => {
+      event.preventDefault();
+      event.stopPropagation();
+    });
     editorClose.addEventListener("click",event => {
       event.stopPropagation();
       closeEditor({ identifier });
@@ -2812,7 +2881,7 @@
     }
     tab.appendChild(editorName);
     tab.appendChild(editorClose);
-    workspace_tabs.appendChild(tab);
+    workspace_tabs.insertBefore(tab,create_editor_button);
     workspace_editors.appendChild(container);
     container.editor.addEventListener("input",() => {
       if (tab.hasAttribute("data-editor-auto-created")) tab.removeAttribute("data-editor-auto-created");
