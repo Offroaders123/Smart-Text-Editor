@@ -183,7 +183,6 @@
     context_menu_previous: null,
     context_menu_timeout: null,
     picker_color: null,
-    insert_color: false,
     install_prompt: null
   };
   if (Editor.appearance().parent_window) document.documentElement.classList.add("startup-fade");
@@ -212,6 +211,17 @@
     --titlebar-area-inset-width-left: env(titlebar-area-x,0px);
     --titlebar-area-inset-width-right: calc(100vw - env(titlebar-area-width,100vw) - var(--titlebar-area-inset-width-left));
     --titlebar-area-inset-height: env(titlebar-area-height,0px);
+  }
+  :root:not(.window-controls-overlay) {
+    --titlebar-area-inset-width-left: 0px;
+    --titlebar-area-inset-width-right: 0px;
+    --titlebar-area-inset-top: 0px;
+    --titlebar-area-inset-height: 0px;
+  }
+  :root {
+    --font-family-interface: -apple-system, BlinkMacSystemFont, "Rubik", sans-serif;
+    --font-family-code: ui-monospace, "Noto Sans Mono", "Cousine", monospace;
+    --line-height-code: 1.4;
 
     --transition-fast: 80ms;
 
@@ -225,12 +235,6 @@
   }
   :root:-moz-window-inactive {
     --selection-background: var(--selection-background-inactive);
-  }
-  :root:not(.window-controls-overlay) {
-    --titlebar-area-inset-width-left: 0px;
-    --titlebar-area-inset-width-right: 0px;
-    --titlebar-area-inset-top: 0px;
-    --titlebar-area-inset-height: 0px;
   }
   html {
     width: 100%;
@@ -249,7 +253,7 @@
     flex-direction: column;
     color: #cccccc;
     font-size: 14.5px;
-    font-family: -apple-system, BlinkMacSystemFont, "Rubik", sans-serif;
+    font-family: var(--font-family-interface);
     background: #121212;
     overflow: hidden;
     -webkit-user-select: none;
@@ -263,14 +267,12 @@
     width: 100%;
     height: 100%;
     background: #1e1e1e;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 3;
+    z-index: 4;
     transition: opacity 250ms;
   }
-  :root.startup-fade body::after {
-    opacity: 1;
-    pointer-events: all;
+  :root:not(.startup-fade) body::after {
+    opacity: 0;
+    pointer-events: none;
   }
   body.split.horizontal[data-scaling-change] {
     cursor: col-resize;
@@ -383,7 +385,7 @@
   :root.window-controls-overlay header .app-omnibox {
     height: var(--titlebar-area-inset-height);
     gap: calc(var(--header-gap) / var(--device-pixel-ratio));
-    z-index: 4;
+    z-index: 5;
   }
   :root:not(.macOS-device).window-controls-overlay header .app-omnibox {
     margin-right: calc(var(--header-gap) * -1);
@@ -915,7 +917,8 @@
   num-text {
     --padding: 8px;
     caret-color: var(--color);
-    font-family: ui-monospace, "Noto Sans Mono", "Cousine", monospace;
+    font-family: var(--font-family-code);
+    line-height: var(--line-height-code);
     --selection-background: inherit;
     --selection-background-inactive: inherit;
     background: var(--background);
@@ -930,8 +933,8 @@
     color: #eaeaea;
     caret-color: #eaeaea;
     font-size: 13px;
-    font-family: ui-monospace, "Noto Sans Mono", "Cousine", monospace;
-    line-height: 1.4;
+    font-family: var(--font-family-code);
+    line-height: var(--line-height-code);
     background: #2d2d2d;
     border: none;
     border-radius: 0;
@@ -1022,7 +1025,7 @@
     position: fixed;
     left: 0;
     top: 0;
-    z-index: 2;
+    z-index: 4;
   }
   .menu .opener {
     display: flex;
@@ -1492,6 +1495,9 @@
   .card .header .card-controls {
     margin-left: auto;
     display: flex;
+  }
+  .card.alert .header .card-controls {
+    display: none;
   }
   :root.macOS-device .card .header .card-controls {
     margin: 7px;
@@ -2590,12 +2596,12 @@
       /* Future feature: If an editor tab is focused, close that editor instead of only the active editor */
       closeEditor();
     }
-    if ((controlShift || controlCommand) && (pressed("[") || pressed("{"))){
+    if (((controlShift || (event.ctrlKey && shift && !command && Editor.environment().apple_device)) && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("[") || pressed("{")))){
       event.preventDefault();
       if (event.repeat) return;
       openEditor({ identifier: getPreviousEditor() });
     }
-    if ((controlShift || controlCommand) && (pressed("]") || pressed("}"))){
+    if (((control || (event.ctrlKey && !command && Editor.environment().apple_device)) && !shift && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("]") || pressed("}")))){
       event.preventDefault();
       if (event.repeat) return;
       openEditor({ identifier: getNextEditor() });
