@@ -1025,7 +1025,7 @@
     position: fixed;
     left: 0;
     top: 0;
-    z-index: 4;
+    z-index: 5;
   }
   .menu .opener {
     display: flex;
@@ -1042,13 +1042,14 @@
     color: #cccccc;
     font-size: 13px;
     line-height: 16px;
+    list-style: none;
     background: #2e2e2e;
     border: var(--list-border-width) solid transparent;
     --list-border-width: 1px;
     border-radius: calc(var(--list-padding-y) + var(--list-border-width));
     box-shadow: 0 5px 10px #00000060;
     z-index: 1;
-    list-style: none;
+    -webkit-app-region: no-drag;
     transform-origin: center top;
     transition-property: visibility, opacity, transform;
   }
@@ -3166,7 +3167,7 @@
     var location = { left: event.pageX, top: event.pageY };
     if (location.left + list.offsetWidth > window.innerWidth) location.left = window.innerWidth - list.offsetWidth;
     if (location.top + list.offsetHeight > window.innerHeight) location.top -= list.offsetHeight;
-    menu.style.left = `${location.left}px`;
+    menu.style.left = `clamp(var(--titlebar-area-inset-width-left),${location.left}px,calc(100vw - var(--titlebar-area-inset-width-right) - ${list.offsetWidth}px))`;
     menu.style.top = `${location.top}px`;
     //document.body.addEventListener("keydown",catchMenuNavigation);
     var transitionDuration = parseInt(getElementStyle({ element: list, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 500);
