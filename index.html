@@ -52,6 +52,7 @@
 <link rel="preload" as="fetch" crossorigin href="https://offroaders123.github.io/Num-Text-Component/vanilla-appearance.css">
 <link rel="preload" as="fetch" crossorigin href="https://offroaders123.github.io/Num-Text-Component/vanilla-highlighting.css">
 <script src="https://offroaders123.github.io/Num-Text-Component/script.js"></script>
+<script src="https://offroaders123.github.io/Menu-Drop-Component/script.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js" data-manual></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-json.min.js"></script>
 
@@ -166,12 +167,11 @@
       reset: () => {
         if (!Editor.support().local_storage) return;
         if (!confirm("Are you sure you would like to reset all settings?")) return;
-        var active = document.activeElement;
         Editor.settings.entries = {};
-        default_orientation_setting.closest(".menu").querySelector("[data-option='horizontal']").click();/* Temporary! Look at note below */
+        default_orientation_setting.select("horizontal");
+        setSyntaxHighlighting(false);
         syntax_highlighting_setting.checked = false;
         automatic_refresh_setting.checked = true;
-        active.focus({ preventScroll: true });/* Temporary! Changing select dropdown options currently requires them to be clicked programmatically, so it will remove focus from the current element. This will be addressed with MenuDrop once that is out. I can't wait for it to be ready! :) */
         window.localStorage.removeItem("settings");
         reset_settings_card.open();
         return true;
@@ -180,8 +180,6 @@
     active_dialog: null,
     dialog_previous: null,
     active_widget: null,
-    context_menu_previous: null,
-    context_menu_timeout: null,
     picker_color: null,
     install_prompt: null
   };
@@ -340,33 +338,31 @@
     z-index: 3;
     -webkit-app-region: no-drag;
   }
-  header .app-menubar .menu {
+  header .app-menubar menu-drop {
     min-width: 0;
   }
-  header .app-menubar .menu .opener {
+  header .app-menubar menu-drop::part(opener) {
+    min-width: unset;
     padding: 0 8px;
-    display: unset;
     background: none;
-    border: none;
-    outline: none;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  header .app-menubar .menu .opener:hover, header .app-menubar .menu .opener:focus, header .app-menubar .menu.active .opener {
+  header .app-menubar menu-drop::part(opener):hover, header .app-menubar menu-drop::part(opener):focus, header .app-menubar menu-drop[data-open]::part(opener) {
     color: #ffffff;
     background: #ffffff24;
   }
-  header .app-menubar .menu:not(.active) .opener:not(:hover):focus:not(:focus-visible) {
+  header .app-menubar menu-drop:not([data-open])::part(opener):not(:hover):focus:not(:focus-visible) {
     color: inherit;
     background: none;
   }
-  header .app-menubar .menu .opener:focus-visible {
+  header .app-menubar menu-drop::part(opener):focus-visible {
     color: #ffffff;
     background: #ffffff24;
   }
 /* -- Future Focus Visible --
-  header .app-menubar .menu .opener:where(:hover,:focus-visible), header .app-menubar .menu.active .opener {
+  header .app-menubar menu-drop::part(opener):where(:hover,:focus-visible), header .app-menubar menu-drop[data-open]::part(opener) {
     color: #ffffff;
     background: #ffffff24;
   }
@@ -512,6 +508,7 @@
   }
   main .workspace .workspace-tabs::before, main .workspace .workspace-tabs::after {
     content: "";
+    height: 100%;
     flex-shrink: 0;
     pointer-events: none;
   }
@@ -909,6 +906,7 @@
     color: inherit;
     font-size: inherit;
     font-family: inherit;
+    border-radius: 0;
   }
   a {
     color: inherit;
@@ -1017,213 +1015,93 @@
     /*aspect-ratio: 1/1;*/
     fill: currentColor;
   }
-  .menu {
-    position: relative;
-    display: flex;
-  }
-  .menu.context-menu {
-    position: fixed;
-    left: 0;
-    top: 0;
-    z-index: 5;
-  }
-  .menu .opener {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .menu .list {
-    padding: var(--list-padding-y) var(--list-padding-x);
-    --list-padding-x: 0px;
-    --list-padding-y: 6px;
-    position: absolute;
-    left: 0;
-    top: 100%;
-    color: #cccccc;
+  menu-drop {
+    color: inherit;
+    font: inherit;
     font-size: 13px;
     line-height: 16px;
-    list-style: none;
+  }
+  menu-drop {
+    --list-padding-x: 0px;
+    --list-padding-y: 6px;
+    --list-border-width: 1px;
+    --option-padding-x: 11px;
+    --option-padding-y: 3px;
+    --option-icon-gap: 10px;
+    --option-selected-icon-width: 5px;
+  }
+  menu-drop::part(opener) {
+    border: none;
+    outline: none;
+  }
+  menu-drop::part(list) {
+    --list-position-x: calc(100% + max(0px,var(--list-border-width)));
     background: #2e2e2e;
     border: var(--list-border-width) solid transparent;
-    --list-border-width: 1px;
     border-radius: calc(var(--list-padding-y) + var(--list-border-width));
     box-shadow: 0 5px 10px #00000060;
-    z-index: 1;
-    -webkit-app-region: no-drag;
-    transform-origin: center top;
-    transition-property: visibility, opacity, transform;
+    visibility: hidden;
+    opacity: 0.25;
+    transform: scale(0.5);
+    transition-property: opacity, transform;
   }
-  :root.apple-device .menu .list {
-    --list-padding-x: 5px;
-    border-color: #ffffff24;
+  menu-drop::part(list left) {
+    transform-origin: left calc(var(--list-position-y) * -1);
   }
-  .menu:not(.context-menu) > .list {
+  menu-drop::part(list right) {
+    transform-origin: right calc(var(--list-position-y) * -1);
+  }
+  menu-drop::part(list main) {
+    --list-position-x: 0;
     border-top: none;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
+    transform: scaleY(0.5);
+    transform-origin: center top;
   }
-  .menu .list.selectable {
-    --list-item-selected-icon-size: 10px;
+  menu-drop::part(list open) {
+    visibility: visible;
+    opacity: 1;
+    transform: scale(1);
+    transition-duration: 130ms;
   }
-  .menu .list-item {
-    padding: calc(var(--list-item-padding-y) - var(--list-item-border-width)) calc(var(--list-item-padding-x) - var(--list-item-border-width));
-    padding-left: calc(var(--list-item-padding-x) + var(--list-item-selected-icon-size,0px) - var(--list-item-border-width));
-    --list-item-padding-x: 12px;
-    --list-item-padding-y: 4px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border: var(--list-item-border-width) solid transparent;
-    --list-item-border-width: 1px;
-    outline: none;
-    white-space: nowrap;
-  }
-  :root.apple-device .menu .list-item {
-    --list-item-padding-x: 8px;
-    border-radius: calc(var(--list-padding-y) - var(--list-border-width));
-  }
-  :root.apple-device .menu .list.selectable .list-item {
-    padding-left: calc(var(--list-padding-x) + var(--list-padding-x) + var(--list-item-selected-icon-size,0px) - var(--list-item-border-width));
-  }
-
-  .menu .list-item:hover, .menu .list-item:active {
-    color: #ffffff;
-    background: hsl(213,94%,43%,0.75);
-  }
-  .menu .list-item:focus-visible {
-    color: #ffffff;
-    background: hsl(213,94%,43%,0.75);
-  }
-/* -- Future Where --
-  .menu .list-item:where(:hover,:active,:focus-visible) {
-    color: #ffffff;
-    background: hsl(213,94%,43%,0.75);
-  }
-*/
-
-  .menu .list-item:focus-visible {
+  menu-drop::part(option) {
+    --option-color-interact: #ffffff;
+    text-decoration: none;
+    --option-background-color-interact: #0763d5bf;
+    --sub-list-option-color-interact: #ffffff;
+    --sub-list-option-background-color-interact: #ffffff1c;
+    border: 1px solid transparent;
+  }/* -- For some reason the :focus-visible styles are showing up by default when the page starts up, so I disabled the focus outline for now. --
+  menu-drop::part(option):focus-visible {
     border-color: #c0c0c0;
-  }
-  .menu .list.selectable .list-item.selected::before {
+  }*/
+  menu-drop[data-select]::part(option)::before {
     content: "";
-    margin-left: calc(var(--list-item-padding-x) * 0.5 - var(--list-item-border-width));
-    position: absolute;
-    left: 0;
-    width: var(--list-item-selected-icon-size);
-    height: var(--list-item-selected-icon-size);
+    height: var(--option-selected-icon-width);
     background: currentColor;
-    -webkit-mask: var(--list-item-selected-icon-source);
-    mask: var(--list-item-selected-icon-source);
-    --list-item-selected-icon-source: url("data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%20512%20512%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%3Cpath%20d%3D%22m63.346%20191.15%20192.72%20192.72-63.402%2063.402-192.72-192.72z%22%2F%3E%0A%20%20%3Cpath%20d%3D%22m129.5%20383.87%20319.15-319.15%2063.402%2063.402-319.15%20319.15z%22%2F%3E%0A%3C%2Fsvg%3E");
-    pointer-events: none;
+    -webkit-mask: var(--option-selected-icon-mask);
+    mask: var(--option-selected-icon-mask);
+    --option-selected-icon-mask: url("data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%20512%20512%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%3Cpath%20d%3D%22m63.346%20191.15%20192.72%20192.72-63.402%2063.402-192.72-192.72z%22%2F%3E%0A%20%20%3Cpath%20d%3D%22m129.5%20383.87%20319.15-319.15%2063.402%2063.402-319.15%20319.15z%22%2F%3E%0A%3C%2Fsvg%3E");
+    transform: translateX(-50%) scale(2);
+    transform-origin: center;
   }
-  .menu.context-menu.link > .list .list-item:not(.link):not(.global), .menu.context-menu.editing > .list .list-item:not(.editing):not(.global), :root:not(.web-sharing) .menu.context-menu > .list .list-item.web-sharing:not(.global), :root.web-sharing .menu.context-menu > .list .list-item.web-sharing-alt:not(.global) {
-    display: none;
-  }
-  .menu .list-item > img {
+  menu-drop::part(icon) {
     width: 16px;height: 16px;
     /*aspect-ratio: 1/1;*/
   }
-  .menu .list-item > img.invert {
+  menu-drop::part(icon invert) {
     filter: invert() hue-rotate(180deg);
   }
-  .menu .list-item > img.rounded {
+  menu-drop::part(icon rounded) {
     border-radius: 3px;
   }
-  .menu .list-item .info {
-    margin-left: auto;
-    padding-left: 8px;
+  menu-drop::part(shortcut) {
     font-size: 12px;
-    opacity: 0.5;
-    pointer-events: none;
+    --shortcut-opacity: 0.5;
   }
-  .menu .list-item svg.info {
-    box-sizing: content-box;
-    width: 12px;height: 12px;
-    /*aspect-ratio: 1/1;*/
-    fill: currentColor;
-  }
-
-  .menu .list-item:not(.list-parent):hover .info, .menu .list-item:not(.list-parent):active .info {
-    opacity: 1;
-  }
-  .menu .list-item:not(.list-parent):focus-visible .info {
-    opacity: 1;
-  }
-/* -- Future Where --
-  .menu .list-item:not(.list-parent):where(:hover,:active,:focus-visible) .info {
-    opacity: 1;
-  }
-*/
-
-  .menu .list-parent.active {
-    color: #ffffff;
-    background: hsl(213,94%,43%,0.75);
-  }
-
-  .menu .list-parent:hover > svg.info, .menu .list-parent.active > svg.info {
-    opacity: 1;
-  }
-  .menu .list-parent:focus-visible > svg.info {
-    opacity: 1;
-  }
-/* -- Future Where --
-  .menu .list-parent:where(:hover,:focus-visible,.active) > svg.info {
-    opacity: 1;
-  }
-*/
-
-  .menu .list hr {
-    margin: calc(var(--list-padding-y) * 0.8) calc(var(--list-padding-y) * 2);
-    margin-left: calc(var(--list-padding-y) * 2 + var(--list-item-selected-icon-size,0px));
-    border: none;
-    border-top: 1px solid currentColor;
+  menu-drop::part(divider) {
     opacity: 0.6;
-  }
-  :root.apple-device .menu .list hr {
-    margin-left: calc(var(--list-padding-y) + var(--list-item-selected-icon-size,0px));
-    margin-right: var(--list-padding-y);
-  }
-  :root.apple-device .menu .list.selectable hr {
-    margin-left: calc(var(--list-padding-y) + var(--list-item-selected-icon-size,0px) + var(--list-border-width));
-  }
-  .menu .list hr:last-child {
-    display: none;
-  }
-  .menu .list .list {
-    left: calc(100% + var(--list-padding-x) + var(--list-border-width) + var(--list-item-border-width));
-    top: calc(calc(var(--list-padding-y) + var(--list-border-width) + var(--list-item-border-width)) * -1);
-    transform-origin: left top;
-  }
-  :root.apple-device .menu .list .list {
-    left: calc(100% + var(--list-item-border-width));
-  }
-  .menu:not(.active) > .list, .menu .list-parent:not(.active) > .list {
-    visibility: hidden;
-    opacity: 0.25;
-    transform: scaleY(0.5);
-  }
-  .menu .list-parent:not(.active) > .list {
-    transform: scale(0.5);
-  }
-  .menu.active > .list, .menu .list-parent.active > .list {
-    transition-duration: 130ms;
-  }
-  :root:not(.apple-device) .shortcut.ctrl::before {
-    content: "Ctrl + ";
-  }
-  :root:not(.apple-device) .shortcut.ctrl-shift::before {
-    content: "Ctrl + Shift + ";
-  }
-  :root.apple-device .shortcut.command::before {
-    content: "\2318";
-  }
-  :root.apple-device .shortcut.shift-command::before {
-    content: "\21E7\2318";
-  }
-  :root.apple-device .shortcut.ctrl-command::before {
-    content: "\2303\2318";
   }
   .select {
     margin: calc(var(--select-padding) * -1);
@@ -1232,37 +1110,51 @@
     display: flex;
     justify-content: center;
     gap: 6px;
+  }
+  .select label {
+    display: flex;
+    align-items: center;
     transition: color var(--transition-fast);
   }
 
 /* Temp Where */
-  .select:-webkit-any(:hover,:focus-within,.active) {
+  .select:-webkit-any(:hover,:active,:focus-within) label, .select:-webkit-any(:hover,:active,:focus-within) menu-drop::part(opener) {
     color: #ffffff;
   }
-  .select:where(:hover,:focus-within,.active) {
+  .select:where(:hover,:active,:focus-within) label, .select:where(:hover,:active,:focus-within) menu-drop::part(opener) {
     color: #ffffff;
   }
-
-  .select label {
-    display: flex;
-    align-items: center;
+  
+  .select menu-drop::part(opener) {
+    padding: 2px 8px;
+    min-width: 74px;
+    background: #444444;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    box-shadow: 0 1px 2px #00000028;
+    transition: var(--transition-fast);
+    transition-property: color, background-color, border-color, border-radius;
   }
-  .select:hover .menu .opener {
+  .select:hover menu-drop::part(opener) {
     background: #4f4f4f;
   }
-  .select .menu.active .opener {
+
+/* Temp Where */
+  .select menu-drop::part(opener):-webkit-any(:hover,:active,:focus-visible), .select:focus-within menu-drop::part(opener), .select menu-drop[data-open]::part(opener) {
+    color: #ffffff;
+    background: #4f4f4f;
+  }
+  .select menu-drop::part(opener):where(:hover,:active,:focus-visible), .select:focus-within menu-drop::part(opener), .select menu-drop[data-open]::part(opener) {
+    color: #ffffff;
+    background: #4f4f4f;
+  }
+
+  .select menu-drop::part(opener):focus-visible {
+    border-color: #c0c0c0;
+  }
+  .select menu-drop[data-open]::part(opener) {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
-  }
-  .select .menu .opener svg {
-    margin-left: auto;
-    width: 10px;height: 10px;
-    /*aspect-ratio: 1/1;*/
-    fill: currentColor;
-    transform: rotate(270deg);
-  }
-  .select .menu > .list {
-    min-width: 100%;
   }
   .checkbox {
     margin: calc(var(--checkbox-padding) * -1);
@@ -1703,11 +1595,11 @@
   }
 
 /* Temp Where */
-  .card .main button:-webkit-any(:hover,:active,:focus-visible), .select:focus-within .menu .opener, .select .menu.active .opener {
+  .card .main button:-webkit-any(:hover,:active,:focus-visible) {
     color: #ffffff;
     background: #4f4f4f;
   }
-  .card .main button:where(:hover,:active,:focus-visible), .select:focus-within .menu .opener, .select .menu.active .opener {
+  .card .main button:where(:hover,:active,:focus-visible) {
     color: #ffffff;
     background: #4f4f4f;
   }
@@ -1853,90 +1745,90 @@
     <img src="resources/icon.svg" alt="">
   </div>
   <div class="app-menubar">
-    <div class="menu">
-      <button class="opener">File</button>
-      <ul class="list">
-        <li class="list-item" onclick="createEditor({ auto_replace: false });">New Editor<span class="info shortcut ctrl-shift shift-command">X</span></li>
-        <li id="create_window_option" class="list-item" onclick="createWindow();">New Window<span class="info shortcut ctrl-shift shift-command">C</span></li>
-        <li class="list-item" onclick="openFiles();">Open<span class="info shortcut ctrl command">O</span></li>
-        <li class="list-item" onclick="window.setTimeout(renameEditor,10);">Rename<span class="info shortcut ctrl-shift shift-command">R</span></li>
-        <li class="list-item" onclick="saveFile();">Save<span class="info shortcut ctrl command">S</span></li>
-        <li class="list-item list-parent">Save As...<svg class="info"><use href="#arrow_icon"/></svg>
-          <ul class="list">
-            <li class="list-item" onclick="saveFile('txt');">Plain Text<span class="info">.txt</span></li>
-            <li class="list-item" onclick="saveFile('html');">HTML<span class="info">.html</span></li>
-            <li class="list-item" onclick="saveFile('css');">CSS<span class="info">.css</span></li>
-            <li class="list-item" onclick="saveFile('js');">JavaScript<span class="info">.js</span></li>
-            <li class="list-item" onclick="saveFile('json');">JSON<span class="info">.json</span></li>
-            <li class="list-item" onclick="saveFile('svg');">SVG<span class="info">.svg</span></li>
-            <li class="list-item list-parent">More...<svg class="info"><use href="#arrow_icon"/></svg>
-              <ul class="list">
-                <li class="list-item" onclick="saveFile('webmanifest');">Web Manifest<span class="info">.webmanifest</span></li>
-                <li class="list-item" onclick="saveFile('md');">Markdown<span class="info">.md</span></li>
-                <li class="list-item" onclick="saveFile('mcmeta');">MCMETA<span class="info">.mcmeta</span></li>
-                <li class="list-item" onclick="saveFile('xml');">XML<span class="info">.xml</span></li>
+    <menu-drop id="file_menu">
+      <button>File</button>
+      <ul>
+        <li onclick="createEditor({ auto_replace: false });" data-shortcuts='{ "default": "Ctrl+Shift+X", "macOS": "Shift+Cmd+X" }'>New Editor</li>
+        <li id="create_window_option" onclick="createWindow();" data-shortcuts='{ "default": "Ctrl+Shift+C", "macOS": "Shift+Cmd+C" }'>New Window</li>
+        <li onclick="openFiles();" data-shortcuts='{ "default": "Ctrl+O", "macOS": "Cmd+O" }'>Open</li>
+        <li onclick="window.setTimeout(renameEditor,10);" data-shortcuts='{ "default": "Ctrl+Shift+R", "macOS": "Shift+Cmd+R" }'>Rename</li>
+        <li onclick="saveFile();" data-shortcuts='{ "default": "Ctrl+S", "macOS": "Cmd+S" }'>Save</li>
+        <li>Save As...
+          <ul>
+            <li onclick="saveFile('txt');" data-shortcuts='{ "default": ".txt" }'>Plain Text</li>
+            <li onclick="saveFile('html');" data-shortcuts='{ "default": ".html" }'>HTML</li>
+            <li onclick="saveFile('css');" data-shortcuts='{ "default": ".css" }'>CSS</li>
+            <li onclick="saveFile('js');" data-shortcuts='{ "default": ".js" }'>JavaScript</li>
+            <li onclick="saveFile('json');" data-shortcuts='{ "default": ".json" }'>JSON</li>
+            <li onclick="saveFile('svg');" data-shortcuts='{ "default": ".svg" }'>SVG</li>
+            <li>More...
+              <ul>
+                <li onclick="saveFile('webmanifest');" data-shortcuts='{ "default": ".webmanifest" }'>Web Manifest</li>
+                <li onclick="saveFile('md');" data-shortcuts='{ "default": ".md" }'>Markdown</li>
+                <li onclick="saveFile('mcmeta');" data-shortcuts='{ "default": ".mcmeta" }'>MCMETA</li>
+                <li onclick="saveFile('xml');" data-shortcuts='{ "default": ".xml" }'>XML</li>
               </ul>
             </li>
           </ul>
         </li>
       </ul>
-    </div>
-    <div class="menu">
-      <button class="opener">View</button>
-      <ul class="list selectable">
-        <li class="list-item selected" onclick="setView({ type: 'code' });">Code<span class="info shortcut ctrl-shift ctrl-command">1</span></li>
-        <li class="list-item" onclick="setView({ type: 'split' });">Split<span class="info shortcut ctrl-shift ctrl-command">2</span></li>
-        <li class="list-item" onclick="setView({ type: 'preview' });">Preview<span class="info shortcut ctrl-shift ctrl-command">3</span></li>
-        <hr>
-        <li class="list-item non-selectable" onclick="setOrientation();">Orientation<span class="info shortcut ctrl-shift ctrl-command">4</span></li>
-        <li class="list-item non-selectable" onclick="createDisplay();">Display<span class="info shortcut ctrl-shift ctrl-command">5</span></li>
+    </menu-drop>
+    <menu-drop id="view_menu" data-select="no-appearance">
+      <button>View</button>
+      <ul>
+        <li data-selected onclick="setView({ type: 'code' });" data-shortcuts='{ "default": "Ctrl+Shift+1", "macOS": "Ctrl+Cmd+1" }' data-value="code">Code</li>
+        <li onclick="setView({ type: 'split' });" data-shortcuts='{ "default": "Ctrl+Shift+2", "macOS": "Ctrl+Cmd+2" }' data-value="split">Split</li>
+        <li onclick="setView({ type: 'preview' });" data-shortcuts='{ "default": "Ctrl+Shift+3", "macOS": "Ctrl+Cmd+3" }' data-value="preview">Preview</li>
+        <li><hr></li>
+        <li onclick="setOrientation();" data-shortcuts='{ "default": "Ctrl+Shift+4", "macOS": "Ctrl+Cmd+4" }' data-no-select>Orientation</li>
+        <li onclick="createDisplay();" data-shortcuts='{ "default": "Ctrl+Shift+5", "macOS": "Ctrl+Cmd+5" }' data-no-select>Display</li>
       </ul>
-    </div>
-    <div class="menu">
-      <button class="opener">Preview</button>
-      <ul id="preview_options" class="list selectable">
-        <li class="list-item selected" onclick="setPreviewSource({ active_editor: true });">Active Editor</li>
-        <hr>
+    </menu-drop>
+    <menu-drop id="preview_menu" data-select="no-appearance">
+      <button>Preview</button>
+      <ul>
+        <li data-value="active-editor" data-selected onclick="setPreviewSource({ active_editor: true });">Active Editor</li>
+        <li><hr></li>
       </ul>
-    </div>
-    <div class="menu">
-      <button class="opener">Tools</button>
-      <ul class="list">
-        <li class="list-item" onclick="replace_text_card.open();">Replace Text<span class="info shortcut ctrl-shift shift-command">F</span></li>
-        <!--li class="list-item" onclick="color_picker_card.open();">Color Picker<span class="info shortcut ctrl-shift shift-command">K</span></li-->
-        <li class="list-item" onclick="json_formatter_card.open();">JSON Formatter<span class="info shortcut ctrl-shift shift-command">G</span></li>
-        <li class="list-item" onclick="uri_encoder_card.open();">URI Encoder<span class="info shortcut ctrl-shift shift-command">Y</span></li>
-        <li class="list-item" onclick="uuid_generator_card.open();">UUID Generator<span class="info shortcut ctrl-shift shift-command">O</span></li>
-        <li class="list-item list-parent">Insert Templates...<svg class="info"><use href="#arrow_icon"/></svg>
-          <ul class="list">
-            <li class="list-item" onclick="Tools.insertTemplate({ type: 'html' });">HTML<span class="info shortcut ctrl-shift shift-command">H</span></li>
-            <li class="list-item" onclick="Tools.insertTemplate({ type: 'pack-manifest-bedrock' });">Pack Manifest - Bedrock</li>
+    </menu-drop>
+    <menu-drop id="tools_menu">
+      <button>Tools</button>
+      <ul>
+        <li onclick="replace_text_card.open();" data-shortcuts='{ "default": "Ctrl+Shift+F", "macOS": "Shift+Cmd+F" }'>Replace Text</li>
+        <!--li onclick="color_picker_card.open();" data-shortcuts='{ "default": "Ctrl+Shift+K", "macOS": "Shift+Cmd+K" }'>Color Picker</li-->
+        <li onclick="json_formatter_card.open();" data-shortcuts='{ "default": "Ctrl+Shift+G", "macOS": "Shift+Cmd+G" }'>JSON Formatter</li>
+        <li onclick="uri_encoder_card.open();" data-shortcuts='{ "default": "Ctrl+Shift+Y", "macOS": "Shift+Cmd+Y" }'>URI Encoder</li>
+        <li onclick="uuid_generator_card.open();" data-shortcuts='{ "default": "Ctrl+Shift+O", "macOS": "Shift+Cmd+O" }'>UUID Generator</li>
+        <li>Insert Templates...
+          <ul>
+            <li onclick="Tools.insertTemplate({ type: 'html' });" data-shortcuts='{ "default": "Ctrl+Shift+H", "macOS": "Shift+Cmd+H" }'>HTML</li>
+            <li onclick="Tools.insertTemplate({ type: 'pack-manifest-bedrock' });">Pack Manifest - Bedrock</li>
           </ul>
         </li>
-        <li class="list-item list-parent">Online Resources...<svg class="info"><use href="#arrow_icon"/></svg>
-          <ul class="list">
-            <a class="list-item" href="https://webformatter.com"><img src="resources/web-formatter.svg" alt="">Code Formatter</a>
-            <a class="list-item" href="https://www.sharedrop.io"><img class="invert" src="resources/sharedrop.svg" alt="">File Transferer</a>
-            <a class="list-item" href="https://www.diffchecker.com/"><img src="resources/diffchecker.svg" alt="">Difference Finder</a>
-            <a class="list-item" href="https://caniuse.com/"><img src="resources/caniuse.svg" alt="">Compatibility Checker</a>
-            <a class="list-item" href="https://web.dev/measure/"><img src="resources/webdev.svg" alt="">Performance Tester</a>
-            <a class="list-item" href="https://realfavicongenerator.net/"><img class="rounded" src="resources/real-favicon-generator.svg" alt="">Favicon Generator</a>
-            <a class="list-item" href="https://appsco.pe/developer/splash-screens/"><img class="invert" src="resources/appscope.svg" alt="">Splash Generator</a>
-            <a class="list-item" href="https://www.svgminify.com/"><img src="resources/svgminify.svg" alt="">SVG Simplifier</a>
-            <a class="list-item" href="https://cryptii.com/"><img src="resources/cryptii.svg" alt="">Text Encryptor</a>
+        <li>Online Resources...
+          <ul data-show-icons>
+            <li><a href="https://webformatter.com"><img src="resources/web-formatter.svg" alt="">Code Formatter</a></li>
+            <li><a href="https://www.sharedrop.io"><img part="invert" src="resources/sharedrop.svg" alt="">File Transferer</a></li>
+            <li><a href="https://www.diffchecker.com/"><img src="resources/diffchecker.svg" alt="">Difference Finder</a></li>
+            <li><a href="https://caniuse.com/"><img src="resources/caniuse.svg" alt="">Compatibility Checker</a></li>
+            <li><a href="https://web.dev/measure/"><img src="resources/webdev.svg" alt="">Performance Tester</a></li>
+            <li><a href="https://realfavicongenerator.net/"><img part="rounded" src="resources/real-favicon-generator.svg" alt="">Favicon Generator</a></li>
+            <li><a href="https://appsco.pe/developer/splash-screens/"><img part="invert" src="resources/appscope.svg" alt="">Splash Generator</a></li>
+            <li><a href="https://www.svgminify.com/"><img src="resources/svgminify.svg" alt="">SVG Simplifier</a></li>
+            <li><a href="https://cryptii.com/"><img src="resources/cryptii.svg" alt="">Text Encryptor</a></li>
           </ul>
         </li>
       </ul>
-    </div>
-    <div class="menu alternate">
-      <button class="opener" onclick="settings_card.open();">Settings</button>
-      <ul class="list">
-        <li id="install_option" class="list-item" onclick="showInstallPrompt();"><img src="resources/icon.svg" alt="">Install</li>
-        <li class="list-item" onclick="theme_card.open(); Editor.dialog_previous = this.closest('.menu').querySelector('button');">Theme Settings</li>
-        <li class="list-item" id="clear_site_caches_option" onclick="clearSiteCaches();">Clear Cache</li>
-        <li class="list-item" onclick="Editor.settings.reset();">Reset Settings</li>
+    </menu-drop>
+    <menu-drop id="settings_menu" data-alternate>
+      <button onclick="settings_card.open();">Settings</button>
+      <ul data-show-icons>
+        <li id="install_option" onclick="showInstallPrompt();"><img src="resources/icon.svg" alt="">Install</li>
+        <li onclick="theme_card.open();"><img src="resources/template.svg" alt="">Theme Settings</li>
+        <li id="clear_site_caches_option" onclick="clearSiteCaches();"><img src="resources/settings.svg" alt="">Clear Cache</li>
+        <li onclick="Editor.settings.reset();"><img src="resources/settings.svg" alt="">Reset Settings</li>
       </ul>
-    </div>
+    </menu-drop>
   </div>
   <div class="app-omnibox">
     <button class="option" title="Refresh Preview" onclick="refreshPreview({ force: true });"><svg><use href="#refresh_icon"/></svg></button>
@@ -1962,14 +1854,14 @@
       <div class="content">
         <div class="item list start">
           <div class="select">
-            <label for="default_orientation_setting">Default Orientation:</label>
-            <div class="menu">
-              <button id="default_orientation_setting" class="opener">Horizontal<svg><use href="#back_icon"/></svg></button>
-              <ul class="list selectable">
-                <li class="list-item selected" data-option="horizontal" onclick="Editor.settings.set('default-orientation','horizontal');">Horizontal</li>
-                <li class="list-item" data-option="vertical" onclick="Editor.settings.set('default-orientation','vertical');">Vertical</li>
+            <label>Default Orientation:</label>
+            <menu-drop id="default_orientation_setting" data-select>
+              <button>Horizontal</button>
+              <ul>
+                <li data-value="horizontal" onclick="Editor.settings.set('default-orientation','horizontal');" data-selected>Horizontal</li>
+                <li data-value="vertical" onclick="Editor.settings.set('default-orientation','vertical');">Vertical</li>
               </ul>
-            </div>
+            </menu-drop>
           </div>
           <div class="checkbox">
             <input id="syntax_highlighting_setting" type="checkbox" oninput="setSyntaxHighlighting(this.checked);">
@@ -2130,20 +2022,6 @@
       </div>
     </div>
   </ste-card>
-  <div id="context_menu" class="menu context-menu">
-    <ul class="list">
-      <li class="list-item global" onclick="window.location.reload();">Reload<span class="info shortcut ctrl command">R</span></li>
-      <li class="list-item link" onclick="Editor.context_menu_previous.click();">Open in New Tab</li>
-      <li class="list-item web-sharing link" onclick="navigator.share({ url: Editor.context_menu_previous.href });">Share Link</li>
-      <li class="list-item web-sharing-alt link" onclick="navigator.clipboard.writeText(Editor.context_menu_previous.href).catch(error => alert('Clipboard could not be written to, please check app permissions for clipboard use.'));">Copy Link</li>
-      <li class="list-item editing" onclick="callCommand(Editor.context_menu_previous,'undo');">Undo<span class="info shortcut ctrl command">Z</span></li>
-      <li class="list-item editing" onclick="callCommand(Editor.context_menu_previous,'redo');">Redo<span class="info shortcut ctrl-shift shift-command">Z</span></li>
-      <li class="list-item editing" onclick="callCommand(Editor.context_menu_previous,'cut');">Cut<span class="info shortcut ctrl command">X</span></li>
-      <li class="list-item editing" onclick="callCommand(Editor.context_menu_previous,'copy');">Copy<span class="info shortcut ctrl command">C</span></li>
-      <li class="list-item editing" onclick="callCommand(Editor.context_menu_previous,'paste');">Paste<span class="info shortcut ctrl command">V</span></li>
-      <li class="list-item editing" onclick="Editor.context_menu_previous.select();">Select All<span class="info shortcut ctrl command">A</span></li>
-    </ul>
-  </div>
 </main>
 
 <script>
@@ -2227,16 +2105,9 @@
         document.body.addEventListener("keydown",catchCardNavigation);
         card_backdrop.classList.add("active");
         if (!Editor.active_dialog && !Editor.dialog_previous){
-          var menuItem = (document.activeElement.closest(".menu")), contextMenuItem = (document.activeElement.closest(".context-menu"));
-          if (!menuItem && !contextMenuItem){
-            Editor.dialog_previous = document.activeElement;
-          } else if (menuItem){
-            Editor.dialog_previous = document.activeElement.closest(".menu").querySelector(".opener");
-          } else if (contextMenuItem) Editor.dialog_previous = Editor.context_menu_previous;
+          Editor.dialog_previous = document.activeElement;
         }
-        menus.forEach(menu => {
-          if (menu.classList.contains("active")) closeMenu(menu);
-        });
+        document.querySelectorAll("menu-drop[data-open]").forEach(menu => menu.close());
         var transitionDuration = parseInt(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 500);
         window.setTimeout(() => {
           document.activeElement.blur();
@@ -2297,7 +2168,7 @@
     }
   }
   function catchCardNavigation(){
-    if (!Editor.active_dialog || context_menu.matches(".active") || event.key != "Tab" || document.activeElement != document.body) return;
+    if (!Editor.active_dialog || event.key != "Tab" || document.activeElement != document.body) return;
     var navigable = getNavigableElements({ container: Editor.active_dialog, scope: true });
     event.preventDefault();
     navigable[((!event.shiftKey) ? 0 : navigable.length - 1)].focus();
@@ -2307,137 +2178,10 @@
   document.querySelectorAll("a[href]").forEach(anchor => {
     anchor.rel = "noopener";
     anchor.target = "_blank";
-    attachContextMenu({ element: anchor, type: "link" });
   });
   document.querySelectorAll("img").forEach(image => image.draggable = false);
   document.querySelectorAll("num-text").forEach(textarea => applyEditingBehavior({ element: textarea }));
   document.querySelectorAll("input[type='text']").forEach(input => applyEditingBehavior({ element: input }));
-  var menus = document.querySelectorAll(".menu");
-  menus.forEach(menu => {
-    var opener = menu.querySelector(".opener"), lists = menu.querySelectorAll(".list"), listItems = menu.querySelectorAll(".list-item"), subLists = menu.querySelectorAll(".list-parent > .list");
-    menu.addEventListener("mousedown",event => event.stopPropagation());
-    menu.addEventListener("touchend",event => event.stopPropagation());
-    menu.addEventListener("click",event => {
-      if (event.target.matches(".list-item:not(.list-parent)")){
-        event.stopPropagation();
-        closeMenu(menu);
-      }
-    });
-    menu.addEventListener("keydown",event => {
-      if (!menu.classList.contains("active")) return;
-      //if (event.key != "Escape" && event.key != "Tab") return;
-      if (event.key == "Enter" || event.key == " "){
-        event.preventDefault();
-        event.stopPropagation();
-        if (event.target.matches(".list-item:not(.list-parent)")){
-          event.target.click();
-        }
-        if (event.target.matches(".list-item.list-parent")){
-          openSubList(event.target.querySelector(".list"));
-        }
-      }
-      if (event.key == "Escape" || event.key == "Tab"){
-        event.preventDefault();
-        event.stopPropagation();
-        if (event.key != "Escape" && !menu.closest(".select")) return;
-        closeMenu(menu);
-      }
-    });
-    if (opener){
-      if (menu.closest(".select")) menu.querySelector(".opener").style.minWidth = getElementStyle({ element: menu.querySelector(".list"), property: "width" });
-      if (!menu.classList.contains("alternate")){
-        opener.addEventListener("mousedown",event => {
-          if (event.button == 0) openMenu(menu);
-        });
-        opener.addEventListener("touchstart",() => openMenu(menu),{ passive: true });
-        opener.addEventListener("keydown",event => {
-          if (event.key == "Enter" || event.key == " ") openMenu(menu);
-        });
-      } else {
-        attachContextMenu({ element: opener, type: "alternate" });
-      }
-      opener.addEventListener("keydown",event => {
-        if (!menu.classList.contains("active")) return;
-        var navigable = getNavigableElements({ container: lists[0], scope: true });
-        if (event.key == "ArrowDown") navigable[0].focus();
-        if (event.key == "ArrowUp") navigable[navigable.length - 1].focus();
-      });
-    }
-    lists.forEach(list => {
-      list.addEventListener("click",event => {
-        if (!list.classList.contains("selectable") || !event.target.matches(".list-item") || event.target.classList.contains("non-selectable")) return;
-        var listItems = list.querySelectorAll(".list-item");
-        listItems.forEach(listItem => {
-          if (listItem.classList.contains("selected")) listItem.classList.remove("selected");
-        });
-        event.target.classList.add("selected");
-        if (event.target.closest(".select")) event.target.closest(".menu").querySelector(".opener").childNodes[0].textContent = event.target.textContent;
-      });
-      list.addEventListener("mousedown",event => {
-        var navigable = getNavigableElements({ container: list, scope: true });
-        event.stopPropagation();
-        //if (navigable.indexOf(event.target) != -1) ;
-      });
-      list.addEventListener("keydown",event => {
-        if (event.key != "ArrowDown" && event.key != "ArrowUp") return;
-        var navigable = getNavigableElements({ container: list, scope: true });
-        event.preventDefault();
-        event.stopPropagation();
-        if (event.key == "ArrowDown"){
-          if (document.activeElement == navigable[navigable.length - 1]){
-            navigable[0].focus();
-          } else navigable[navigable.indexOf(document.activeElement) + 1].focus();
-        }
-        if (event.key == "ArrowUp"){
-          if (document.activeElement == navigable[0]){
-            navigable[navigable.length - 1].focus();
-          } else navigable[navigable.indexOf(document.activeElement) - 1].focus();
-        }
-      });
-    });
-    listItems.forEach(listItem => {
-      var list = listItem.closest(".list"), listParent = list.closest(".list-parent"), subLists = list.querySelectorAll(".list"), type = listItem.tagName.toLowerCase();
-      listItem.addEventListener("mouseenter",event => {
-        subLists.forEach(subList => {
-          var listParent = subList.closest(".list-parent");
-          if (listItem != listParent && listParent.classList.contains("active") && !listParent.contains(Editor.context_menu_previous) && !subList.contains(listItem) && !subList.contains(document.activeElement)) listParent.classList.remove("active");
-        });
-      });
-      if (type != "a") listItem.tabIndex = 0;
-    });
-    subLists.forEach(subList => {
-      var listParent = subList.closest(".list-parent");
-      listParent.addEventListener("mouseenter",() => {
-        if (!listParent.classList.contains("active")) listParent.classList.add("active");
-      });
-      listParent.addEventListener("click",event => openSubList(subList));
-      listParent.addEventListener("keydown",event => {
-        if (event.key != "Enter" && event.key != " " && event.key != "ArrowRight" && event.key != "ArrowLeft") return;
-        event.preventDefault();
-        event.stopPropagation();
-        if (event.key == "Enter" || event.key == " " || event.key == "ArrowRight") openSubList(subList);
-        if (event.key == "ArrowLeft") closeSubList(subList);
-      });
-      subList.addEventListener("click",event => event.stopPropagation());
-    });
-    function openSubList(subList){
-      var listParent = subList.closest(".list-parent");
-      if (listParent.classList.contains("active")) return closeSubList(subList);
-      if (subList.contains(document.activeElement)) return;
-      listParent.classList.add("active");
-      if (event.type == "click") return;
-      var navigable = getNavigableElements({ container: subList, scope: true });
-      window.setTimeout(() => navigable[0].focus(),20);
-    }
-    function closeSubList(subList){
-      var listParent = subList.closest(".list-parent"), listParents = listParent.querySelectorAll(".list-parent");
-      listParent.focus();
-      listParent.classList.remove("active");
-      if (listParents.length != 0) listParents.forEach(listParent => {
-        if (listParent.classList.contains("active")) listParent.classList.remove("active");
-      });
-    }
-  });
   document.querySelectorAll(".checkbox").forEach(checkbox => {
     var input = checkbox.querySelector("input[type='checkbox']");
     checkbox.addEventListener("click",() => input.click());
@@ -2568,22 +2312,18 @@
   window.addEventListener("resize",event => {
     Editor.appearance().refresh_window_controls_overlay();
     Editor.appearance().refresh_device_pixel_ratio();
-    if (context_menu.classList.contains("active")) closeMenu(context_menu);
     if (Editor.view() != "preview") setEditorTabsVisibility();
     if (Editor.view() == "split" && document.body.hasAttribute("data-scaling-active")) setView({ type: "split" });
   });
   window.addEventListener("blur",() => {
-    if (Editor.appearance().parent_window) menus.forEach(menu => {
-      if (menu.classList.contains("active")) closeMenu(menu);
-    });
+    if (Editor.appearance().parent_window) document.querySelectorAll("menu-drop[data-open]").forEach(menu => menu.close());
   });
   document.body.addEventListener("keydown",event => {
     var pressed = key => (event.key.toLowerCase() == key.toLowerCase()), control = (event.ctrlKey && !Editor.environment().apple_device), command = (event.metaKey && Editor.environment().apple_device), shift = (event.shiftKey || ((event.key.toUpperCase() == event.key) && (event.key + event.key == event.key * 2))), controlShift = (control && shift), shiftCommand = (shift && command), controlCommand = (event.ctrlKey && command);
     if (pressed("Escape")){
       event.preventDefault();
       if (event.repeat) return;
-      if (context_menu.classList.contains("active")) return closeMenu(context_menu);
-      if (Editor.active_dialog) Editor.active_dialog.close();
+      if (Editor.active_dialog && !document.activeElement.matches("menu-drop[data-open]")) Editor.active_dialog.close();
     }
     if (((control || command) && !shift && pressed("n")) || ((controlShift || shiftCommand) && pressed("x"))){
       event.preventDefault();
@@ -2697,7 +2437,7 @@
       if (event.repeat) return;
       settings_card.open();
     }
-  });
+  },{ capture: true });
   document.body.addEventListener("mousedown",event => {
     if (event.button != 2) return;
     event.preventDefault();
@@ -2706,13 +2446,11 @@
   document.body.addEventListener("contextmenu",event => event.preventDefault());
   document.body.addEventListener("dragover",event => {
     event.preventDefault();
-    event.dataTransfer.dropEffect = "copy";
+    event.dataTransfer.dropEffect = (event.target.matches("menu-drop, header, .card") || event.target.closest("menu-drop, header, .card")) ? "none" : "copy";
   });
   document.body.addEventListener("drop",event => {
     event.preventDefault();
-    menus.forEach(menu => {
-      if (menu.classList.contains("active")) closeMenu(menu);
-    });
+    document.querySelectorAll("menu-drop[data-open]").forEach(menu => menu.close());
     Array.from(event.dataTransfer.items).forEach(async (item,index) => {
       if (item.kind == "file"){
         if (!Editor.support().file_system || !("getAsFileSystemHandle")){
@@ -2728,12 +2466,14 @@
       } else if (item.kind == "string" && index == 0 && event.dataTransfer.getData("text") != "") createEditor({ value: event.dataTransfer.getData("text") });
     });
   });
-  //document.body.addEventListener("dragend",() => document.querySelectorAll("textarea").forEach(textarea => textarea.num_refreshLineCount()));
   var toolbar = document.querySelector("header .app-menubar");
-  toolbar.querySelectorAll(".menu").forEach(menu => {
-    menu.addEventListener("mouseenter",() => {
-      if (toolbar.querySelectorAll(".menu:not(.alternate).active").length == 0 || menu.classList.contains("alternate") || menu.classList.contains("active")) return;
-      openMenu(menu);
+  toolbar.querySelectorAll("menu-drop").forEach(menu => {
+    menu.addEventListener("pointerenter",() => {
+      if (event.pointerType != "mouse") return;
+      if (toolbar.querySelectorAll("menu-drop:not([data-alternate])[data-open]").length == 0 || menu.matches("[data-alternate]") || menu.matches("[data-open]")) return;
+      menu.opener.focus();
+      toolbar.querySelectorAll("menu-drop[data-open]").forEach(menu => menu.close());
+      menu.open();
     });
   });
   workspace_tabs.addEventListener("keydown",event => {
@@ -2770,7 +2510,7 @@
   generator_output.addEventListener("click",() => generator_output.select());
   generator_output.addEventListener("keydown",() => generator_output.click());
 
-  createEditor({ auto_created: true });
+  window.requestAnimationFrame(() => createEditor({ auto_created: true }));
   if (Editor.support().file_handling && Editor.support().file_system){
     window.launchQueue.setConsumer(params => {
       params.files.forEach(async handle => {
@@ -2782,10 +2522,9 @@
   }
   if (Editor.appearance().parent_window){
     if (Editor.settings.get("default-orientation")){
-      var value = Editor.settings.get("default-orientation"), active = document.activeElement;
-      default_orientation_setting.closest(".menu").querySelector(`[data-option="${value}"]`).click();
+      var value = Editor.settings.get("default-orientation");
+      default_orientation_setting.select(value);
       setOrientation(value);
-      active.focus({ preventScroll: true });/* Temporary! Will be addressed with MenuDrop in the future */
     }
     if (Editor.settings.get("syntax-highlighting") != undefined){
       var state = Editor.settings.get("syntax-highlighting");
@@ -2875,9 +2614,10 @@
     container.classList.add("editor");
     container.setAttribute("data-editor-identifier",identifier);
     container.setAttribute("value",value);
-    previewOption.classList.add("list-item");
+    previewOption.part = "option";
+    previewOption.classList.add("option");
     previewOption.setAttribute("data-editor-identifier",identifier);
-    previewOption.tabIndex = 0;
+    previewOption.tabIndex = -1;
     previewOption.innerText = name;
     previewOption.addEventListener("click",() => setPreviewSource({ identifier }));
     if ((Editor.active_editor) ? Editor.query().tab.hasAttribute("data-editor-auto-created") : false){
@@ -2896,7 +2636,7 @@
       if (!tab.hasAttribute("data-editor-unsaved")) tab.setAttribute("data-editor-unsaved",true);
       refreshPreview();
     });
-    preview_options.appendChild(previewOption);
+    preview_menu.main.appendChild(previewOption);
     applyEditingBehavior({ element: container });
     if (open || !Editor.active_editor) openEditor({ identifier, auto_created, focused_override });
     container.syntaxLanguage = Editor.query(identifier).getName("extension");
@@ -2922,7 +2662,7 @@
   }
   function closeEditor({ identifier = Editor.active_editor } = {}){
     if (!identifier) return;
-    var { tab, container, textarea, getName } = Editor.query(identifier), previewOption = preview_options.querySelector(`.list-item[data-editor-identifier="${identifier}"]`), active = (tab.classList.contains("active")), focused = (document.activeElement == container), editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])"));
+    var { tab, container, textarea, getName } = Editor.query(identifier), previewOption = preview_menu.main.querySelector(`.option[data-editor-identifier="${identifier}"]`), active = (tab.classList.contains("active")), focused = (document.activeElement == container), editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])"));
     if (tab.hasAttribute("data-editor-unsaved")){
       if (!confirm(`Are you sure you would like to close "${getName()}"?\nRecent changes have not yet been saved.`)) return;
     }
@@ -2950,7 +2690,7 @@
     tab.tabIndex = -1;
     if (tab.classList.contains("active")) tab.classList.remove("active");
     workspace_editors.removeChild(container);
-    preview_options.removeChild(previewOption);
+    preview_menu.main.removeChild(previewOption);
     (transitionDuration) ? window.setTimeout(removeEditorTab,transitionDuration) : removeEditorTab();
     if (Editor.file_handles[identifier]) delete Editor.file_handles[identifier];
     function removeEditorTab(){
@@ -2959,7 +2699,7 @@
     }
   }
   function renameEditor({ name, identifier = Editor.active_editor } = {}){
-    var { tab, container, getName } = Editor.query(identifier), editorName = tab.querySelector("[data-editor-name]"), previewOption = preview_options.querySelector(`.list-item[data-editor-identifier="${identifier}"]`), currentName = getName(), base = getName("base"), extension = getName("extension"), rename = (name) ? name : prompt(`Enter a new file name for "${currentName}".`,currentName);
+    var { tab, container, getName } = Editor.query(identifier), editorName = tab.querySelector("[data-editor-name]"), previewOption = preview_menu.main.querySelector(`.option[data-editor-identifier="${identifier}"]`), currentName = getName(), base = getName("base"), extension = getName("extension"), rename = (name) ? name : prompt(`Enter a new file name for "${currentName}".`,currentName);
     if (!rename) return;
     if (!rename.includes(".")){
       rename = `${rename}.${extension}`;
@@ -3005,6 +2745,7 @@
     document.body.setAttribute("data-view",type);
     document.body.classList.add(Editor.view());
     removeScaling();
+    view_menu.select(Editor.view());
     if (type != "preview") window.setTimeout(setEditorTabsVisibility,transitionDuration);
     window.setTimeout(() => {
       if (document.body.getAttribute("data-view-change") == changeIdentifier) document.body.removeAttribute("data-view-change");
@@ -3047,6 +2788,7 @@
     if (!identifier && !active_editor) return;
     if ((!identifier && active_editor) || (Editor.preview_editor == identifier)){
       Editor.preview_editor = "active-editor";
+      preview_menu.select("active-editor");
     } else Editor.preview_editor = identifier;
     refreshPreview({ force: true });
   }
@@ -3136,62 +2878,6 @@
       if (!win.document.title) win.document.title = Editor.query().getName();
     },20);
   }
-  function openMenu(menu,type){
-    if (menu.classList.contains("active")) return closeMenu(menu);
-    var opener = menu.querySelector(".opener"), list = menu.querySelectorAll(".list")[0];
-    menus.forEach(menu => {
-      if (menu.classList.contains("active")) closeMenu(menu);
-    });
-    menu.classList.add("active");
-    if (opener && document.activeElement != opener) opener.focus();
-    document.body.addEventListener("mousedown",catchMenuExit);
-    document.body.addEventListener("touchend",catchMenuExit);
-    function catchMenuExit(){
-      if (menu.contains(event.target)) return;
-      document.body.removeEventListener("mousedown",catchMenuExit);
-      document.body.removeEventListener("touchend",catchMenuExit);
-      if (event.button != "2") closeMenu(menu);
-    }
-    if (menu.closest(".select")){
-      var selected, navigable = getNavigableElements({ container: list, scope: true });
-      navigable.forEach(element => {
-        if (!selected && element.classList.contains("selected")) selected = element;
-      });
-      if (!selected) selected = navigable[0];
-      window.setTimeout(() => selected.focus(),20);
-    }
-    if (!menu.classList.contains("context-menu")) return;
-    if (Editor.context_menu_timeout) Editor.context_menu_timeout = null;
-    Editor.context_menu_previous = event.target;
-    menu.classList.add(type);
-    var location = { left: event.pageX, top: event.pageY };
-    if (location.left + list.offsetWidth > window.innerWidth) location.left = window.innerWidth - list.offsetWidth;
-    if (location.top + list.offsetHeight > window.innerHeight) location.top -= list.offsetHeight;
-    menu.style.left = `clamp(var(--titlebar-area-inset-width-left),${location.left}px,calc(100vw - var(--titlebar-area-inset-width-right) - ${list.offsetWidth}px))`;
-    menu.style.top = `${location.top}px`;
-    //document.body.addEventListener("keydown",catchMenuNavigation);
-    var transitionDuration = parseInt(getElementStyle({ element: list, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 500);
-    window.setTimeout(() => document.activeElement.blur(),transitionDuration);
-  }
-  function closeMenu(menu){
-    var opener = menu.querySelector(".opener"), list = menu.querySelectorAll(".list")[0], listParents = menu.querySelectorAll(".list-parent");
-    menu.classList.remove("active");
-    listParents.forEach(listParent => {
-      if (listParent.classList.contains("active")) listParent.classList.remove("active");
-    });
-    if (opener && opener != document.activeElement) opener.focus();
-    if (!menu.classList.contains("context-menu")) return;
-    if (Editor.context_menu_previous) Editor.context_menu_previous.focus({ preventScroll: true });
-    var types = ["link","editing"], transitionDuration = parseInt(getElementStyle({ element: list, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
-    window.setTimeout(() => {
-      var types = ["link","editing"];
-      types.forEach(type => {
-        if (menu.classList.contains(type)) menu.classList.remove(type);
-      });
-    },transitionDuration);
-  }
-  function catchMenuNavigation(){
-  }
   async function callCommand(element,action){/* I think I may remove this, or do something else with it. document.execCommand() is broken in so many ways, what a shame */
     element.focus({ preventScroll: true });
     if (action == "paste"){
@@ -3216,16 +2902,13 @@
     element.addEventListener("drop",event => {
       if (Array.from(event.dataTransfer.items)[0].kind == "file") return;
       event.stopPropagation();
-      menus.forEach(menu => {
-        if (menu.classList.contains("active")) closeMenu(menu);
-      });
+      document.querySelectorAll("menu-drop[data-open]").forEach(menu => menu.close());
     });
     if (type == "input"){
       element.spellcheck = false;
       element.autocomplete = "off";
       element.autocapitalize = "none";
       element.setAttribute("autocorrect","off");
-      if (advanced) attachContextMenu({ element, type: "editing" });
     }
     if (type == "num-text"){
       element.colorScheme.set("dark");
@@ -3233,34 +2916,6 @@
       var scrollbarStyles = document.createElement("style");
       scrollbarStyles.textContent = scrollbar_styles.textContent;
       element.shadowRoot.insertBefore(scrollbarStyles,element.container);
-      if (!advanced) return;
-      attachContextMenu({ element, type: "editing" });
-    }
-  }
-  function attachContextMenu({ element, type } = {}){
-    element.addEventListener("mousedown",event => {
-      if (event.button == "2") event.preventDefault();
-    });
-    element.addEventListener("contextmenu",event => {
-      if (type == "alternate"){
-        openMenu(element.closest(".menu"));
-      } else if (Editor.support().editing_commands){
-        openMenu(context_menu,type);
-      } else {
-        event.stopPropagation();
-        menus.forEach(menu => closeMenu(menu));
-      }
-    });
-    if (Editor.environment().touch_device && type != "alternate") return;
-    element.addEventListener("touchstart",event => {
-      if (event.touches.length == 1) Editor.context_menu_timeout = window.setTimeout(() => element.dispatchEvent(new MouseEvent("contextmenu")),750);
-    },{ passive: true });
-    element.addEventListener("touchmove",negateContextMenu,{ passive: true });
-    element.addEventListener("touchend",negateContextMenu);
-    function negateContextMenu(){
-      if (!Editor.context_menu_timeout) return;
-      window.clearTimeout(Editor.context_menu_timeout);
-      Editor.context_menu_timeout = null;
     }
   }
   function sendShortcutAction({ control, command, shift, controlShift, shiftCommand, controlCommand, key } = {}){
