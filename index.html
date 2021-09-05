@@ -1671,16 +1671,16 @@
   #symbol_definitions {
     display: none;
   }
-  :root.apple-home-screen #create_window_option {
+  :root.apple-home-screen #file_menu::part(create-window-option) {
     display: none;
   }
   #install_button, #theme_button {
     padding: 3px 8px;
   }
-  :root:not(.install-prompt-available) #install_option, :root:not(.install-prompt-available) #install_button {
+  :root:not(.install-prompt-available) #settings_menu::part(install-option), :root:not(.install-prompt-available) #install_button {
     display: none;
   }
-  :root:not(.service-worker-activated) #clear_site_caches_option, :root:not(.service-worker-activated) #clear_site_caches_button {
+  :root:not(.service-worker-activated) #settings_menu::part(clear-site-caches-option), :root:not(.service-worker-activated) #clear_site_caches_button {
     display: none;
   }
   #generator_output {
@@ -1693,7 +1693,7 @@
 
 </head>
 
-<body class="code horizontal" data-view="code" data-orientation="horizontal">
+<body class="code horizontal" data-view="code" data-orientation="horizontal" ontouchstart>
 
 <svg id="symbol_definitions">
   <symbol id="arrow_icon" viewBox="0 0 512 512">
@@ -1749,7 +1749,7 @@
       <button>File</button>
       <ul>
         <li onclick="createEditor({ auto_replace: false });" data-shortcuts='{ "default": "Ctrl+Shift+X", "macOS": "Shift+Cmd+X" }'>New Editor</li>
-        <li id="create_window_option" onclick="createWindow();" data-shortcuts='{ "default": "Ctrl+Shift+C", "macOS": "Shift+Cmd+C" }'>New Window</li>
+        <li part="create-window-option" onclick="createWindow();" data-shortcuts='{ "default": "Ctrl+Shift+C", "macOS": "Shift+Cmd+C" }'>New Window</li>
         <li onclick="openFiles();" data-shortcuts='{ "default": "Ctrl+O", "macOS": "Cmd+O" }'>Open</li>
         <li onclick="window.setTimeout(renameEditor,10);" data-shortcuts='{ "default": "Ctrl+Shift+R", "macOS": "Shift+Cmd+R" }'>Rename</li>
         <li onclick="saveFile();" data-shortcuts='{ "default": "Ctrl+S", "macOS": "Cmd+S" }'>Save</li>
@@ -1823,9 +1823,9 @@
     <menu-drop id="settings_menu" data-alternate>
       <button onclick="settings_card.open();">Settings</button>
       <ul data-show-icons>
-        <li id="install_option" onclick="showInstallPrompt();"><img src="resources/icon.svg" alt="">Install</li>
+        <li part="install-option" onclick="showInstallPrompt();"><img src="resources/icon.svg" alt="">Install</li>
         <li onclick="theme_card.open();"><img src="resources/template.svg" alt="">Theme Settings</li>
-        <li id="clear_site_caches_option" onclick="clearSiteCaches();"><img src="resources/settings.svg" alt="">Clear Cache</li>
+        <li part="clear-site-caches-option" onclick="clearSiteCaches();"><img src="resources/settings.svg" alt="">Clear Cache</li>
         <li onclick="Editor.settings.reset();"><img src="resources/settings.svg" alt="">Reset Settings</li>
       </ul>
     </menu-drop>
@@ -2523,7 +2523,7 @@
   if (Editor.appearance().parent_window){
     if (Editor.settings.get("default-orientation")){
       var value = Editor.settings.get("default-orientation");
-      default_orientation_setting.select(value);
+      window.requestAnimationFrame(() => default_orientation_setting.select(value));
       setOrientation(value);
     }
     if (Editor.settings.get("syntax-highlighting") != undefined){
