@@ -1,8 +1,9 @@
 self.Editor = {
-  version: 3.01,
+  version: 3.02,
   environment: () => ({
     macOS_device: (/(Mac)/i.test(navigator.platform) && navigator.standalone === undefined)
-  })
+  }),
+  share_files: []
 }
 self.addEventListener("activate",event => {
   event.waitUntil(caches.keys().then(versions => Promise.all(versions.map(cache => {
@@ -12,6 +13,12 @@ self.addEventListener("activate",event => {
   postMessageAllClients({ action: "service-worker-activated" });
 });
 self.addEventListener("fetch",event => {
+  if (event.request.method == "POST"){
+    event.respondWith(Response.redirect("/?share-target=true",303));
+    return event.waitUntil((async () => {
+      Editor.share_files = Array.from(await event.request.formData()).map(file => file[1]);
+    })());
+  }
   if (event.request.url === `${self.location.href.match("(.*\/).*")[1]}manifest.webmanifest`){
     return event.respondWith(caches.match(event.request).then(response => {
       return response || fetch("manifest.webmanifest").then(async request => {
@@ -34,6 +41,9 @@ self.addEventListener("fetch",event => {
   }));
 });
 self.addEventListener("message",event => {
+  if (event.data.action === "share-target"){
+    clients.matchAll().then(clients => clients.filter(client => client.id === event.source.id).forEach(client => client.postMessage({ action: "share-target", files: Editor.share_files })));
+  }
   if (event.data.action === "clear-site-caches"){
     caches.keys().then(versions => {
       Promise.all(versions.map(cache => caches.delete(cache)));
