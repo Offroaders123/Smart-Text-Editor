@@ -18,7 +18,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Text Editor">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<base href="https://stedit.app">
+<base href="https://stedit.app" target="_blank">
 <link rel="canonical" href="https://stedit.app">
 <link rel="manifest">
 <link rel="icon" type="image/svg+xml" href="resources/icon.svg">
@@ -2175,10 +2175,6 @@
   }
   window.customElements.define("ste-card",STECardElement);
 
-  document.querySelectorAll("a[href]").forEach(anchor => {
-    anchor.rel = "noopener";
-    anchor.target = "_blank";
-  });
   document.querySelectorAll("img").forEach(image => image.draggable = false);
   document.querySelectorAll("num-text").forEach(textarea => applyEditingBehavior({ element: textarea }));
   document.querySelectorAll("input[type='text']").forEach(input => applyEditingBehavior({ element: input }));
@@ -2290,8 +2286,19 @@
       navigator.serviceWorker.addEventListener("message",event => {
         if (event.data.action == "service-worker-activated") activateManifest();
         if (event.data.action == "clear-site-caches-complete") cleared_cache_card.open();
+        if (event.data.action == "share-target"){
+          event.data.files.forEach(file => {
+            var reader = new FileReader();
+            reader.readAsText(file,"UTF-8");
+            reader.addEventListener("loadend",() => createEditor({ name: file.name, value: reader.result }));
+          });
+        }
       });
       document.documentElement.classList.add("service-worker-activated");
+      if (queryParameters.get("share-target")){
+        navigator.serviceWorker.controller.postMessage({ action: "share-target" });
+        removeQueryParameters(["share-target"]);
+      }
     });
     function activateManifest(){
       document.querySelector("link[rel='manifest']").href = "manifest.webmanifest";
