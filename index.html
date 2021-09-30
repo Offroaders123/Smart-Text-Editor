@@ -2643,6 +2643,12 @@
       if (!tab.hasAttribute("data-editor-unsaved")) tab.setAttribute("data-editor-unsaved",true);
       refreshPreview();
     });
+    container.editor.addEventListener("keydown", (e) => {
+      if(e.key.toUpperCase() === "TAB") {
+        e.preventDefault();
+        document.execCommand("insertText",null,"\t");
+      }
+    });
     preview_menu.main.appendChild(previewOption);
     applyEditingBehavior({ element: container });
     if (open || !Editor.active_editor) openEditor({ identifier, auto_created, focused_override });
