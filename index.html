@@ -18,7 +18,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Text Editor">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<base href="https://stedit.app" target="_blank">
+<base href="http://192.168.1.80:5500" target="_blank">
 <link rel="canonical" href="https://stedit.app">
 <link rel="manifest">
 <link rel="icon" type="image/svg+xml" href="resources/icon.svg">
@@ -2055,23 +2055,23 @@
       if (this.defined || !this.isConnected) return;
       this.defined = true;
       if (this.matches(".widget")) this.style.zIndex = Array.from(this.parentElement.querySelectorAll(".card.widget")).reverse().indexOf(this) + (parseInt(window.getComputedStyle(this).getPropertyValue("z-index")) || 0);
-      this.addEventListener("pointerdown",event => {
+      this.addEventListener("touchstart",event => {
         this.focus();
         if (!this.matches(".card.widget")) return;
         if (!event.target.matches(".header") && !event.target.closest(".header") || event.target.closest(".header .card-controls")) return;
         event.preventDefault();
-        var { offsetLeft, offsetTop } = this, { pageX, pageY } = event;
+        var { offsetLeft, offsetTop } = this, { pageX, pageY } = event.touches[0], safeAreaInsets = Editor.appearance().safe_area_insets;
         var moveObserver = event => {
           event.preventDefault();
           this.style.margin = "revert";
-          this.style.left = `clamp(0px,${offsetLeft + event.pageX - pageX}px,${main.clientWidth - this.offsetWidth}px)`;
+          this.style.left = `clamp(${safeAreaInsets.left}px,${offsetLeft + event.pageX - pageX}px,${main.clientWidth - safeAreaInsets.right - this.offsetWidth}px)`;
           this.style.right = "revert";
-          this.style.top = `clamp(0px,${offsetTop + event.pageY - pageY}px,${main.clientHeight - this.offsetHeight}px)`;
+          this.style.top = `clamp(0px,${offsetTop + event.pageY - pageY}px,${main.clientHeight - safeAreaInsets.bottom - this.offsetHeight}px)`;
         }
         document.body.setAttribute("data-card-dragging","");
-        window.addEventListener("pointermove",moveObserver);
-        window.addEventListener("pointerup",() => {
-          window.removeEventListener("pointermove",moveObserver);
+        window.addEventListener("touchmove",moveObserver);
+        window.addEventListener("touchend",() => {
+          window.removeEventListener("touchmove",moveObserver);
           document.body.removeAttribute("data-card-dragging");
         },{ once: true });
       });

@@ -28,14 +28,14 @@ self.addEventListener("fetch",event => {
           if (Editor.environment().macOS_device && icon.platform === "macOS" || icon.purpose === "maskable") return icon;
         });
         const response = new Response(new Blob([JSON.stringify(manifest,null,"  ")],{ type: "text/json" }));
-        caches.open(Editor.version).then(cache => cache.put(event.request,response));
+        //caches.open(Editor.version).then(cache => cache.put(event.request,response));
         return response.clone();
       });
     }));
   }
   event.respondWith(caches.match(event.request).then(response => {
     return response || fetch(event.request).then(async response => {
-      caches.open(Editor.version).then(cache => cache.put(event.request,response));
+      //caches.open(Editor.version).then(cache => cache.put(event.request,response));
       return response.clone();
     });
   }));

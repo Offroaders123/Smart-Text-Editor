@@ -1,6 +1,6 @@
 {
-  "name": "Smart Text Editor",
-  "short_name": "Text Editor",
+  "name": "Smart Text Editor2",
+  "short_name": "Text Editor2",
   "description": "The text editor that requires only a browser and a keyboard!",
   "start_url": "./",
   "scope": ".",
