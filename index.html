@@ -179,7 +179,7 @@
     },
     active_dialog: null,
     dialog_previous: null,
-    active_widget: null,
+    active_widget: () => document.querySelector(".card.widget.active.has-focus"),
     picker_color: null,
     install_prompt: null
   };
@@ -265,7 +265,7 @@
     width: 100%;
     height: 100%;
     background: #1e1e1e;
-    z-index: 4;
+    z-index: 101;
     transition: opacity 250ms;
   }
   :root:not(.startup-fade) body::after {
@@ -305,6 +305,9 @@
   body[data-scaling-change] header {
     pointer-events: none;
   }
+  body[data-card-dragging] header {
+    pointer-events: none;
+  }
   header .app-region {
     margin: var(--app-region-margin);
     margin-bottom: 0;
@@ -335,7 +338,7 @@
     min-width: 0;
     align-self: stretch;
     display: flex;
-    z-index: 3;
+    z-index: 100;
     -webkit-app-region: no-drag;
   }
   header .app-menubar menu-drop {
@@ -381,7 +384,7 @@
   :root.window-controls-overlay header .app-omnibox {
     height: var(--titlebar-area-inset-height);
     gap: calc(var(--header-gap) / var(--device-pixel-ratio));
-    z-index: 5;
+    z-index: 102;
   }
   :root:not(.macOS-device).window-controls-overlay header .app-omnibox {
     margin-right: calc(var(--header-gap) * -1);
@@ -493,6 +496,9 @@
     height: 0%;
   }
   body[data-scaling-change] main .workspace {
+    pointer-events: none;
+  }
+  body[data-card-dragging] main .workspace {
     pointer-events: none;
   }
   main .workspace .workspace-tabs {
@@ -901,6 +907,9 @@
   body[data-scaling-change] main .preview {
     pointer-events: none;
   }
+  body[data-card-dragging] main .preview {
+    pointer-events: none;
+  }
   button {
     color: inherit;
     font-size: inherit;
@@ -1270,7 +1279,7 @@
     bottom: 0;
     --card-border-radius: 10px;
     pointer-events: none;
-    --card-z-index: 5;
+    --card-z-index: 102;
   }
   .card.alert:not(.active) {
     transform: translateX(calc(100% + var(--margin) * 2));
@@ -1300,7 +1309,7 @@
   .card.dialog {
     position: absolute;
     --card-border-radius: 14px;
-    --card-z-index: 3;
+    --card-z-index: 100;
   }
   .card.dialog:not(.active) {
     transform: scale(0.5);
@@ -1386,7 +1395,7 @@
     transform: scale(0);
   }
   .card.dialog .header .heading {
-    font-size: 18px;
+    font-size: 16px;
   }
   .card .header .card-controls {
     margin-left: auto;
@@ -1407,6 +1416,9 @@
   :root.macOS-device .card.minimize .header .card-controls {
     margin: 1px;
     margin-right: auto;
+  }
+  body[data-card-dragging] .card .header .card-controls {
+    pointer-events: none;
   }
   .card .header .card-controls .control {
     padding: var(--control-padding,0px);
@@ -1551,6 +1563,9 @@
     opacity: 0;
     transform: scale(0);
   }
+  body[data-card-dragging] .card .main {
+    pointer-events: none;
+  }
   .card .main .content {
     display: flex;
     justify-content: space-around;
@@ -1657,7 +1672,7 @@
     width: 100%;
     height: 100%;
     background: #1e1e1e60;
-    z-index: 3;
+    z-index: 100;
     transition: calc(var(--main-transition-duration) * 0.5);
     transition-property: visibility, opacity;
   }
@@ -1799,11 +1814,11 @@
     <menu-drop id="tools_menu">
       <button>Tools</button>
       <ul>
-        <li onclick="replace_text_card.open();" data-shortcuts='{ "default": "Ctrl+Shift+F", "macOS": "Shift+Cmd+F" }'>Replace Text</li>
-        <!--li onclick="color_picker_card.open();" data-shortcuts='{ "default": "Ctrl+Shift+K", "macOS": "Shift+Cmd+K" }'>Color Picker</li-->
-        <li onclick="json_formatter_card.open();" data-shortcuts='{ "default": "Ctrl+Shift+G", "macOS": "Shift+Cmd+G" }'>JSON Formatter</li>
-        <li onclick="uri_encoder_card.open();" data-shortcuts='{ "default": "Ctrl+Shift+Y", "macOS": "Shift+Cmd+Y" }'>URI Encoder</li>
-        <li onclick="uuid_generator_card.open();" data-shortcuts='{ "default": "Ctrl+Shift+O", "macOS": "Shift+Cmd+O" }'>UUID Generator</li>
+        <li onclick="replace_text_card.toggle();" data-shortcuts='{ "default": "Ctrl+Shift+F", "macOS": "Shift+Cmd+F" }'>Replace Text</li>
+        <!--li onclick="color_picker_card.toggle();" data-shortcuts='{ "default": "Ctrl+Shift+K", "macOS": "Shift+Cmd+K" }'>Color Picker</li-->
+        <li onclick="json_formatter_card.toggle();" data-shortcuts='{ "default": "Ctrl+Shift+G", "macOS": "Shift+Cmd+G" }'>JSON Formatter</li>
+        <li onclick="uri_encoder_card.toggle();" data-shortcuts='{ "default": "Ctrl+Shift+Y", "macOS": "Shift+Cmd+Y" }'>URI Encoder</li>
+        <li onclick="uuid_generator_card.toggle();" data-shortcuts='{ "default": "Ctrl+Shift+O", "macOS": "Shift+Cmd+O" }'>UUID Generator</li>
         <li>Insert Templates...
           <ul>
             <li onclick="Tools.insertTemplate({ type: 'html' });" data-shortcuts='{ "default": "Ctrl+Shift+H", "macOS": "Shift+Cmd+H" }'>HTML</li>
@@ -2039,6 +2054,27 @@
     connectedCallback(){
       if (this.defined || !this.isConnected) return;
       this.defined = true;
+      if (this.matches(".widget")) this.style.zIndex = Array.from(this.parentElement.querySelectorAll(".card.widget")).reverse().indexOf(this) + (parseInt(window.getComputedStyle(this).getPropertyValue("z-index")) || 0);
+      this.addEventListener("pointerdown",event => {
+        this.focus();
+        if (!this.matches(".card.widget")) return;
+        if (!event.target.matches(".header") && !event.target.closest(".header") || event.target.closest(".header .card-controls")) return;
+        event.preventDefault();
+        var { offsetLeft, offsetTop } = this, { pageX, pageY } = event;
+        var moveObserver = event => {
+          event.preventDefault();
+          this.style.margin = "revert";
+          this.style.left = `clamp(0px,${offsetLeft + event.pageX - pageX}px,${main.clientWidth - this.offsetWidth}px)`;
+          this.style.right = "revert";
+          this.style.top = `clamp(0px,${offsetTop + event.pageY - pageY}px,${main.clientHeight - this.offsetHeight}px)`;
+        }
+        document.body.setAttribute("data-card-dragging","");
+        window.addEventListener("pointermove",moveObserver);
+        window.addEventListener("pointerup",() => {
+          window.removeEventListener("pointermove",moveObserver);
+          document.body.removeAttribute("data-card-dragging");
+        },{ once: true });
+      });
       this.addEventListener("keydown",event => {
         if (this.getAttribute("data-type") != "dialog" || event.key != "Tab") return;
         var navigable = getNavigableElements({ container: this, scope: true });
@@ -2086,14 +2122,12 @@
       }
     }
     open(previous){
+      if (this.matches(".widget.active:not(.has-focus)")) return this.focus();
       if (this.matches(".active") && !this.hasAttribute("data-alert-timeout")) return this.close();
       if (this.type != "alert"){
         document.querySelectorAll(`.card.active`).forEach(card => {
           if (card.type != "dialog" && card.type != this.type) return;
-          card.close();
-          if (!card.matches(".minimize")) return;
-          var transitionDuration = parseInt(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
-          window.setTimeout(() => card.minimize(),transitionDuration);
+          if (card.type != "widget") card.close();
         });
       }
       this.classList.add("active");
@@ -2121,7 +2155,7 @@
         },transitionDuration);
         Editor.active_dialog = this;
       }
-      if (this.type == "widget") Editor.active_widget = this;
+      if (this.type == "widget") this.focus();
     }
     minimize(){
       var icon = this.controls.minimize.querySelector("svg use"), main = this.querySelector(".main"), changeIdentifier = Math.random().toString();
@@ -2156,6 +2190,7 @@
     }
     close(){
       this.classList.remove("active");
+      this.classList.remove("has-focus");
       if (this.matches(".minimize")){
         var transitionDuration = parseInt(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
         window.setTimeout(() => this.minimize(),transitionDuration);
@@ -2166,11 +2201,32 @@
         Editor.active_dialog = null;
         if (Editor.dialog_previous){
           var hidden = (getElementStyle({ element: Editor.dialog_previous, property: "visibility" }) == "hidden");
-          (!workspace_editors.contains(Editor.dialog_previous) && !hidden) ? Editor.dialog_previous.focus({ preventScroll: true }) : Editor.query().container.focus({ preventScroll: true });
+          if (Editor.query().container) (!workspace_editors.contains(Editor.dialog_previous) && !hidden) ? Editor.dialog_previous.focus({ preventScroll: true }) : Editor.query().container.focus({ preventScroll: true });
           Editor.dialog_previous = null;
         }
       }
-      if (this.type == "widget") Editor.active_widget = null;
+      if (this.type == "widget"){
+        var cards = Array.from(this.parentElement.querySelectorAll(".card.widget")).sort((a,b) => (a.style.zIndex > b.style.zIndex) ? -1 : 1);
+        if (this == cards[0] && cards[1]){
+          var transitionDuration = parseInt(getElementStyle({ element: cards[1], property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
+          window.setTimeout(() => cards[1].focus(),transitionDuration);
+        }
+      }
+    }
+    toggle(){
+      (!this.matches(".active")) ? this.open() : this.close();
+    }
+    focus(){
+      if (!this.matches(".card.widget")) return;
+      var cards = Array.from(this.parentElement.querySelectorAll(".card.widget")).sort((a,b) => (a.style.zIndex > b.style.zIndex) ? -1 : 1);
+      this.classList.add("has-focus");
+      if (this.style.zIndex == (cards.length - 1 + parseInt(cards[cards.length - 1].style.zIndex))) return;
+      cards.forEach(card => {
+        if (card == this) return;
+        card.classList.remove("has-focus");
+        if (card.style.zIndex >= this.style.zIndex) card.style.zIndex = card.style.zIndex - 1;
+      });
+      this.style.zIndex = cards.length - 1 + parseInt(cards[cards.length - 1].style.zIndex);
     }
   }
   function catchCardNavigation(){
@@ -2442,8 +2498,8 @@
     }
     if ((controlShift || shiftCommand) && pressed("m")){
       event.preventDefault();
-      if (event.repeat || !Editor.active_widget) return;
-      if (Editor.active_widget) Editor.active_widget.minimize();
+      if (event.repeat || !Editor.active_widget()) return;
+      if (Editor.active_widget()) Editor.active_widget().minimize();
     }
     if ((control || command) && (pressed(",") || pressed("<"))){
       event.preventDefault();
