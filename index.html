@@ -250,7 +250,7 @@
     display: flex;
     flex-direction: column;
     color: #cccccc;
-    font-size: 14.5px;
+    font-size: 14px;
     font-family: var(--font-family-interface);
     background: #121212;
     overflow: hidden;
@@ -399,12 +399,10 @@
   }
   header .app-omnibox .option {
     padding: 5px;
-    box-sizing: content-box;
-    width: 14px;height: 14px;
-    /*aspect-ratio: 1/1;*/
     display: flex;
+    gap: 8px;
     align-items: center;
-    border-radius: 50%;
+    border-radius: 12px;
     outline: none;
     transition: background-color 250ms linear;
     -webkit-app-region: no-drag;
@@ -414,8 +412,9 @@
     width: calc(14px / var(--device-pixel-ratio));height: calc(14px / var(--device-pixel-ratio));
   }
   header .app-omnibox .option svg {
-    width: 100%;
-    height: 100%;
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
     fill: currentColor;
   }
   header .app-omnibox .option:hover {
@@ -541,7 +540,7 @@
     display: none;
   }
   main .workspace .workspace-tabs .tab {
-    margin-right: 1px;
+    margin-right: -1px;
     margin-top: 3px;
     padding: calc(6px - var(--tab-border-width));
     padding-left: calc(10px - var(--tab-border-width));
@@ -559,7 +558,7 @@
   main .workspace .workspace-tabs .tab:not([data-editor-change]):not(.active) + .tab:not([data-editor-change]):not(.active)::before, main .workspace .workspace-tabs > .tab:not([data-editor-change]):not(.active) + :nth-last-child(2):not([data-editor-change]):not(.active)::before, main .workspace .workspace-tabs > .tab + :nth-last-child(2):not([data-editor-change]):not(.active)::after {
     content: "";
     position: absolute;
-    right: calc(100% + 1px);
+    right: 100%;
     width: 1px;
     height: 14px;
     background: currentColor;
@@ -568,7 +567,7 @@
     z-index: 1;
   }
   main .workspace .workspace-tabs > .tab + :nth-last-child(2):not([data-editor-change]):not(.active)::after {
-    left: calc(100% + 2px);
+    left: 100%;
     right: unset;
   }
   main .workspace .workspace-tabs .tab:focus-visible {
@@ -622,11 +621,9 @@
     line-height: 12px;
   }
   main .workspace .workspace-tabs .create-editor-button {
-    margin-left: var(--workspace-tabs-padding);
+    margin-left: calc(var(--workspace-tabs-padding) + 1px);
     margin-bottom: 1px;
     padding: 6px;
-    position: sticky;
-    right: calc(var(--safe-area-inset-right) + var(--workspace-tabs-padding) + var(--minimize-tab-width,0px));
     display: flex;
     align-items: center;
     color: #aaaaaa;
@@ -1018,7 +1015,7 @@
   menu-drop {
     color: inherit;
     font: inherit;
-    font-size: 13px;
+    font-size: inherit;
     line-height: 16px;
   }
   menu-drop {
@@ -1033,6 +1030,9 @@
   menu-drop::part(opener) {
     border: none;
     outline: none;
+  }
+  menu-drop::part(body) {
+    font-size: 13px;
   }
   menu-drop::part(list) {
     --list-position-x: calc(100% + max(0px,var(--list-border-width)));
@@ -1259,10 +1259,10 @@
     z-index: calc(var(--card-z-index) + 1);
   }
   .card:not(.dialog) {
-    --margin: 8px;
     margin: var(--margin) max(var(--safe-area-inset-right),var(--margin)) max(var(--safe-area-inset-bottom),var(--margin)) max(var(--safe-area-inset-left),var(--margin));
   }
   .card.alert {
+    --margin: 16px;
     position: absolute;
     right: 0;
     bottom: 0;
@@ -1274,6 +1274,7 @@
     transform: translateX(calc(100% + var(--margin) * 2));
   }
   .card.widget {
+    --margin: 8px;
     position: absolute;
     right: 0;
     top: 0;
@@ -1527,7 +1528,6 @@
   .card .main {
     display: flex;
     flex-direction: column;
-    font-size: 14px;
   }
   .card:not(.widget) .main {
     padding: 16px;
@@ -1677,7 +1677,7 @@
   #install_button, #theme_button {
     padding: 3px 8px;
   }
-  :root:not(.install-prompt-available) #settings_menu::part(install-option), :root:not(.install-prompt-available) #install_button {
+  :root:not(.install-prompt-available) #settings_menu::part(install-option), :root:not(.install-prompt-available) #install_option, :root:not(.install-prompt-available) #install_button {
     display: none;
   }
   :root:not(.service-worker-activated) #settings_menu::part(clear-site-caches-option), :root:not(.service-worker-activated) #clear_site_caches_button {
@@ -1729,6 +1729,9 @@
     <path d="m0.0044544 249c0.72363-111.33 91.271-201.16 202.61-200.98 111.33 0.17137 201.61 90.272 201.99 201.61l-52.695 0.18028c-0.28168-82.334-67.039-148.97-149.37-149.09-82.334-0.12673-149.3 66.299-149.83 148.63z"/>
     <path d="m404.6 246.77h-52.472v57.48h52.472z"/>
     <path d="m52.473 246.77h-52.472v190.87h52.472z"/>
+  </symbol>
+  <symbol id="install_icon" viewBox="0 0 512 512">
+    <path d="m198.36 18v43.917h-154.81v308.88h424.9v-75.391h43.551v66.242c-0.029 13.167-4.952 25.852-13.813 35.592-8.86 9.739-21.025 15.837-34.13 17.108l-5.123 0.366h-65.876l23.788 26.351v52.7h-321.69v-52.7l23.788-26.351h-66.241c-13.19 0.054-25.922-4.84-35.679-13.717-9.7572-8.876-15.831-21.089-17.022-34.225v-296.07c-0.053852-13.19 4.8408-25.922 13.717-35.679 8.8764-9.7572 21.089-15.831 34.226-17.022h150.42zm174.94 0v186.65l64.046-66.241 38.427 39.525-128.09 132.85-128.09-132.85 38.427-39.891 64.046 66.607v-186.65h51.236z"/>
   </symbol>
   <symbol id="refresh_icon" viewBox="0 0 512 512">
     <path d="m510.27 285.75c-13.893 118.73-108.1 212.04-226.96 224.79-118.86 12.751-230.71-58.451-269.47-171.53-38.761-113.08 5.8941-237.93 107.58-300.78 101.68-62.846 233.32-46.955 317.13 38.282l-37.067 36.446c-66.79-67.929-171.7-80.593-252.74-30.508-81.036 50.084-116.62 149.58-85.733 239.7 30.89 90.117 120.03 146.86 214.75 136.7 94.721-10.161 169.8-84.522 180.87-179.14z"/>
@@ -1823,7 +1826,7 @@
     <menu-drop id="settings_menu" data-alternate>
       <button onclick="settings_card.open();">Settings</button>
       <ul data-show-icons>
-        <li part="install-option" onclick="showInstallPrompt();"><img src="resources/icon.svg" alt="">Install</li>
+        <li part="install-option" onclick="showInstallPrompt();"><img src="resources/install.svg" alt="">Install</li>
         <li onclick="theme_card.open();"><img src="resources/template.svg" alt="">Theme Settings</li>
         <li part="clear-site-caches-option" onclick="clearSiteCaches();"><img src="resources/settings.svg" alt="">Clear Cache</li>
         <li onclick="Editor.settings.reset();"><img src="resources/settings.svg" alt="">Reset Settings</li>
@@ -1831,6 +1834,7 @@
     </menu-drop>
   </div>
   <div class="app-omnibox">
+    <button id="install_option" class="option" title="Install" onclick="showInstallPrompt();"><svg><use href="#install_icon"/></svg></button>
     <button class="option" title="Refresh Preview" onclick="refreshPreview({ force: true });"><svg><use href="#refresh_icon"/></svg></button>
     <a class="option" href="https://github.com/Offroaders123/Smart-Text-Editor" title="Smart Text Editor on GitHub"><svg><use href="#github_icon"/></svg></a>
   </div>
@@ -1874,7 +1878,7 @@
         </div>
       </div>
       <div class="options">
-        <button id="install_button" onclick="showInstallPrompt();"><img src="resources/icon.svg" alt="">Install</button>
+        <button id="install_button" onclick="showInstallPrompt();"><svg><use href="#install_icon"/></svg>Install</button>
         <button id="theme_button" onclick="theme_card.open();" data-card-previous="theme_card">Customize Theme<svg><use href="#arrow_icon"/></svg></button>
       </div>
       <div class="options">
@@ -1890,7 +1894,7 @@
     <div class="main">
       <div class="content">
         <div class="item list">
-          <span style="font-size: 13px; line-height: 1.6;">Custom workspace theme settings<br>will be featured in a later update.</span>
+          <span style="line-height: 1.6;">Custom workspace theme settings<br>will be featured in a later update.</span>
         </div>
         <!--div class="item list expand">
           <num-text id="theme_setting" placeholder="CSS to modify..."></num-text>
