@@ -409,13 +409,6 @@
   }
   :root.window-controls-overlay header .app-omnibox .option {
     padding: calc(5px / var(--device-pixel-ratio));
-    width: calc(14px / var(--device-pixel-ratio));height: calc(14px / var(--device-pixel-ratio));
-  }
-  header .app-omnibox .option svg {
-    width: 14px;
-    height: 14px;
-    flex-shrink: 0;
-    fill: currentColor;
   }
   header .app-omnibox .option:hover {
     background-color: #ffffff14;
@@ -429,6 +422,15 @@
     background-color: #ffffff22;
   }
 
+  header .app-omnibox .option svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    fill: currentColor;
+  }
+  :root.window-controls-overlay header .app-omnibox .option svg {
+    width: calc(14px / var(--device-pixel-ratio));height: calc(14px / var(--device-pixel-ratio));
+  }
   main {
     padding: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
     position: relative;
