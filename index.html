@@ -18,7 +18,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Text Editor">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<base href="https://stedit.app" target="_blank">
+<base href="." target="_blank">
 <link rel="canonical" href="https://stedit.app">
 <link rel="manifest">
 <link rel="icon" type="image/svg+xml" href="resources/icon.svg">
@@ -61,7 +61,7 @@
     appearance: () => {
       var parent_window = (window.self == window.top),
         standalone = (window.matchMedia("(display-mode: standalone)").matches || navigator.standalone || !window.menubar.visible),
-        apple_home_screen = (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform) && "standalone" in navigator && navigator.standalone),
+        apple_home_screen = (/(macOS|Mac|iPhone|iPad|iPod)/i.test(("userAgentData" in navigator) ? navigator.userAgentData.platform : navigator.platform) && "standalone" in navigator && navigator.standalone),
         hidden_chrome = (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight),
         window_controls_overlay = ((("windowControlsOverlay" in navigator) ? navigator.windowControlsOverlay.visible : false) && standalone),
         refresh_window_controls_overlay = () => {
@@ -102,8 +102,8 @@
     environment: () => ({
       file_protocol: (window.location.protocol == "file:"),
       touch_device: ("ontouchstart" in window),
-      apple_device: (/(Mac|iPhone|iPad|iPod)/i.test(navigator.platform)),
-      macOS_device: (/(Mac)/i.test(navigator.platform) && navigator.standalone == undefined),
+      apple_device: (/(macOS|Mac|iPhone|iPad|iPod)/i.test(("userAgentData" in navigator) ? navigator.userAgentData.platform : navigator.platform)),
+      macOS_device: (/(macOS|Mac)/i.test(("userAgentData" in navigator) ? navigator.userAgentData.platform : navigator.platform) && navigator.standalone == undefined),
       mozilla_browser: (CSS.supports("-moz-appearance: none"))
     }),
     support: () => ({
@@ -236,12 +236,8 @@
   }
   html {
     width: 100%;
-    height: 100%;
+    height: calc(100% + var(--safe-area-inset-top));
     overflow: hidden;
-  }
-  html.apple-home-screen {
-    width: 100vw;
-    height: 100vh;
   }
   body {
     position: fixed;
