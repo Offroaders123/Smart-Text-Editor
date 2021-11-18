@@ -6,191 +6,21 @@
 <title>Smart Text Editor</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="author" content="Brandon Bennett">
-<meta name="description" content="Smart Text Editor is a vanilla JavaScript PWA that allows you to work on your coding projects from any device, in any browser, even if you don't have Internet access.">
-<meta name="google-site-verification" content="_LrfHy7pIualH1TolkQ5b3Po0dtjYrx-QQsiXelwx20">
-<meta property="og:title" content="Smart Text Editor">
-<meta property="og:description" content="The text editor that requires only a browser and a keyboard!">
-<meta property="og:image" content="https://stedit.app/resources/share-1200.png">
-<meta property="og:url" content="https://stedit.app">
-<meta name="twitter:card" content="summary_large_image">
-<meta id="theme_color" name="theme-color" content="#1e1e1e">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Text Editor">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<base href="." target="_blank">
-<link rel="canonical" href="https://stedit.app">
-<link rel="manifest">
-<link rel="icon" type="image/svg+xml" href="resources/icon.svg">
-<link rel="alternate icon" type="image/png" sizes="16x16" href="resources/icon-16.png">
-<link rel="alternate icon" type="image/png" sizes="32x32" href="resources/icon-32.png">
-<link rel="apple-touch-icon" sizes="180x180" href="resources/app-apple-touch-180.png">
-<link rel="apple-touch-icon" sizes="1024x1024" href="resources/app-apple-touch-1024.png">
-<link rel="apple-touch-startup-image" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="resources/startup-iphone5-landscape.png">
-<link rel="apple-touch-startup-image" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="resources/startup-iphone5-portrait.png">
-<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="resources/startup-iphone6-landscape.png">
-<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="resources/startup-iphone6-portrait.png">
-<link rel="apple-touch-startup-image" media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)" href="resources/startup-iphoneplus-landscape.png">
-<link rel="apple-touch-startup-image" media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="resources/startup-iphoneplus-portrait.png">
-<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)" href="resources/startup-iphonex-landscape.png">
-<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="resources/startup-iphonex-portrait.png">
-<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="resources/startup-iphonexr-landscape.png">
-<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="resources/startup-iphonexr-portrait.png">
-<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)" href="resources/startup-iphonexsmax-landscape.png">
-<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="resources/startup-iphonexsmax-portrait.png">
-<link rel="apple-touch-startup-image" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="resources/startup-ipad-landscape.png">
-<link rel="apple-touch-startup-image" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="resources/startup-ipad-portrait.png">
-<link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="resources/startup-ipadpro1-landscape.png">
-<link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="resources/startup-ipadpro1-portrait.png">
-<link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="resources/startup-ipadpro3-landscape.png">
-<link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="resources/startup-ipadpro3-portrait.png">
-<link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="resources/startup-ipadpro2-landscape.png">
-<link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="resources/startup-ipadpro2-portrait.png">
+<meta name="theme-color" content="#dddddd">
+<base href="https://stedit.app" target="_blank">
 <link rel="preconnect" href="https://fonts.gstatic.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cousine&family=Rubik&display=swap">
 <link rel="preload" as="fetch" crossorigin href="https://offroaders123.github.io/Num-Text-Component/vanilla-layout.css">
 <link rel="preload" as="fetch" crossorigin href="https://offroaders123.github.io/Num-Text-Component/vanilla-appearance.css">
 <link rel="preload" as="fetch" crossorigin href="https://offroaders123.github.io/Num-Text-Component/vanilla-highlighting.css">
-<script src="https://offroaders123.github.io/Num-Text-Component/script.js"></script>
 <script src="https://offroaders123.github.io/Menu-Drop-Component/script.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js" data-manual></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-json.min.js"></script>
+<script src="https://offroaders123.github.io/Num-Text-Component/script.js"></script>
+<!--script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js" data-manual></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-json.min.js"></script-->
 
 <script>
-  window.Editor = {
-    appearance: () => {
-      var parent_window = (window.self == window.top),
-        standalone = (window.matchMedia("(display-mode: standalone)").matches || navigator.standalone || !window.menubar.visible),
-        apple_home_screen = (/(macOS|Mac|iPhone|iPad|iPod)/i.test(("userAgentData" in navigator) ? navigator.userAgentData.platform : navigator.platform) && "standalone" in navigator && navigator.standalone),
-        hidden_chrome = (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight),
-        window_controls_overlay = ((("windowControlsOverlay" in navigator) ? navigator.windowControlsOverlay.visible : false) && standalone),
-        refresh_window_controls_overlay = () => {
-          var visibility = window_controls_overlay, styling = document.documentElement.classList.contains("window-controls-overlay");
-          if (visibility != styling) (visibility) ? document.documentElement.classList.add("window-controls-overlay") : document.documentElement.classList.remove("window-controls-overlay");
-        },
-        fullscreen = (window.matchMedia("(display-mode: fullscreen)").matches || (!window.screenY && !window.screenTop && hidden_chrome) || (!window.screenY && !window.screenTop && standalone)),
-        safe_area_insets = {
-          left: getSafeAreaInset("left"),
-          right: getSafeAreaInset("right"),
-          top: getSafeAreaInset("top"),
-          bottom: getSafeAreaInset("bottom"),
-        },
-        titlebar_area_insets = {
-          top: getTitlebarAreaInset("top"),
-          width_left: getTitlebarAreaInset("width-left"),
-          width_right: getTitlebarAreaInset("width-right"),
-          height: getTitlebarAreaInset("height"),
-        },
-        device_pixel_ratio = window.devicePixelRatio.toFixed(2),
-        refresh_device_pixel_ratio = () => {
-          var ratio = Editor.appearance().device_pixel_ratio, styling = getRootStyleProperty("--device-pixel-ratio");
-          if (ratio != styling) document.documentElement.style.setProperty("--device-pixel-ratio",ratio);
-        };
-        function getSafeAreaInset(section){
-          return parseInt(getRootStyleProperty(`--safe-area-inset-${section}`),10);
-        }
-        function getTitlebarAreaInset(section){
-          var value = getRootStyleProperty(`--titlebar-area-inset-${section}`);
-          if (value.includes("calc")) value = Function(`"use strict"; return (${value.replace(/calc/g,"").replace(/100vw/g,`${window.innerWidth}px`).replace(/px/g,"")})`)();
-          return parseInt(value,10);
-        }
-        function getRootStyleProperty(template){
-          return window.getComputedStyle(document.documentElement).getPropertyValue(template);
-        }
-      return { parent_window, standalone, apple_home_screen, hidden_chrome, window_controls_overlay, refresh_window_controls_overlay, fullscreen, safe_area_insets, titlebar_area_insets, device_pixel_ratio, refresh_device_pixel_ratio };
-    },
-    environment: () => ({
-      file_protocol: (window.location.protocol == "file:"),
-      touch_device: ("ontouchstart" in window),
-      apple_device: (/(macOS|Mac|iPhone|iPad|iPod)/i.test(("userAgentData" in navigator) ? navigator.userAgentData.platform : navigator.platform)),
-      macOS_device: (/(macOS|Mac)/i.test(("userAgentData" in navigator) ? navigator.userAgentData.platform : navigator.platform) && navigator.standalone == undefined),
-      mozilla_browser: (CSS.supports("-moz-appearance: none"))
-    }),
-    support: () => ({
-      local_storage: (window.location.protocol != "blob:") ? window.localStorage : null,
-      file_system: ("showOpenFilePicker" in window),
-      file_handling: ("launchQueue" in window && "LaunchParams" in window),
-      window_controls_overlay: ("windowControlsOverlay" in navigator),
-      editing_commands: (!Editor.environment().mozilla_browser),
-      web_sharing: ("share" in navigator)
-    }),
-    query: (identifier = Editor.active_editor) => {
-      var tab = workspace_tabs.querySelector(`.tab[data-editor-identifier="${identifier}"]`),
-        container = workspace_editors.querySelector(`.editor[data-editor-identifier="${identifier}"]`),
-        textarea = (container) ? container.editor : null,
-        getName = section => {
-          if ((document.querySelectorAll(`[data-editor-identifier="${identifier}"]:not([data-editor-change])`).length == 0) && (identifier != Editor.active_editor)) return null;
-          var name = workspace_tabs.querySelector(`.tab[data-editor-identifier="${identifier}"] [data-editor-name]`).innerText;
-          if (!section || (!name.includes(".") && section == "base")) return name;
-          if (section == "base"){
-            name = name.split(".");
-            name.pop();
-            return name.join(".");
-          }
-          if (section == "extension"){
-            if (!name.includes(".")) return "";
-            return name.split(".").pop();
-          }
-        }
-      return { tab, container, textarea, getName };
-    },
-    view: () => document.body.getAttribute("data-view"),
-    view_change: () => (document.body.hasAttribute("data-view-change")),
-    orientation: () => document.body.getAttribute("data-orientation"),
-    orientation_change: () => (document.body.hasAttribute("data-orientation-change")),
-    scaling_change: () => (document.body.hasAttribute("data-scaling-change")),
-    unsaved_work: () => (!Editor.appearance().parent_window || (workspace_tabs.querySelectorAll(".tab:not([data-editor-change])[data-editor-unsaved]").length == 0)),
-    preapproved_extensions: ["txt","html","css","js","php","json","webmanifest","bbmodel","xml","yaml","yml","dist","config","ini","md","markdown","mcmeta","lang","properties","uidx","material","h","fragment","vertex","fxh","hlsl","ihlsl","svg"],
-    active_editor: null,
-    preview_editor: "active-editor",
-    file_handles: {},
-    child_windows: [],
-    settings: {
-      entries: JSON.parse(window.localStorage.getItem("settings")) || {},
-      set: (key,value) => {
-        if (!Editor.support().local_storage) return;
-        Editor.settings.entries[key] = value;
-        window.localStorage.setItem("settings",JSON.stringify(Editor.settings.entries,null,"  "));
-        return value;
-      },
-      remove: key => {
-        if (!Editor.support().local_storage) return;
-        delete Editor.settings.entries[key];
-        window.localStorage.setItem("settings",JSON.stringify(Editor.settings.entries,null,"  "));
-        return true;
-      },
-      get: key => {
-        if (!Editor.support().local_storage) return;
-        if (!(key in Editor.settings.entries)) return;
-        return Editor.settings.entries[key];
-      },
-      reset: () => {
-        if (!Editor.support().local_storage) return;
-        if (!confirm("Are you sure you would like to reset all settings?")) return;
-        Editor.settings.entries = {};
-        default_orientation_setting.select("horizontal");
-        setSyntaxHighlighting(false);
-        syntax_highlighting_setting.checked = false;
-        automatic_refresh_setting.checked = true;
-        window.localStorage.removeItem("settings");
-        reset_settings_card.open();
-        return true;
-      }
-    },
-    active_dialog: null,
-    dialog_previous: null,
-    active_widget: null,
-    picker_color: null,
-    install_prompt: null
+  const STE = {
   };
-  if (Editor.appearance().parent_window) document.documentElement.classList.add("startup-fade");
-  if (Editor.appearance().apple_home_screen) document.documentElement.classList.add("apple-home-screen");
-  if (Editor.environment().touch_device) document.documentElement.classList.add("touch-device");
-  if (Editor.environment().apple_device) document.documentElement.classList.add("apple-device");
-  if (Editor.environment().macOS_device) document.documentElement.classList.add("macOS-device");
-  if (Editor.support().web_sharing) document.documentElement.classList.add("web-sharing");
-  Editor.appearance().refresh_window_controls_overlay();
-  Editor.appearance().refresh_device_pixel_ratio();
 </script>
 
 <style>
@@ -206,838 +36,88 @@
     --safe-area-inset-bottom: env(safe-area-inset-bottom,0px);
 
     --titlebar-area-inset-top: env(titlebar-area-y,0px);
-    --titlebar-area-inset-width-left: env(titlebar-area-x,0px);
-    --titlebar-area-inset-width-right: calc(100vw - env(titlebar-area-width,100vw) - var(--titlebar-area-inset-width-left));
+    --titlebar-area-inset-left: env(titlebar-area-x,0px);
+    --titlebar-area-inset-right: calc(100vw - env(titlebar-area-width,100vw) - var(--titlebar-area-inset-left));
     --titlebar-area-inset-height: env(titlebar-area-height,0px);
   }
   :root:not(.window-controls-overlay) {
-    --titlebar-area-inset-width-left: 0px;
-    --titlebar-area-inset-width-right: 0px;
+    --titlebar-area-inset-left: 0px;
+    --titlebar-area-inset-right: 0px;
     --titlebar-area-inset-top: 0px;
     --titlebar-area-inset-height: 0px;
   }
-  :root {
-    --font-family-interface: -apple-system, BlinkMacSystemFont, "Rubik", sans-serif;
-    --font-family-code: ui-monospace, "Noto Sans Mono", "Cousine", monospace;
-    --line-height-code: 1.4;
-
-    --transition-fast: 80ms;
-
-    --selection-color: inherit;
-    --selection-background: #75b1ff38;
-    --selection-background-inactive: #a1a1a138;
-
-    --scrollbar-width: 16px;
-    --scrollbar-height: 16px;
-    --scrollbar-border-width: 4px;
-  }
-  :root:-moz-window-inactive {
-    --selection-background: var(--selection-background-inactive);
-  }
   html {
     width: 100%;
-    height: calc(100% + var(--safe-area-inset-top));
+    height: 100%;
+    background: #ffffff;
     overflow: hidden;
   }
   body {
     position: fixed;
     width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    color: #cccccc;
-    font-size: 14px;
-    font-family: var(--font-family-interface);
-    background: #121212;
-    overflow: hidden;
+    display: grid;
+    grid-template-rows: min-content auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Rubik", sans-serif;
+    background: inherit;
+    cursor: default;
+    overflow: auto;
     -webkit-user-select: none;
     user-select: none;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
-  body::after {
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: #1e1e1e;
-    z-index: 4;
-    transition: opacity 250ms;
-  }
-  :root:not(.startup-fade) body::after {
-    opacity: 0;
-    pointer-events: none;
-  }
-  body.split.horizontal[data-scaling-change] {
-    cursor: col-resize;
-  }
-  body.split.vertical[data-scaling-change] {
-    cursor: row-resize;
-  }
-  header {
-    padding-top: calc(var(--safe-area-inset-top) + var(--titlebar-area-inset-top));
-    position: relative;
-    --header-height: max(var(--titlebar-area-inset-height),34px);
-    display: flex;
-    align-items: center;
-    --header-gap: 8px;
-    gap: var(--header-gap);
-    font-size: 13px;
-    background: #1e1e1e;
-    border-bottom: 1px solid #000000;
-  }
-  header::before, header::after {
-    content: "";
-    height: var(--header-height);
-    flex-shrink: 0;
-    -webkit-app-region: no-drag;
-  }
-  header::before {
-    width: calc(var(--safe-area-inset-left) + var(--titlebar-area-inset-width-left));
-  }
-  header::after {
-    width: calc(var(--safe-area-inset-right) + var(--titlebar-area-inset-width-right));
-  }
-  body[data-scaling-change] header {
-    pointer-events: none;
-  }
-  header .app-region {
-    margin: var(--app-region-margin);
-    margin-bottom: 0;
-    --app-region-margin: 4px;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: calc(100% - var(--app-region-margin) * 2);
-    height: calc(100% - var(--app-region-margin));
-    z-index: -1;
-    -webkit-app-region: drag;
-  }
-  :root.window-controls-overlay header .app-region {
-    --app-region-margin: calc(var(--titlebar-area-inset-height) * 0.12);
-  }
-  header .app-icon {
-    flex-shrink: 0;
-    display: flex;
-  }
-  :root.window-controls-overlay.macOS-device header .app-icon {
-    display: none;
-  }
-  header .app-icon img {
-    width: 16px;height: 16px;
-    /*aspect-ratio: 1/1;*/
-  }
-  header .app-menubar {
-    min-width: 0;
-    align-self: stretch;
-    display: flex;
-    z-index: 3;
-    -webkit-app-region: no-drag;
-  }
-  header .app-menubar menu-drop {
-    min-width: 0;
-  }
-  header .app-menubar menu-drop::part(opener) {
-    min-width: unset;
-    padding: 0 8px;
-    background: none;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  header .app-menubar menu-drop::part(opener):hover, header .app-menubar menu-drop::part(opener):focus, header .app-menubar menu-drop[data-open]::part(opener) {
-    color: #ffffff;
-    background: #ffffff24;
-  }
-  header .app-menubar menu-drop:not([data-open])::part(opener):not(:hover):focus:not(:focus-visible) {
-    color: inherit;
-    background: none;
-  }
-  header .app-menubar menu-drop::part(opener):focus-visible {
-    color: #ffffff;
-    background: #ffffff24;
-  }
-/* -- Future Focus Visible --
-  header .app-menubar menu-drop::part(opener):where(:hover,:focus-visible), header .app-menubar menu-drop[data-open]::part(opener) {
-    color: #ffffff;
-    background: #ffffff24;
-  }
-*/
-
-  header .app-omnibox {
-    margin-left: auto;
-    height: var(--header-height);
-    align-self: flex-start;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    gap: var(--header-gap);
-    color: #ffffff;
-  }
-  :root.window-controls-overlay header .app-omnibox {
-    height: var(--titlebar-area-inset-height);
-    gap: calc(var(--header-gap) / var(--device-pixel-ratio));
-    z-index: 5;
-  }
-  :root:not(.macOS-device).window-controls-overlay header .app-omnibox {
-    margin-right: calc(var(--header-gap) * -1);
-  }
-  :root.macOS-device.window-controls-overlay header .app-omnibox {
-    margin-right: -4px;
-  }
-  header .app-omnibox button {
-    background: none;
-    border: none;
-    outline: none;
-  }
-  header .app-omnibox a {
-    cursor: default;
-  }
-  header .app-omnibox .option {
-    padding: 5px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    border-radius: 12px;
-    outline: none;
-    transition: background-color 250ms linear;
-    -webkit-app-region: no-drag;
-  }
-  :root.window-controls-overlay header .app-omnibox .option {
-    padding: calc(5px / var(--device-pixel-ratio));
-  }
-  header .app-omnibox .option:hover {
-    background-color: #ffffff14;
-  }
-
-  header .app-omnibox .option:where(:active,:focus-visible) {
-    background-color: #ffffff22;
-  }
-/* Temp Where */
-  header .app-omnibox .option:-webkit-any(:active,:focus-visible) {
-    background-color: #ffffff22;
-  }
-
-  header .app-omnibox .option svg {
-    width: 14px;
-    height: 14px;
-    flex-shrink: 0;
-    fill: currentColor;
-  }
-  :root.window-controls-overlay header .app-omnibox .option svg {
-    width: calc(14px / var(--device-pixel-ratio));height: calc(14px / var(--device-pixel-ratio));
-  }
-  main {
-    padding: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
-    position: relative;
-    flex-grow: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    --workspace-background: #222222;
-    --workspace-accent: #ffffff24;
-    --scaler-size: 16px;
-    --preview-border-color: #181818;
-    --main-transition-duration: 400ms;
-  }
-  main .workspace {
-    position: absolute;
-    left: 0;
-    top: 0;
-    display: flex;
-    flex-direction: column;
-  }
-
-/* Temp Where */
-  body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace {
-    transition: var(--main-transition-duration);
-    transition-property: width, height, opacity;
-  }
-  body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace {
-    transition: var(--main-transition-duration);
-    transition-property: width, height, opacity;
-  }
-
-  body.code main .workspace {
-    width: 100%;
-    height: 100%;
-  }
-  body.split.horizontal main .workspace {
-    width: calc(50% - calc(var(--scaler-size) * 0.5));
-    height: 100%;
-  }
-  body.split.vertical main .workspace {
-    width: 100%;
-    height: calc(50% - calc(var(--scaler-size) * 0.5) - calc(var(--safe-area-inset-bottom) * 0.5));
-  }
-  body.split.horizontal[data-scaling-active] main .workspace {
-    width: calc(var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
-  }
-  body.split.vertical[data-scaling-active] main .workspace {
-    height: calc(var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
-  }
-  body.preview main .workspace {
-    opacity: 0;
-  }
-  body.preview.horizontal main .workspace {
-    width: 0%;
-    height: 100%;
-  }
-  body.preview.vertical main .workspace {
-    width: 100%;
-    height: 0%;
-  }
-  body[data-scaling-change] main .workspace {
-    pointer-events: none;
-  }
-  main .workspace .workspace-tabs {
-    --workspace-tabs-padding: 6px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    box-shadow: 0 -1px 0 var(--workspace-accent) inset, 0 -1px 0 var(--workspace-background) inset;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    scrollbar-width: none;
-    transition: calc(var(--main-transition-duration) * 0.5);
-    transition-property: none;
-  }
-  main .workspace .workspace-tabs::before, main .workspace .workspace-tabs::after {
-    content: "";
-    height: 100%;
-    flex-shrink: 0;
-    pointer-events: none;
-  }
-
-/* Temp Where */
-  body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-tabs::before, body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-tabs::after {
-    transition: width var(--main-transition-duration);
-  }
-  body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-tabs::before, body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-tabs::after {
-    transition: width var(--main-transition-duration);
-  }
-
-  main .workspace .workspace-tabs::before {
-    width: calc(var(--safe-area-inset-left) + var(--workspace-tabs-padding));
-  }
-  main .workspace .workspace-tabs::after {
-    margin-left: auto;
-    width: calc(var(--safe-area-inset-right) + var(--workspace-tabs-padding) + var(--minimize-tab-width,0px));
-  }
-  main .workspace .workspace-tabs[data-minimize-change]::after {
-    transition: width calc(var(--main-transition-duration) * 0.55);
-  }
-  body.split.horizontal main .workspace .workspace-tabs::after {
-    width: var(--workspace-tabs-padding);
-  }
-  body.preview.horizontal main .workspace .workspace-tabs::after {
-    width: var(--workspace-tabs-padding);
-  }
-  main .workspace .workspace-tabs::-webkit-scrollbar {
-    display: none;
-  }
-  main .workspace .workspace-tabs .tab {
-    margin-right: -1px;
-    margin-top: 3px;
-    padding: calc(6px - var(--tab-border-width));
-    padding-left: calc(10px - var(--tab-border-width));
-    padding-bottom: calc(8px - var(--tab-border-width));
-    position: relative;
-    min-width: 80px;
-    flex-shrink: 0;
-    gap: 6px;
-    justify-content: space-between;
-    color: #aaaaaa;
-    font-size: 12px;
-    background: none;
-    outline: none;
-  }
-  main .workspace .workspace-tabs .tab:not([data-editor-change]):not(.active) + .tab:not([data-editor-change]):not(.active)::before, main .workspace .workspace-tabs > .tab:not([data-editor-change]):not(.active) + :nth-last-child(2):not([data-editor-change]):not(.active)::before, main .workspace .workspace-tabs > .tab + :nth-last-child(2):not([data-editor-change]):not(.active)::after {
-    content: "";
-    position: absolute;
-    right: 100%;
-    width: 1px;
-    height: 14px;
-    background: currentColor;
-    opacity: 0.5;
-    pointer-events: none;
-    z-index: 1;
-  }
-  main .workspace .workspace-tabs > .tab + :nth-last-child(2):not([data-editor-change]):not(.active)::after {
-    left: 100%;
-    right: unset;
-  }
-  main .workspace .workspace-tabs .tab:focus-visible {
-    border-bottom-color: #ffffff80;
-  }
-  main .workspace .workspace-tabs .tab.active {
-    color: #eaeaea;
-    background: var(--workspace-background);
-    border-left-color: var(--workspace-accent);
-    border-top-color: var(--workspace-accent);
-    border-right-color: var(--workspace-accent);
-  }
-  body[data-editor-change] main .workspace .workspace-tabs .tab[data-editor-change] {
-    margin-right: var(--tab-margin-right);
-    opacity: 0;
-    pointer-events: none;
-    transform: scale(0);
-    transform-origin: left center;
-    transition: inherit;
-    transition-property: margin-right, opacity, transform;
-  }
-  main .workspace .workspace-tabs .tab[data-editor-unsaved] {
-    font-style: italic;
-  }
-  main .workspace .workspace-tabs .tab [data-editor-rename] {
-    margin: calc(calc(var(--editor-rename-padding-y) + var(--editor-rename-border-width)) * -1) calc(calc(var(--editor-rename-padding-x) + var(--editor-rename-border-width)) * -1);
-    padding: var(--editor-rename-padding-y) var(--editor-rename-padding-x);
-    --editor-rename-padding-x: 4px;
-    --editor-rename-padding-y: 3px;
-    min-width: calc(var(--editor-name-width) + calc(var(--editor-rename-padding-x) + var(--editor-rename-border-width)) * 2);
-    width: calc(var(--editor-rename-width,0px) + calc(var(--editor-rename-border-width) * 2));
-    color: inherit;
-    font-size: inherit;
-    font-family: inherit;
-    background: none;
-    border: var(--editor-rename-border-width) solid #ffffff80;
-    --editor-rename-border-width: 1px;
-    border-radius: 4px;
-  }
-  main .workspace .workspace-tabs .tab [data-editor-name] {
-    pointer-events: none;
-  }
-  main .workspace .workspace-tabs .tab [data-editor-rename] ~ [data-editor-name] {
-    display: none;
-  }
-  main .workspace .workspace-tabs .tab[data-editor-unsaved] [data-editor-name]::after {
-    content: "*";
-    margin-left: 0.5ch;
-    font-size: 13px;
-    font-style: normal;
-    line-height: 12px;
-  }
-  main .workspace .workspace-tabs .create-editor-button {
-    margin-left: calc(var(--workspace-tabs-padding) + 1px);
-    margin-bottom: 1px;
-    padding: 6px;
-    display: flex;
-    align-items: center;
-    color: #aaaaaa;
-    background: none;
-    border: none;
-    border-radius: 6px;
-    outline: none;
-  }
-  main .workspace .workspace-tabs .create-editor-button:only-child {
-    display: none;
-  }
-
-  main .workspace .workspace-tabs .create-editor-button:hover, main .workspace .workspace-tabs .create-editor-button:active {
-    color: #ffffff;
-    background-color: #ffffff24;
-  }
-  main .workspace .workspace-tabs .create-editor-button:focus-visible {
-    color: #ffffff;
-    background-color: #ffffff24;
-  }
-/* -- Future Where --
-  main .workspace .workspace-tabs .create-editor-button:where(:hover,:active,:focus-visible) {
-    color: #ffffff;
-    background-color: #ffffff24;
-  }
-*/
-
-  main .workspace .workspace-tabs .create-editor-button svg {
-    width: 8px;height: 8px;
-    /*aspect-ratio: 1/1;*/
-    fill: currentColor;
-    transform: rotate(45deg);
-  }
-  main .workspace .workspace-editors {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 0 solid transparent;
-  }
-  :root:not(.startup-fade) main .workspace .workspace-editors:empty {
-    border-width: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
-  }
-
-/* Temp Where */
-  :root:not(.startup-fade) body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-editors:empty {
-    transition: var(--main-transition-duration);
-    transition-property: border-width, border-color;
-  }
-  :root:not(.startup-fade) body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-editors:empty {
-    transition: var(--main-transition-duration);
-    transition-property: border-width, border-color;
-  }
-
-  :root:not(.startup-fade) main .workspace .workspace-editors:empty::before {
-    content: "No Editors Open";
-    padding: 8px;
-    text-align: center;
-  }
-
-/* Temp Where */
-  :root:not(.startup-fade) body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-editors:empty::before {
-    transition: transform var(--main-transition-duration);
-  }
-  :root:not(.startup-fade) body[data-view-change] main .workspace .workspace-editors:empty::before {
-    white-space: nowrap;
-  }
-  :root:not(.startup-fade) body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-editors:empty::before {
-    transition: transform var(--main-transition-duration);
-  }
-
-  :root:not(.startup-fade) body.preview main .workspace .workspace-editors:empty::before {
-    transform: scale(0);
-  }
-  :root:not(.startup-fade) body.split.horizontal main .workspace .workspace-editors:empty {
-    border-right-width: 0;
-  }
-  :root:not(.startup-fade) body.preview.horizontal main .workspace .workspace-editors:empty {
-    border-right-width: 0;
-  }
-  @media (orientation: portrait) and (max-aspect-ratio: 5/8) {
-    :root:not(.startup-fade) body.split.horizontal main .workspace .workspace-editors:empty {
-      border-bottom-color: var(--preview-border-color);
-    }
-    :root:not(.startup-fade) body.preview.horizontal main .workspace .workspace-editors:empty {
-      border-bottom-color: var(--preview-border-color);
-    }
-  }
-  :root:not(.startup-fade) body.split.vertical main .workspace .workspace-editors:empty {
-    border-bottom-width: 0;
-  }
-  :root:not(.startup-fade) body.preview.vertical main .workspace .workspace-editors:empty {
-    border-bottom-width: 0;
-  }
-  main .workspace .editor {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    --background: var(--workspace-background);
-    border: solid transparent;
-    border-width: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
-    visibility: hidden;
-    --scrollbar-width: 18px;
-    --scrollbar-height: 18px;
-    --scrollbar-border-width: 5px;
-  }
-
-/* Temp Where */
-  body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .editor {
-    transition: var(--main-transition-duration);
-    transition-property: border-width, border-color;
-  }
-  body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .editor {
-    transition: var(--main-transition-duration);
-    transition-property: border-width, border-color;
-  }
-
-  body.split.horizontal main .workspace .editor {
-    border-right-width: 0;
-  }
-  body.preview.horizontal main .workspace .editor {
-    border-right-width: 0;
-  }
-  @media (orientation: portrait) and (max-aspect-ratio: 5/8) {
-    body.split.horizontal main .workspace .editor {
-      border-bottom-color: var(--preview-border-color);
-    }
-    body.preview.horizontal main .workspace .editor {
-      border-bottom-color: var(--preview-border-color);
-    }
-  }
-  body.split.vertical main .workspace .editor {
-    border-bottom-width: 0;
-  }
-  body.preview.vertical main .workspace .editor {
-    border-bottom-width: 0;
-  }
-  main .workspace .editor:not(.active) {
-    z-index: -1;
-  }
-  main .workspace .editor.active {
-    visibility: visible;
-  }
-  main .scaler {
-    position: absolute;
-    background: #424242;
-    border: 0 solid transparent;
-    box-shadow: 0 0 2px 1px #00000028;
-    touch-action: none;
-    z-index: 1;
-    transition: background-color var(--transition-fast);
-  }
-
-/* Temp Where */
-  body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .scaler {
-    transition: var(--main-transition-duration);
-    transition-property: left, top, width, height, border-width, border-color, opacity;
-  }
-  body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .scaler {
-    transition: var(--main-transition-duration);
-    transition-property: left, top, width, height, border-width, border-color, opacity;
-  }
-
-  main .scaler:hover, body[data-scaling-change] main .scaler {
-    background: #4f4f4f;
-  }
-  body.code main .scaler {
-    --scaler-size: 0px;
-    opacity: 0;
-  }
-  body.preview main .scaler {
-    --scaler-size: 0px;
-    opacity: 0;
-  }
-  body.horizontal main .scaler {
-    top: 0;
-    width: var(--scaler-size);
-    height: 100%;
-    cursor: col-resize;
-  }
-  @media (orientation: portrait) and (max-aspect-ratio: 5/8) {
-    body.horizontal main .scaler {
-      border-bottom-width: var(--safe-area-inset-bottom);
-      border-bottom-color: var(--preview-border-color);
-    }
-  }
-  body.vertical main .scaler {
-    left: 0;
-    width: 100%;
-    height: var(--scaler-size);
-    cursor: row-resize;
-  }
-  body.code.horizontal main .scaler {
-    left: 100%;
-  }
-  body.code.vertical main .scaler {
-    top: 100%;
-  }
-  body.split.horizontal main .scaler {
-    left: calc(50% - calc(var(--scaler-size) * 0.5));
-  }
-  body.split.vertical main .scaler {
-    top: calc(50% - calc(var(--scaler-size) * 0.5) - calc(var(--safe-area-inset-bottom) * 0.5));
-  }
-  body.split.horizontal[data-scaling-active] main .scaler {
-    left: calc(var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
-  }
-  body.split.vertical[data-scaling-active] main .scaler {
-    top: calc(var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
-  }
-  body.preview.horizontal main .scaler {
-    left: calc(var(--scaler-size) * -1);
-  }
-  body.preview.vertical main .scaler {
-    top: calc(var(--scaler-size) * -1);
-  }
-  main .preview {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 50%;
-    background: #ffffff;
-    border: solid var(--preview-border-color);
-    border-width: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
-    z-index: 1;
-  }
-
-/* Temp Where */
-  body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .preview {
-    transition: var(--main-transition-duration);
-    transition-property: width, height, border-width, visibility, opacity;
-  }
-  body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .preview {
-    transition: var(--main-transition-duration);
-    transition-property: width, height, border-width, visibility, opacity;
-  }
-
-  body.code main .preview {
-    visibility: hidden;
-    opacity: 0;
-  }
-  body.code.horizontal main .preview {
-    width: 0%;
-    height: 100%;
-    border-left-width: 0;
-  }
-  body.code.vertical main .preview {
-    width: 100%;
-    height: 0%;
-  }
-  body.split.horizontal main .preview {
-    width: calc(50% - calc(var(--scaler-size) * 0.5));
-    height: 100%;
-    border-left-width: 0;
-  }
-  body.split.vertical main .preview {
-    width: 100%;
-    height: calc(50% - calc(var(--scaler-size) * 0.5) + var(--safe-area-inset-bottom) * 0.5);
-  }
-  body.split.horizontal[data-scaling-active] main .preview {
-    width: calc(100% - var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
-  }
-  body.split.vertical[data-scaling-active] main .preview {
-    height: calc(100% - var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
-  }
-  body.preview main .preview {
-    width: 100%;
-    height: 100%;
-  }
-  body[data-scaling-change] main .preview {
-    pointer-events: none;
-  }
   button {
     color: inherit;
-    font-size: inherit;
-    font-family: inherit;
+    font: inherit;
+    display: flex;
+    align-items: center;
+    background: none;
+    border: 0 solid transparent;
     border-radius: 0;
+    outline: none;
   }
   a {
+    display: flex;
+    align-items: center;
     color: inherit;
     text-decoration: none;
   }
-  num-text {
-    --padding: 8px;
-    caret-color: var(--color);
-    font-family: var(--font-family-code);
-    line-height: var(--line-height-code);
-    --selection-background: inherit;
-    --selection-background-inactive: inherit;
-    background: var(--background);
-    --background: #2d2d2d;
-    scrollbar-color: #808080 var(--background);
+  img {
+    -webkit-touch-callout: none;
   }
-  num-text::part(container) {
-    border-radius: inherit;
-  }
-  input[type="text"] {
-    padding: 8px;
-    color: #eaeaea;
-    caret-color: #eaeaea;
-    font-size: 13px;
-    font-family: var(--font-family-code);
-    line-height: var(--line-height-code);
-    background: #2d2d2d;
-    border: none;
-    border-radius: 0;
-    outline: none;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-  ::selection {
-    color: var(--selection-color);
-    background: var(--selection-background);
-  }
-  ::selection:window-inactive {
-    background: var(--selection-background-inactive);
-  }
-</style>
-
-<style id="scrollbar_styles">
-  ::-webkit-scrollbar {
-    width: var(--scrollbar-width);
-    height: var(--scrollbar-height);
-  }
-  ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner {
-    background: none;
-  }
-  ::-webkit-scrollbar-thumb {
-    width: 36px;
-    height: 36px;
-    background: #808080;
-    background-clip: content-box;
-    border: var(--scrollbar-border-width) solid transparent;
-    border-radius: 10px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: #a0a0a0;
-  }
-</style>
-
-<style>
-  .tab {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: none;
-    border: var(--tab-border-width) solid transparent;
-    --tab-border-width: 1px;
-    border-radius: calc(6px + var(--tab-border-width));
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-  .tab .option {
-    margin: calc(var(--option-border-width) * -1);
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    background: none;
-    background-clip: padding-box;
-    border: var(--option-border-width) solid transparent;
-    --option-border-width: 4px;
-    border-radius: calc(4px + var(--option-border-width));
-    outline: none;
-  }
-
-  .tab .option:hover, .tab .option:active {
-    color: #ffffff;
-    background-color: #ffffff24;
-  }
-  .tab .option:focus-visible {
-    color: #ffffff;
-    background-color: #ffffff24;
-  }
-/* -- Future Where --
-  .tab .option:where(:hover,:active,:focus-visible) {
-    color: #ffffff;
-    background-color: #ffffff24;
-  }
-*/
-
-  .tab .option svg {
-    width: 8px;height: 8px;
-    /*aspect-ratio: 1/1;*/
-    fill: currentColor;
+  iframe {outline: 2px solid;outline-offset: -2px;
+    background: #ffffff;
+    border: 0 solid transparent;
   }
   menu-drop {
     color: inherit;
     font: inherit;
-    font-size: inherit;
     line-height: 16px;
   }
   menu-drop {
-    --list-padding-x: 0px;
+    --list-padding-x: 6px;
     --list-padding-y: 6px;
     --list-border-width: 1px;
-    --option-padding-x: 11px;
-    --option-padding-y: 3px;
+    --option-padding-x: 8px;
+    --option-padding-y: 4px;
     --option-icon-gap: 10px;
+    --option-selected-icon-gap: 8px;
     --option-selected-icon-width: 5px;
   }
   menu-drop::part(opener) {
-    border: none;
+    background: none;
+    border: 0 solid transparent;
     outline: none;
   }
   menu-drop::part(body) {
     font-size: 13px;
   }
   menu-drop::part(list) {
-    --list-position-x: calc(100% + max(0px,var(--list-border-width)));
-    background: #2e2e2e;
+    --list-position-x: 100%;
     border: var(--list-border-width) solid transparent;
     border-radius: calc(var(--list-padding-y) + var(--list-border-width));
-    box-shadow: 0 5px 10px #00000060;
+    box-shadow: 0 5px 10px #00000040;
     visibility: hidden;
     opacity: 0.25;
     transform: scale(0.5);
@@ -1067,13 +147,11 @@
     --option-color-interact: #ffffff;
     text-decoration: none;
     --option-background-color-interact: #0763d5bf;
-    --sub-list-option-color-interact: #ffffff;
-    --sub-list-option-background-color-interact: #ffffff1c;
+    --sub-list-option-color-interact: revert;
+    --sub-list-option-background-color-interact: #0000001c;
     border: 1px solid transparent;
-  }/* -- For some reason the :focus-visible styles are showing up by default when the page starts up, so I disabled the focus outline for now. --
-  menu-drop::part(option):focus-visible {
-    border-color: #c0c0c0;
-  }*/
+    border-radius: calc(var(--list-padding-y) - 2px);
+  }
   menu-drop[data-select]::part(option)::before {
     content: "";
     height: var(--option-selected-icon-width);
@@ -1081,18 +159,12 @@
     -webkit-mask: var(--option-selected-icon-mask);
     mask: var(--option-selected-icon-mask);
     --option-selected-icon-mask: url("data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%20512%20512%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%3Cpath%20d%3D%22m63.346%20191.15%20192.72%20192.72-63.402%2063.402-192.72-192.72z%22%2F%3E%0A%20%20%3Cpath%20d%3D%22m129.5%20383.87%20319.15-319.15%2063.402%2063.402-319.15%20319.15z%22%2F%3E%0A%3C%2Fsvg%3E");
-    transform: translateX(-50%) scale(2);
+    transform: translateX(-25%) scale(2);
     transform-origin: center;
   }
   menu-drop::part(icon) {
-    width: 16px;height: 16px;
-    /*aspect-ratio: 1/1;*/
-  }
-  menu-drop::part(icon invert) {
-    filter: invert() hue-rotate(180deg);
-  }
-  menu-drop::part(icon rounded) {
-    border-radius: 3px;
+    width: 16px;
+    aspect-ratio: 1 / 1;
   }
   menu-drop::part(shortcut) {
     font-size: 12px;
@@ -1101,633 +173,208 @@
   menu-drop::part(divider) {
     opacity: 0.6;
   }
-  .select {
-    margin: calc(var(--select-padding) * -1);
-    padding: var(--select-padding);
-    --select-padding: 4px;
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-  }
-  .select label {
-    display: flex;
-    align-items: center;
-    transition: color var(--transition-fast);
-  }
-
-/* Temp Where */
-  .select:-webkit-any(:hover,:active,:focus-within) label, .select:-webkit-any(:hover,:active,:focus-within) menu-drop::part(opener) {
-    color: #ffffff;
-  }
-  .select:where(:hover,:active,:focus-within) label, .select:where(:hover,:active,:focus-within) menu-drop::part(opener) {
-    color: #ffffff;
-  }
-  
-  .select menu-drop::part(opener) {
-    padding: 2px 8px;
-    min-width: 74px;
-    background: #444444;
-    border: 1px solid transparent;
-    border-radius: 5px;
-    box-shadow: 0 1px 2px #00000028;
-    transition: var(--transition-fast);
-    transition-property: color, background-color, border-color, border-radius;
-  }
-  .select:hover menu-drop::part(opener) {
-    background: #4f4f4f;
-  }
-
-/* Temp Where */
-  .select menu-drop::part(opener):-webkit-any(:hover,:active,:focus-visible), .select:focus-within menu-drop::part(opener), .select menu-drop[data-open]::part(opener) {
-    color: #ffffff;
-    background: #4f4f4f;
-  }
-  .select menu-drop::part(opener):where(:hover,:active,:focus-visible), .select:focus-within menu-drop::part(opener), .select menu-drop[data-open]::part(opener) {
-    color: #ffffff;
-    background: #4f4f4f;
-  }
-
-  .select menu-drop::part(opener):focus-visible {
-    border-color: #c0c0c0;
-  }
-  .select menu-drop[data-open]::part(opener) {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-  .checkbox {
-    margin: calc(var(--checkbox-padding) * -1);
-    padding: calc(var(--checkbox-padding) - var(--checkbox-border-width));
-    --checkbox-padding: 4px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: var(--checkbox-border-width) solid transparent;
-    --checkbox-border-width: 1px;
-    --checkbox-check-border-width: 2px;
-    border-radius: calc(var(--checkbox-padding) + var(--checkbox-border-width) + var(--checkbox-check-border-width));
-    outline: none;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    transition: var(--transition-fast);
-    transition-property: color, border-color, opacity;
-  }
-
-/* Temp Where */
-  .checkbox:-webkit-any(:hover,:active,:focus-visible) {
-    color: #ffffff;
-  }
-  .checkbox:where(:hover,:active,:focus-visible) {
-    color: #ffffff;
-  }
-
-  .checkbox:active {
-    opacity: 0.85;
-  }
-  .checkbox:focus-visible {
-    border-color: #c0c0c0;
-  }
-  .checkbox input[type="checkbox"] {
-    display: none;
-  }
-  .checkbox label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    --check-padding: 2px;
-    --check-size: 12px;
-    pointer-events: none;
-  }
-  .checkbox label::before {
-    content: "";
-    padding: var(--check-padding);
-    width: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));height: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));
-    /*aspect-ratio: 1/1;*/
-    background: #ffffff0c;
-    border: var(--checkbox-check-border-width) solid currentColor;
-    border-radius: calc(var(--check-padding) + calc(var(--checkbox-check-border-width) * 2));
-    transition: background-color var(--transition-fast);
-  }
-
-/* Temp Where */
-  .checkbox:-webkit-any(:hover,:active,:focus-visible) label::before {
-    background: #ffffff1c;
-  }
-  .checkbox:where(:hover,:active,:focus-visible) label::before {
-    background: #ffffff1c;
-  }
-
-  .checkbox label .check {
-    padding: calc(var(--check-padding) + var(--checkbox-check-border-width));
-    position: absolute;
-    width: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));height: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));
-    /*aspect-ratio: 1/1;*/
-    fill: currentColor;
-    transform: rotate(-45deg) scale(0);
-    transform-origin: 45% 65%;
-    transition: transform 125ms ease-in;
-  }
-  .checkbox input[type="checkbox"]:checked + label .check {
-    transform: rotate(0deg) scale(1);
-    transition-timing-function: ease-out;
-  }
-  .card {
-    --card-header-padding-right: max(var(--safe-area-inset-right),8px);
-    display: flex;
-    flex-direction: column;
-    background: #212121;
-    border: var(--card-border-width) solid #ffffff24;
-    --card-border-width: 1px;
-    border-radius: var(--card-border-radius);
-    box-shadow: 0 8px 15px #00000050;
-    overflow: hidden;
-    z-index: var(--card-z-index);
-    --card-z-index: 1;
-    transition: var(--card-transition-duration);
-    --card-transition-duration: calc(var(--main-transition-duration) * 0.55);
-    transition-property: visibility, opacity, transform;
-  }
-  .card:not(.active) {
-    visibility: hidden;
-    opacity: 0;
-    pointer-events: none;
-  }
-  .card.active {
-    visibility: visible;
-    opacity: 1;
-    z-index: calc(var(--card-z-index) + 1);
-  }
-  .card:not(.dialog) {
-    margin: var(--margin) max(var(--safe-area-inset-right),var(--margin)) max(var(--safe-area-inset-bottom),var(--margin)) max(var(--safe-area-inset-left),var(--margin));
-  }
-  .card.alert {
-    --margin: 16px;
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    --card-border-radius: 10px;
-    pointer-events: none;
-    --card-z-index: 5;
-  }
-  .card.alert:not(.active) {
-    transform: translateX(calc(100% + var(--margin) * 2));
-  }
-  .card.widget {
-    --margin: 8px;
-    position: absolute;
-    right: 0;
-    top: 0;
-    --card-border-radius: 12px;
-    transform-origin: center top;
-  }
-  .card.widget:not(.active) {
-    transform: scaleY(0.25);
-  }
-  .card.widget[data-minimize-change] {
-    transition-property: margin-right, margin-top, border-top-right-radius, border-bottom-right-radius, box-shadow, visibility, opacity, transform;
-  }
-  .card.widget.minimize {
-    margin-right: calc(var(--card-border-width) * -1);
-    margin-top: 3px;
-    --card-border-radius: 10px;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    box-shadow: 0 4px 7px #00000050;
-  }
-  .card.dialog {
-    position: absolute;
-    --card-border-radius: 14px;
-    --card-z-index: 3;
-  }
-  .card.dialog:not(.active) {
-    transform: scale(0.5);
-  }
-  .card .header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #ffffff12;
-    border-bottom: var(--card-header-border-width) solid #000000;
-    --card-header-border-width: 1px;
-  }
-  .card.widget[data-minimize-change] .header {
-    background-clip: content-box;
-    transition: var(--card-transition-duration);
-    transition-property: margin-bottom, border-color;
-  }
-  .card.widget.minimize .header {
-    margin-bottom: calc(var(--card-header-border-width) * -1);
-    border-color: transparent;
-  }
-  .card .header .card-back {
-    margin-right: auto;
-    padding: 10px;
-    display: flex;
-    background: none;
-    border: none;
-    outline: none;
-  }
-  :root.macOS-device .card .header .card-back {
-    padding: 4px;
-    border-radius: 4px;
-  }
-  .card .header:not([data-card-parent]) .card-back {
-    display: none;
-  }
-
-  .card .header .card-back:hover, .card .header .card-back:active {
-    color: #ffffff;
-    background: #ffffff24;
-  }
-  .card .header .card-back:focus-visible {
-    color: #ffffff;
-    background: #ffffff24;
-  }
-/* -- Future Where --
-  .card .header .card-back:where(:hover,:active,:focus-visible) {
-    color: #ffffff;
-    background: #ffffff24;
-  }
-*/
-
-  .card .header .card-back svg {
-    width: 12px;height: 12px;
-    /*aspect-ratio: 1/1;*/
-    fill: currentColor;
-  }
-  .card .header .icon {
-    margin: 8px;
-    margin-left: 12px;
-    margin-right: 0;
-    width: 20px;height: 20px;
-    /*aspect-ratio: 1/1;*/
-  }
-  .card .header .heading {
-    white-space: pre;
-    z-index: -1;
-  }
-  .card:not(.alert) .header .heading {
-    position: absolute;
-  }
-  .card.alert .header .heading {
-    margin: 0 auto;
-  }
-  .card.widget[data-minimize-change] .header .heading {
-    transform-origin: calc(50% - calc(var(--card-minimize-width) + var(--card-header-padding-right)) * 0.5) center;
-    transition: var(--card-transition-duration);
-    transition-property: visibility, opacity, transform;
-  }
-  .card.widget.minimize .header .heading {
-    visibility: hidden;
-    opacity: 0;
-    transform: scale(0);
-  }
-  .card.dialog .header .heading {
-    font-size: 18px;
-  }
-  .card .header .card-controls {
-    margin-left: auto;
-    display: flex;
-  }
-  .card.alert .header .card-controls {
-    display: none;
-  }
-  :root.macOS-device .card .header .card-controls {
-    margin: 7px;
-    padding: 4px;
-    gap: 8px;
-    transition: margin var(--card-transition-duration);
-  }
-  :root.macOS-device .card .header:not([data-card-parent]) .card-controls {
-    margin-right: auto;
-  }
-  :root.macOS-device .card.minimize .header .card-controls {
-    margin: 1px;
-    margin-right: auto;
-  }
-  .card .header .card-controls .control {
-    padding: var(--control-padding,0px);
-    display: flex;
-    background: var(--control-background);
-    border: none;
-    outline: none;
-  }
-  :root:not(.macOS-device) .card .header .card-controls .control {
-    --control-padding: 10px;
-    --control-background: none;
-  }
-
-  :root:not(.macOS-device) .card .header .card-controls .control:hover, :root:not(.macOS-device) .card .header .card-controls .control:active {
-    color: #ffffff;
-    --control-background: #ffffff24;
-  }
-  :root:not(.macOS-device) .card .header .card-controls .control:focus-visible {
-    color: #ffffff;
-    --control-background: #ffffff24;
-  }
-/* -- Future Where
-  :root:not(.macOS-device) .card .header .card-controls .control:where(:hover,:active,:focus-visible) {
-    color: #ffffff;
-    --control-background: #ffffff24;
-  }
-*/
-
-  :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:hover, :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:active {
-    --control-background: #cc2a24;
-  }
-  :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:focus-visible {
-    --control-background: #cc2a24;
-  }
-/* -- Future Where
-  :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:where(:hover,:active,:focus-visible) {
-    --control-background: #cc2a24;
-  }
-*/
-
-  :root.macOS-device .card .header .card-controls .control {
-    --control-padding: 3px;
-    border-radius: 50%;
-  }
-  :root.macOS-device .card .header .card-controls .control[data-control="minimize"] {
-    --control-background: #fcbb40;
-  }
-  :root.macOS-device .card .header .card-controls .control[data-control="minimize"]:hover:active {
-    --control-background: #fee867;
-  }
-  :root.macOS-device .card .header .card-controls .control[data-control="close"] {
-    --control-background: #fc605c;
-  }
-  :root.macOS-device .card .header .card-controls .control[data-control="close"]:hover:active {
-    --control-background: #fd8e87;
-  }
-  .card:not(.widget) .header .card-controls .control[data-control="minimize"] {
-    display: none;
-  }
-  :root:not(.macOS-device) .card.widget.minimize .header .card-controls .control {
-    --control-padding: 6px;
-  }
-  :root:not(.macOS-device) .card.widget.minimize .header .card-controls .control[data-control="minimize"] {
-    border-radius: calc(var(--card-border-radius) - var(--card-border-width));
-  }
-  .card.widget.minimize .header .card-controls .control[data-control="close"] {
-    visibility: hidden;
-    opacity: 0;
-  }
-  :root:not(.macOS-device) .card.widget.minimize .header .card-controls .control[data-control="close"] {
-    margin-left: var(--card-header-padding-right);
-    margin-right: calc(var(--card-minimize-width) * -1);
-  }
-  :root.macOS-device .card.widget.minimize .header .card-controls .control[data-control="close"] {
-    margin-left: calc(var(--card-minimize-width) * -1 - 8px);
-  }
-  .card.widget[data-minimize-change] .header .card-controls .control {
-    transition: var(--card-transition-duration);
-    transition-property: padding;
-  }
-  .card.widget[data-minimize-change] .header .card-controls .control[data-control="minimize"] {
-    transition-property: padding, border-radius;
-  }
-  .card.widget[data-minimize-change] .header .card-controls .control[data-control="close"] {
-    transition-property: margin-left, margin-right, padding, visibility, opacity;
-  }
-  .card .header .card-controls .control svg {
-    fill: currentColor;
-  }
-  :root:not(.macOS-device) .card .header .card-controls .control svg {
-    width: 12px;height: 12px;
-    /*aspect-ratio: 1/1;*/
-  }
-  :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:hover svg {
-    color: #ffffff;
-  }
-  :root.macOS-device .card .header .card-controls .control svg {
-    width: 6px;height: 6px;
-    /*aspect-ratio: 1/1;*/
-    color: transparent;
-    mix-blend-mode: luminosity;
-  }
-
-/* Temp Where */
-  :root.macOS-device .card .header .card-controls:-webkit-any(:hover,:active) .control svg, :root.macOS-device .card .header .card-controls:focus-within .control:focus-visible svg {
-    color: #202020bf;
-  }
-  :root.macOS-device .card .header .card-controls:where(:hover,:active) .control svg, :root.macOS-device .card .header .card-controls:focus-within .control:focus-visible svg {
-    color: #202020bf;
-  }
-
-  .card.widget.minimize .header .card-controls .control[data-control="minimize"] svg {
-    transform: rotateY(180deg);
-  }
-  .card.widget[data-minimize-change] .header .card-controls .control[data-control="close"] svg {
-    transition: transform var(--card-transition-duration);
-  }
-  .card.widget.minimize .header .card-controls .control[data-control="close"] svg {
-    transform: scale(0);
-  }
-  .card .main {
-    display: flex;
-    flex-direction: column;
-  }
-  .card:not(.widget) .main {
-    padding: 16px;
-    gap: 16px;
-  }
-  .card.widget .main {
-    padding: 14px;
-    gap: 14px;
-    transform-origin: calc(100% - calc(var(--card-minimize-width) + var(--card-header-padding-right)) * 0.5) top;
-  }
-  .card.widget[data-minimize-change] .main {
-    transition: var(--card-transition-duration);
-    transition-property: margin-left, margin-bottom, visibility, opacity, transform;
-  }
-  .card.widget.minimize .main {
-    margin-left: calc(calc(var(--card-main-width) - var(--card-header-padding-right)) * -1 + var(--card-minimize-width));
-    margin-bottom: calc(var(--card-main-height) * -1);
-    visibility: hidden;
-    opacity: 0;
-    transform: scale(0);
-  }
-  .card .main .content {
-    display: flex;
-    justify-content: space-around;
-  }
-  .card .main .content .item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .card:not(.widget) .main .content .item {
-    gap: 16px;
-  }
-  .card.widget .main .content .item {
-    gap: 14px;
-  }
-  .card .main .content .item.start {
-    align-items: flex-start;
-  }
-  .card .options {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .card:not(.widget) .options {
-    gap: 16px;
-  }
-  .card.widget .options {
-    gap: 14px;
-  }
-  .card .main button {
-    padding: 2px 8px;
-    min-width: 74px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    background: #444444;
-    border: 1px solid transparent;
-    border-radius: 5px;
-    box-shadow: 0 1px 2px #00000028;
-    outline: none;
-    transition: var(--transition-fast);
-    transition-property: color, background-color, border-color, border-radius;
-  }
-
-/* Temp Where */
-  .card .main button:-webkit-any(:hover,:active,:focus-visible) {
-    color: #ffffff;
-    background: #4f4f4f;
-  }
-  .card .main button:where(:hover,:active,:focus-visible) {
-    color: #ffffff;
-    background: #4f4f4f;
-  }
-
-  .card .main button:focus-visible {
-    border-color: #c0c0c0;
-  }
-
-/* Temp Where */
-  .card .main button.warning:-webkit-any(:hover,:active,:focus-visible) {
-    background: #b12f25;
-  }
-  .card .main button.warning:where(:hover,:active,:focus-visible) {
-    background: #b12f25;
-  }
-
-  .card .options button > img {
-    width: 16px;height: 16px;
-    /*aspect-ratio: 1/1;*/
-  }
-  .card .options button > svg {
-    width: 12px;height: 12px;
-    /*aspect-ratio: 1/1;*/
-    fill: currentColor;
-  }
-  .card num-text {
-    width: 32ch;
-    height: 12ch;
-    --background: #2d2d2d;
-    border-radius: 6px;
-  }
-  .card num-text.expand {
-    height: 20ch;
-  }
-  .card num-text::part(container)::before {
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 100%;
+  num-text {
+    --padding: 8px;
+    height: unset;
+    caret-color: var(--color);
+    font-family: ui-monospace, "Noto Sans Mono", "Cousine", monospace;
+    line-height: 1.4;
+    background: var(--background);
+    --background: #ffffff;
+    scrollbar-color: #808080 var(--background);
+  }
+  num-text::part(container) {
     border-radius: inherit;
-    box-shadow: 0 2px 3px #00000090 inset;
-    pointer-events: none;
-    z-index: 2;
   }
-  .card input[type="text"] {
-    border-radius: 6px;
-    box-shadow: 0 2px 3px #00000090 inset;
+  header {
+    box-sizing: content-box;
+    height: max(var(--titlebar-area-inset-height),34px);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 13px;
+    background: #dddddd;
+    border: 0 solid transparent;
+    border-top-width: calc(var(--safe-area-inset-top) + var(--titlebar-area-inset-top));
+    border-bottom: 1px solid #00000060;
   }
-  .card-backdrop {
-    position: fixed;
-    left: 0;
-    top: 0;
+  header::before, header::after {
+    content: "";
+    height: 100%;
+    flex-shrink: 0;
+  }
+  header::before {
+    width: calc(var(--safe-area-inset-left) + var(--titlebar-area-inset-left));
+  }
+  header::after {
+    width: calc(var(--safe-area-inset-right) + var(--titlebar-area-inset-right));
+  }
+  app-icon {/* Cymande */
+    flex-shrink: 0;
+    display: flex;
+  }
+  app-icon img {
+    width: 16px;
+    aspect-ratio: 1 / 1;
+  }
+  app-menubar {
+    min-width: 0;
+    align-self: stretch;
+    display: flex;
+    z-index: 3;
+  }
+  app-menubar menu-drop {
+    min-width: 0;
+  }
+  app-menubar menu-drop::part(opener) {
+    min-width: unset;
+    padding: 0 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  app-menubar menu-drop::part(opener):where(:hover,:focus-visible), app-menubar menu-drop[data-open]::part(opener) {
+    background: #00000014;
+  }
+  app-menubar menu-drop::part(list main) {
+    --list-position-y: 1px;
+  }
+  app-omnibox {
+    margin-left: auto;
+    height: 100%;
+    align-self: flex-start;
+    flex-shrink: 0;
+    display: flex;
+    gap: inherit;
+    align-items: center;
+  }
+  app-omnibox .option {
+    padding: 5px;
+    box-sizing: content-box;
+    width: 14px;
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    transition: background-color 250ms linear;
+  }
+  app-omnibox .option:hover {
+    background-color: #00000014;
+  }
+  app-omnibox .option:is(:active,:focus-visible) {
+    background-color: #00000022;
+  }
+  app-omnibox .option svg {
     width: 100%;
     height: 100%;
-    background: #1e1e1e60;
-    z-index: 3;
-    transition: calc(var(--main-transition-duration) * 0.5);
-    transition-property: visibility, opacity;
+    flex-shrink: 0;
+    fill: currentColor;
   }
-  .card-backdrop:not(.active) {
-    visibility: hidden;
-    opacity: 0;
+  main {background: #00f4;
+    display: grid;
+    grid-template-rows: min-content 1fr 16px 1fr;
+  }
+  workspace-tabs {
+    padding: 0 6px;
+    padding-bottom: 1px;
+    display: flex;
+    box-shadow: 0 -1px 0 #00000060 inset, 0 -1px 0 #ffffff inset;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+  }
+  workspace-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  workspace-tab {
+    margin-right: -1px;
+    margin-top: 3px;
+    margin-bottom: -1px;
+    padding-left: 11px;
+    padding-right: 11px;
+    padding-top: 5px;
+    padding-bottom: 7px;
+    position: relative;
+    min-width: 80px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 13px;
+    border: 0 solid transparent;
+    border-width: 1px;
+    border-radius: 7px 7px 0 0;
+    isolation: isolate;
+  }
+  workspace-tab:not([open]) + workspace-tab:not([open])::before,
+  workspace-tab:not([open]) + :nth-last-child(2):not([open])::before,
+  workspace-tab + :nth-last-child(2):not([open])::after {
+    content: "";
+    position: absolute;
+    right: 100%;
+    width: 1px;
+    height: 14px;
+    background: currentColor;
+    opacity: 0.5;
     pointer-events: none;
+    z-index: 1;
   }
-  .card-backdrop.active {
-    visibility: visible;
-    opacity: 1;
+  workspace-tab + :nth-last-child(2):not([open])::after {
+    left: 100%;
+    right: unset;
+  }
+  workspace-tab[open] {
+    background: #ffffff;
+    border-color: #00000060;
+    border-bottom-color: transparent;
+  }
+  workspace-tab .opener {
+    position: absolute;
+    inset: -1px;
+    width: calc(100% + 2px);
+    border-radius: inherit;
+  }
+  workspace-tab .closer {
+    margin: 0 -6px;
+    padding: 4px;
+    box-sizing: content-box;
+    width: 1em;
+    height: 1em;
+    justify-content: center;
+    font-size: 10px;
+    line-height: 1em;
+    border-radius: 4px;
+    z-index: 1;
+  }
+  workspace-tab .closer:hover {
+    background-color: #00000024;
+  }
+  workspace-editors {
+    display: grid;
+  }
+  workspace-scaler {
+    display: flex;
+  }
+  workspace-scaler button {
+    width: 100%;
+    height: 100%;
+    background: #808080;
+    cursor: row-resize;
+  }
+  workspace-previews {
+    display: grid;
+  }
+  workspace-previews iframe {
+    width: 100%;
+    height: 100%;
   }
   #symbol_definitions {
     display: none;
   }
-  :root.apple-home-screen #file_menu::part(create-window-option) {
-    display: none;
-  }
-  #install_button, #theme_button {
-    padding: 3px 8px;
-  }
-  :root:not(.install-prompt-available) #settings_menu::part(install-option), :root:not(.install-prompt-available) #install_option, :root:not(.install-prompt-available) #install_button {
-    display: none;
-  }
-  :root:not(.service-worker-activated) #settings_menu::part(clear-site-caches-option), :root:not(.service-worker-activated) #clear_site_caches_button {
-    display: none;
-  }
-  #generator_output {
-    width: 220px;
-    cursor: grab;
-  }
 </style>
-
-<style id="theme_styles"></style>
 
 </head>
 
-<body class="code horizontal" data-view="code" data-orientation="horizontal" ontouchstart>
+<body ontouchstart>
 
 <svg id="symbol_definitions">
-  <symbol id="arrow_icon" viewBox="0 0 512 512">
-    <path d="m112.66 0 286.68 256-286.68 256z"/>
-  </symbol>
-  <symbol id="check_icon" viewBox="0 0 512 512">
-    <path d="m63.346 191.15 192.72 192.72-63.402 63.402-192.72-192.72z"/>
-    <path d="m129.5 383.87 319.15-319.15 63.402 63.402-319.15 319.15z"/>
-  </symbol>
-  <symbol id="back_icon" viewBox="0 0 512 512">
-    <path d="m160.8 191.81 254.36 254.36-64 64-254.36-254.36z"/>
-    <path d="m96.833 255.86 254.36-254.36 64 64-254.36 254.36z"/>
-  </symbol>
-  <symbol id="minimize_icon" viewBox="0 0 512 512">
-    <path d="m30.33 211.17h451.34v89.669h-451.34z"/>
-  </symbol>
-  <symbol id="close_icon" viewBox="0 0 512 512">
-    <path d="m1.5795 65.78 64.201-64.201 190.22 190.22 190.22-190.22 64.201 64.201-190.22 190.22 190.22 190.22-64.201 64.201-190.22-190.22-190.22 190.22-64.201-64.201 190.22-190.22z"/>
-  </symbol>
-  <symbol id="rename_icon" viewBox="0 0 512 512">
-    <path d="m-0.0618 512.07v-128.63l128.63 128.63z"/>
-    <path d="m383.21 0.052969 128.72 128.72-88.63 88.63-128.72-128.72z"/>
-    <path d="m252.59 130.63 128.72 128.72-210.68 210.68-128.72-128.72z"/>
-  </symbol>
-  <symbol id="undo_icon" viewBox="0 0 512 512">
-    <path d="m133.64 437.65-133.64-133.64h267.28z"/>
-    <path d="m512 249c-0.72363-111.33-91.271-201.16-202.61-200.98-111.33 0.17137-201.61 90.272-201.99 201.61l52.695 0.18028c0.28168-82.334 67.039-148.97 149.37-149.09 82.334-0.12673 149.3 66.299 149.83 148.63z"/>
-    <path d="m107.4 246.77h52.472v57.48h-52.472z"/>
-    <path d="m459.53 246.77h52.472v190.87h-52.472z"/>
-  </symbol>
-  <symbol id="redo_icon" viewBox="0 0 512 512">
-    <path d="m378.36 437.65 133.64-133.64h-267.28z"/>
-    <path d="m0.0044544 249c0.72363-111.33 91.271-201.16 202.61-200.98 111.33 0.17137 201.61 90.272 201.99 201.61l-52.695 0.18028c-0.28168-82.334-67.039-148.97-149.37-149.09-82.334-0.12673-149.3 66.299-149.83 148.63z"/>
-    <path d="m404.6 246.77h-52.472v57.48h52.472z"/>
-    <path d="m52.473 246.77h-52.472v190.87h52.472z"/>
-  </symbol>
   <symbol id="install_icon" viewBox="0 0 512 512">
     <path d="m198.36 18v43.917h-154.81v308.88h424.9v-75.391h43.551v66.242c-0.029 13.167-4.952 25.852-13.813 35.592-8.86 9.739-21.025 15.837-34.13 17.108l-5.123 0.366h-65.876l23.788 26.351v52.7h-321.69v-52.7l23.788-26.351h-66.241c-13.19 0.054-25.922-4.84-35.679-13.717-9.7572-8.876-15.831-21.089-17.022-34.225v-296.07c-0.053852-13.19 4.8408-25.922 13.717-35.679 8.8764-9.7572 21.089-15.831 34.226-17.022h150.42zm174.94 0v186.65l64.046-66.241 38.427 39.525-128.09 132.85-128.09-132.85 38.427-39.891 64.046 66.607v-186.65h51.236z"/>
   </symbol>
@@ -1740,294 +387,125 @@
   </symbol>
 </svg>
 
-<header id="header">
-  <div class="app-region"></div>
-  <div class="app-icon">
+<header>
+  <app-icon>
     <img src="resources/icon.svg" alt="">
-  </div>
-  <div class="app-menubar">
-    <menu-drop id="file_menu">
+  </app-icon>
+  <app-menubar>
+    <menu-drop>
       <button>File</button>
       <ul>
-        <li onclick="createEditor({ auto_replace: false });" data-shortcuts='{ "default": "Ctrl+Shift+X", "macOS": "Shift+Cmd+X" }'>New Editor</li>
-        <li part="create-window-option" onclick="createWindow();" data-shortcuts='{ "default": "Ctrl+Shift+C", "macOS": "Shift+Cmd+C" }'>New Window</li>
-        <li onclick="openFiles();" data-shortcuts='{ "default": "Ctrl+O", "macOS": "Cmd+O" }'>Open</li>
-        <li onclick="window.setTimeout(renameEditor,10);" data-shortcuts='{ "default": "Ctrl+Shift+R", "macOS": "Shift+Cmd+R" }'>Rename</li>
-        <li onclick="saveFile();" data-shortcuts='{ "default": "Ctrl+S", "macOS": "Cmd+S" }'>Save</li>
-        <li>Save As...
-          <ul>
-            <li onclick="saveFile('txt');" data-shortcuts='{ "default": ".txt" }'>Plain Text</li>
-            <li onclick="saveFile('html');" data-shortcuts='{ "default": ".html" }'>HTML</li>
-            <li onclick="saveFile('css');" data-shortcuts='{ "default": ".css" }'>CSS</li>
-            <li onclick="saveFile('js');" data-shortcuts='{ "default": ".js" }'>JavaScript</li>
-            <li onclick="saveFile('json');" data-shortcuts='{ "default": ".json" }'>JSON</li>
-            <li onclick="saveFile('svg');" data-shortcuts='{ "default": ".svg" }'>SVG</li>
-            <li>More...
-              <ul>
-                <li onclick="saveFile('webmanifest');" data-shortcuts='{ "default": ".webmanifest" }'>Web Manifest</li>
-                <li onclick="saveFile('md');" data-shortcuts='{ "default": ".md" }'>Markdown</li>
-                <li onclick="saveFile('mcmeta');" data-shortcuts='{ "default": ".mcmeta" }'>MCMETA</li>
-                <li onclick="saveFile('xml');" data-shortcuts='{ "default": ".xml" }'>XML</li>
-              </ul>
-            </li>
-          </ul>
-        </li>
+        <li data-shortcuts='{ "default": "Ctrl+Shift+X", "macOS": "Shift+Cmd+X" }'>New File</li>
+        <li data-shortcuts='{ "default": "Ctrl+Shift+C", "macOS": "Shift+Cmd+C" }'>New Window</li>
+        <li><hr></li>
+        <li data-shortcuts='{ "default": "Ctrl+O", "macOS": "Cmd+O" }'>Open</li>
+        <li data-shortcuts='{ "default": "Ctrl+Shift+R", "macOS": "Shift+Cmd+R" }'>Rename</li>
+        <li data-shortcuts='{ "default": "Ctrl+S", "macOS": "Cmd+S" }'>Save</li>
+        <li data-shortcuts='{ "default": "Ctrl+Shift+S", "macOS": "Shift+Cmd+S" }'>Save As...</li>
+        <li><hr></li>
+        <li data-shortcuts='{ "default": "Ctrl+Shift+D", "macOS": "Shift+Cmd+D" }'>Close File</li>
+        <li data-shortcuts='{ "default": "Ctrl+Shift+W", "macOS": "Shift+Cmd+W" }'>Close Window</li>
       </ul>
     </menu-drop>
-    <menu-drop id="view_menu" data-select="no-appearance">
+    <menu-drop data-select="no-appearance">
       <button>View</button>
       <ul>
-        <li data-selected onclick="setView({ type: 'code' });" data-shortcuts='{ "default": "Ctrl+Shift+1", "macOS": "Ctrl+Cmd+1" }' data-value="code">Code</li>
-        <li onclick="setView({ type: 'split' });" data-shortcuts='{ "default": "Ctrl+Shift+2", "macOS": "Ctrl+Cmd+2" }' data-value="split">Split</li>
-        <li onclick="setView({ type: 'preview' });" data-shortcuts='{ "default": "Ctrl+Shift+3", "macOS": "Ctrl+Cmd+3" }' data-value="preview">Preview</li>
+        <li data-value="code" data-selected data-shortcuts='{ "default": "Ctrl+Shift+1", "macOS": "Ctrl+Cmd+1" }'>Code</li>
+        <li data-value="split" data-shortcuts='{ "default": "Ctrl+Shift+2", "macOS": "Ctrl+Cmd+2" }'>Split</li>
+        <li data-value="preview" data-shortcuts='{ "default": "Ctrl+Shift+3", "macOS": "Ctrl+Cmd+3" }'>Preview</li>
         <li><hr></li>
-        <li onclick="setOrientation();" data-shortcuts='{ "default": "Ctrl+Shift+4", "macOS": "Ctrl+Cmd+4" }' data-no-select>Orientation</li>
-        <li onclick="createDisplay();" data-shortcuts='{ "default": "Ctrl+Shift+5", "macOS": "Ctrl+Cmd+5" }' data-no-select>Display</li>
+        <li data-no-select data-shortcuts='{ "default": "Ctrl+Shift+4", "macOS": "Ctrl+Cmd+4" }'>Orientation</li>
+        <li data-no-select data-shortcuts='{ "default": "Ctrl+Shift+5", "macOS": "Ctrl+Cmd+5" }'>Display</li>
       </ul>
     </menu-drop>
-    <menu-drop id="preview_menu" data-select="no-appearance">
+    <menu-drop>
       <button>Preview</button>
       <ul>
-        <li data-value="active-editor" data-selected onclick="setPreviewSource({ active_editor: true });">Active Editor</li>
-        <li><hr></li>
+        <li></li>
       </ul>
     </menu-drop>
-    <menu-drop id="tools_menu">
+    <menu-drop>
       <button>Tools</button>
       <ul>
-        <li onclick="replace_text_card.open();" data-shortcuts='{ "default": "Ctrl+Shift+F", "macOS": "Shift+Cmd+F" }'>Replace Text</li>
-        <!--li onclick="color_picker_card.open();" data-shortcuts='{ "default": "Ctrl+Shift+K", "macOS": "Shift+Cmd+K" }'>Color Picker</li-->
-        <li onclick="json_formatter_card.open();" data-shortcuts='{ "default": "Ctrl+Shift+G", "macOS": "Shift+Cmd+G" }'>JSON Formatter</li>
-        <li onclick="uri_encoder_card.open();" data-shortcuts='{ "default": "Ctrl+Shift+Y", "macOS": "Shift+Cmd+Y" }'>URI Encoder</li>
-        <li onclick="uuid_generator_card.open();" data-shortcuts='{ "default": "Ctrl+Shift+O", "macOS": "Shift+Cmd+O" }'>UUID Generator</li>
-        <li>Insert Templates...
-          <ul>
-            <li onclick="Tools.insertTemplate({ type: 'html' });" data-shortcuts='{ "default": "Ctrl+Shift+H", "macOS": "Shift+Cmd+H" }'>HTML</li>
-            <li onclick="Tools.insertTemplate({ type: 'pack-manifest-bedrock' });">Pack Manifest - Bedrock</li>
-          </ul>
-        </li>
-        <li>Online Resources...
-          <ul data-show-icons>
-            <li><a href="https://webformatter.com"><img src="resources/web-formatter.svg" alt="">Code Formatter</a></li>
-            <li><a href="https://www.sharedrop.io"><img part="invert" src="resources/sharedrop.svg" alt="">File Transferer</a></li>
-            <li><a href="https://www.diffchecker.com/"><img src="resources/diffchecker.svg" alt="">Difference Finder</a></li>
-            <li><a href="https://caniuse.com/"><img src="resources/caniuse.svg" alt="">Compatibility Checker</a></li>
-            <li><a href="https://web.dev/measure/"><img src="resources/webdev.svg" alt="">Performance Tester</a></li>
-            <li><a href="https://realfavicongenerator.net/"><img part="rounded" src="resources/real-favicon-generator.svg" alt="">Favicon Generator</a></li>
-            <li><a href="https://appsco.pe/developer/splash-screens/"><img part="invert" src="resources/appscope.svg" alt="">Splash Generator</a></li>
-            <li><a href="https://www.svgminify.com/"><img src="resources/svgminify.svg" alt="">SVG Simplifier</a></li>
-            <li><a href="https://cryptii.com/"><img src="resources/cryptii.svg" alt="">Text Encryptor</a></li>
-          </ul>
-        </li>
+        <li></li>
       </ul>
     </menu-drop>
-    <menu-drop id="settings_menu" data-alternate>
-      <button onclick="settings_card.open();">Settings</button>
-      <ul data-show-icons>
-        <li part="install-option" onclick="showInstallPrompt();"><img src="resources/install.svg" alt="">Install</li>
-        <li onclick="theme_card.open();"><img src="resources/template.svg" alt="">Theme Settings</li>
-        <li part="clear-site-caches-option" onclick="clearSiteCaches();"><img src="resources/settings.svg" alt="">Clear Cache</li>
-        <li onclick="Editor.settings.reset();"><img src="resources/settings.svg" alt="">Reset Settings</li>
-      </ul>
+    <menu-drop data-alternate>
+      <button>Settings</button>
     </menu-drop>
-  </div>
-  <div class="app-omnibox">
-    <button id="install_option" class="option" title="Install" onclick="showInstallPrompt();"><svg><use href="#install_icon"/></svg></button>
-    <button class="option" title="Refresh Preview" onclick="refreshPreview({ force: true });"><svg><use href="#refresh_icon"/></svg></button>
+  </app-menubar>
+  <app-omnibox>
+    <button style="display: none;" class="option" title="Install"><svg><use href="#install_icon"/></svg></button>
+    <button class="option" title="Refresh Preview"><svg><use href="#refresh_icon"/></svg></button>
     <a class="option" href="https://github.com/Offroaders123/Smart-Text-Editor" title="Smart Text Editor on GitHub"><svg><use href="#github_icon"/></svg></a>
-  </div>
+  </app-omnibox>
 </header>
 
-<main id="main">
-  <div id="workspace" class="workspace">
-    <div id="workspace_tabs" class="workspace-tabs">
-      <button id="create_editor_button" class="create-editor-button" title="New Editor"><svg><use href="#close_icon"/></svg></button>
-    </div>
-    <div id="workspace_editors" class="workspace-editors"></div>
-  </div>
-  <div id="scaler" class="scaler"></div>
-  <iframe id="preview" class="preview" src="about:blank"></iframe>
-  <div id="card_backdrop" class="card-backdrop"></div>
-  <ste-card id="settings_card" class="card dialog" data-type="dialog">
-    <div class="header">
-      <span class="heading">Settings</span>
-    </div>
-    <div class="main">
-      <div class="content">
-        <div class="item list start">
-          <div class="select">
-            <label>Default Orientation:</label>
-            <menu-drop id="default_orientation_setting" data-select>
-              <button>Horizontal</button>
-              <ul>
-                <li data-value="horizontal" onclick="Editor.settings.set('default-orientation','horizontal');" data-selected>Horizontal</li>
-                <li data-value="vertical" onclick="Editor.settings.set('default-orientation','vertical');">Vertical</li>
-              </ul>
-            </menu-drop>
-          </div>
-          <div class="checkbox">
-            <input id="syntax_highlighting_setting" type="checkbox" oninput="setSyntaxHighlighting(this.checked);">
-            <label for="syntax_highlighting_setting"><svg class="check"><use href="#check_icon"/></svg>Syntax Highlighting (Beta)</label>
-          </div>
-          <div class="checkbox">
-            <input id="automatic_refresh_setting" type="checkbox" oninput="Editor.settings.set('automatic-refresh',this.checked);" checked>
-            <label for="automatic_refresh_setting"><svg class="check"><use href="#check_icon"/></svg>Automatically Refresh Preview</label>
-          </div>
-        </div>
-      </div>
-      <div class="options">
-        <button id="install_button" onclick="showInstallPrompt();"><svg><use href="#install_icon"/></svg>Install</button>
-        <button id="theme_button" onclick="theme_card.open();" data-card-previous="theme_card">Customize Theme<svg><use href="#arrow_icon"/></svg></button>
-      </div>
-      <div class="options">
-        <button id="clear_site_caches_button" class="warning" onclick="clearSiteCaches();">Clear Cache</button>
-        <button class="warning" onclick="Editor.settings.reset();">Reset Settings</button>
-      </div>
-    </div>
-  </ste-card>
-  <ste-card id="theme_card" class="card dialog" data-type="dialog">
-    <div class="header" data-card-parent="settings_card">
-      <span class="heading">Theme</span>
-    </div>
-    <div class="main">
-      <div class="content">
-        <div class="item list">
-          <span style="line-height: 1.6;">Custom workspace theme settings<br>will be featured in a later update.</span>
-        </div>
-        <!--div class="item list expand">
-          <num-text id="theme_setting" placeholder="CSS to modify..."></num-text>
-        </div-->
-      </div>
-      <!--div class="options">
-        <button onclick="resetTheme();">Reset Theme</button>
-      </div-->
-    </div>
-  </ste-card>
-  <ste-card id="reset_settings_card" class="card alert" data-type="alert">
-    <div class="header">
-      <img class="icon" src="resources/settings.svg" alt="">
-      <span class="heading">Reset Settings</span>
-    </div>
-    <div class="main">
-      <div class="content">
-        <div class="item">Your settings have been reset!</div>
-      </div>
-    </div>
-  </ste-card>
-  <ste-card id="cleared_cache_card" class="card alert" data-type="alert">
-    <div class="header">
-      <img class="icon" src="resources/template.svg" alt="">
-      <span class="heading">Cleared Cache</span>
-    </div>
-    <div class="main">
-      <div class="content">
-        <div class="item">Successfully cleared offline cache!</div>
-      </div>
-    </div>
-  </ste-card>
-  <ste-card id="replace_text_card" class="card widget" data-type="widget">
-    <div class="header">
-      <span class="heading">Replace Text</span>
-    </div>
-    <div class="main">
-      <div class="content">
-        <div class="item list expand">
-          <num-text id="replacer_find" placeholder="Text to find..."></num-text>
-          <num-text id="replacer_replace" placeholder="Replace with..."></num-text>
-        </div>
-      </div>
-      <div class="options">
-        <button onclick="Tools.replaceText.replace();">Replace</button>
-        <button onclick="Tools.replaceText.flip();">Flip</button>
-        <button onclick="Tools.replaceText.clear();">Clear</button>
-      </div>
-    </div>
-  </ste-card>
-  <ste-card id="color_picker_card" class="card widget" data-type="widget">
-    <div class="header">
-      <span class="heading">Color Picker</span>
-    </div>
-    <div class="main">
-      <div class="content">
-        <div class="item list">
-          <div id="picker_preview"></div>
-          <input id="picker_input" type="text" value="#ee8800" maxlength="7" placeholder="#rrggbb">
-        </div>
-        <div class="item list">
-          <label for="red_channel">Red</label>
-          <input id="red_channel" type="range">
-          <label for="green_channel">Green</label>
-          <input id="green_channel" type="range">
-          <label for="blue_channel">Blue</label>
-          <input id="blue_channel" type="range">
-        </div>
-      </div>
-      <div class="options">
-        <button onclick="copyPicker();">Copy</button>
-        <button onclick="insertPicker();">Insert</button>
-        <button onclick="deletePicker();">Delete</button>
-      </div>
-    </div>
-  </ste-card>
-  <ste-card id="json_formatter_card" class="card widget" data-type="widget">
-    <div class="header">
-      <span class="heading">JSON Formatter</span>
-    </div>
-    <div class="main">
-      <div class="content">
-        <div class="item expand">
-          <num-text id="formatter_input" class="expand" syntax-language="json" placeholder="JSON data to format..."></num-text>
-        </div>
-      </div>
-      <div class="options">
-        <button onclick="Tools.jsonFormatter.format();">Format</button>
-        <button onclick="Tools.jsonFormatter.collapse();">Collapse</button>
-        <button onclick="Tools.jsonFormatter.clear();">Clear</button>
-      </div>
-    </div>
-  </ste-card>
-  <ste-card id="uri_encoder_card" class="card widget" data-type="widget">
-    <div class="header">
-      <span class="heading">URI Encoder</span>
-    </div>
-    <div class="main">
-      <div class="content">
-        <div class="item expand">
-          <num-text id="encoder_input" class="expand" placeholder="Text to encode..."></num-text>
-        </div>
-      </div>
-      <div class="options">
-        <button onclick="Tools.uriEncoder.encode();">Encode</button>
-        <button onclick="Tools.uriEncoder.decode();">Decode</button>
-        <button onclick="Tools.uriEncoder.clear();">Clear</button>
-      </div>
-      <div class="options">
-        <div class="checkbox">
-          <input id="encoder_type" type="checkbox">
-          <label for="encoder_type"><svg class="check"><use href="#check_icon"/></svg>Enable URI Component</label>
-        </div>
-      </div>
-    </div>
-  </ste-card>
-  <ste-card id="uuid_generator_card" class="card widget" data-type="widget">
-    <div class="header">
-      <span class="heading">UUID Generator</span>
-    </div>
-    <div class="main">
-      <div class="content">
-        <div class="item expand">
-          <input id="generator_output" type="text" placeholder="Result..." readonly>
-        </div>
-      </div>
-      <div class="options">
-        <button onclick="generator_output.value = Tools.uuidGenerator.generate();">Generate</button>
-      </div>
-    </div>
-  </ste-card>
+<main>
+  <workspace-tabs>
+    <workspace-tab>File 1.html</workspace-tab>
+    <workspace-tab>File 2.html</workspace-tab>
+    <workspace-tab open>File 3.html</workspace-tab>
+    <workspace-tab>File 4.html</workspace-tab>
+    <workspace-tab>File 5.html</workspace-tab>
+  </workspace-tabs>
+  <workspace-editors>
+    <num-text></num-text>
+  </workspace-editors>
+  <workspace-scaler>
+    <button></button>
+  </workspace-scaler>
+  <workspace-previews>
+    <iframe></iframe>
+  </workspace-previews>
 </main>
 
-<script>
-  class STECardElement extends HTMLElement {
+<script>console.clear();
+  // Window
+  window.addEventListener("blur",() => {
+    //if (window.self == window.top) document.querySelectorAll("menu-drop[data-open]").forEach(menu => menu.close());
+  });
+
+  // Body
+  document.body.addEventListener("mousedown",event => {
+    if (event.button != 2) return;
+    event.preventDefault();
+    event.stopPropagation();
+  });
+  document.body.addEventListener("contextmenu",event => event.preventDefault());
+  document.body.addEventListener("dragstart",event => {
+    if (event.target.matches("img")) event.preventDefault();
+  });
+  document.body.addEventListener("dragover",event => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = (event.target.matches("menu-drop, header") || event.target.closest("menu-drop, header")) ? "none" : "copy";
+  });
+
+  // Menubar
+  const menubar = document.querySelector("app-menubar");
+  menubar.addEventListener("pointerover",event => {
+    if (event.pointerType != "mouse") return;
+    if (!menubar.querySelectorAll("menu-drop:not([data-alternate])[data-open]").length || event.target.matches("[data-alternate], [data-open]")) return;
+    event.target.opener.focus();
+    event.target.open();
+  });
+
+  // Omnibox
+  const omnibox = document.querySelector("app-omnibox");
+  omnibox.querySelectorAll(".option").forEach(option => {
+    option.tabIndex = -1;
+    option.addEventListener("pointerdown",event => event.preventDefault());
+  });
+
+  // NumText Elements
+  const editors = document.getElementsByTagName("num-text");
+  Array.from(editors).forEach(element => setEditorAppearance(element));
+  function setEditorAppearance(element){
+    element.themes.remove("vanilla-appearance");
+  }
+
+  // Workspace
+  class WorkspaceTabElement extends HTMLElement {
     constructor(){
       super();
       this.defined = false;
@@ -2035,977 +513,27 @@
     connectedCallback(){
       if (this.defined || !this.isConnected) return;
       this.defined = true;
-      this.addEventListener("keydown",event => {
-        if (this.getAttribute("data-type") != "dialog" || event.key != "Tab") return;
-        var navigable = getNavigableElements({ container: this, scope: true });
-        if (!event.shiftKey){
-          if (document.activeElement != navigable[navigable.length - 1]) return;
-          event.preventDefault();
-          navigable[0].focus();
-        } else if (document.activeElement == navigable[0]){
-          event.preventDefault();
-          navigable[navigable.length - 1].focus();
-        }
-      });
-      this.type = this.getAttribute("data-type");
-      this.header = this.querySelector(".header");
-      this.back = document.createElement("button");
-      this.back.classList.add("card-back");
-      this.back.innerHTML = `<svg><use href="#back_icon"/></svg>`;
-      this.back.addEventListener("click",() => document.querySelector(`#${this.header.getAttribute("data-card-parent")}`).open(this));
-      this.heading = this.header.querySelector(".heading");
-      this.controls = document.createElement("div");
-      this.controls.classList.add("card-controls");
-      this.controls.minimize = document.createElement("button");
-      this.controls.minimize.classList.add("control");
-      this.controls.minimize.setAttribute("data-control","minimize");
-      this.controls.minimize.innerHTML = `<svg><use href="#minimize_icon"/></svg>`;
-      this.controls.minimize.addEventListener("keydown",event => {
-        if (event.key != "Enter") return;
-        event.preventDefault();
-        if (event.repeat) return;
-        this.controls.minimize.click();
-      });
-      this.controls.minimize.addEventListener("click",() => this.minimize());
-      this.controls.close = document.createElement("button");
-      this.controls.close.classList.add("control");
-      this.controls.close.setAttribute("data-control","close");
-      this.controls.close.innerHTML = `<svg><use href="#close_icon"/></svg>`;
-      this.controls.close.addEventListener("click",() => this.close());
-      this.header.insertBefore(this.back,this.heading);
-      this.controls.appendChild(this.controls.minimize);
-      this.controls.appendChild(this.controls.close);
-      this.header.appendChild(this.controls);
-      if (Editor.environment().macOS_device){
-        this.controls.insertBefore(this.controls.close,this.controls.minimize);
-        this.header.insertBefore(this.controls,this.header.firstChild);
-      }
-    }
-    open(previous){
-      if (this.matches(".active") && !this.hasAttribute("data-alert-timeout")) return this.close();
-      if (this.type != "alert"){
-        document.querySelectorAll(`.card.active`).forEach(card => {
-          if (card.type != "dialog" && card.type != this.type) return;
-          card.close();
-          if (!card.matches(".minimize")) return;
-          var transitionDuration = parseInt(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
-          window.setTimeout(() => card.minimize(),transitionDuration);
-        });
-      }
-      this.classList.add("active");
-      if (this.type == "widget" && card_backdrop.matches(".active")) card_backdrop.classList.remove("active");
-      if (this.type == "alert"){
-        var timeoutIdentifier = Math.random().toString();
-        this.setAttribute("data-alert-timeout",timeoutIdentifier);
-        window.setTimeout(() => {
-          if (this.getAttribute("data-alert-timeout") != timeoutIdentifier) return;
-          this.removeAttribute("data-alert-timeout");
-          this.close();
-        },4000);
-      }
-      if (this.type == "dialog"){
-        document.body.addEventListener("keydown",catchCardNavigation);
-        card_backdrop.classList.add("active");
-        if (!Editor.active_dialog && !Editor.dialog_previous){
-          Editor.dialog_previous = document.activeElement;
-        }
-        document.querySelectorAll("menu-drop[data-open]").forEach(menu => menu.close());
-        var transitionDuration = parseInt(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 500);
-        window.setTimeout(() => {
-          document.activeElement.blur();
-          if (previous) this.querySelector(`[data-card-previous="${previous.id}"]`).focus();
-        },transitionDuration);
-        Editor.active_dialog = this;
-      }
-      if (this.type == "widget") Editor.active_widget = this;
-    }
-    minimize(){
-      var icon = this.controls.minimize.querySelector("svg use"), main = this.querySelector(".main"), changeIdentifier = Math.random().toString();
-      this.setAttribute("data-minimize-change",changeIdentifier);
-      workspace_tabs.setAttribute("data-minimize-change",changeIdentifier);
-      var transitionDuration = parseInt(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
-      if (!this.matches(".minimize")){
-        this.classList.add("minimize");
-        this.style.setProperty("--card-minimize-width",`${this.controls.minimize.querySelector("svg").clientWidth + parseInt(getElementStyle({ element: this.controls.minimize, property: "--control-padding" }),10) * 2}px`);
-        this.style.setProperty("--card-main-width",`${main.clientWidth}px`);
-        this.style.setProperty("--card-main-height",`${main.clientHeight}px`);
-        icon.setAttribute("href","#arrow_icon");
-        window.setTimeout(() => {
-          workspace_tabs.style.setProperty("--minimize-tab-width",getElementStyle({ element: this, property: "width" }));
-          setEditorTabsVisibility();
-        },transitionDuration);
-        if (this.contains(document.activeElement) && document.activeElement != this.controls.minimize) this.controls.minimize.focus();
-      } else {
-        this.classList.remove("minimize");
-        window.setTimeout(() => {
-          if (this.getAttribute("data-minimize-change") == changeIdentifier) this.style.removeProperty("--card-minimize-width");
-        },transitionDuration);
-        this.style.removeProperty("--card-main-width");
-        this.style.removeProperty("--card-main-height");
-        icon.setAttribute("href","#minimize_icon");
-        workspace_tabs.style.removeProperty("--minimize-tab-width");
-      }
-      window.setTimeout(() => {
-        if (this.getAttribute("data-minimize-change") == changeIdentifier) this.removeAttribute("data-minimize-change");
-        if (workspace_tabs.getAttribute("data-minimize-change") == changeIdentifier) workspace_tabs.removeAttribute("data-minimize-change");
-      },transitionDuration);
-    }
-    close(){
-      this.classList.remove("active");
-      if (this.matches(".minimize")){
-        var transitionDuration = parseInt(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
-        window.setTimeout(() => this.minimize(),transitionDuration);
-      }
-      if (this.type == "dialog"){
-        document.body.removeEventListener("keydown",catchCardNavigation);
-        card_backdrop.classList.remove("active");
-        Editor.active_dialog = null;
-        if (Editor.dialog_previous){
-          var hidden = (getElementStyle({ element: Editor.dialog_previous, property: "visibility" }) == "hidden");
-          (!workspace_editors.contains(Editor.dialog_previous) && !hidden) ? Editor.dialog_previous.focus({ preventScroll: true }) : Editor.query().container.focus({ preventScroll: true });
-          Editor.dialog_previous = null;
-        }
-      }
-      if (this.type == "widget") Editor.active_widget = null;
-    }
-  }
-  function catchCardNavigation(){
-    if (!Editor.active_dialog || event.key != "Tab" || document.activeElement != document.body) return;
-    var navigable = getNavigableElements({ container: Editor.active_dialog, scope: true });
-    event.preventDefault();
-    navigable[((!event.shiftKey) ? 0 : navigable.length - 1)].focus();
-  }
-  window.customElements.define("ste-card",STECardElement);
-
-  document.querySelectorAll("img").forEach(image => image.draggable = false);
-  document.querySelectorAll("num-text").forEach(textarea => applyEditingBehavior({ element: textarea }));
-  document.querySelectorAll("input[type='text']").forEach(input => applyEditingBehavior({ element: input }));
-  document.querySelectorAll(".checkbox").forEach(checkbox => {
-    var input = checkbox.querySelector("input[type='checkbox']");
-    checkbox.addEventListener("click",() => input.click());
-    checkbox.addEventListener("keydown",event => {
-      if (!event.repeat && event.key == "Enter") input.click();
-    });
-    checkbox.addEventListener("keyup",event => {
-      if (event.key == " ") input.click();
-    });
-    checkbox.tabIndex = 0;
-    input.addEventListener("click",event => event.stopPropagation());
-  });
-  document.querySelectorAll("header .app-omnibox .option").forEach(option => {
-    option.tabIndex = -1;
-    option.addEventListener("mousedown",event => event.preventDefault());
-  });
-  window.Tools = {
-    replaceText: {
-      replace: () => {
-        var { container: editor } = Editor.query();
-        if (!editor) return;
-        var replaced = editor.value.split(replacer_find.value).join(replacer_replace.value);
-        if (replaced != editor.value) editor.value = replaced;
-      },
-      flip: () => [replacer_find.value,replacer_replace.value] = [replacer_replace.value,replacer_find.value],
-      clear: () => [replacer_find.value,replacer_replace.value] = ""
-    },
-    jsonFormatter: {
-      format: (spacing = "  ") => {
-        try {
-          var formatted = JSON.stringify(JSON.parse(formatter_input.value),null,spacing);
-          if (formatted != formatter_input.value) formatter_input.value = formatted;
-        } catch (error){/* Make matching for "position" optional, as Safari doesn't give JSON parsing error data, it only says that an error occurred. */
-          var message = error.toString().match(/^(.+?)position /)[0],
-            errorIndex = error.toString().match(/position (\d+)/)[1],
-
-            errorLine,
-            errorLineIndex = (() => {
-              var lineIndexes = indexi("\n",formatter_input.value);
-              errorLine = formatter_input.value.substring(0,errorIndex).split("\n").length - 1;
-              return lineIndexes[errorLine - 1] || 1;
-            })(),
-            errorPosition = errorIndex - errorLineIndex + 1;
-
-          alert(`Could not parse JSON, an error occurred.\n${message}line ${errorLine + 1} position ${errorPosition}`);
-        }
-
-
-      function indexi(char,str){
-        var list = [], i = -1;
-        while ((i = str.indexOf(char,i + 1)) >= 0) list.push(i + 1);
-        return list;
-      }
-
-
-      },
-      collapse: () => {
-        Tools.jsonFormatter.format("");
-      },
-      clear: () => formatter_input.value = ""
-    },
-    uriEncoder: {
-      encode: () => {
-        var encodingType = (!encoder_type.checked) ? encodeURI : encodeURIComponent;
-        encoder_input.value = encodingType(encoder_input.value);
-      },
-      decode: () => {
-        var decodingType = (!encoder_type.checked) ? decodeURI : decodeURIComponent;
-        encoder_input.value = decodingType(encoder_input.value);
-      },
-      clear: () => encoder_input.value = ""
-    },
-    uuidGenerator: (() => {
-      var lut = [];
-      for (var i = 0; i < 256; i++) lut[i] = ((i < 16) ? "0" : "") + i.toString(16);
-      return {
-        generate: () => {
-          var d0 = (Math.random() * 0xffffffff) | 0, d1 = (Math.random() * 0xffffffff) | 0, d2 = (Math.random() * 0xffffffff) | 0, d3 = (Math.random() * 0xffffffff) | 0;
-          return `${lut[d0 & 0xff]}${lut[(d0 >> 8) & 0xff]}${lut[(d0 >> 16) & 0xff]}${lut[(d0 >> 24) & 0xff]}-${lut[d1 & 0xff]}${lut[(d1 >> 8) & 0xff]}-${lut[((d1 >> 16) & 0x0f) | 0x40]}${lut[(d1 >> 24) & 0xff]}-${lut[(d2 & 0x3f) | 0x80]}${lut[(d2 >> 8) & 0xff]}-${lut[(d2 >> 16) & 0xff]}${lut[(d2 >> 24) & 0xff]}${lut[d3 & 0xff]}${lut[(d3 >> 8) & 0xff]}${lut[(d3 >> 16) & 0xff]}${lut[(d3 >> 24) & 0xff]}`;
-        }
-      };
-    })(),
-    insertTemplate: ({ type } = {}) => {
-      var template, editor = Editor.query(), name;
-      if (type == "html"){
-        var language = navigator.language;
-        if (language.includes("-")) language = language.replace(/[^-]+$/g,code => code.toUpperCase());
-        name = "index.html";
-        template = decodeURI(`%3C!DOCTYPE%20html%3E%0A%3Chtml%20lang=%22${language}%22%3E%0A%0A%3Chead%3E%0A%0A%3Ctitle%3E%3C/title%3E%0A%3Cmeta%20charset=%22UTF-8%22%3E%0A%3Cmeta%20name=%22viewport%22%20content=%22width=device-width,%20initial-scale=1%22%3E%0A%0A%3Cstyle%3E%0A%20%20*,%20*::before,%20*::after%20%7B%0A%20%20%20%20box-sizing:%20border-box;%0A%20%20%7D%0A%20%20body%20%7B%0A%20%20%20%20font-family:%20sans-serif;%0A%20%20%7D%0A%3C/style%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3Cscript%3E%0A%3C/script%3E%0A%0A%3C/body%3E%0A%0A%3C/html%3E`);
-      }
-      if (type == "pack-manifest-bedrock"){
-        name = "manifest.json";
-        template = decodeURI(`%7B%0A%20%20%22format_version%22:%202,%0A%0A%20%20%22header%22:%20%7B%0A%20%20%20%20%22name%22:%20%22Pack%20Manifest%20Template%20-%20Bedrock%20Edition%22,%0A%20%20%20%20%22description%22:%20%22Your%20resource%20pack%20description%22,%0A%20%20%20%20%22uuid%22:%20%22${Tools.uuidGenerator.generate()}%22,%0A%20%20%20%20%22version%22:%20%5B%201,%200,%200%20%5D,%0A%20%20%20%20%22min_engine_version%22:%20%5B%201,%2013,%200%20%5D%0A%20%20%7D,%0A%20%20%22modules%22:%20%5B%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%22description%22:%20%22Your%20resource%20pack%20description%22,%0A%20%20%20%20%20%20%22type%22:%20%22resources%22,%0A%20%20%20%20%20%20%22uuid%22:%20%22${Tools.uuidGenerator.generate()}%22,%0A%20%20%20%20%20%20%22version%22:%20%5B%201,%200,%200%20%5D%0A%20%20%20%20%7D%0A%20%20%5D,%0A%20%20%22metadata%22:%20%7B%0A%20%20%20%20%22authors%22:%20%5B%0A%20%20%20%20%20%20%22Add%20author%20names%20here%20(optional,%20'metadata'%20can%20be%20removed%20altogether)%22%0A%20%20%20%20%5D%0A%20%20%7D%0A%7D`);
-      }
-      if (!template) return;
-      createEditor({ name, value: template });
-      if (Editor.view() == "preview") setView({ type: "split" });
-    }
-  };
-  window.addEventListener("load",() => {
-    if (Editor.environment().file_protocol) return;
-    if (window.location.href.includes("index.html")) history.pushState(null,"",window.location.href.replace(/index.html/,""));
-    if (!("serviceWorker" in navigator) || !Editor.appearance().parent_window) return;
-    navigator.serviceWorker.register("service-worker.js").then(() => {
-      if ((navigator.serviceWorker.controller) ? (navigator.serviceWorker.controller.state == "activated") : false) activateManifest();
-      navigator.serviceWorker.addEventListener("message",event => {
-        if (event.data.action == "service-worker-activated") activateManifest();
-        if (event.data.action == "clear-site-caches-complete") cleared_cache_card.open();
-        if (event.data.action == "share-target"){
-          event.data.files.forEach(file => {
-            var reader = new FileReader();
-            reader.readAsText(file,"UTF-8");
-            reader.addEventListener("loadend",() => createEditor({ name: file.name, value: reader.result }));
-          });
-        }
-      });
-      document.documentElement.classList.add("service-worker-activated");
-      if (queryParameters.get("share-target")){
-        navigator.serviceWorker.controller.postMessage({ action: "share-target" });
-        removeQueryParameters(["share-target"]);
-      }
-    });
-    function activateManifest(){
-      document.querySelector("link[rel='manifest']").href = "manifest.webmanifest";
-    }
-  });
-  window.addEventListener("beforeinstallprompt",event => {
-    event.preventDefault();
-    Editor.install_prompt = event;
-    document.documentElement.classList.add("install-prompt-available");
-    theme_button.childNodes[0].textContent = "Theme";
-  });
-  window.addEventListener("beforeunload",event => {
-    if (Editor.unsaved_work()) return;
-    event.preventDefault();
-    event.returnValue = "";
-  });
-  window.addEventListener("unload",() => Editor.child_windows.forEach(window => window.close()));
-  window.addEventListener("resize",event => {
-    Editor.appearance().refresh_window_controls_overlay();
-    Editor.appearance().refresh_device_pixel_ratio();
-    if (Editor.view() != "preview") setEditorTabsVisibility();
-    if (Editor.view() == "split" && document.body.hasAttribute("data-scaling-active")) setView({ type: "split" });
-  });
-  window.addEventListener("blur",() => {
-    if (Editor.appearance().parent_window) document.querySelectorAll("menu-drop[data-open]").forEach(menu => menu.close());
-  });
-  document.body.addEventListener("keydown",event => {
-    var pressed = key => (event.key.toLowerCase() == key.toLowerCase()), control = (event.ctrlKey && !Editor.environment().apple_device), command = (event.metaKey && Editor.environment().apple_device), shift = (event.shiftKey || ((event.key.toUpperCase() == event.key) && (event.key + event.key == event.key * 2))), controlShift = (control && shift), shiftCommand = (shift && command), controlCommand = (event.ctrlKey && command);
-    if (pressed("Escape")){
-      event.preventDefault();
-      if (event.repeat) return;
-      if (Editor.active_dialog && !document.activeElement.matches("menu-drop[data-open]")) Editor.active_dialog.close();
-    }
-    if (((control || command) && !shift && pressed("n")) || ((controlShift || shiftCommand) && pressed("x"))){
-      event.preventDefault();
-      if (event.repeat) return;
-      createEditor({ auto_replace: false });
-    }
-    if (((control || command) && pressed("w")) || ((controlShift || shiftCommand) && pressed("d"))){
-      if (shift && pressed("w")) return window.close();
-      event.preventDefault();
-      if (event.repeat) return;
-      /* Future feature: If an editor tab is focused, close that editor instead of only the active editor */
-      closeEditor();
-    }
-    if (((controlShift || (event.ctrlKey && shift && !command && Editor.environment().apple_device)) && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("[") || pressed("{")))){
-      event.preventDefault();
-      if (event.repeat) return;
-      openEditor({ identifier: getPreviousEditor() });
-    }
-    if (((control || (event.ctrlKey && !command && Editor.environment().apple_device)) && !shift && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("]") || pressed("}")))){
-      event.preventDefault();
-      if (event.repeat) return;
-      openEditor({ identifier: getNextEditor() });
-    }
-    if (((controlShift || shiftCommand) && pressed("n")) || ((controlShift || shiftCommand) && pressed("c"))){
-      event.preventDefault();
-      if (event.repeat) return;
-      createWindow();
-    }
-    if ((control || command) && !shift && pressed("o")){
-      event.preventDefault();
-      if (event.repeat) return;
-      openFiles();
-    }
-    if ((controlShift || shiftCommand) && pressed("r")){
-      event.preventDefault();
-      if (event.repeat) return;
-      renameEditor();
-    }
-    if ((control || command) && !shift && pressed("s")){
-      event.preventDefault();
-      if (event.repeat) return;
-      saveFile();
-    }
-    if ((controlShift || controlCommand) && (pressed("1") || pressed("!"))){
-      event.preventDefault();
-      if (event.repeat) return;
-      setView({ type: "code" });
-    }
-    if ((controlShift || controlCommand) && (pressed("2") || pressed("@"))){
-      event.preventDefault();
-      if (event.repeat) return;
-      setView({ type: "split" });
-    }
-    if ((controlShift || controlCommand) && (pressed("3") || pressed("#"))){
-      event.preventDefault();
-      if (event.repeat) return;
-      setView({ type: "preview" });
-    }
-    if ((controlShift || controlCommand) && (pressed("4") || pressed("$"))){
-      event.preventDefault();
-      if (event.repeat) return;
-      setOrientation();
-    }
-    if ((controlShift || controlCommand) && (pressed("5") || pressed("%"))){
-      event.preventDefault();
-      if (event.repeat) return;
-      createDisplay();
-    }
-    if ((controlShift || shiftCommand) && pressed("Enter")){
-      event.preventDefault();
-      if (event.repeat) return;
-      refreshPreview({ force: true });
-    }
-    if ((controlShift || shiftCommand) && pressed("f")){
-      event.preventDefault();
-      if (event.repeat) return;
-      replace_text_card.open();
-    }/*
-    if ((controlShift || shiftCommand) && pressed("k")){
-      event.preventDefault();
-      if (event.repeat) return;
-      color_picker_card.open();
-    }*/
-    if ((controlShift || shiftCommand) && pressed("g")){
-      event.preventDefault();
-      if (event.repeat) return;
-      json_formatter_card.open();
-    }
-    if ((controlShift || shiftCommand) && pressed("y")){
-      event.preventDefault();
-      if (event.repeat) return;
-      uri_encoder_card.open();
-    }
-    if ((controlShift || shiftCommand) && pressed("o")){
-      event.preventDefault();
-      if (event.repeat) return;
-      uuid_generator_card.open();
-    }
-    if ((controlShift || shiftCommand) && pressed("h")){
-      event.preventDefault();
-      if (event.repeat) return;
-      Tools.insertTemplate({ type: "html" });
-    }
-    if ((controlShift || shiftCommand) && pressed("m")){
-      event.preventDefault();
-      if (event.repeat || !Editor.active_widget) return;
-      if (Editor.active_widget) Editor.active_widget.minimize();
-    }
-    if ((control || command) && (pressed(",") || pressed("<"))){
-      event.preventDefault();
-      if (event.repeat) return;
-      settings_card.open();
-    }
-  },{ capture: true });
-  document.body.addEventListener("mousedown",event => {
-    if (event.button != 2) return;
-    event.preventDefault();
-    event.stopPropagation();
-  });
-  document.body.addEventListener("contextmenu",event => event.preventDefault());
-  document.body.addEventListener("dragover",event => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = (event.target.matches("menu-drop, header, .card") || event.target.closest("menu-drop, header, .card")) ? "none" : "copy";
-  });
-  document.body.addEventListener("drop",event => {
-    event.preventDefault();
-    document.querySelectorAll("menu-drop[data-open]").forEach(menu => menu.close());
-    Array.from(event.dataTransfer.items).forEach(async (item,index) => {
-      if (item.kind == "file"){
-        if (!Editor.support().file_system || !("getAsFileSystemHandle")){
-          var file = item.getAsFile(), reader = new FileReader();
-          reader.readAsText(file,"UTF-8");
-          reader.addEventListener("loadend",() => createEditor({ name: file.name, value: reader.result }));
-        } else {
-          var handle = await item.getAsFileSystemHandle();
-          if (handle.kind != "file") return;
-          var file = await handle.getFile(), identifier = createEditor({ name: await file.name, value: await file.text() });
-          Editor.file_handles[identifier] = await handle;
-        }
-      } else if (item.kind == "string" && index == 0 && event.dataTransfer.getData("text") != "") createEditor({ value: event.dataTransfer.getData("text") });
-    });
-  });
-  var toolbar = document.querySelector("header .app-menubar");
-  toolbar.querySelectorAll("menu-drop").forEach(menu => {
-    menu.addEventListener("pointerenter",() => {
-      if (event.pointerType != "mouse") return;
-      if (toolbar.querySelectorAll("menu-drop:not([data-alternate])[data-open]").length == 0 || menu.matches("[data-alternate]") || menu.matches("[data-open]")) return;
-      menu.opener.focus();
-      toolbar.querySelectorAll("menu-drop[data-open]").forEach(menu => menu.close());
-      menu.open();
-    });
-  });
-  workspace_tabs.addEventListener("keydown",event => {
-    if (event.key != "ArrowLeft" && event.key != "ArrowRight") return;
-    if (!workspace_tabs.contains(document.activeElement)) return;
-    var identifier = document.activeElement.getAttribute("data-editor-identifier"),
-      previousEditor = getPreviousEditor({ identifier }),
-      nextEditor = getNextEditor({ identifier });
-    event.preventDefault();
-    if (event.key == "ArrowLeft") Editor.query(previousEditor).tab.focus();
-    if (event.key == "ArrowRight") Editor.query(nextEditor).tab.focus();
-  });
-  create_editor_button.addEventListener("keydown",event => {
-    if (event.key != "Enter") return;
-    if (event.repeat) event.preventDefault();
-  });
-  create_editor_button.addEventListener("mousedown",event => event.preventDefault());
-  create_editor_button.addEventListener("click",() => createEditor({ auto_replace: false }));
-  scaler.addEventListener("mousedown",event => {
-    if (event.button != 0) return;
-    if (Editor.view() != "split") return;
-    event.preventDefault();
-    document.body.setAttribute("data-scaling-change",true);
-    document.addEventListener("mousemove",setScaling);
-    document.addEventListener("mouseup",disableScaling);
-  });
-  scaler.addEventListener("touchstart",event => {
-    if (Editor.view() != "split" || event.touches.length != 1) return;
-    document.body.setAttribute("data-scaling-change",true);
-    document.addEventListener("touchmove",setScaling,{ passive: true });
-    document.addEventListener("touchend",disableScaling,{ passive: true });
-  },{ passive: true });
-  card_backdrop.addEventListener("click",() => Editor.active_dialog.close());
-  generator_output.addEventListener("click",() => generator_output.select());
-  generator_output.addEventListener("keydown",() => generator_output.click());
-
-  window.requestAnimationFrame(() => createEditor({ auto_created: true }));
-  if (Editor.support().file_handling && Editor.support().file_system){
-    window.launchQueue.setConsumer(params => {
-      params.files.forEach(async handle => {
-        var file = await handle.getFile(), identifier = createEditor({ name: await file.name, value: await file.text() });
-        Editor.file_handles[identifier] = await handle;
-      });
-      if (!Editor.environment().touch_device) Editor.query().container.focus({ preventScroll: true });
-    });
-  }
-  if (Editor.appearance().parent_window){
-    if (Editor.settings.get("default-orientation")){
-      var value = Editor.settings.get("default-orientation");
-      window.requestAnimationFrame(() => default_orientation_setting.select(value));
-      setOrientation(value);
-    }
-    if (Editor.settings.get("syntax-highlighting") != undefined){
-      var state = Editor.settings.get("syntax-highlighting");
-      setSyntaxHighlighting(state);
-      syntax_highlighting_setting.checked = state;
-    }
-    if (Editor.settings.get("automatic-refresh") != undefined) automatic_refresh_setting.checked = Editor.settings.get("automatic-refresh");
-    window.setTimeout(() => document.documentElement.classList.remove("startup-fade"),50);
-  }
-  var queryParameters = new URLSearchParams(window.location.search);
-  if (queryParameters.get("template")){
-    Tools.insertTemplate({ type: "html" });
-    removeQueryParameters(["template"]);
-  }
-  if (queryParameters.get("settings")){
-    settings_card.open();
-    removeQueryParameters(["settings"]);
-  }
-  function createEditor({ name = "Untitled.txt", value = "", open = true, auto_created = false, auto_replace = true } = {}){
-    var identifier = Math.random().toString(), tab = document.createElement("button"), editorName = document.createElement("span"), editorClose = document.createElement("button"), container = document.createElement("num-text"), previewOption = document.createElement("li"), focused_override, changeIdentifier = Math.random().toString();
-    document.body.setAttribute("data-editor-change",changeIdentifier);
-    var transitionDuration = parseInt(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
-    if (!name.includes(".")) name = `${name}.txt`;
-    tab.classList.add("tab");
-    tab.setAttribute("data-editor-identifier",identifier);
-    if (value) tab.setAttribute("data-editor-refresh",true);
-    tab.addEventListener("mousedown",event => {
-      if (event.button != 0 || document.activeElement.matches("[data-editor-rename]")) return;
-      event.preventDefault();
-      if (tab != Editor.query().tab) openEditor({ identifier });
-    });
-    tab.addEventListener("keydown",event => {
-      if (event.key != " " && event.key != "Enter") return;
-      event.preventDefault();
-      if (tab != Editor.query().tab) openEditor({ identifier });
-    });
-    tab.addEventListener("contextmenu",event => {
-      if (event.target != tab) return;
-      var editorRename = tab.querySelector("[data-editor-rename]");
-      if (!editorRename){
-        editorRename = document.createElement("input");
-      } else return editorRename.blur();
-      editorRename.type = "text";
-      editorRename.placeholder = Editor.query(identifier).getName();
-      editorRename.setAttribute("data-editor-rename",true);
-      editorRename.tabIndex = -1;
-      editorRename.style.setProperty("--editor-name-width",`${editorName.offsetWidth}px`);
-      editorRename.value = Editor.query(identifier).getName();
-      editorRename.addEventListener("keydown",event => {
-        if (event.key == "Escape") editorRename.blur();
-      });
-      editorRename.addEventListener("input",() => {
-        editorRename.style.width = "0px";
-        editorRename.offsetWidth;
-        editorRename.style.setProperty("--editor-rename-width",`${editorRename.scrollWidth + 1}px`);
-        editorRename.style.removeProperty("width");
-      });
-      editorRename.addEventListener("change",() => {
-        if (editorRename.value) renameEditor({ name: editorRename.value, identifier });
-        editorRename.blur();
-      });
-      editorRename.addEventListener("blur",() => editorRename.remove());
-      tab.insertBefore(editorRename,tab.firstChild);
-      applyEditingBehavior({ element: editorRename, advanced: false });
-      editorRename.focus();
-      editorRename.select();
-    });
-    tab.addEventListener("dragover",event => {
-      event.preventDefault();
-      event.stopPropagation();
-      event.dataTransfer.dropEffect = "copy";
-      if (tab != Editor.query().tab) openEditor({ identifier });
-    });
-    editorName.setAttribute("data-editor-name",name);
-    editorName.innerText = name;
-    editorClose.classList.add("option");
-    editorClose.tabIndex = -1;
-    editorClose.innerHTML = "<svg><use href='#close_icon'/></svg>";
-    editorClose.addEventListener("mousedown",event => {
-      event.preventDefault();
-      event.stopPropagation();
-    });
-    editorClose.addEventListener("click",event => {
-      event.stopPropagation();
-      closeEditor({ identifier });
-    });
-    container.classList.add("editor");
-    container.setAttribute("data-editor-identifier",identifier);
-    container.setAttribute("value",value);
-    previewOption.part = "option";
-    previewOption.classList.add("option");
-    previewOption.setAttribute("data-editor-identifier",identifier);
-    previewOption.tabIndex = -1;
-    previewOption.innerText = name;
-    previewOption.addEventListener("click",() => setPreviewSource({ identifier }));
-    if ((Editor.active_editor) ? Editor.query().tab.hasAttribute("data-editor-auto-created") : false){
-      if (document.activeElement == Editor.query().container) focused_override = true;
-      if (auto_replace){
-        closeEditor();
-      } else Editor.query().tab.removeAttribute("data-editor-auto-created");
-    }
-    tab.appendChild(editorName);
-    tab.appendChild(editorClose);
-    workspace_tabs.insertBefore(tab,create_editor_button);
-    workspace_editors.appendChild(container);
-    container.editor.addEventListener("input",() => {
-      if (tab.hasAttribute("data-editor-auto-created")) tab.removeAttribute("data-editor-auto-created");
-      if (!tab.hasAttribute("data-editor-refresh")) tab.setAttribute("data-editor-refresh",true);
-      if (!tab.hasAttribute("data-editor-unsaved")) tab.setAttribute("data-editor-unsaved",true);
-      refreshPreview();
-    });
-    preview_menu.main.appendChild(previewOption);
-    applyEditingBehavior({ element: container });
-    if (open || !Editor.active_editor) openEditor({ identifier, auto_created, focused_override });
-    container.syntaxLanguage = Editor.query(identifier).getName("extension");
-    if ((Editor.settings.get("syntax-highlighting") == true) && (container.syntaxLanguage in Prism.languages)) container.syntaxHighlight.enable();
-    window.setTimeout(() => {
-      if (document.body.getAttribute("data-editor-change") == changeIdentifier) document.body.removeAttribute("data-editor-change");
-    },transitionDuration);
-    return identifier;
-  }
-  function openEditor({ identifier, auto_created = false, focused_override = false } = {}){
-    if (!identifier) return;
-    var { tab, container, textarea, getName } = Editor.query(identifier), focused = (document.activeElement == Editor.query().container) || focused_override;
-    if (Editor.query().tab) Editor.query().tab.classList.remove("active");
-    if (Editor.query().container) Editor.query().container.classList.remove("active");
-    tab.classList.add("active");
-    if (auto_created) tab.setAttribute("data-editor-auto-created",true);
-    container.classList.add("active");
-    Editor.active_editor = identifier;
-    setEditorTabsVisibility();
-    setTitle({ content: getName() });
-    if ((((document.activeElement == document.body && !Editor.active_dialog) || auto_created) && !Editor.environment().touch_device && Editor.appearance().parent_window) || focused) container.focus({ preventScroll: true });
-    if (Editor.preview_editor == "active-editor") refreshPreview({ force: (Editor.settings.get("automatic-refresh") != false) });
-  }
-  function closeEditor({ identifier = Editor.active_editor } = {}){
-    if (!identifier) return;
-    var { tab, container, textarea, getName } = Editor.query(identifier), previewOption = preview_menu.main.querySelector(`.option[data-editor-identifier="${identifier}"]`), active = (tab.classList.contains("active")), focused = (document.activeElement == container), editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])"));
-    if (tab.hasAttribute("data-editor-unsaved")){
-      if (!confirm(`Are you sure you would like to close "${getName()}"?\nRecent changes have not yet been saved.`)) return;
-    }
-    var changeIdentifier = Math.random().toString();
-    if (editorTabs.length != 1){
-      document.body.setAttribute("data-editor-change",changeIdentifier);
-      tab.style.setProperty("--tab-margin-right",`-${tab.offsetWidth}px`);
-    } else if (document.body.hasAttribute("data-editor-change")){
-      document.body.removeAttribute("data-editor-change",changeIdentifier);
-      workspace_tabs.querySelectorAll(".tab[data-editor-change]").forEach(tab => workspace_tabs.removeChild(tab));
-    }
-    var transitionDuration = (document.body.hasAttribute("data-editor-change")) ? parseInt(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000) : 0;
-    if (tab == editorTabs[0] && editorTabs.length == 1){
-      Editor.active_editor = null;
-      setTitle({ reset: true });
-      preview.src = "about:blank";
-    }
-    if (Editor.preview_editor == identifier) setPreviewSource({ active_editor: true });
-    if (tab == editorTabs[0] && editorTabs[1] && tab.classList.contains("active")) openEditor({ identifier: editorTabs[1].getAttribute("data-editor-identifier") });
-    if (tab == editorTabs[editorTabs.length - 1] && tab != editorTabs[0] && tab.classList.contains("active")) openEditor({ identifier: editorTabs[editorTabs.length - 2].getAttribute("data-editor-identifier") });
-    if (tab != editorTabs[0] && tab.classList.contains("active")) openEditor({ identifier: editorTabs[editorTabs.indexOf(tab) + 1].getAttribute("data-editor-identifier") });
-    if (focused && Editor.query().textarea) Editor.query().container.focus({ preventScroll: true });
-    tab.setAttribute("data-editor-change",true);
-    if (tab == document.activeElement) tab.blur();
-    tab.tabIndex = -1;
-    if (tab.classList.contains("active")) tab.classList.remove("active");
-    workspace_editors.removeChild(container);
-    preview_menu.main.removeChild(previewOption);
-    (transitionDuration) ? window.setTimeout(removeEditorTab,transitionDuration) : removeEditorTab();
-    if (Editor.file_handles[identifier]) delete Editor.file_handles[identifier];
-    function removeEditorTab(){
-      if (workspace_tabs.contains(tab)) workspace_tabs.removeChild(tab);
-      if (document.body.getAttribute("data-editor-change") == changeIdentifier) document.body.removeAttribute("data-editor-change");
-    }
-  }
-  function renameEditor({ name, identifier = Editor.active_editor } = {}){
-    var { tab, container, getName } = Editor.query(identifier), editorName = tab.querySelector("[data-editor-name]"), previewOption = preview_menu.main.querySelector(`.option[data-editor-identifier="${identifier}"]`), currentName = getName(), base = getName("base"), extension = getName("extension"), rename = (name) ? name : prompt(`Enter a new file name for "${currentName}".`,currentName);
-    if (!rename) return;
-    if (!rename.includes(".")){
-      rename = `${rename}.${extension}`;
-    } else if (rename.charAt(0) == ".") rename = `${base}${rename}`;
-    editorName.innerText = rename;
-    previewOption.innerText = rename;
-    var syntaxLanguage = Editor.query(identifier).getName("extension");
-    if (syntaxLanguage in Prism.languages) container.syntaxLanguage = syntaxLanguage;
-    ((Editor.settings.get("syntax-highlighting") == true) && (syntaxLanguage in Prism.languages)) ? container.syntaxHighlight.enable() : container.syntaxHighlight.disable();
-    if (syntaxLanguage != container.syntaxLanguage) container.syntaxLanguage = syntaxLanguage;
-    if (tab.hasAttribute("data-editor-auto-created")) tab.removeAttribute("data-editor-auto-created");
-    if (tab == Editor.query().tab) setTitle({ content: rename });
-    if ((Editor.preview_editor == "active-editor" && Editor.active_editor == identifier) || Editor.preview_editor == identifier) refreshPreview({ force: true });
-    return rename;
-  }
-  /* Future feature: Add support to disable the wrapping behavior */
-  function getPreviousEditor({ identifier = Editor.active_editor, wrap = true } = {}){
-    var { tab } = Editor.query(identifier), editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")), previousTab = editorTabs[(editorTabs.indexOf(tab) || editorTabs.length) - 1], previousEditor = previousTab.getAttribute("data-editor-identifier");
-    return previousEditor;
-  }
-  function getNextEditor({ identifier = Editor.active_editor, wrap = true } = {}){
-    var { tab } = Editor.query(identifier), editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")), nextTab = editorTabs[(editorTabs.indexOf(tab) != editorTabs.length - 1) ? editorTabs.indexOf(tab) + 1 : 0], nextEditor = nextTab.getAttribute("data-editor-identifier");
-    return nextEditor;
-  }
-  function setEditorTabsVisibility({ identifier = Editor.active_editor } = {}){
-    if (!Editor.active_editor) return;
-    var { tab } = Editor.query(identifier), obstructedLeft = (tab.offsetLeft <= workspace_tabs.scrollLeft), obstructedRight = ((tab.offsetLeft + tab.clientWidth) >= (workspace_tabs.scrollLeft + workspace_tabs.clientWidth)), spacingOffset = 0;
-    if ((workspace_tabs.clientWidth < tab.clientWidth) && !obstructedLeft) return;
-    if (obstructedLeft){
-      spacingOffset = parseInt(getElementStyle({ element: workspace_tabs, pseudo: "::before", property: "width" }),10) * 3;
-      workspace_tabs.scrollTo(tab.offsetLeft - spacingOffset,0);
-    } else if (obstructedRight){
-      spacingOffset = parseInt(getElementStyle({ element: workspace_tabs, pseudo: "::after", property: "width" }),10) * 3;
-      workspace_tabs.scrollTo(tab.offsetLeft + tab.clientWidth + spacingOffset - workspace_tabs.clientWidth,0);
-    }
-  }
-  function setView({ type, force = false } = {}){
-    if ((Editor.orientation_change() && !force) || Editor.scaling_change()) return;
-    var changeIdentifier = Math.random().toString();
-    document.body.setAttribute("data-view-change",changeIdentifier);
-    var transitionDuration = parseInt(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
-    document.body.classList.remove(Editor.view());
-    document.body.setAttribute("data-view",type);
-    document.body.classList.add(Editor.view());
-    removeScaling();
-    view_menu.select(Editor.view());
-    if (type != "preview") window.setTimeout(setEditorTabsVisibility,transitionDuration);
-    window.setTimeout(() => {
-      if (document.body.getAttribute("data-view-change") == changeIdentifier) document.body.removeAttribute("data-view-change");
-    },transitionDuration);
-    refreshPreview();
-  }
-  function setOrientation(orientation){
-    if (Editor.orientation_change() || Editor.scaling_change()) return;
-    document.body.setAttribute("data-orientation-change",true);
-    var param = (orientation), transitionDuration = ((Editor.view() != "split") ? 0 : parseInt(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000));
-    if (!param && Editor.view() == "split") setView({ type: "code", force: true });
-    if (!param && Editor.orientation() == "horizontal") orientation = "vertical";
-    if (!param && Editor.orientation() == "vertical") orientation = "horizontal";
-    window.setTimeout(() => {
-      setTransitionDurations("off");
-      document.body.classList.remove(Editor.orientation());
-      document.body.setAttribute("data-orientation",orientation);
-      document.body.classList.add(Editor.orientation());
-      workspace.offsetHeight;
-      scaler.offsetHeight;
-      preview.offsetHeight;
-      setTransitionDurations("on");
-      if (!param) setView({ type: "split", force: true });
-      window.setTimeout(() => document.body.removeAttribute("data-orientation-change"),transitionDuration);
-    },transitionDuration);
-    function setTransitionDurations(state){
-      if (state == "on"){
-        workspace.style.removeProperty("transition-duration");
-        scaler.style.removeProperty("transition-duration");
-        preview.style.removeProperty("transition-duration");
-      }
-      if (state == "off"){
-        workspace.style.transitionDuration = "0s";
-        scaler.style.transitionDuration = "0s";
-        preview.style.transitionDuration = "0s";
-      }
-    }
-  }
-  function setPreviewSource({ identifier, active_editor }){
-    if (!identifier && !active_editor) return;
-    if ((!identifier && active_editor) || (Editor.preview_editor == identifier)){
-      Editor.preview_editor = "active-editor";
-      preview_menu.select("active-editor");
-    } else Editor.preview_editor = identifier;
-    refreshPreview({ force: true });
-  }
-  function setSyntaxHighlighting(state){
-    state = (state != undefined) ? state : (Editor.settings.get("syntax-highlighting") != undefined);
-    document.querySelectorAll("num-text").forEach(editor => {
-      if (editor.syntaxLanguage in Prism.languages) (state) ? editor.syntaxHighlight.enable() : editor.syntaxHighlight.disable();
-    });
-    Editor.settings.set("syntax-highlighting",state);
-  }
-  function createWindow(){
-    var features = (Editor.appearance().standalone || Editor.appearance().fullscreen) ? "popup" : "", win = window.open(window.location.href,"_blank",features);
-    if (Editor.appearance().fullscreen){
-      win.resizeTo(window.screen.width * 2/3,window.screen.height * 2/3);
-      win.moveTo(window.screen.width / 6,window.screen.height / 6);
-    } else if (Editor.appearance().standalone){
-      win.resizeTo(window.outerWidth,window.outerHeight);
-      win.moveTo(window.screenX,window.screenY);
-    }
-  }
-  async function openFiles(){
-    if (!Editor.support().file_system){
-      var input = document.createElement("input");
-      input.type = "file";
-      input.multiple = true;
-      input.addEventListener("change",() => Array.from(input.files).forEach(file => {
-        var reader = new FileReader();
-        reader.readAsText(file,"UTF-8");
-        reader.addEventListener("loadend",() => createEditor({ name: file.name, value: reader.result }));
-      }));
-      input.click();
-    } else {
-      var handles = await window.showOpenFilePicker({ multiple: true }).catch(error => {
-        if (error.message.toLowerCase().includes("abort")) return;
-      });
-      if (!handles) return;
-      handles.forEach(async handle => {
-        var file = await handle.getFile(), identifier = createEditor({ name: await file.name, value: await file.text() });
-        Editor.file_handles[identifier] = await handle;
+      window.requestAnimationFrame(() => {
+        this.opener = document.createElement("button");
+        this.opener.classList.add("opener");
+        this.name = document.createElement("span");
+        this.name.classList.add("name");
+        this.name.textContent = this.getTextNodes(this)[0].textContent;
+        this.getTextNodes(this)[0].textContent = "";
+        this.closer = document.createElement("button");
+        this.closer.classList.add("closer");
+        this.closer.title = "Close File";
+        this.closer.innerHTML = "✕";
+        this.appendChild(this.opener);
+        this.appendChild(this.name);
+        this.appendChild(this.closer);
       });
     }
-  }
-  async function saveFile(extension){
-    if (extension || !Editor.support().file_system){
-      if (!extension) extension = Editor.query().getName("extension");
-      var anchor = document.createElement("a"), link = window.URL.createObjectURL(new Blob([Editor.query().textarea.value]));
-      anchor.href = link;
-      anchor.download = `${Editor.query().getName("base")}.${extension}`;
-      anchor.click();
-      window.URL.revokeObjectURL(link);
-    } else {
-      var identifier = Editor.active_editor, handle;
-      if (!Editor.file_handles[identifier]){
-        handle = await window.showSaveFilePicker({ suggestedName: Editor.query().getName(), startIn: (Editor.file_handles[identifier]) ? Editor.file_handles[identifier] : "desktop" }).catch(error => {
-          if (error.message.toLowerCase().includes("abort")) return;
-        });
-        if (!handle) return;
-        Editor.file_handles[identifier] = await handle;
-      } else handle = Editor.file_handles[identifier];
-      var stream = await Editor.file_handles[identifier].createWritable().catch(error => {
-        alert(`"${Editor.query().getName()}" could not be saved.`);
-        if (error.toString().toLowerCase().includes("not allowed")) return;
-      });
-      if (!stream) return;
-      await stream.write(Editor.query().textarea.value);
-      await stream.close();
-      var currentName = Editor.query().getName(), file = await handle.getFile(), rename = await file.name;
-      if (currentName != rename) renameEditor({ name: rename });
-    }
-    if (Editor.query().tab.hasAttribute("data-editor-auto-created")) Editor.query().tab.removeAttribute("data-editor-auto-created");
-    if (Editor.query().tab.hasAttribute("data-editor-unsaved")) Editor.query().tab.removeAttribute("data-editor-unsaved");
-    refreshPreview({ force: true });
-  }
-  function createDisplay(){
-    var width = window.screen.availWidth * 2/3,
-      height = window.screen.availHeight * 2/3,
-      left = window.screen.availWidth / 2 + window.screen.availLeft - width / 2,
-      top = window.screen.availHeight / 2 + window.screen.availTop - height / 2,
-      features = (Editor.appearance().standalone || Editor.appearance().fullscreen) ? "popup" : "",
-      link = window.URL.createObjectURL(new Blob([Editor.query().textarea.value],{ type: "text/html" })),
-      win = window.open(link,"_blank",features);
-    window.URL.revokeObjectURL(link);
-    win.moveTo(left,top);
-    win.resizeTo(width,height);
-    Editor.child_windows.push(win);
-    window.setTimeout(() => {
-      if (!win.document.title) win.document.title = Editor.query().getName();
-    },20);
-  }
-  async function callCommand(element,action){/* I think I may remove this, or do something else with it. document.execCommand() is broken in so many ways, what a shame */
-    element.focus({ preventScroll: true });
-    if (action == "paste"){
-      var clipboard = await navigator.clipboard.readText().catch(error => alert("Could not access the clipboard, please check site permissions for clipboard use."));
-      document.execCommand("insertText",false,await clipboard);
-    } else document.execCommand(action);
-  }
-  function getNavigableElements({ container, scope = false } = {}){
-    scope = (scope) ? "" : ":scope > ";
-    var navigable = container.querySelectorAll(`${scope}button:not([disabled]), ${scope}textarea:not([disabled]), ${scope}input:not([disabled]), ${scope}select:not([disabled]), ${scope}a[href]:not([disabled]), ${scope}[tabindex]:not([tabindex="-1"])`);
-    return Array.from(navigable).filter(element => (getElementStyle({ element, property: "display" }) != "none"));
-  }
-  function getElementStyle({ element, pseudo = null, property } = {}){
-    return window.getComputedStyle(element,pseudo).getPropertyValue(property);
-  }
-  function applyEditingBehavior({ element, advanced = true } = {}){
-    var type = element.tagName.toLowerCase();
-    element.addEventListener("dragover",event => {
-      event.stopPropagation();
-      event.dataTransfer.dropEffect = "copy";
-    });
-    element.addEventListener("drop",event => {
-      if (Array.from(event.dataTransfer.items)[0].kind == "file") return;
-      event.stopPropagation();
-      document.querySelectorAll("menu-drop[data-open]").forEach(menu => menu.close());
-    });
-    if (type == "input"){
-      element.spellcheck = false;
-      element.autocomplete = "off";
-      element.autocapitalize = "none";
-      element.setAttribute("autocorrect","off");
-    }
-    if (type == "num-text"){
-      element.colorScheme.set("dark");
-      element.themes.remove("vanilla-appearance");
-      var scrollbarStyles = document.createElement("style");
-      scrollbarStyles.textContent = scrollbar_styles.textContent;
-      element.shadowRoot.insertBefore(scrollbarStyles,element.container);
+    getTextNodes(element){
+      return Array.from(element.childNodes).filter(node => node.nodeType == Node.TEXT_NODE && node.textContent.replace(/\s/g,"").length);
     }
   }
-  function sendShortcutAction({ control, command, shift, controlShift, shiftCommand, controlCommand, key } = {}){
-    if (!key) return;
-    var appleDevice = (Editor.environment().apple_device);
-    control = ((control && !appleDevice) || (controlShift && !appleDevice) || (controlCommand && appleDevice)), command = ((command && appleDevice) || (shiftCommand && appleDevice) || (controlCommand && appleDevice)), shift = (shift || (controlShift && !appleDevice) || (shiftCommand && appleDevice)), key = key.toString().toLowerCase();
-    document.body.dispatchEvent(new KeyboardEvent("keydown",{ ctrlKey: control, metaKey: command, shiftKey: shift, key }));
-  }
-  function refreshPreview({ force = false } = {}){
-    if (Editor.view() == "code") return;
-    var source = (Editor.preview_editor == "active-editor") ? Editor.query() : Editor.query(Editor.preview_editor);
-    if (!source.textarea) return;
-    var change = (source.tab.hasAttribute("data-editor-refresh") && Editor.settings.get("automatic-refresh") != false);
-    if (!change && !force) return;
-    preview.addEventListener("load",() => {
-      preview.contentWindow.document.open();
-      preview.contentWindow.document.write(source.textarea.value);
-      preview.contentWindow.document.close();
-    },{ once: true });
-    preview.src = "about:blank";
-    if (change) source.tab.removeAttribute("data-editor-refresh");
-  }
-  function setTitle({ content, reset = false } = {}){
-    document.title = `${(content && !reset) ? `${content} - ` : ""}Smart Text Editor`;
-  }
-  function addQueryParameters(entries){
-    var parameters = new URLSearchParams(window.location.search);
-    entries.forEach(entry => parameters.set(entry,true));
-    changeQueryParameters(parameters);
-  }
-  function removeQueryParameters(entries){
-    var parameters = new URLSearchParams(window.location.search);
-    entries.forEach(entry => parameters.delete(entry));
-    changeQueryParameters(parameters);
-  }
-  function changeQueryParameters(parameters){
-    var query = parameters.toString();
-    if (query) query = "?" + query;
-    var address = window.location.pathname + query;
-    history.pushState(null,"",address);
-  }
-  function showInstallPrompt(){
-    Editor.install_prompt.prompt();
-    Editor.install_prompt.userChoice.then(result => {
-      if (result.outcome != "accepted") return;
-      document.documentElement.classList.remove("install-prompt-available");
-      theme_button.childNodes[0].textContent = "Customize Theme";
-    });
-  }
-  function clearSiteCaches(){
-    if (confirm("Are you sure you would like to clear all app caches?\nSmart Text Editor will no longer work offline until an Internet connection is available.")) navigator.serviceWorker.controller.postMessage({ action: "clear-site-caches" });
-  }
-  function setScaling(event){
-    var { safe_area_insets: safeAreaInsets } = Editor.appearance(), scalingOffset, scalingRange = { minimum: ((Editor.orientation() == "vertical") ? workspace_tabs.offsetHeight : safeAreaInsets.left) + 80, maximum: ((Editor.orientation() == "horizontal") ? window.innerWidth - safeAreaInsets.right : (Editor.orientation() == "vertical") ? (window.innerHeight - header.offsetHeight - safeAreaInsets.bottom) : 0) - 80 }, touchEvent = (Editor.environment().touch_device && event instanceof TouchEvent);
-    if (Editor.orientation() == "horizontal") scalingOffset = (!touchEvent) ? event.pageX : event.touches[0].pageX;
-    if (Editor.orientation() == "vertical") scalingOffset = (!touchEvent) ? event.pageY - header.offsetHeight : event.touches[0].pageY - header.offsetHeight;
-    if (scalingOffset < scalingRange.minimum) scalingOffset = scalingRange.minimum;
-    if (scalingOffset > scalingRange.maximum) scalingOffset = scalingRange.maximum;
-    document.body.setAttribute("data-scaling-active",true);
-    workspace.style.setProperty("--scaling-offset",`${scalingOffset}px`);
-    scaler.style.setProperty("--scaling-offset",`${scalingOffset}px`);
-    preview.style.setProperty("--scaling-offset",`${scalingOffset}px`);
-  }
-  function disableScaling(event){
-    var touchEvent = (Editor.environment().touch_device && event instanceof TouchEvent);
-    if (!touchEvent){
-      document.removeEventListener("mousemove",setScaling);
-      document.removeEventListener("mouseup",disableScaling);
-    } else {
-      document.removeEventListener("touchmove",setScaling);
-      document.removeEventListener("touchend",disableScaling);
-    }
-    document.body.removeAttribute("data-scaling-change");
-  }
-  function removeScaling(){
-    if (!document.body.hasAttribute("data-scaling-active")) return;
-    document.body.removeAttribute("data-scaling-active");
-    workspace.style.removeProperty("--scaling-offset");
-    scaler.style.removeProperty("--scaling-offset");
-    preview.style.removeProperty("--scaling-offset");
-  }
+  window.customElements.define("workspace-tab",WorkspaceTabElement);
 </script>
 
 </body>
