@@ -6,7 +6,7 @@
 <title>Smart Text Editor</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#dddddd">
+<meta name="theme-color" content="#eaeaea">
 <base href="https://stedit.app" target="_blank">
 <link rel="preconnect" href="https://fonts.gstatic.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cousine&family=Rubik&display=swap">
@@ -49,17 +49,16 @@
   html {
     width: 100%;
     height: 100%;
-    background: #ffffff;
     overflow: hidden;
   }
   body {
     position: fixed;
     width: 100%;
     height: 100%;
-    display: grid;
-    grid-template-rows: min-content auto;
+    display: flex;
+    flex-direction: column;
     font-family: -apple-system, BlinkMacSystemFont, "Rubik", sans-serif;
-    background: inherit;
+    background: #cccccc;
     cursor: default;
     overflow: auto;
     -webkit-user-select: none;
@@ -193,7 +192,7 @@
     gap: 8px;
     align-items: center;
     font-size: 13px;
-    background: #dddddd;
+    background: #eaeaea;
     border: 0 solid transparent;
     border-top-width: calc(var(--safe-area-inset-top) + var(--titlebar-area-inset-top));
     border-bottom: 1px solid #00000060;
@@ -209,7 +208,7 @@
   header::after {
     width: calc(var(--safe-area-inset-right) + var(--titlebar-area-inset-right));
   }
-  app-icon {/* Cymande */
+  app-icon {
     flex-shrink: 0;
     display: flex;
   }
@@ -267,13 +266,22 @@
     flex-shrink: 0;
     fill: currentColor;
   }
-  main {background: #00f4;
-    display: grid;
-    grid-template-rows: min-content 1fr 16px 1fr;
+  main {
+    position: relative;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  app-workspace {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
   }
   workspace-tabs {
     padding: 0 6px;
     padding-bottom: 1px;
+    flex-shrink: 0;
     display: flex;
     box-shadow: 0 -1px 0 #00000060 inset, 0 -1px 0 #ffffff inset;
     overflow-x: auto;
@@ -299,7 +307,8 @@
     gap: 9px;
     font-size: 13px;
     border: 0 solid transparent;
-    border-width: 1px;
+    border-width: var(--border-width);
+    --border-width: 1px;
     border-radius: 7px 7px 0 0;
     isolation: isolate;
   }
@@ -327,9 +336,21 @@
   }
   workspace-tab .opener {
     position: absolute;
-    inset: -1px;
-    width: calc(100% + 2px);
+    inset: calc(var(--border-width) * -1);
+    width: calc(100% + var(--border-width) * 2);
     border-radius: inherit;
+  }
+  workspace-tab .opener:focus-visible::after {
+    content: "";
+    margin: auto;
+    margin-bottom: 0;
+    position: absolute;
+    inset: 0;
+    width: calc(100% - 20px);
+    height: 0;
+    border: calc(var(--border-width) * 2) solid transparent;
+    border-top: none;
+    border-bottom-color: currentColor;
   }
   workspace-tab .closer {
     margin: 0 -6px;
@@ -339,6 +360,7 @@
     height: 1em;
     justify-content: center;
     font-size: 10px;
+    font-weight: bold;
     line-height: 1em;
     border-radius: 4px;
     z-index: 1;
@@ -347,21 +369,31 @@
     background-color: #00000024;
   }
   workspace-editors {
-    display: grid;
-  }
-  workspace-scaler {
+    position: relative;
+    width: 100%;
+    height: 100%;
     display: flex;
   }
-  workspace-scaler button {
+  workspace-editors num-text {
+    position: absolute;
+    inset: 0;
+  }
+  app-scaler {
+    position: absolute;
+    height: 16px;
+    display: none;
+  }
+  app-scaler button {outline: revert;outline-offset: -2px;
     width: 100%;
     height: 100%;
     background: #808080;
     cursor: row-resize;
   }
-  workspace-previews {
-    display: grid;
+  app-preview {
+    position: absolute;
+    display: none;
   }
-  workspace-previews iframe {
+  app-preview iframe {
     width: 100%;
     height: 100%;
   }
@@ -442,22 +474,24 @@
 </header>
 
 <main>
-  <workspace-tabs>
-    <workspace-tab>File 1.html</workspace-tab>
-    <workspace-tab>File 2.html</workspace-tab>
-    <workspace-tab open>File 3.html</workspace-tab>
-    <workspace-tab>File 4.html</workspace-tab>
-    <workspace-tab>File 5.html</workspace-tab>
-  </workspace-tabs>
-  <workspace-editors>
-    <num-text></num-text>
-  </workspace-editors>
-  <workspace-scaler>
+  <app-workspace>
+    <workspace-tabs>
+      <workspace-tab>File 1.html</workspace-tab>
+      <workspace-tab>File 2.html</workspace-tab>
+      <workspace-tab open>File 3.html</workspace-tab>
+      <workspace-tab>File 4.html</workspace-tab>
+      <workspace-tab>File 5.html</workspace-tab>
+    </workspace-tabs>
+    <workspace-editors>
+      <num-text>this is an editor</num-text>
+    </workspace-editors>
+  </app-workspace>
+  <app-scaler>
     <button></button>
-  </workspace-scaler>
-  <workspace-previews>
+  </app-scaler>
+  <app-preview>
     <iframe></iframe>
-  </workspace-previews>
+  </app-preview>
 </main>
 
 <script>console.clear();
@@ -505,6 +539,46 @@
   }
 
   // Workspace
+  class WorkspaceTabsElement extends HTMLElement {
+    constructor(){
+      super();
+      this.defined = false;
+    }
+    connectedCallback(){
+      if (this.defined || !this.isConnected) return;
+      this.defined = true;
+      this.tabIndex = 0;
+      this.addEventListener("keydown",event => {
+        if (["ArrowLeft","ArrowUp"].includes(event.key)){
+          event.preventDefault();
+          let editors = Array.from(this.querySelectorAll("workspace-tab .opener"));
+          let selected = event.target;
+          let index = editors.indexOf(selected);
+          let previous = (index > 0) ? index - 1 : editors.length - 1;
+          editors[previous].focus();
+        }
+        if (["ArrowRight","ArrowDown"].includes(event.key)){
+          event.preventDefault();
+          let editors = Array.from(this.querySelectorAll("workspace-tab .opener"));
+          let selected = event.target;
+          let index = editors.indexOf(selected);
+          let next = (index < editors.length - 1) ? index + 1 : 0;
+          editors[next].focus();
+        }
+      });
+
+      this.addEventListener("focus",event => {
+        let openEditor = this.querySelector("workspace-tab[open] .opener");
+        if (openEditor) openEditor.focus();
+      });
+      this.addEventListener("focusout",event => {
+        let focusable = (!this.contains(event.relatedTarget)) ? 0 : -1;
+        if (this.tabIndex != focusable) this.tabIndex = focusable;
+      });
+    }
+  }
+  window.customElements.define("workspace-tabs",WorkspaceTabsElement);
+
   class WorkspaceTabElement extends HTMLElement {
     constructor(){
       super();
@@ -516,6 +590,7 @@
       window.requestAnimationFrame(() => {
         this.opener = document.createElement("button");
         this.opener.classList.add("opener");
+        this.opener.tabIndex = -1;
         this.name = document.createElement("span");
         this.name.classList.add("name");
         this.name.textContent = this.getTextNodes(this)[0].textContent;
@@ -523,6 +598,7 @@
         this.closer = document.createElement("button");
         this.closer.classList.add("closer");
         this.closer.title = "Close File";
+        this.closer.tabIndex = -1;
         this.closer.innerHTML = "✕";
         this.appendChild(this.opener);
         this.appendChild(this.name);
