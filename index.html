@@ -159,21 +159,25 @@
         window.localStorage.setItem("settings",JSON.stringify(Editor.settings.entries,null,"  "));
         return true;
       },
+      has: key => (key in Editor.settings.entries),
       get: key => {
         if (!Editor.support().local_storage) return;
-        if (!(key in Editor.settings.entries)) return;
+        if (!Editor.settings.has(key)) return;
         return Editor.settings.entries[key];
       },
-      reset: () => {
+      reset: ({ confirm: showPrompt = false } = {}) => {
         if (!Editor.support().local_storage) return;
-        if (!confirm("Are you sure you would like to reset all settings?")) return;
-        Editor.settings.entries = {};
+        if (showPrompt){
+          if (!confirm("Are you sure you would like to reset all settings?")) return false;
+        }
         default_orientation_setting.select("horizontal");
         setSyntaxHighlighting(false);
         syntax_highlighting_setting.checked = false;
         automatic_refresh_setting.checked = true;
+        preview_base_input.reset();
+        Editor.settings.entries = {};
         window.localStorage.removeItem("settings");
-        reset_settings_card.open();
+        if (showPrompt) reset_settings_card.open();
         return true;
       }
     },
@@ -237,6 +241,7 @@
   html {
     width: 100%;
     height: calc(100% + var(--safe-area-inset-top));
+    background: #121212;
     overflow: hidden;
   }
   body {
@@ -248,7 +253,7 @@
     color: #cccccc;
     font-size: 14px;
     font-family: var(--font-family-interface);
-    background: #121212;
+    background: inherit;
     overflow: hidden;
     -webkit-user-select: none;
     user-select: none;
@@ -598,8 +603,7 @@
     min-width: calc(var(--editor-name-width) + calc(var(--editor-rename-padding-x) + var(--editor-rename-border-width)) * 2);
     width: calc(var(--editor-rename-width,0px) + calc(var(--editor-rename-border-width) * 2));
     color: inherit;
-    font-size: inherit;
-    font-family: inherit;
+    font: inherit;
     background: none;
     border: var(--editor-rename-border-width) solid #ffffff80;
     --editor-rename-border-width: 1px;
@@ -899,8 +903,7 @@
   }
   button {
     color: inherit;
-    font-size: inherit;
-    font-family: inherit;
+    font: inherit;
     border-radius: 0;
   }
   a {
@@ -921,7 +924,7 @@
   num-text::part(container) {
     border-radius: inherit;
   }
-  input[type="text"] {
+  input:is([type="text"],[type="url"]) {
     padding: 8px;
     color: #eaeaea;
     caret-color: #eaeaea;
@@ -934,6 +937,21 @@
     outline: none;
     -webkit-appearance: none;
     appearance: none;
+  }
+  input[type="url"]:invalid {
+    color: #ffa600;
+    caret-color: #ffa600;
+    background: #362f21;
+  }
+  input[type="url"]:valid:not(:placeholder-shown):focus {
+    color: #60df20;
+    caret-color: #60df20;
+    background: #2a3126;
+  }
+  ::placeholder {
+    color: inherit;
+    opacity: 0.55;
+    white-space: pre-wrap;
   }
   ::selection {
     color: var(--selection-color);
@@ -1013,7 +1031,6 @@
   menu-drop {
     color: inherit;
     font: inherit;
-    font-size: inherit;
     line-height: 16px;
   }
   menu-drop {
@@ -1382,7 +1399,7 @@
     transform: scale(0);
   }
   .card.dialog .header .heading {
-    font-size: 18px;
+    font-size: 16px;
   }
   .card .header .card-controls {
     margin-left: auto;
@@ -1642,7 +1659,7 @@
     pointer-events: none;
     z-index: 2;
   }
-  .card input[type="text"] {
+  .card input:is([type="text"],[type="url"]) {
     border-radius: 6px;
     box-shadow: 0 2px 3px #00000090 inset;
   }
@@ -1680,6 +1697,12 @@
   }
   :root:not(.service-worker-activated) #settings_menu::part(clear-site-caches-option), :root:not(.service-worker-activated) #clear_site_caches_button {
     display: none;
+  }
+  #preview_base_input {
+    box-sizing: content-box;
+    min-width: calc(var(--placeholder-count,0) * 1ch);
+    max-width: min(40ch,75vw);
+    width: calc(var(--input-count,0) * 1ch);
   }
   #generator_output {
     width: 220px;
@@ -1788,8 +1811,10 @@
     <menu-drop id="preview_menu" data-select="no-appearance">
       <button>Preview</button>
       <ul>
-        <li data-value="active-editor" data-selected onclick="setPreviewSource({ active_editor: true });">Active Editor</li>
+        <li onclick="refreshPreview({ force: true });" data-shortcuts='{ "default": "Ctrl+Shift+Enter", "macOS": "Ctrl+Cmd+Return" }' data-no-select>Refresh</li>
+        <li onclick="preview_base_card.open();" data-shortcuts='{ "default": "Ctrl+Shift+B", "macOS": "Ctrl+Cmd+B" }' data-no-select>Base URL</li>
         <li><hr></li>
+        <li data-value="active-editor" data-selected onclick="setPreviewSource({ active_editor: true });">Active Editor</li>
       </ul>
     </menu-drop>
     <menu-drop id="tools_menu">
@@ -1827,7 +1852,7 @@
         <li part="install-option" onclick="showInstallPrompt();"><img src="resources/install.svg" alt="">Install</li>
         <li onclick="theme_card.open();"><img src="resources/template.svg" alt="">Theme Settings</li>
         <li part="clear-site-caches-option" onclick="clearSiteCaches();"><img src="resources/settings.svg" alt="">Clear Cache</li>
-        <li onclick="Editor.settings.reset();"><img src="resources/settings.svg" alt="">Reset Settings</li>
+        <li onclick="Editor.settings.reset({ confirm: true });"><img src="resources/settings.svg" alt="">Reset Settings</li>
       </ul>
     </menu-drop>
   </div>
@@ -1881,7 +1906,7 @@
       </div>
       <div class="options">
         <button id="clear_site_caches_button" class="warning" onclick="clearSiteCaches();">Clear Cache</button>
-        <button class="warning" onclick="Editor.settings.reset();">Reset Settings</button>
+        <button class="warning" onclick="Editor.settings.reset({ confirm: true });">Reset Settings</button>
       </div>
     </div>
   </ste-card>
@@ -1901,6 +1926,22 @@
       <!--div class="options">
         <button onclick="resetTheme();">Reset Theme</button>
       </div-->
+    </div>
+  </ste-card>
+  <ste-card id="preview_base_card" class="card dialog" data-type="dialog">
+    <div class="header">
+      <span class="heading">Base URL</span>
+    </div>
+    <div class="main">
+      <div class="content">
+        <div class="item list expand">
+          <input id="preview_base_input" type="url">
+        </div>
+      </div>
+      <div class="options">
+        <button onclick="preview_base_card.close();">Done</button>
+        <button onclick="preview_base_input.reset();">Reset</button>
+      </div>
     </div>
   </ste-card>
   <ste-card id="reset_settings_card" class="card alert" data-type="alert">
@@ -2179,7 +2220,7 @@
 
   document.querySelectorAll("img").forEach(image => image.draggable = false);
   document.querySelectorAll("num-text").forEach(textarea => applyEditingBehavior({ element: textarea }));
-  document.querySelectorAll("input[type='text']").forEach(input => applyEditingBehavior({ element: input }));
+  document.querySelectorAll("input:is([type='text'],[type='url'])").forEach(input => applyEditingBehavior({ element: input }));
   document.querySelectorAll(".checkbox").forEach(checkbox => {
     var input = checkbox.querySelector("input[type='checkbox']");
     checkbox.addEventListener("click",() => input.click());
@@ -2406,6 +2447,11 @@
       if (event.repeat) return;
       refreshPreview({ force: true });
     }
+    if ((controlShift || shiftCommand) && pressed("B")){
+      event.preventDefault();
+      if (event.repeat) return;
+      preview_base_card.open();
+    }
     if ((controlShift || shiftCommand) && pressed("f")){
       event.preventDefault();
       if (event.repeat) return;
@@ -2516,19 +2562,30 @@
     document.addEventListener("touchend",disableScaling,{ passive: true });
   },{ passive: true });
   card_backdrop.addEventListener("click",() => Editor.active_dialog.close());
+  preview_base_input.placeholder = document.baseURI;
+  preview_base_input.setWidth = () => preview_base_input.style.setProperty("--input-count",preview_base_input.value.length);
+  preview_base_input.setValue = value => {
+    preview_base_input.value = value;
+    preview_base_input.setWidth();
+  };
+  preview_base_input.reset = () => {
+    preview_base_input.setValue("");
+    if (!Editor.settings.has("preview-base")) return;
+    Editor.settings.remove("preview-base");
+    refreshPreview({ force: true });
+  };
+  preview_base_input.style.setProperty("--placeholder-count",preview_base_input.placeholder.length);
+  preview_base_input.addEventListener("input",event => event.target.setWidth());
+  preview_base_input.addEventListener("change",event => {
+    var empty = event.target.matches(":placeholder-shown"), valid = event.target.matches(":valid");
+    if (empty || !valid) Editor.settings.remove("preview-base");
+    if (!empty && valid) Editor.settings.set("preview-base",event.target.value);
+    if (empty || valid) refreshPreview({ force: true });
+  });
   generator_output.addEventListener("click",() => generator_output.select());
   generator_output.addEventListener("keydown",() => generator_output.click());
 
   window.requestAnimationFrame(() => createEditor({ auto_created: true }));
-  if (Editor.support().file_handling && Editor.support().file_system){
-    window.launchQueue.setConsumer(params => {
-      params.files.forEach(async handle => {
-        var file = await handle.getFile(), identifier = createEditor({ name: await file.name, value: await file.text() });
-        Editor.file_handles[identifier] = await handle;
-      });
-      if (!Editor.environment().touch_device) Editor.query().container.focus({ preventScroll: true });
-    });
-  }
   if (Editor.appearance().parent_window){
     if (Editor.settings.get("default-orientation")){
       var value = Editor.settings.get("default-orientation");
@@ -2541,7 +2598,17 @@
       syntax_highlighting_setting.checked = state;
     }
     if (Editor.settings.get("automatic-refresh") != undefined) automatic_refresh_setting.checked = Editor.settings.get("automatic-refresh");
+    if (Editor.settings.get("preview-base")) preview_base_input.setValue(Editor.settings.get("preview-base"));
     window.setTimeout(() => document.documentElement.classList.remove("startup-fade"),50);
+  }
+  if (Editor.support().file_handling && Editor.support().file_system){
+    window.launchQueue.setConsumer(params => {
+      params.files.forEach(async handle => {
+        var file = await handle.getFile(), identifier = createEditor({ name: await file.name, value: await file.text() });
+        Editor.file_handles[identifier] = await handle;
+      });
+      if (!Editor.environment().touch_device) Editor.query().container.focus({ preventScroll: true });
+    });
   }
   var queryParameters = new URLSearchParams(window.location.search);
   if (queryParameters.get("template")){
@@ -2935,17 +3002,27 @@
   }
   function refreshPreview({ force = false } = {}){
     if (Editor.view() == "code") return;
-    var source = (Editor.preview_editor == "active-editor") ? Editor.query() : Editor.query(Editor.preview_editor);
-    if (!source.textarea) return;
-    var change = (source.tab.hasAttribute("data-editor-refresh") && Editor.settings.get("automatic-refresh") != false);
+    var editor = (Editor.preview_editor == "active-editor") ? Editor.query() : Editor.query(Editor.preview_editor);
+    if (!editor.textarea) return;
+    var change = (editor.tab.hasAttribute("data-editor-refresh") && Editor.settings.get("automatic-refresh") != false);
     if (!change && !force) return;
+    var baseURL = Editor.settings.get("preview-base") || null, source = editor.textarea.value;
+    if (baseURL){
+      var sourceDOM = new DOMParser().parseFromString(source,"text/html"), baseElement = sourceDOM.querySelector("base");
+      if (baseURL && !baseElement){
+        baseElement = sourceDOM.createElement("base");
+        sourceDOM.head.appendChild(baseElement);
+      }
+      if (baseURL) baseElement.href = baseURL;
+      source = new XMLSerializer().serializeToString(sourceDOM);
+    }
     preview.addEventListener("load",() => {
       preview.contentWindow.document.open();
-      preview.contentWindow.document.write(source.textarea.value);
+      preview.contentWindow.document.write(source);
       preview.contentWindow.document.close();
     },{ once: true });
     preview.src = "about:blank";
-    if (change) source.tab.removeAttribute("data-editor-refresh");
+    if (change) editor.tab.removeAttribute("data-editor-refresh");
   }
   function setTitle({ content, reset = false } = {}){
     document.title = `${(content && !reset) ? `${content} - ` : ""}Smart Text Editor`;
@@ -2990,13 +3067,8 @@
   }
   function disableScaling(event){
     var touchEvent = (Editor.environment().touch_device && event instanceof TouchEvent);
-    if (!touchEvent){
-      document.removeEventListener("mousemove",setScaling);
-      document.removeEventListener("mouseup",disableScaling);
-    } else {
-      document.removeEventListener("touchmove",setScaling);
-      document.removeEventListener("touchend",disableScaling);
-    }
+    document.removeEventListener((!touchEvent) ? "mousemove" : "touchmove",setScaling);
+    document.removeEventListener((!touchEvent) ? "mouseup" : "touchend",disableScaling);
     document.body.removeAttribute("data-scaling-change");
   }
   function removeScaling(){
