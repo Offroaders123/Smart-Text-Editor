@@ -214,11 +214,13 @@
     --titlebar-area-inset-width-right: calc(100vw - env(titlebar-area-width,100vw) - var(--titlebar-area-inset-width-left));
     --titlebar-area-inset-height: env(titlebar-area-height,0px);
   }
-  :root:not(.window-controls-overlay) {
-    --titlebar-area-inset-width-left: 0px;
-    --titlebar-area-inset-width-right: 0px;
-    --titlebar-area-inset-top: 0px;
-    --titlebar-area-inset-height: 0px;
+  @media not (display-mode: fullscreen) {
+    :root:not(.window-controls-overlay) {
+      --titlebar-area-inset-width-left: 0px;
+      --titlebar-area-inset-width-right: 0px;
+      --titlebar-area-inset-top: 0px;
+      --titlebar-area-inset-height: 0px;
+    }
   }
   :root {
     --font-family-interface: -apple-system, BlinkMacSystemFont, "Rubik", sans-serif;
@@ -1939,7 +1941,6 @@
         </div>
       </div>
       <div class="options">
-        <button onclick="preview_base_card.close();">Done</button>
         <button onclick="preview_base_input.reset();">Reset</button>
       </div>
     </div>
@@ -3008,12 +3009,9 @@
     if (!change && !force) return;
     var baseURL = Editor.settings.get("preview-base") || null, source = editor.textarea.value;
     if (baseURL){
-      var sourceDOM = new DOMParser().parseFromString(source,"text/html"), baseElement = sourceDOM.querySelector("base");
-      if (baseURL && !baseElement){
-        baseElement = sourceDOM.createElement("base");
-        sourceDOM.head.appendChild(baseElement);
-      }
-      if (baseURL) baseElement.href = baseURL;
+      var sourceDOM = new DOMParser().parseFromString(source,"text/html"), baseElement = document.createElement("base");
+      sourceDOM.head.prepend(baseElement);
+      baseElement.href = baseURL;
       source = new XMLSerializer().serializeToString(sourceDOM);
     }
     preview.addEventListener("load",() => {
