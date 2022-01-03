@@ -43,6 +43,12 @@
       "sizes": "1024x1024"
     },
     {
+      "src": "resources/app-maskable-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
       "src": "resources/app-maskable-512.png",
       "type": "image/png",
       "sizes": "512x512",
@@ -63,8 +69,37 @@
       "url": "./?template=true",
       "icons": [
         {
-          "src": "resources/template.png",
+          "src": "resources/template-192.png",
+          "type": "image/png",
           "sizes": "192x192"
+        },
+        {
+          "src": "resources/template-512.png",
+          "type": "image/png",
+          "sizes": "512x512"
+        },
+        {
+          "src": "resources/template-1024.png",
+          "type": "image/png",
+          "sizes": "1024x1024"
+        },
+        {
+          "src": "resources/template-maskable-192.png",
+          "type": "image/png",
+          "sizes": "192x192",
+          "purpose": "maskable"
+        },
+        {
+          "src": "resources/template-maskable-512.png",
+          "type": "image/png",
+          "sizes": "512x512",
+          "purpose": "maskable"
+        },
+        {
+          "src": "resources/template-maskable-1024.png",
+          "type": "image/png",
+          "sizes": "1024x1024",
+          "purpose": "maskable"
         }
       ]
     },
@@ -75,8 +110,37 @@
       "url": "./?settings=true",
       "icons": [
         {
-          "src": "resources/settings.png",
+          "src": "resources/settings-192.png",
+          "type": "image/png",
           "sizes": "192x192"
+        },
+        {
+          "src": "resources/settings-512.png",
+          "type": "image/png",
+          "sizes": "512x512"
+        },
+        {
+          "src": "resources/settings-1024.png",
+          "type": "image/png",
+          "sizes": "1024x1024"
+        },
+        {
+          "src": "resources/settings-maskable-192.png",
+          "type": "image/png",
+          "sizes": "192x192",
+          "purpose": "maskable"
+        },
+        {
+          "src": "resources/settings-maskable-512.png",
+          "type": "image/png",
+          "sizes": "512x512",
+          "purpose": "maskable"
+        },
+        {
+          "src": "resources/settings-maskable-1024.png",
+          "type": "image/png",
+          "sizes": "1024x1024",
+          "purpose": "maskable"
         }
       ]
     }
