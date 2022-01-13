@@ -193,7 +193,6 @@
   if (Editor.environment().apple_device) document.documentElement.classList.add("apple-device");
   if (Editor.environment().macOS_device) document.documentElement.classList.add("macOS-device");
   if (Editor.support().web_sharing) document.documentElement.classList.add("web-sharing");
-  Editor.appearance().refresh_window_controls_overlay();
   Editor.appearance().refresh_device_pixel_ratio();
 </script>
 
@@ -2361,7 +2360,6 @@
   });
   window.addEventListener("unload",() => Editor.child_windows.forEach(window => window.close()));
   window.addEventListener("resize",event => {
-    Editor.appearance().refresh_window_controls_overlay();
     Editor.appearance().refresh_device_pixel_ratio();
     if (Editor.view() != "preview") setEditorTabsVisibility();
     if (Editor.view() == "split" && document.body.hasAttribute("data-scaling-active")) setView({ type: "split" });
@@ -2369,6 +2367,7 @@
   window.addEventListener("blur",() => {
     if (Editor.appearance().parent_window) document.querySelectorAll("menu-drop[data-open]").forEach(menu => menu.close());
   });
+  navigator.windowControlsOverlay.addEventListener("geometrychange",() => Editor.appearance().refresh_window_controls_overlay());
   document.body.addEventListener("keydown",event => {
     var pressed = key => (event.key.toLowerCase() == key.toLowerCase()), control = (event.ctrlKey && !Editor.environment().apple_device), command = (event.metaKey && Editor.environment().apple_device), shift = (event.shiftKey || ((event.key.toUpperCase() == event.key) && (event.key + event.key == event.key * 2))), controlShift = (control && shift), shiftCommand = (shift && command), controlCommand = (event.ctrlKey && command);
     if (pressed("Escape")){

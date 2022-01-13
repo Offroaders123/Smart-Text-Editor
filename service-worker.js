@@ -1,5 +1,5 @@
 self.Editor = {
-  version: 3.13,
+  version: 3.14,
   cache: true,
   environment: () => ({
     macOS_device: (/(macOS|Mac)/i.test(("userAgentData" in navigator) ? navigator.userAgentData.platform : navigator.platform) && navigator.standalone === undefined)
