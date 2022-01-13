@@ -193,6 +193,7 @@
   if (Editor.environment().apple_device) document.documentElement.classList.add("apple-device");
   if (Editor.environment().macOS_device) document.documentElement.classList.add("macOS-device");
   if (Editor.support().web_sharing) document.documentElement.classList.add("web-sharing");
+  Editor.appearance().refresh_window_controls_overlay();
   Editor.appearance().refresh_device_pixel_ratio();
 </script>
 
