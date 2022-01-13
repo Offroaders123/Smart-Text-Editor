@@ -2368,7 +2368,7 @@
   window.addEventListener("blur",() => {
     if (Editor.appearance().parent_window) document.querySelectorAll("menu-drop[data-open]").forEach(menu => menu.close());
   });
-  navigator.windowControlsOverlay.addEventListener("geometrychange",() => Editor.appearance().refresh_window_controls_overlay());
+  if (Editor.support().window_controls_overlay) navigator.windowControlsOverlay.addEventListener("geometrychange",() => Editor.appearance().refresh_window_controls_overlay());
   document.body.addEventListener("keydown",event => {
     var pressed = key => (event.key.toLowerCase() == key.toLowerCase()), control = (event.ctrlKey && !Editor.environment().apple_device), command = (event.metaKey && Editor.environment().apple_device), shift = (event.shiftKey || ((event.key.toUpperCase() == event.key) && (event.key + event.key == event.key * 2))), controlShift = (control && shift), shiftCommand = (shift && command), controlCommand = (event.ctrlKey && command);
     if (pressed("Escape")){
