@@ -2945,7 +2945,10 @@
       left = window.screen.availWidth / 2 + window.screen.availLeft - width / 2,
       top = window.screen.availHeight / 2 + window.screen.availTop - height / 2,
       features = (Editor.appearance().standalone || Editor.appearance().fullscreen) ? "popup" : "",
-      link = window.URL.createObjectURL(new Blob([Editor.query().textarea.value],{ type: "text/html" })),
+      baseURL = Editor.settings.get("preview-base") || null,
+      source = Editor.query().textarea.value;
+    if (baseURL) source = `<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
+    var link = window.URL.createObjectURL(new Blob([source],{ type: "text/html" })),
       win = window.open(link,"_blank",features);
     window.URL.revokeObjectURL(link);
     win.moveTo(left,top);
@@ -3008,12 +3011,7 @@
     var change = (editor.tab.hasAttribute("data-editor-refresh") && Editor.settings.get("automatic-refresh") != false);
     if (!change && !force) return;
     var baseURL = Editor.settings.get("preview-base") || null, source = editor.textarea.value;
-    if (baseURL){
-      var sourceDOM = new DOMParser().parseFromString(source,"text/html"), baseElement = document.createElement("base");
-      sourceDOM.head.prepend(baseElement);
-      baseElement.href = baseURL;
-      source = new XMLSerializer().serializeToString(sourceDOM);
-    }
+    if (baseURL) source = `<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
     preview.addEventListener("load",() => {
       preview.contentWindow.document.open();
       preview.contentWindow.document.write(source);
