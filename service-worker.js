@@ -1,5 +1,5 @@
 self.Editor = {
-  version: 3.18,
+  version: `Smart Text Editor v${3.19}`,
   cache: true,
   environment: () => ({
     macOS_device: (/(macOS|Mac)/i.test(("userAgentData" in navigator) ? navigator.userAgentData.platform : navigator.platform) && navigator.standalone === undefined)
@@ -8,13 +8,13 @@ self.Editor = {
 }
 self.addEventListener("activate",event => {
   event.waitUntil(caches.keys().then(versions => Promise.all(versions.map(cache => {
-    if (cache !== Editor.version) return caches.delete(cache);
+    if (cache.startsWith("Smart Text Editor") && cache !== Editor.version) return caches.delete(cache);
   }))));
   event.waitUntil(clients.claim());
   postMessageAllClients({ action: "service-worker-activated" });
 });
 self.addEventListener("fetch",event => {
-  if (event.request.method == "POST"){
+  if (event.request.method === "POST"){
     event.respondWith(Response.redirect("/?share-target=true",303));
     return event.waitUntil((async () => {
       Editor.share_files = Array.from(await event.request.formData()).map(file => file[1]);

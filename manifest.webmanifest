@@ -3,7 +3,7 @@
   "short_name": "Text Editor",
   "description": "The text editor that requires only a browser and a keyboard!",
   "start_url": "./",
-  "scope": ".",
+  "scope": "./",
   "display": "standalone",
   "display_override": ["window-controls-overlay"],
   "theme_color": "#1e1e1e",
