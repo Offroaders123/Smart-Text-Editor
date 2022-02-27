@@ -3266,84 +3266,97 @@
             workspace_editors.appendChild(container);
             container.editor.addEventListener("beforeinput", /** @param {InputEvent} ev */ (ev) => {
                 if ((ev.data || "nnn").length > 1 && ev.type === "insertText") return;
+                var ext = editorName.innerText.split(".").pop().toLowerCase();
                 var selection = {
                     start: container.editor.selectionStart,
                     end: container.editor.selectionEnd
                 }
                 var editsMade = false;
                 var currentSelection = container.editor.value.substring(container.editor.selectionStart, container.editor.selectionEnd);
-                if (ev.data == "{" && !container.editor.value.substring(container.editor.selectionEnd, (container.editor.value.indexOf("\n", container.editor.selectionEnd) > -1 ? container.editor.value.indexOf("\n", container.editor.selectionEnd) : container.editor.value.length)).trim().startsWith("}")) {
-                    editsMade = true;
-                    ev.preventDefault();
-                    document.execCommand("insertText", null, `{${currentSelection}}`);
-                    setTimeout(() => {
-                        container.editor.selectionStart = selection.start + 1;
-                        container.editor.selectionEnd = selection.end + 1;
-                    }, 2);
-                }
-                if (ev.data == "[" && !container.editor.value.substring(container.editor.selectionEnd, (container.editor.value.indexOf("\n", container.editor.selectionEnd) > -1 ? container.editor.value.indexOf("\n", container.editor.selectionEnd) : container.editor.value.length)).trim().startsWith("]")) {
-                    editsMade = true;
-                    ev.preventDefault();
-                    document.execCommand("insertText", null, `[${currentSelection}]`);
-                    setTimeout(() => {
-                        container.editor.selectionStart = selection.start + 1;
-                        container.editor.selectionEnd = selection.end + 1;
-                    }, 2);
-                }
-                if (ev.data == "(" && !container.editor.value.substring(container.editor.selectionEnd, (container.editor.value.indexOf("\n", container.editor.selectionEnd) > -1 ? container.editor.value.indexOf("\n", container.editor.selectionEnd) : container.editor.value.length)).trim().startsWith(")")) {
-                    editsMade = true;
-                    ev.preventDefault();
-                    document.execCommand("insertText", null, `(${currentSelection})`);
-                    setTimeout(() => {
-                        container.editor.selectionStart = selection.start + 1;
-                        container.editor.selectionEnd = selection.end + 1;
-                    }, 2);
-                }
-                if (ev.data == '"' && !container.editor.value.substring(container.editor.selectionEnd, (container.editor.value.indexOf("\n", container.editor.selectionEnd) > -1 ? container.editor.value.indexOf("\n", container.editor.selectionEnd) : container.editor.value.length)).trim().startsWith('"')) {
-                    editsMade = true;
-                    ev.preventDefault();
-                    document.execCommand("insertText", null, `"${currentSelection}"`);
-                    setTimeout(() => {
-                        container.editor.selectionStart = selection.start + 1;
-                        container.editor.selectionEnd = selection.end + 1;
-                    }, 2);
-                }
-                if (ev.data == "'" && !container.editor.value.substring(container.editor.selectionEnd, (container.editor.value.indexOf("\n", container.editor.selectionEnd) > -1 ? container.editor.value.indexOf("\n", container.editor.selectionEnd) : container.editor.value.length)).trim().startsWith("'")) {
-                    editsMade = true;
-                    ev.preventDefault();
-                    document.execCommand("insertText", null, `'${currentSelection}'`);
-                    setTimeout(() => {
-                        container.editor.selectionStart = selection.start + 1;
-                        container.editor.selectionEnd = selection.end + 1;
-                    }, 2);
-                }
-                if (ev.data == "`" && !container.editor.value.substring(container.editor.selectionEnd, (container.editor.value.indexOf("\n", container.editor.selectionEnd) > -1 ? container.editor.value.indexOf("\n", container.editor.selectionEnd) : container.editor.value.length)).trim().startsWith("`")) {
-                    editsMade = true;
-                    ev.preventDefault();
-                    document.execCommand("insertText", null, `\`${currentSelection}\``);
-                    setTimeout(() => {
-                        container.editor.selectionStart = selection.start + 1;
-                        container.editor.selectionEnd = selection.end + 1;
-                    }, 2);
-                }
-                if (ev.inputType.trim() === "insertLineBreak" && ["{", "[", "("].includes(container.editor.value.substring(selection.start - 1, selection.start).trim())) {
-                    ev.preventDefault();
-                    var indexes = [0];
-                    [...container.editor.value.matchAll("\n")].forEach((lb) => {
-                        indexes.push(lb.index);
+                var scriptPositions = [];
+                if (["htm", "html", "xml"].includes("ext")) {
+                    [...container.editor.value.matchAll(/<script>[a-z\s]+<\/script>/gmi)].map((o) => o.index).forEach((val, i) => {
+                        if (!scriptPositions[Math.floor(i / 2)]) scriptPositions[Math.floor(i / 2)] = [];
+                        scriptPositions[Math.floor(i / 2)].push(val);
                     });
-                    var prevLineIndex = indexes.find((index, arrI) => selection.start >= index && selection.start < (indexes[arrI + 1] || container.editor.value.length));
-                    var prevLine = container.editor.value.substring(prevLineIndex + 1, (container.editor.value.indexOf("\n", prevLineIndex + 1) > -1 ? container.editor.value.indexOf("\n", prevLineIndex + 1) : container.editor.value.length));
-                    var tabs = 0;
-                    [...prevLine.matchAll(/^( {4})/gim)].forEach((lb) => {
-                        var str = lb[0];
-                        tabs = str.split(/.{4}/gim).length - 1;
-                    });
-                    document.execCommand("insertText", null, `\n${"    ".repeat(tabs + 1)}\n${"    ".repeat(tabs)}`);
-                    setTimeout(() => {
-                        container.editor.selectionStart = selection.start + 1 + ("    ".repeat(tabs + 1)).length;
-                        container.editor.selectionEnd = selection.end + 1 + ("    ".repeat(tabs + 1)).length;
-                    }, 2);
+                }
+                if (scriptPositions.length < 1) scriptPositions = [
+                    [0, container.editor.value.length]
+                ];
+                if (["js", "javascript", "ts", "json", "webmanifest"].includes(ext) || (["htm", "html", "xml"].includes("ext") && !!scriptPositions.find((vals) => vals[0] + 8 <= selection.start && vals[1] - 9 >= selection.end))) {
+                    if (ev.data == "{" && !container.editor.value.substring(container.editor.selectionEnd, (container.editor.value.indexOf("\n", container.editor.selectionEnd) > -1 ? container.editor.value.indexOf("\n", container.editor.selectionEnd) : container.editor.value.length)).trim().startsWith("}")) {
+                        editsMade = true;
+                        ev.preventDefault();
+                        document.execCommand("insertText", null, `{${currentSelection}}`);
+                        setTimeout(() => {
+                            container.editor.selectionStart = selection.start + 1;
+                            container.editor.selectionEnd = selection.end + 1;
+                        }, 2);
+                    }
+                    if (ev.data == "[" && !container.editor.value.substring(container.editor.selectionEnd, (container.editor.value.indexOf("\n", container.editor.selectionEnd) > -1 ? container.editor.value.indexOf("\n", container.editor.selectionEnd) : container.editor.value.length)).trim().startsWith("]")) {
+                        editsMade = true;
+                        ev.preventDefault();
+                        document.execCommand("insertText", null, `[${currentSelection}]`);
+                        setTimeout(() => {
+                            container.editor.selectionStart = selection.start + 1;
+                            container.editor.selectionEnd = selection.end + 1;
+                        }, 2);
+                    }
+                    if (ev.data == "(" && !container.editor.value.substring(container.editor.selectionEnd, (container.editor.value.indexOf("\n", container.editor.selectionEnd) > -1 ? container.editor.value.indexOf("\n", container.editor.selectionEnd) : container.editor.value.length)).trim().startsWith(")")) {
+                        editsMade = true;
+                        ev.preventDefault();
+                        document.execCommand("insertText", null, `(${currentSelection})`);
+                        setTimeout(() => {
+                            container.editor.selectionStart = selection.start + 1;
+                            container.editor.selectionEnd = selection.end + 1;
+                        }, 2);
+                    }
+                    if (ev.data == '"' && !container.editor.value.substring(container.editor.selectionEnd, (container.editor.value.indexOf("\n", container.editor.selectionEnd) > -1 ? container.editor.value.indexOf("\n", container.editor.selectionEnd) : container.editor.value.length)).trim().startsWith('"')) {
+                        editsMade = true;
+                        ev.preventDefault();
+                        document.execCommand("insertText", null, `"${currentSelection}"`);
+                        setTimeout(() => {
+                            container.editor.selectionStart = selection.start + 1;
+                            container.editor.selectionEnd = selection.end + 1;
+                        }, 2);
+                    }
+                    if (ev.data == "'" && !container.editor.value.substring(container.editor.selectionEnd, (container.editor.value.indexOf("\n", container.editor.selectionEnd) > -1 ? container.editor.value.indexOf("\n", container.editor.selectionEnd) : container.editor.value.length)).trim().startsWith("'")) {
+                        editsMade = true;
+                        ev.preventDefault();
+                        document.execCommand("insertText", null, `'${currentSelection}'`);
+                        setTimeout(() => {
+                            container.editor.selectionStart = selection.start + 1;
+                            container.editor.selectionEnd = selection.end + 1;
+                        }, 2);
+                    }
+                    if (ev.data == "`" && !container.editor.value.substring(container.editor.selectionEnd, (container.editor.value.indexOf("\n", container.editor.selectionEnd) > -1 ? container.editor.value.indexOf("\n", container.editor.selectionEnd) : container.editor.value.length)).trim().startsWith("`")) {
+                        editsMade = true;
+                        ev.preventDefault();
+                        document.execCommand("insertText", null, `\`${currentSelection}\``);
+                        setTimeout(() => {
+                            container.editor.selectionStart = selection.start + 1;
+                            container.editor.selectionEnd = selection.end + 1;
+                        }, 2);
+                    }
+                    if (ev.inputType.trim() === "insertLineBreak" && ["{", "[", "("].includes(container.editor.value.substring(selection.start - 1, selection.start).trim())) {
+                        ev.preventDefault();
+                        var indexes = [0];
+                        [...container.editor.value.matchAll("\n")].forEach((lb) => {
+                            indexes.push(lb.index);
+                        });
+                        var prevLineIndex = indexes.find((index, arrI) => selection.start >= index && selection.start < (indexes[arrI + 1] || container.editor.value.length));
+                        var prevLine = container.editor.value.substring(prevLineIndex + 1, (container.editor.value.indexOf("\n", prevLineIndex + 1) > -1 ? container.editor.value.indexOf("\n", prevLineIndex + 1) : container.editor.value.length));
+                        var tabs = 0;
+                        [...prevLine.matchAll(/^( {4})/gim)].forEach((lb) => {
+                            var str = lb[0];
+                            tabs = str.split(/.{4}/gim).length - 1;
+                        });
+                        document.execCommand("insertText", null, `\n${"    ".repeat(tabs + 1)}\n${"    ".repeat(tabs)}`);
+                        setTimeout(() => {
+                            container.editor.selectionStart = selection.start + 1 + ("    ".repeat(tabs + 1)).length;
+                            container.editor.selectionEnd = selection.end + 1 + ("    ".repeat(tabs + 1)).length;
+                        }, 2);
+                    }
                 }
                 if (ev.inputType.trim() === "insertLineBreak" && !["{", "[", "("].includes(container.editor.value.substring(selection.start - 1, selection.start).trim())) {
                     ev.preventDefault();
@@ -3385,7 +3398,7 @@
                                 name: "indent_empty_lines",
                                 value: true
                             }]));
-                        } else if (["html", "htm", "xml"]) {
+                        } else if (["html", "htm", "xml"].includes(ext)) {
                             textarea.selectionStart = 0;
                             textarea.selectionEnd = textarea.value.length;
                             document.execCommand("insertText", null, html_format(textarea.value, [{
