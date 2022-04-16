@@ -331,8 +331,9 @@
     display: none;
   }
   header .app-icon img {
-    width: 16px;height: 16px;
-    /*aspect-ratio: 1/1;*/
+    width: 16px;
+    height: 16px;
+    /* aspect-ratio: 1 / 1; */
   }
   header .app-menubar {
     min-width: 0;
@@ -351,26 +352,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
-  header .app-menubar menu-drop::part(opener):hover, header .app-menubar menu-drop::part(opener):focus, header .app-menubar menu-drop[data-open]::part(opener) {
-    color: #ffffff;
-    background: #ffffff24;
-  }
-  header .app-menubar menu-drop:not([data-open])::part(opener):not(:hover):focus:not(:focus-visible) {
-    color: inherit;
-    background: none;
-  }
-  header .app-menubar menu-drop::part(opener):focus-visible {
-    color: #ffffff;
-    background: #ffffff24;
-  }
-/* -- Future Focus Visible --
   header .app-menubar menu-drop::part(opener):where(:hover,:focus-visible), header .app-menubar menu-drop[data-open]::part(opener) {
     color: #ffffff;
     background: #ffffff24;
   }
-*/
-
   header .app-omnibox {
     margin-left: auto;
     height: var(--header-height);
@@ -416,23 +401,19 @@
   header .app-omnibox .option:hover {
     background-color: #ffffff14;
   }
-
   header .app-omnibox .option:where(:active,:focus-visible) {
     background-color: #ffffff22;
   }
-/* Temp Where */
-  header .app-omnibox .option:-webkit-any(:active,:focus-visible) {
-    background-color: #ffffff22;
-  }
-
   header .app-omnibox .option svg {
     width: 14px;
     height: 14px;
+    /* aspect-ratio: 1 / 1; */
     flex-shrink: 0;
     fill: currentColor;
   }
   :root.window-controls-overlay header .app-omnibox .option svg {
-    width: calc(14px / var(--device-pixel-ratio));height: calc(14px / var(--device-pixel-ratio));
+    width: calc(14px / var(--device-pixel-ratio));
+    height: calc(14px / var(--device-pixel-ratio));
   }
   main {
     padding: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
@@ -455,17 +436,10 @@
     display: flex;
     flex-direction: column;
   }
-
-/* Temp Where */
-  body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace {
-    transition: var(--main-transition-duration);
-    transition-property: width, height, opacity;
-  }
   body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace {
     transition: var(--main-transition-duration);
     transition-property: width, height, opacity;
   }
-
   body.code main .workspace {
     width: 100%;
     height: 100%;
@@ -516,15 +490,9 @@
     flex-shrink: 0;
     pointer-events: none;
   }
-
-/* Temp Where */
-  body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-tabs::before, body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-tabs::after {
-    transition: width var(--main-transition-duration);
-  }
   body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-tabs::before, body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-tabs::after {
     transition: width var(--main-transition-duration);
   }
-
   main .workspace .workspace-tabs::before {
     width: calc(var(--safe-area-inset-left) + var(--workspace-tabs-padding));
   }
@@ -639,25 +607,14 @@
   main .workspace .workspace-tabs .create-editor-button:only-child {
     display: none;
   }
-
-  main .workspace .workspace-tabs .create-editor-button:hover, main .workspace .workspace-tabs .create-editor-button:active {
-    color: #ffffff;
-    background-color: #ffffff24;
-  }
-  main .workspace .workspace-tabs .create-editor-button:focus-visible {
-    color: #ffffff;
-    background-color: #ffffff24;
-  }
-/* -- Future Where --
   main .workspace .workspace-tabs .create-editor-button:where(:hover,:active,:focus-visible) {
     color: #ffffff;
     background-color: #ffffff24;
   }
-*/
-
   main .workspace .workspace-tabs .create-editor-button svg {
-    width: 8px;height: 8px;
-    /*aspect-ratio: 1/1;*/
+    width: 8px;
+    height: 8px;
+    /* aspect-ratio: 1 / 1; */
     fill: currentColor;
     transform: rotate(45deg);
   }
@@ -673,26 +630,14 @@
   :root:not(.startup-fade) main .workspace .workspace-editors:empty {
     border-width: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
   }
-
-/* Temp Where */
-  :root:not(.startup-fade) body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-editors:empty {
-    transition: var(--main-transition-duration);
-    transition-property: border-width, border-color;
-  }
   :root:not(.startup-fade) body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-editors:empty {
     transition: var(--main-transition-duration);
     transition-property: border-width, border-color;
   }
-
   :root:not(.startup-fade) main .workspace .workspace-editors:empty::before {
     content: "No Editors Open";
     padding: 8px;
     text-align: center;
-  }
-
-/* Temp Where */
-  :root:not(.startup-fade) body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-editors:empty::before {
-    transition: transform var(--main-transition-duration);
   }
   :root:not(.startup-fade) body[data-view-change] main .workspace .workspace-editors:empty::before {
     white-space: nowrap;
@@ -700,7 +645,6 @@
   :root:not(.startup-fade) body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-editors:empty::before {
     transition: transform var(--main-transition-duration);
   }
-
   :root:not(.startup-fade) body.preview main .workspace .workspace-editors:empty::before {
     transform: scale(0);
   }
@@ -710,7 +654,7 @@
   :root:not(.startup-fade) body.preview.horizontal main .workspace .workspace-editors:empty {
     border-right-width: 0;
   }
-  @media (orientation: portrait) and (max-aspect-ratio: 5/8) {
+  @media (orientation: portrait) and (max-aspect-ratio: 5 / 8) {
     :root:not(.startup-fade) body.split.horizontal main .workspace .workspace-editors:empty {
       border-bottom-color: var(--preview-border-color);
     }
@@ -736,24 +680,17 @@
     --scrollbar-height: 18px;
     --scrollbar-border-width: 5px;
   }
-
-/* Temp Where */
-  body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .editor {
-    transition: var(--main-transition-duration);
-    transition-property: border-width, border-color;
-  }
   body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .editor {
     transition: var(--main-transition-duration);
     transition-property: border-width, border-color;
   }
-
   body.split.horizontal main .workspace .editor {
     border-right-width: 0;
   }
   body.preview.horizontal main .workspace .editor {
     border-right-width: 0;
   }
-  @media (orientation: portrait) and (max-aspect-ratio: 5/8) {
+  @media (orientation: portrait) and (max-aspect-ratio: 5 / 8) {
     body.split.horizontal main .workspace .editor {
       border-bottom-color: var(--preview-border-color);
     }
@@ -782,17 +719,10 @@
     z-index: 1;
     transition: background-color var(--transition-fast);
   }
-
-/* Temp Where */
-  body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .scaler {
-    transition: var(--main-transition-duration);
-    transition-property: left, top, width, height, border-width, border-color, opacity;
-  }
   body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .scaler {
     transition: var(--main-transition-duration);
     transition-property: left, top, width, height, border-width, border-color, opacity;
   }
-
   main .scaler:hover, body[data-scaling-change] main .scaler {
     background: #4f4f4f;
   }
@@ -810,7 +740,7 @@
     height: 100%;
     cursor: col-resize;
   }
-  @media (orientation: portrait) and (max-aspect-ratio: 5/8) {
+  @media (orientation: portrait) and (max-aspect-ratio: 5 / 8) {
     body.horizontal main .scaler {
       border-bottom-width: var(--safe-area-inset-bottom);
       border-bottom-color: var(--preview-border-color);
@@ -857,17 +787,10 @@
     border-width: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
     z-index: 1;
   }
-
-/* Temp Where */
-  body:-webkit-any([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .preview {
-    transition: var(--main-transition-duration);
-    transition-property: width, height, border-width, visibility, opacity;
-  }
   body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .preview {
     transition: var(--main-transition-duration);
     transition-property: width, height, border-width, visibility, opacity;
   }
-
   body.code main .preview {
     visibility: hidden;
     opacity: 0;
@@ -1009,25 +932,14 @@
     border-radius: calc(4px + var(--option-border-width));
     outline: none;
   }
-
-  .tab .option:hover, .tab .option:active {
-    color: #ffffff;
-    background-color: #ffffff24;
-  }
-  .tab .option:focus-visible {
-    color: #ffffff;
-    background-color: #ffffff24;
-  }
-/* -- Future Where --
   .tab .option:where(:hover,:active,:focus-visible) {
     color: #ffffff;
     background-color: #ffffff24;
   }
-*/
-
   .tab .option svg {
-    width: 8px;height: 8px;
-    /*aspect-ratio: 1/1;*/
+    width: 8px;
+    height: 8px;
+    /* aspect-ratio: 1 / 1; */
     fill: currentColor;
   }
   menu-drop {
@@ -1089,10 +1001,14 @@
     --sub-list-option-color-interact: #ffffff;
     --sub-list-option-background-color-interact: #ffffff1c;
     border: 1px solid transparent;
-  }/* -- For some reason the :focus-visible styles are showing up by default when the page starts up, so I disabled the focus outline for now. --
+  }
+
+  /* -- For some reason the :focus-visible styles are showing up by default when the page starts up, so I disabled the focus outline for now. --
   menu-drop::part(option):focus-visible {
     border-color: #c0c0c0;
-  }*/
+  }
+  */
+
   menu-drop[data-select]::part(option)::before {
     content: "";
     height: var(--option-selected-icon-width);
@@ -1104,8 +1020,9 @@
     transform-origin: center;
   }
   menu-drop::part(icon) {
-    width: 16px;height: 16px;
-    /*aspect-ratio: 1/1;*/
+    width: 16px;
+    height: 16px;
+    /* aspect-ratio: 1 / 1; */
   }
   menu-drop::part(icon invert) {
     filter: invert() hue-rotate(180deg);
@@ -1133,15 +1050,9 @@
     align-items: center;
     transition: color var(--transition-fast);
   }
-
-/* Temp Where */
-  .select:-webkit-any(:hover,:active,:focus-within) label, .select:-webkit-any(:hover,:active,:focus-within) menu-drop::part(opener) {
-    color: #ffffff;
-  }
   .select:where(:hover,:active,:focus-within) label, .select:where(:hover,:active,:focus-within) menu-drop::part(opener) {
     color: #ffffff;
-  }
-  
+  }  
   .select menu-drop::part(opener) {
     padding: 2px 8px;
     min-width: 74px;
@@ -1155,17 +1066,10 @@
   .select:hover menu-drop::part(opener) {
     background: #4f4f4f;
   }
-
-/* Temp Where */
-  .select menu-drop::part(opener):-webkit-any(:hover,:active,:focus-visible), .select:focus-within menu-drop::part(opener), .select menu-drop[data-open]::part(opener) {
-    color: #ffffff;
-    background: #4f4f4f;
-  }
   .select menu-drop::part(opener):where(:hover,:active,:focus-visible), .select:focus-within menu-drop::part(opener), .select menu-drop[data-open]::part(opener) {
     color: #ffffff;
     background: #4f4f4f;
   }
-
   .select menu-drop::part(opener):focus-visible {
     border-color: #c0c0c0;
   }
@@ -1190,15 +1094,9 @@
     transition: var(--transition-fast);
     transition-property: color, border-color, opacity;
   }
-
-/* Temp Where */
-  .checkbox:-webkit-any(:hover,:active,:focus-visible) {
-    color: #ffffff;
-  }
   .checkbox:where(:hover,:active,:focus-visible) {
     color: #ffffff;
   }
-
   .checkbox:active {
     opacity: 0.85;
   }
@@ -1219,27 +1117,23 @@
   .checkbox label::before {
     content: "";
     padding: var(--check-padding);
-    width: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));height: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));
-    /*aspect-ratio: 1/1;*/
+    width: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));
+    height: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));
+    /* aspect-ratio: 1 / 1; */
     background: #ffffff0c;
     border: var(--checkbox-check-border-width) solid currentColor;
     border-radius: calc(var(--check-padding) + calc(var(--checkbox-check-border-width) * 2));
     transition: background-color var(--transition-fast);
   }
-
-/* Temp Where */
-  .checkbox:-webkit-any(:hover,:active,:focus-visible) label::before {
-    background: #ffffff1c;
-  }
   .checkbox:where(:hover,:active,:focus-visible) label::before {
     background: #ffffff1c;
   }
-
   .checkbox label .check {
     padding: calc(var(--check-padding) + var(--checkbox-check-border-width));
     position: absolute;
-    width: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));height: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));
-    /*aspect-ratio: 1/1;*/
+    width: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));
+    height: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));
+    /* aspect-ratio: 1 / 1; */
     fill: currentColor;
     transform: rotate(-45deg) scale(0);
     transform-origin: 45% 65%;
@@ -1352,33 +1246,23 @@
   .card .header:not([data-card-parent]) .card-back {
     display: none;
   }
-
-  .card .header .card-back:hover, .card .header .card-back:active {
-    color: #ffffff;
-    background: #ffffff24;
-  }
-  .card .header .card-back:focus-visible {
-    color: #ffffff;
-    background: #ffffff24;
-  }
-/* -- Future Where --
   .card .header .card-back:where(:hover,:active,:focus-visible) {
     color: #ffffff;
     background: #ffffff24;
   }
-*/
-
   .card .header .card-back svg {
-    width: 12px;height: 12px;
-    /*aspect-ratio: 1/1;*/
+    width: 12px;
+    height: 12px;
+    /* aspect-ratio: 1 / 1; */
     fill: currentColor;
   }
   .card .header .icon {
     margin: 8px;
     margin-left: 12px;
     margin-right: 0;
-    width: 20px;height: 20px;
-    /*aspect-ratio: 1/1;*/
+    width: 20px;
+    height: 20px;
+    /* aspect-ratio: 1 / 1; */
   }
   .card .header .heading {
     white-space: pre;
@@ -1434,34 +1318,13 @@
     --control-padding: 10px;
     --control-background: none;
   }
-
-  :root:not(.macOS-device) .card .header .card-controls .control:hover, :root:not(.macOS-device) .card .header .card-controls .control:active {
-    color: #ffffff;
-    --control-background: #ffffff24;
-  }
-  :root:not(.macOS-device) .card .header .card-controls .control:focus-visible {
-    color: #ffffff;
-    --control-background: #ffffff24;
-  }
-/* -- Future Where
   :root:not(.macOS-device) .card .header .card-controls .control:where(:hover,:active,:focus-visible) {
     color: #ffffff;
     --control-background: #ffffff24;
   }
-*/
-
-  :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:hover, :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:active {
-    --control-background: #cc2a24;
-  }
-  :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:focus-visible {
-    --control-background: #cc2a24;
-  }
-/* -- Future Where
   :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:where(:hover,:active,:focus-visible) {
     --control-background: #cc2a24;
   }
-*/
-
   :root.macOS-device .card .header .card-controls .control {
     --control-padding: 3px;
     border-radius: 50%;
@@ -1512,24 +1375,23 @@
     fill: currentColor;
   }
   :root:not(.macOS-device) .card .header .card-controls .control svg {
-    width: 12px;height: 12px;
-    /*aspect-ratio: 1/1;*/
+    width: 12px;
+    height: 12px;
+    /* aspect-ratio: 1 / 1; */
   }
   :root:not(.macOS-device) .card .header .card-controls .control[data-control="close"]:hover svg {
     color: #ffffff;
   }
   :root.macOS-device .card .header .card-controls .control svg {
-    width: 6px;height: 6px;
-    /*aspect-ratio: 1/1;*/
+    width: 6px;
+    height: 6px;
+    /* aspect-ratio: 1 / 1; */
     color: transparent;
     mix-blend-mode: luminosity;
   }
 
-/* Temp Where */
-  :root.macOS-device .card .header .card-controls:-webkit-any(:hover,:active) .control svg, :root.macOS-device .card .header .card-controls:focus-within .control:focus-visible svg {
-    color: #202020bf;
-  }
-  :root.macOS-device .card .header .card-controls:where(:hover,:active) .control svg, :root.macOS-device .card .header .card-controls:focus-within .control:focus-visible svg {
+  /* Temp Focus Visible (:where() wrapper for Safari support. It was cancelling out the whole selector before because :focus-visible was making it invalid.) */
+  :root.macOS-device .card .header .card-controls:where(:hover,:active) .control svg, :root.macOS-device .card .header .card-controls:focus-within .control:where(:focus-visible) svg {
     color: #202020bf;
   }
 
@@ -1610,36 +1472,25 @@
     transition: var(--transition-fast);
     transition-property: color, background-color, border-color, border-radius;
   }
-
-/* Temp Where */
-  .card .main button:-webkit-any(:hover,:active,:focus-visible) {
-    color: #ffffff;
-    background: #4f4f4f;
-  }
   .card .main button:where(:hover,:active,:focus-visible) {
     color: #ffffff;
     background: #4f4f4f;
   }
-
   .card .main button:focus-visible {
     border-color: #c0c0c0;
-  }
-
-/* Temp Where */
-  .card .main button.warning:-webkit-any(:hover,:active,:focus-visible) {
-    background: #b12f25;
   }
   .card .main button.warning:where(:hover,:active,:focus-visible) {
     background: #b12f25;
   }
-
   .card .options button > img {
-    width: 16px;height: 16px;
-    /*aspect-ratio: 1/1;*/
+    width: 16px;
+    height: 16px;
+    /* aspect-ratio: 1 / 1; */
   }
   .card .options button > svg {
-    width: 12px;height: 12px;
-    /*aspect-ratio: 1/1;*/
+    width: 12px;
+    height: 12px;
+    /* aspect-ratio: 1 / 1; */
     fill: currentColor;
   }
   .card num-text {
