@@ -1,57 +1,118 @@
-self.Editor = {
+/// <reference no-default-lib="true"/>
+/// <reference lib="ESNext"/>
+/// <reference lib="WebWorker"/>
+
+declare global {
+  interface WorkerNavigator {
+    standalone?: boolean;
+    userAgentData?: NavigatorUAData;
+  }
+
+  interface NavigatorUAData {
+    platform: string;
+  }
+}
+
+declare var self: ServiceWorkerGlobalScope;
+
+export {};
+
+const STE = {
   version: "Smart Text Editor v4.0.0",
   cache: true,
-  environment: () => ({
-    macOS_device: (/(macOS|Mac)/i.test(("userAgentData" in navigator) ? navigator.userAgentData.platform : navigator.platform) && navigator.standalone === undefined)
-  }),
-  share_files: []
+  environment: {
+    get macOSDevice() {
+      return (/(macOS|Mac)/i.test(navigator.userAgentData?.platform || navigator.platform) && navigator.standalone === undefined);
+    }
+  },
+  shareFiles: [] as File[]
 }
+
 self.addEventListener("activate",event => {
-  event.waitUntil(caches.keys().then(versions => Promise.all(versions.map(cache => {
-    if (cache.startsWith("Smart Text Editor") && cache !== Editor.version) return caches.delete(cache);
-  }))));
-  event.waitUntil(clients.claim());
-  postMessageAllClients({ action: "service-worker-activated" });
-});
-self.addEventListener("fetch",event => {
-  if (event.request.method === "POST"){
-    event.respondWith(Response.redirect("/?share-target=true",303));
-    return event.waitUntil((async () => {
-      Editor.share_files = Array.from(await event.request.formData()).map(file => file[1]);
-    })());
-  }
-  if (event.request.url === `${self.location.href.match("(.*\/).*")[1]}manifest.webmanifest`){
-    return event.respondWith(caches.match(event.request).then(response => {
-      return response || fetch("manifest.webmanifest").then(async request => {
-        const manifest = await request.json();
-        manifest.icons = manifest.icons.filter(icon => {
-          if (!Editor.environment().macOS_device && icon.platform !== "macOS") return icon;
-          if (Editor.environment().macOS_device && icon.platform === "macOS" || icon.purpose === "maskable") return icon;
-        });
-        const response = new Response(new Blob([JSON.stringify(manifest,null,"  ")],{ type: "text/json" }));
-        if (Editor.cache) caches.open(Editor.version).then(cache => cache.put(event.request,response));
-        return response.clone();
-      });
-    }));
-  }
-  event.respondWith(caches.match(event.request).then(response => {
-    return response || fetch(event.request).then(async response => {
-      if (Editor.cache) caches.open(Editor.version).then(cache => cache.put(event.request,response));
-      return response.clone();
+  event.waitUntil(caches.keys().then(async keys => {
+    const results = keys.map(async key => {
+      if (key.startsWith("Smart Text Editor") && key !== STE.version){
+        return caches.delete(key);
+      }
     });
+    await Promise.all(results);
+    await self.clients.claim();
+    return messageClients({ action: "service-worker-activated" });
   }));
 });
-self.addEventListener("message",event => {
-  if (event.data.action === "share-target"){
-    clients.matchAll().then(clients => clients.filter(client => client.id === event.source.id).forEach(client => client.postMessage({ action: "share-target", files: Editor.share_files })));
+
+self.addEventListener("fetch",async event => {
+  if (event.request.method === "POST"){
+    event.waitUntil((async () => {
+      const formData = await event.request.formData();
+      const files = formData.getAll("file");
+      for (const file of files){
+        STE.shareFiles.push(file as File);
+      }
+      event.respondWith(Response.redirect("./?share-target=true",303));
+    })());
+    return;
   }
-  if (event.data.action === "clear-site-caches"){
-    caches.keys().then(versions => {
-      Promise.all(versions.map(cache => caches.delete(cache)));
-      postMessageAllClients({ action: "clear-site-caches-complete" });
+
+  if (event.request.url === `${(self.location.href.match("(.*\/).*") || "")[1]}manifest.webmanifest`){
+    event.respondWith(caches.match(event.request).then(async response => {
+      const result = response || fetch("./manifest.webmanifest").then(async response => {
+        const manifest = await response.json();
+        manifest.icons = manifest.icons.filter((icon: { platform: string; purpose: string; }) => {
+          switch (true){
+            case !STE.environment.macOSDevice && icon.platform !== "macOS":
+            case STE.environment.macOSDevice && icon.platform === "macOS" || icon.purpose === "maskable": {
+              return icon;
+            }
+          }
+        });
+        response = new Response(new Blob([JSON.stringify(manifest,null,2)],{ type: "text/json" }));
+        if (STE.cache){
+          const cache = await caches.open(STE.version);
+          cache.put(event.request,response);
+        }
+        return response.clone();
+      });
+      return result;
+    }));
+  }
+
+  event.respondWith(caches.match(event.request).then(async response => {
+    const result = response || fetch(event.request).then(async response => {
+      if (STE.cache){
+        const cache = await caches.open(STE.version);
+        await cache.put(event.request,response);
+      }
+      return response.clone();
     });
+    return result;
+  }));
+});
+
+self.addEventListener("message",async event => {
+  switch (event.data.action){
+    case "share-target": {
+      const client = event.source;
+      client?.postMessage({ action: "share-target", files: STE.shareFiles });
+      break;
+    }
+    case "clear-site-caches": {
+      const keys = await caches.keys();
+      const results = keys.map(key => {
+        if (key.startsWith("Smart Text Editor")){
+          return caches.delete(key);
+        }
+      });
+      await Promise.all(results);
+      await messageClients({ action: "clear-site-caches-complete" });
+      break;
+    }
   }
 });
-function postMessageAllClients(data){
-  clients.matchAll().then(clients => clients.forEach(client => client.postMessage(data)));
+
+async function messageClients(message: any, options: StructuredSerializeOptions = {}){
+  const clients = await self.clients.matchAll();
+  for (const client of clients){
+    client.postMessage(message,options);
+  }
 }
