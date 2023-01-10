@@ -1,21 +1,9 @@
-/// <reference no-default-lib="true"/>
-/// <reference lib="ESNext"/>
-/// <reference lib="WebWorker"/>
+// @ts-nocheck
+///// <reference lib="WebWorker"/>
 
-declare global {
-  interface WorkerNavigator {
-    standalone?: boolean;
-    userAgentData?: NavigatorUAData;
-  }
+(async () => {
 
-  interface NavigatorUAData {
-    platform: string;
-  }
-}
-
-declare var self: ServiceWorkerGlobalScope;
-
-export {};
+var self = /** @type { ServiceWorkerGlobalScope } */ (/** @type { unknown } */ (globalThis.self));
 
 const STE = {
   version: "Smart Text Editor v4.0.0",
@@ -25,7 +13,8 @@ const STE = {
       return (/(macOS|Mac)/i.test(navigator.userAgentData?.platform || navigator.platform) && navigator.standalone === undefined);
     }
   },
-  shareFiles: [] as File[]
+  /** @type { File[] } */
+  shareFiles: []
 }
 
 self.addEventListener("activate",event => {
@@ -47,7 +36,7 @@ self.addEventListener("fetch",async event => {
       const formData = await event.request.formData();
       const files = formData.getAll("file");
       for (const file of files){
-        STE.shareFiles.push(file as File);
+        STE.shareFiles.push(/** @type { File } */ (file));
       }
       event.respondWith(Response.redirect("./?share-target=true",303));
     })());
@@ -58,7 +47,7 @@ self.addEventListener("fetch",async event => {
     event.respondWith(caches.match(event.request).then(async response => {
       const result = response || fetch("./manifest.webmanifest").then(async response => {
         const manifest = await response.json();
-        manifest.icons = manifest.icons.filter((icon: { platform: string; purpose: string; }) => {
+        manifest.icons = manifest.icons.filter(/** @param { { platform: string; purpose: string; } } icon */ (icon) => {
           switch (true){
             case !STE.environment.macOSDevice && icon.platform !== "macOS":
             case STE.environment.macOSDevice && icon.platform === "macOS" || icon.purpose === "maskable": {
@@ -110,9 +99,15 @@ self.addEventListener("message",async event => {
   }
 });
 
-async function messageClients(message: any, options: StructuredSerializeOptions = {}){
+/**
+ * @param { any } message
+ * @param { StructuredSerializeOptions } options
+*/
+async function messageClients(message,options = {}){
   const clients = await self.clients.matchAll();
   for (const client of clients){
     client.postMessage(message,options);
   }
 }
+
+})();

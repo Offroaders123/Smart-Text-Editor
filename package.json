@@ -1,0 +1,6 @@
+{
+  "name": "smart-text-editor",
+  "devDependencies": {
+    "new-javascript": "^0.1.14"
+  }
+}
