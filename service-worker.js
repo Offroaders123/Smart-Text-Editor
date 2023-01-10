@@ -43,39 +43,48 @@ self.addEventListener("fetch",async event => {
     return;
   }
 
-  if (event.request.url === `${(self.location.href.match("(.*\/).*") || "")[1]}manifest.webmanifest`){
-    event.respondWith(caches.match(event.request).then(async response => {
-      const result = response || fetch("./manifest.webmanifest").then(async response => {
-        const manifest = await response.json();
-        manifest.icons = manifest.icons.filter(/** @param { { platform: string; purpose: string; } } icon */ (icon) => {
-          switch (true){
-            case !STE.environment.macOSDevice && icon.platform !== "macOS":
-            case STE.environment.macOSDevice && icon.platform === "macOS" || icon.purpose === "maskable": {
-              return icon;
-            }
-          }
-        });
-        response = new Response(new Blob([JSON.stringify(manifest,null,2)],{ type: "text/json" }));
-        if (STE.cache){
-          const cache = await caches.open(STE.version);
-          cache.put(event.request,response);
-        }
-        return response.clone();
-      });
-      return result;
-    }));
-  }
+  if (event.request.url === `${(self.location.href.match(/(.*\/).*/) || "")[1]}manifest.webmanifest`){
+    event.respondWith((async () => {
+      const cached = await caches.match(event.request);
+      if (cached !== undefined) return cached;
 
-  event.respondWith(caches.match(event.request).then(async response => {
-    const result = response || fetch(event.request).then(async response => {
+      const fetched = await fetch("./manifest.webmanifest");
+      const manifest = await fetched.json();
+
+      manifest.icons = manifest.icons.filter(/** @param { { platform: string; purpose: string; } } icon */ icon => {
+        switch (true){
+          case !STE.environment.macOSDevice && icon.platform !== "macOS":
+          case STE.environment.macOSDevice && icon.platform === "macOS" || icon.purpose === "maskable": {
+            return icon;
+          }
+        }
+      });
+
+      const result = new Response(JSON.stringify(manifest,null,2),{ headers: { "Content-Type": "text/json" } });
+
       if (STE.cache){
         const cache = await caches.open(STE.version);
-        await cache.put(event.request,response);
+        await cache.put(event.request,result.clone());
       }
-      return response.clone();
-    });
-    return result;
-  }));
+
+      return result;
+    })());
+    return;
+  }
+
+  event.respondWith((async () => {
+    const cached = await caches.match(event.request);
+    if (cached !== undefined) return cached;
+
+    const fetched = await fetch(event.request);
+
+    if (STE.cache){
+      const cache = await caches.open(STE.version);
+      await cache.put(event.request,fetched.clone());
+    }
+
+    return fetched;
+  })());
 });
 
 self.addEventListener("message",async event => {
