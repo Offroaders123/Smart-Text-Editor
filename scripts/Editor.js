@@ -135,8 +135,8 @@ class Editor {
    * @param { string | null } identifier
   */
   static query(identifier = Editor.active_editor) {
-    const tab = workspace_tabs.querySelector(`.tab[data-editor-identifier="${identifier}"]`);
-    const container = workspace_editors.querySelector(`.editor[data-editor-identifier="${identifier}"]`);
+    const tab = /** @type { HTMLButtonElement } */ (workspace_tabs.querySelector(`.tab[data-editor-identifier="${identifier}"]`));
+    const container = /** @type { NumTextElement } */ (workspace_editors.querySelector(`.editor[data-editor-identifier="${identifier}"]`));
     const textarea = (container) ? container.editor : null;
 
     /**

@@ -6,7 +6,8 @@
     "moduleResolution": "Node",
     "target": "ESNext",
     "types": [
-      "new-javascript"
+      "new-javascript",
+      "num-text"
     ],
     "noEmit": true,
     "strict": true

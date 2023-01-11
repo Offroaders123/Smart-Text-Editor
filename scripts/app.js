@@ -160,8 +160,8 @@ function catchCardNavigation(event){
 window.customElements.define("ste-card",STECardElement);
 
 document.querySelectorAll("img").forEach(image => image.draggable = false);
-/** @type { NodeListOf<HTMLElement> } */ (document.querySelectorAll("num-text")).forEach(textarea => applyEditingBehavior({ element: textarea }));
-/** @type { NodeListOf<HTMLElement> } */ (document.querySelectorAll("input:is([type='text'],[type='url'])")).forEach(input => applyEditingBehavior({ element: input }));
+/** @type { NodeListOf<NumTextElement> } */ (document.querySelectorAll("num-text")).forEach(textarea => applyEditingBehavior({ element: textarea }));
+/** @type { NodeListOf<HTMLInputElement> } */ (document.querySelectorAll("input:is([type='text'],[type='url'])")).forEach(input => applyEditingBehavior({ element: input }));
 /** @type { NodeListOf<HTMLDivElement> } */ (document.querySelectorAll(".checkbox")).forEach(checkbox => {
   var input = /** @type { HTMLInputElement } */ (checkbox.querySelector("input[type='checkbox']"));
   checkbox.addEventListener("click",() => input.click());
@@ -368,11 +368,14 @@ document.body.addEventListener("keydown",event => {
   if (((controlShift || (event.ctrlKey && shift && !command && Editor.environment.apple_device)) && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("[") || pressed("{")))){
     event.preventDefault();
     if (event.repeat) return;
+    // For both of these expected errors, I need to add handling for when there aren't any Editors opened, since it will throw an error trying to open the next editor, when there isn't one there. There's not even one to start from in that case, either!
+    // @ts-expect-error
     openEditor({ identifier: getPreviousEditor() });
   }
   if (((control || (event.ctrlKey && !command && Editor.environment.apple_device)) && !shift && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("]") || pressed("}")))){
     event.preventDefault();
     if (event.repeat) return;
+    // @ts-expect-error
     openEditor({ identifier: getNextEditor() });
   }
   if (((controlShift || shiftCommand) && pressed("n")) || ((controlShift || shiftCommand) && pressed("c"))){
@@ -484,7 +487,7 @@ document.body.addEventListener("dragover",event => {
 });
 document.body.addEventListener("drop",event => {
   event.preventDefault();
-  document.querySelectorAll("menu-drop[data-open]").forEach(menu => menu.close());
+  /** @type { NodeListOf<MenuDropElement> } */ (document.querySelectorAll("menu-drop[data-open]")).forEach(menu => menu.close());
   if (event.dataTransfer === null) return;
   Array.from(event.dataTransfer.items).forEach(async (item,index) => {
     if (item.kind == "file"){
@@ -610,9 +613,9 @@ function createEditor({ name = "Untitled.txt", value = "", open = true, auto_cre
     tab = document.createElement("button"),
     editorName = document.createElement("span"),
     editorClose = document.createElement("button"),
-    container = document.createElement("num-text"),
+    container = /** @type { NumTextElement } */ (document.createElement("num-text")),
     previewOption = document.createElement("li"),
-    /** @type { boolean } */
+    /** @type { boolean | undefined } */
     focused_override,
     changeIdentifier = Math.random().toString();
 
@@ -640,11 +643,11 @@ function createEditor({ name = "Untitled.txt", value = "", open = true, auto_cre
       editorRename = document.createElement("input");
     } else return editorRename.blur();
     editorRename.type = "text";
-    editorRename.placeholder = Editor.query(identifier).getName();
+    editorRename.placeholder = /** @type { string } */ (Editor.query(identifier).getName());
     editorRename.setAttribute("data-editor-rename","");
     editorRename.tabIndex = -1;
     editorRename.style.setProperty("--editor-name-width",`${editorName.offsetWidth}px`);
-    editorRename.value = Editor.query(identifier).getName();
+    editorRename.value = /** @type { string } */ (Editor.query(identifier).getName());
     editorRename.addEventListener("keydown",event => {
       if (event.key == "Escape") editorRename.blur();
     });
@@ -711,7 +714,7 @@ function createEditor({ name = "Untitled.txt", value = "", open = true, auto_cre
   preview_menu.main.appendChild(previewOption);
   applyEditingBehavior({ element: container });
   if (open || !Editor.active_editor) openEditor({ identifier, auto_created, focused_override });
-  container.syntaxLanguage = Editor.query(identifier).getName("extension");
+  container.syntaxLanguage = /** @type { string } */ (Editor.query(identifier).getName("extension"));
   if ((Editor.settings.get("syntax-highlighting") == true) && (container.syntaxLanguage in Prism.languages)) container.syntaxHighlight.enable();
   window.setTimeout(() => {
     if (document.body.getAttribute("data-editor-change") == changeIdentifier) document.body.removeAttribute("data-editor-change");
@@ -732,7 +735,7 @@ function openEditor({ identifier, auto_created = false, focused_override = false
   container.classList.add("active");
   Editor.active_editor = identifier;
   setEditorTabsVisibility();
-  setTitle({ content: getName() });
+  setTitle({ content: /** @type { string } */ (getName()) });
   if ((((document.activeElement == document.body && !Editor.active_dialog) || auto_created) && !Editor.environment.touch_device && Editor.appearance.parent_window) || focused) container.focus({ preventScroll: true });
   if (Editor.preview_editor == "active-editor") refreshPreview({ force: (Editor.settings.get("automatic-refresh") != false) });
 }
@@ -751,19 +754,19 @@ function closeEditor({ identifier = Editor.active_editor } = {}){
     document.body.setAttribute("data-editor-change",changeIdentifier);
     tab.style.setProperty("--tab-margin-right",`-${tab.offsetWidth}px`);
   } else if (document.body.hasAttribute("data-editor-change")){
-    document.body.removeAttribute("data-editor-change",changeIdentifier);
+    document.body.removeAttribute("data-editor-change");
     workspace_tabs.querySelectorAll(".tab[data-editor-change]").forEach(tab => workspace_tabs.removeChild(tab));
   }
-  var transitionDuration = (document.body.hasAttribute("data-editor-change")) ? parseInt(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000) : 0;
+  var transitionDuration = (document.body.hasAttribute("data-editor-change")) ? parseInt(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000 : 0;
   if (tab == editorTabs[0] && editorTabs.length == 1){
     Editor.active_editor = null;
     setTitle({ reset: true });
     preview.src = "about:blank";
   }
   if (Editor.preview_editor == identifier) setPreviewSource({ active_editor: true });
-  if (tab == editorTabs[0] && editorTabs[1] && tab.classList.contains("active")) openEditor({ identifier: editorTabs[1].getAttribute("data-editor-identifier") });
-  if (tab == editorTabs[editorTabs.length - 1] && tab != editorTabs[0] && tab.classList.contains("active")) openEditor({ identifier: editorTabs[editorTabs.length - 2].getAttribute("data-editor-identifier") });
-  if (tab != editorTabs[0] && tab.classList.contains("active")) openEditor({ identifier: editorTabs[editorTabs.indexOf(tab) + 1].getAttribute("data-editor-identifier") });
+  if (tab == editorTabs[0] && editorTabs[1] && tab.classList.contains("active")) openEditor({ identifier: /** @type { string } */ (editorTabs[1].getAttribute("data-editor-identifier")) });
+  if (tab == editorTabs[editorTabs.length - 1] && tab != editorTabs[0] && tab.classList.contains("active")) openEditor({ identifier: /** @type { string } */ (editorTabs[editorTabs.length - 2].getAttribute("data-editor-identifier")) });
+  if (tab != editorTabs[0] && tab.classList.contains("active")) openEditor({ identifier: /** @type { string } */ (editorTabs[editorTabs.indexOf(tab) + 1].getAttribute("data-editor-identifier")) });
   if (focused && Editor.query().textarea) Editor.query().container.focus({ preventScroll: true });
   tab.setAttribute("data-editor-change","");
   if (tab == document.activeElement) tab.blur();
@@ -783,9 +786,9 @@ function closeEditor({ identifier = Editor.active_editor } = {}){
 */
 function renameEditor({ name, identifier = Editor.active_editor } = {}){
   const { tab, container, getName } = Editor.query(identifier),
-    editorName = tab.querySelector("[data-editor-name]"),
+    editorName = /** @type { HTMLSpanElement } */ (tab.querySelector("[data-editor-name]")),
     previewOption = preview_menu.main.querySelector(`.option[data-editor-identifier="${identifier}"]`),
-    currentName = getName(),
+    currentName = /** @type { string } */ (getName()),
     base = getName("base"),
     extension = getName("extension");
   let rename = (name) ? name : prompt(`Enter a new file name for "${currentName}".`,currentName);
@@ -796,7 +799,7 @@ function renameEditor({ name, identifier = Editor.active_editor } = {}){
   } else if (rename.charAt(0) == ".") rename = `${base}${rename}`;
   editorName.innerText = rename;
   previewOption.innerText = rename;
-  var syntaxLanguage = Editor.query(identifier).getName("extension");
+  var syntaxLanguage = /** @type { string } */ (Editor.query(identifier).getName("extension"));
   if (syntaxLanguage in Prism.languages) container.syntaxLanguage = syntaxLanguage;
   ((Editor.settings.get("syntax-highlighting") == true) && (syntaxLanguage in Prism.languages)) ? container.syntaxHighlight.enable() : container.syntaxHighlight.disable();
   if (syntaxLanguage != container.syntaxLanguage) container.syntaxLanguage = syntaxLanguage;
@@ -905,7 +908,7 @@ function setPreviewSource({ identifier, active_editor }){
 */
 function setSyntaxHighlighting(state){
   state = (state != undefined) ? state : (Editor.settings.get("syntax-highlighting") != undefined);
-  document.querySelectorAll("num-text").forEach(editor => {
+  /** @type { NodeListOf<NumTextElement> } */ (document.querySelectorAll("num-text")).forEach(editor => {
     if (editor.syntaxLanguage in Prism.languages) (state) ? editor.syntaxHighlight.enable() : editor.syntaxHighlight.disable();
   });
   Editor.settings.set("syntax-highlighting",String(state));
@@ -950,8 +953,8 @@ async function openFiles(){
 */
 async function saveFile(extension){
   if (extension || !Editor.support.file_system){
-    if (!extension) extension = Editor.query().getName("extension");
-    var anchor = document.createElement("a"), link = window.URL.createObjectURL(new Blob([Editor.query().textarea.value]));
+    if (!extension) extension = Editor.query().getName("extension") ?? "";
+    var anchor = document.createElement("a"), link = window.URL.createObjectURL(new Blob([Editor.query().textarea?.value ?? ""]));
     anchor.href = link;
     anchor.download = `${Editor.query().getName("base")}.${extension}`;
     anchor.click();
@@ -960,7 +963,7 @@ async function saveFile(extension){
     var identifier = Editor.active_editor, handle;
     if (identifier === null) throw new Error("No editors are open, couldn't save anything!");
     if (!Editor.file_handles[identifier]){
-      handle = await window.showSaveFilePicker({ suggestedName: Editor.query().getName(), startIn: (Editor.file_handles[identifier]) ? Editor.file_handles[identifier] : "desktop" }).catch(error => {
+      handle = await window.showSaveFilePicker({ suggestedName: /** @type { string } */ (Editor.query().getName()), startIn: (Editor.file_handles[identifier]) ? Editor.file_handles[identifier] : "desktop" }).catch(error => {
         if (error.message.toLowerCase().includes("abort")) return;
       });
       if (!handle) return;
@@ -971,7 +974,7 @@ async function saveFile(extension){
       if (error.toString().toLowerCase().includes("not allowed")) return;
     });
     if (!stream) return;
-    await stream.write(Editor.query().textarea.value);
+    await stream.write(Editor.query().textarea?.value ?? "");
     await stream.close();
     var currentName = Editor.query().getName(), file = await handle.getFile(), rename = file.name;
     if (currentName != rename) renameEditor({ name: rename });
@@ -987,7 +990,7 @@ function createDisplay(){
     top = window.screen.availHeight / 2 + window.screen.availTop - height / 2,
     features = (Editor.appearance.standalone || Editor.appearance.fullscreen) ? "popup" : "",
     baseURL = Editor.settings.get("preview-base") || null,
-    source = Editor.query().textarea.value;
+    source = Editor.query().textarea?.value ?? "";
   if (baseURL) source = `<!DOCTYPE html>\n<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
   var link = window.URL.createObjectURL(new Blob([source],{ type: "text/html" })),
     win = window.open(link,"_blank",features);
@@ -999,7 +1002,7 @@ function createDisplay(){
   Editor.child_windows.push(win);
   window.setTimeout(() => {
     if (win === null) return;
-    if (!win.document.title) win.document.title = Editor.query().getName();
+    if (!win.document.title) win.document.title = /** @type { string } */ (Editor.query().getName());
   },20);
 }
 /**
@@ -1030,20 +1033,20 @@ function getElementStyle({ element, pseudo = null, property }){
   return window.getComputedStyle(element,pseudo).getPropertyValue(property);
 }
 /**
- * @param { { element: HTMLElement; } } options
+ * @param { { element: HTMLInputElement | NumTextElement; } } options
 */
 function applyEditingBehavior({ element }){
   var type = element.tagName.toLowerCase();
-  element.addEventListener("dragover",event => {
+  /** @type { HTMLElement } */ (element).addEventListener("dragover",event => {
     event.stopPropagation();
     if (event.dataTransfer === null) return;
     event.dataTransfer.dropEffect = "copy";
   });
-  element.addEventListener("drop",event => {
+  /** @type { HTMLElement } */ (element).addEventListener("drop",event => {
     if (event.dataTransfer === null) return;
     if (Array.from(event.dataTransfer.items)[0].kind == "file") return;
     event.stopPropagation();
-    document.querySelectorAll("menu-drop[data-open]").forEach(menu => menu.close());
+    /** @type { NodeListOf<MenuDropElement> } */ (document.querySelectorAll("menu-drop[data-open]")).forEach(menu => menu.close());
   });
   if (type == "input"){
     element.spellcheck = false;
@@ -1053,6 +1056,7 @@ function applyEditingBehavior({ element }){
     element.setAttribute("autocorrect","off");
   }
   if (type == "num-text"){
+    if (!(element instanceof NumTextElement)) return;
     element.colorScheme.set("dark");
     element.themes.remove("vanilla-appearance");
     var scrollbarStyles = document.createElement("style");

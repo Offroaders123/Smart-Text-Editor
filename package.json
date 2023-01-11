@@ -2,6 +2,7 @@
   "name": "smart-text-editor",
   "devDependencies": {
     "@types/prismjs": "^1.26.0",
-    "new-javascript": "^0.1.14"
+    "new-javascript": "^0.1.14",
+    "num-text": "github:Offroaders123/Num-Text-Component#legacy-types"
   }
 }
