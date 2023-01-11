@@ -3,6 +3,7 @@ class STECardElement extends HTMLElement {
     super();
     this.defined = false;
   }
+
   connectedCallback(){
     if (this.defined || !this.isConnected) return;
     this.defined = true;
@@ -19,13 +20,13 @@ class STECardElement extends HTMLElement {
       }
     });
     this.type = this.getAttribute("data-type");
-    this.header = this.querySelector(".header");
+    this.header = /** @type { HTMLDivElement } */ (this.querySelector(".header"));
     this.back = document.createElement("button");
     this.back.classList.add("card-back");
     this.back.innerHTML = `<svg><use href="#back_icon"/></svg>`;
-    this.back.addEventListener("click",() => document.querySelector(`#${this.header.getAttribute("data-card-parent")}`).open(this));
-    this.heading = this.header.querySelector(".heading");
-    this.controls = document.createElement("div");
+    this.back.addEventListener("click",() => /** @type { STECardElement } */ (document.querySelector(`#${this.header?.getAttribute("data-card-parent")}`)).open(this));
+    this.heading = /** @type { HTMLDivElement } */ (this.header.querySelector(".heading"));
+    this.controls = /** @type { HTMLDivElement & { minimize: HTMLButtonElement; close: HTMLButtonElement; } } */ (document.createElement("div"));
     this.controls.classList.add("card-controls");
     this.controls.minimize = document.createElement("button");
     this.controls.minimize.classList.add("control");
@@ -35,7 +36,7 @@ class STECardElement extends HTMLElement {
       if (event.key != "Enter") return;
       event.preventDefault();
       if (event.repeat) return;
-      this.controls.minimize.click();
+      this.controls?.minimize.click();
     });
     this.controls.minimize.addEventListener("click",() => this.minimize());
     this.controls.close = document.createElement("button");
@@ -47,19 +48,23 @@ class STECardElement extends HTMLElement {
     this.controls.appendChild(this.controls.minimize);
     this.controls.appendChild(this.controls.close);
     this.header.appendChild(this.controls);
-    if (Editor.environment().macOS_device){
+    if (Editor.environment.macOS_device){
       this.controls.insertBefore(this.controls.close,this.controls.minimize);
       this.header.insertBefore(this.controls,this.header.firstChild);
     }
   }
+
+  /**
+   * @param { STECardElement } [previous]
+  */
   open(previous){
     if (this.matches(".active") && !this.hasAttribute("data-alert-timeout")) return this.close();
     if (this.type != "alert"){
-      document.querySelectorAll(`.card.active`).forEach(card => {
+      /** @type { NodeListOf<STECardElement> } */ (document.querySelectorAll(`.card.active`)).forEach(card => {
         if (card.type != "dialog" && card.type != this.type) return;
         card.close();
         if (!card.matches(".minimize")) return;
-        var transitionDuration = parseInt(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
+        var transitionDuration = parseInt(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000;
         window.setTimeout(() => card.minimize(),transitionDuration);
       });
     }
@@ -78,26 +83,28 @@ class STECardElement extends HTMLElement {
       document.body.addEventListener("keydown",catchCardNavigation);
       card_backdrop.classList.add("active");
       if (!Editor.active_dialog && !Editor.dialog_previous){
-        Editor.dialog_previous = document.activeElement;
+        Editor.dialog_previous = /** @type { STECardElement } */ (document.activeElement);
       }
-      document.querySelectorAll("menu-drop[data-open]").forEach(menu => menu.close());
-      var transitionDuration = parseInt(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 500);
+      /** @type { NodeListOf<MenuDropElement> } */ (document.querySelectorAll("menu-drop[data-open]")).forEach(menu => menu.close());
+      var transitionDuration = parseInt(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 500;
       window.setTimeout(() => {
-        document.activeElement.blur();
-        if (previous) this.querySelector(`[data-card-previous="${previous.id}"]`).focus();
+        if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+        if (previous) /** @type { HTMLElement } */ (this.querySelector(`[data-card-previous="${previous.id}"]`)).focus();
       },transitionDuration);
       Editor.active_dialog = this;
     }
     if (this.type == "widget") Editor.active_widget = this;
   }
+
   minimize(){
-    var icon = this.controls.minimize.querySelector("svg use"), main = this.querySelector(".main"), changeIdentifier = Math.random().toString();
+    var icon = /** @type { SVGUseElement } */ (this.controls?.minimize.querySelector("svg use")), main = /** @type { HTMLDivElement } */ (this.querySelector(".main")), changeIdentifier = Math.random().toString();
     this.setAttribute("data-minimize-change",changeIdentifier);
     workspace_tabs.setAttribute("data-minimize-change",changeIdentifier);
-    var transitionDuration = parseInt(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
+    var transitionDuration = parseInt(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000;
     if (!this.matches(".minimize")){
       this.classList.add("minimize");
-      this.style.setProperty("--card-minimize-width",`${this.controls.minimize.querySelector("svg").clientWidth + parseInt(getElementStyle({ element: this.controls.minimize, property: "--control-padding" }),10) * 2}px`);
+      if (this.controls === undefined) return;
+      this.style.setProperty("--card-minimize-width",`${this.controls?.minimize.querySelector("svg")?.clientWidth ?? "" + parseInt(getElementStyle({ element: this.controls.minimize, property: "--control-padding" }),10) * 2}px`);
       this.style.setProperty("--card-main-width",`${main.clientWidth}px`);
       this.style.setProperty("--card-main-height",`${main.clientHeight}px`);
       icon.setAttribute("href","#arrow_icon");
@@ -121,10 +128,11 @@ class STECardElement extends HTMLElement {
       if (workspace_tabs.getAttribute("data-minimize-change") == changeIdentifier) workspace_tabs.removeAttribute("data-minimize-change");
     },transitionDuration);
   }
+
   close(){
     this.classList.remove("active");
     if (this.matches(".minimize")){
-      var transitionDuration = parseInt(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
+      var transitionDuration = parseInt(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000;
       window.setTimeout(() => this.minimize(),transitionDuration);
     }
     if (this.type == "dialog"){
@@ -140,7 +148,10 @@ class STECardElement extends HTMLElement {
     if (this.type == "widget") Editor.active_widget = null;
   }
 }
-function catchCardNavigation(){
+/**
+ * @param { KeyboardEvent } event
+*/
+function catchCardNavigation(event){
   if (!Editor.active_dialog || event.key != "Tab" || document.activeElement != document.body) return;
   var navigable = getNavigableElements({ container: Editor.active_dialog, scope: true });
   event.preventDefault();
@@ -149,10 +160,10 @@ function catchCardNavigation(){
 window.customElements.define("ste-card",STECardElement);
 
 document.querySelectorAll("img").forEach(image => image.draggable = false);
-document.querySelectorAll("num-text").forEach(textarea => applyEditingBehavior({ element: textarea }));
-document.querySelectorAll("input:is([type='text'],[type='url'])").forEach(input => applyEditingBehavior({ element: input }));
-document.querySelectorAll(".checkbox").forEach(checkbox => {
-  var input = checkbox.querySelector("input[type='checkbox']");
+/** @type { NodeListOf<HTMLElement> } */ (document.querySelectorAll("num-text")).forEach(textarea => applyEditingBehavior({ element: textarea }));
+/** @type { NodeListOf<HTMLElement> } */ (document.querySelectorAll("input:is([type='text'],[type='url'])")).forEach(input => applyEditingBehavior({ element: input }));
+/** @type { NodeListOf<HTMLDivElement> } */ (document.querySelectorAll(".checkbox")).forEach(checkbox => {
+  var input = /** @type { HTMLInputElement } */ (checkbox.querySelector("input[type='checkbox']"));
   checkbox.addEventListener("click",() => input.click());
   checkbox.addEventListener("keydown",event => {
     if (!event.repeat && event.key == "Enter") input.click();
@@ -163,27 +174,34 @@ document.querySelectorAll(".checkbox").forEach(checkbox => {
   checkbox.tabIndex = 0;
   input.addEventListener("click",event => event.stopPropagation());
 });
-document.querySelectorAll("header .app-omnibox .option").forEach(option => {
+/** @type { NodeListOf<HTMLButtonElement | HTMLAnchorElement> } */ (document.querySelectorAll("header .app-omnibox .option")).forEach(option => {
   option.tabIndex = -1;
   option.addEventListener("mousedown",event => event.preventDefault());
 });
-window.Tools = {
-  replaceText: {
-    replace: () => {
+class Tools {
+  static replaceText = {
+    replace() {
       var { container: editor } = Editor.query();
       if (!editor) return;
       var replaced = editor.value.split(replacer_find.value).join(replacer_replace.value);
       if (replaced != editor.value) editor.value = replaced;
     },
-    flip: () => [replacer_find.value,replacer_replace.value] = [replacer_replace.value,replacer_find.value],
-    clear: () => [replacer_find.value,replacer_replace.value] = ""
-  },
-  jsonFormatter: {
-    format: (spacing = "  ") => {
+
+    flip() {
+      [replacer_find.value,replacer_replace.value] = [replacer_replace.value,replacer_find.value];
+    },
+
+    clear() {
+      [replacer_find.value,replacer_replace.value] = "";
+    }
+  }
+
+  static jsonFormatter = {
+    format(spacing = "  ") {
       try {
         var formatted = JSON.stringify(JSON.parse(formatter_input.value),null,spacing);
         if (formatted != formatter_input.value) formatter_input.value = formatted;
-      } catch (error){/* Make matching for "position" optional, as Safari doesn't give JSON parsing error data, it only says that an error occurred. */
+      } catch (/** @type { any } */ error){/* Make matching for "position" optional, as Safari doesn't give JSON parsing error data, it only says that an error occurred. */
         var message = error.toString().match(/^(.+?)position /)[0],
           errorIndex = error.toString().match(/position (\d+)/)[1],
 
@@ -199,6 +217,10 @@ window.Tools = {
       }
 
 
+    /**
+     * @param { string } char
+     * @param { string } str
+    */
     function indexi(char,str){
       var list = [], i = -1;
       while ((i = str.indexOf(char,i + 1)) >= 0) list.push(i + 1);
@@ -207,23 +229,34 @@ window.Tools = {
 
 
     },
-    collapse: () => {
+
+    collapse() {
       Tools.jsonFormatter.format("");
     },
-    clear: () => formatter_input.value = ""
-  },
-  uriEncoder: {
-    encode: () => {
+
+    clear() {
+      formatter_input.value = "";
+    }
+  }
+
+  static uriEncoder = {
+    encode() {
       var encodingType = (!encoder_type.checked) ? encodeURI : encodeURIComponent;
       encoder_input.value = encodingType(encoder_input.value);
     },
-    decode: () => {
+
+    decode() {
       var decodingType = (!encoder_type.checked) ? decodeURI : decodeURIComponent;
       encoder_input.value = decodingType(encoder_input.value);
     },
-    clear: () => encoder_input.value = ""
-  },
-  uuidGenerator: (() => {
+
+    clear() {
+      encoder_input.value = "";
+    }
+  }
+
+  static uuidGenerator = (() => {
+    /** @type { string[] } */
     var lut = [];
     for (var i = 0; i < 256; i++) lut[i] = ((i < 16) ? "0" : "") + i.toString(16);
     return {
@@ -232,8 +265,12 @@ window.Tools = {
         return `${lut[d0 & 0xff]}${lut[(d0 >> 8) & 0xff]}${lut[(d0 >> 16) & 0xff]}${lut[(d0 >> 24) & 0xff]}-${lut[d1 & 0xff]}${lut[(d1 >> 8) & 0xff]}-${lut[((d1 >> 16) & 0x0f) | 0x40]}${lut[(d1 >> 24) & 0xff]}-${lut[(d2 & 0x3f) | 0x80]}${lut[(d2 >> 8) & 0xff]}-${lut[(d2 >> 16) & 0xff]}${lut[(d2 >> 24) & 0xff]}${lut[d3 & 0xff]}${lut[(d3 >> 8) & 0xff]}${lut[(d3 >> 16) & 0xff]}${lut[(d3 >> 24) & 0xff]}`;
       }
     };
-  })(),
-  insertTemplate: ({ type } = {}) => {
+  })()
+
+  /**
+   * @param { { type: string; } } options
+  */
+  static insertTemplate({ type }) {
     var template, editor = Editor.query(), name;
     if (type == "html"){
       var language = navigator.language;
@@ -247,34 +284,35 @@ window.Tools = {
     }
     if (!template) return;
     createEditor({ name, value: template });
-    if (Editor.view() == "preview") setView({ type: "split" });
+    if (Editor.view == "preview") setView({ type: "split" });
   }
 };
 window.addEventListener("load",() => {
-  if (Editor.environment().file_protocol) return;
+  if (Editor.environment.file_protocol) return;
   if (window.location.href.includes("index.html")) history.pushState(null,"",window.location.href.replace(/index.html/,""));
-  if (!("serviceWorker" in navigator) || !Editor.appearance().parent_window) return;
+  if (!("serviceWorker" in navigator) || !Editor.appearance.parent_window) return;
   navigator.serviceWorker.register("service-worker.js").then(() => {
     if ((navigator.serviceWorker.controller) ? (navigator.serviceWorker.controller.state == "activated") : false) activateManifest();
     navigator.serviceWorker.addEventListener("message",event => {
       if (event.data.action == "service-worker-activated") activateManifest();
       if (event.data.action == "clear-site-caches-complete") cleared_cache_card.open();
       if (event.data.action == "share-target"){
-        event.data.files.forEach(file => {
+        event.data.files.forEach(/** @param { File } file */ file => {
           var reader = new FileReader();
           reader.readAsText(file,"UTF-8");
-          reader.addEventListener("loadend",() => createEditor({ name: file.name, value: reader.result }));
+          reader.addEventListener("loadend",() => createEditor({ name: file.name, value: /** @type { string } */ (reader.result) }));
         });
       }
     });
     document.documentElement.classList.add("service-worker-activated");
     if (queryParameters.get("share-target")){
+      if (navigator.serviceWorker.controller === null) return;
       navigator.serviceWorker.controller.postMessage({ action: "share-target" });
       removeQueryParameters(["share-target"]);
     }
   });
   function activateManifest(){
-    document.querySelector("link[rel='manifest']").href = "manifest.webmanifest";
+    /** @type { HTMLLinkElement } */ (document.querySelector("link[rel='manifest']")).href = "manifest.webmanifest";
   }
 });
 window.addEventListener("beforeinstallprompt",event => {
@@ -284,26 +322,36 @@ window.addEventListener("beforeinstallprompt",event => {
   theme_button.childNodes[0].textContent = "Theme";
 });
 window.addEventListener("beforeunload",event => {
-  if (Editor.unsaved_work()) return;
+  if (Editor.unsaved_work) return;
   event.preventDefault();
   event.returnValue = "";
 });
 window.addEventListener("unload",() => Editor.child_windows.forEach(window => window.close()));
 window.addEventListener("resize",event => {
-  Editor.appearance().refresh_device_pixel_ratio();
-  if (Editor.view() != "preview") setEditorTabsVisibility();
-  if (Editor.view() == "split" && document.body.hasAttribute("data-scaling-active")) setView({ type: "split" });
+  Editor.appearance.refresh_device_pixel_ratio();
+  if (Editor.view != "preview") setEditorTabsVisibility();
+  if (Editor.view == "split" && document.body.hasAttribute("data-scaling-active")) setView({ type: "split" });
 });
 window.addEventListener("blur",() => {
-  if (Editor.appearance().parent_window) document.querySelectorAll("menu-drop[data-open]").forEach(menu => menu.close());
+  if (Editor.appearance.parent_window) /** @type { NodeListOf<MenuDropElement> } */ (document.querySelectorAll("menu-drop[data-open]")).forEach(menu => menu.close());
 });
-if (Editor.support().window_controls_overlay) navigator.windowControlsOverlay.addEventListener("geometrychange",() => Editor.appearance().refresh_window_controls_overlay());
+if (Editor.support.window_controls_overlay) navigator.windowControlsOverlay.addEventListener("geometrychange",() => Editor.appearance.refresh_window_controls_overlay());
 document.body.addEventListener("keydown",event => {
-  var pressed = key => (event.key.toLowerCase() == key.toLowerCase()), control = (event.ctrlKey && !Editor.environment().apple_device), command = (event.metaKey && Editor.environment().apple_device), shift = (event.shiftKey || ((event.key.toUpperCase() == event.key) && (event.key + event.key == event.key * 2))), controlShift = (control && shift), shiftCommand = (shift && command), controlCommand = (event.ctrlKey && command);
+  /**
+   * @param { string } key
+  */
+  var pressed = key => (event.key.toLowerCase() == key.toLowerCase()),
+    control = (event.ctrlKey && !Editor.environment.apple_device),
+    command = (event.metaKey && Editor.environment.apple_device),
+    shift = (event.shiftKey || ((event.key.toUpperCase() == event.key) && (event.key + event.key == String(Number(event.key) * 2)))),
+    controlShift = (control && shift),
+    shiftCommand = (shift && command),
+    controlCommand = (event.ctrlKey && command);
+
   if (pressed("Escape")){
     event.preventDefault();
     if (event.repeat) return;
-    if (Editor.active_dialog && !document.activeElement.matches("menu-drop[data-open]")) Editor.active_dialog.close();
+    if (Editor.active_dialog && !document.activeElement?.matches("menu-drop[data-open]")) Editor.active_dialog.close();
   }
   if (((control || command) && !shift && pressed("n")) || ((controlShift || shiftCommand) && pressed("x"))){
     event.preventDefault();
@@ -317,12 +365,12 @@ document.body.addEventListener("keydown",event => {
     /* Future feature: If an editor tab is focused, close that editor instead of only the active editor */
     closeEditor();
   }
-  if (((controlShift || (event.ctrlKey && shift && !command && Editor.environment().apple_device)) && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("[") || pressed("{")))){
+  if (((controlShift || (event.ctrlKey && shift && !command && Editor.environment.apple_device)) && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("[") || pressed("{")))){
     event.preventDefault();
     if (event.repeat) return;
     openEditor({ identifier: getPreviousEditor() });
   }
-  if (((control || (event.ctrlKey && !command && Editor.environment().apple_device)) && !shift && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("]") || pressed("}")))){
+  if (((control || (event.ctrlKey && !command && Editor.environment.apple_device)) && !shift && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("]") || pressed("}")))){
     event.preventDefault();
     if (event.repeat) return;
     openEditor({ identifier: getNextEditor() });
@@ -431,39 +479,43 @@ document.body.addEventListener("mousedown",event => {
 document.body.addEventListener("contextmenu",event => event.preventDefault());
 document.body.addEventListener("dragover",event => {
   event.preventDefault();
+  if (event.dataTransfer === null || !(event.target instanceof Element)) return;
   event.dataTransfer.dropEffect = (event.target.matches("menu-drop, header, .card") || event.target.closest("menu-drop, header, .card")) ? "none" : "copy";
 });
 document.body.addEventListener("drop",event => {
   event.preventDefault();
   document.querySelectorAll("menu-drop[data-open]").forEach(menu => menu.close());
+  if (event.dataTransfer === null) return;
   Array.from(event.dataTransfer.items).forEach(async (item,index) => {
     if (item.kind == "file"){
-      if (!Editor.support().file_system || !("getAsFileSystemHandle")){
+      if (!Editor.support.file_system || !("getAsFileSystemHandle")){
         var file = item.getAsFile(), reader = new FileReader();
+        if (file === null) return;
         reader.readAsText(file,"UTF-8");
-        reader.addEventListener("loadend",() => createEditor({ name: file.name, value: reader.result }));
+        reader.addEventListener("loadend",() => createEditor({ name: file?.name, value: /** @type { string } */ (reader.result) }));
       } else {
         var handle = await item.getAsFileSystemHandle();
-        if (handle.kind != "file") return;
-        var file = await handle.getFile(), identifier = createEditor({ name: await file.name, value: await file.text() });
-        Editor.file_handles[identifier] = await handle;
+        if (handle === null) return;
+        if (handle.kind != "file" || !(handle instanceof FileSystemFileHandle)) return;
+        let file = await handle.getFile(), identifier = createEditor({ name: file.name, value: await file.text() });
+        Editor.file_handles[identifier] = handle;
       }
-    } else if (item.kind == "string" && index == 0 && event.dataTransfer.getData("text") != "") createEditor({ value: event.dataTransfer.getData("text") });
+    } else if (item.kind == "string" && index == 0 && event.dataTransfer?.getData("text") != "") createEditor({ value: event.dataTransfer?.getData("text") });
   });
 });
-var toolbar = document.querySelector("header .app-menubar");
-toolbar.querySelectorAll("menu-drop").forEach(menu => {
-  menu.addEventListener("pointerenter",() => {
+var appToolbar = /** @type { HTMLDivElement } */ (document.querySelector("header .app-menubar"));
+/** @type { NodeListOf<MenuDropElement> } */ (appToolbar.querySelectorAll("menu-drop")).forEach(menu => {
+  menu.addEventListener("pointerenter",event => {
     if (event.pointerType != "mouse") return;
-    if (toolbar.querySelectorAll("menu-drop:not([data-alternate])[data-open]").length == 0 || menu.matches("[data-alternate]") || menu.matches("[data-open]")) return;
+    if (appToolbar.querySelectorAll("menu-drop:not([data-alternate])[data-open]").length == 0 || menu.matches("[data-alternate]") || menu.matches("[data-open]")) return;
     menu.opener.focus();
-    toolbar.querySelectorAll("menu-drop[data-open]").forEach(menu => menu.close());
+    /** @type { NodeListOf<MenuDropElement> } */ (appToolbar.querySelectorAll("menu-drop[data-open]")).forEach(menu => menu.close());
     menu.open();
   });
 });
 workspace_tabs.addEventListener("keydown",event => {
   if (event.key != "ArrowLeft" && event.key != "ArrowRight") return;
-  if (!workspace_tabs.contains(document.activeElement)) return;
+  if (!workspace_tabs.contains(document.activeElement) || !(document.activeElement instanceof HTMLElement)) return;
   var identifier = document.activeElement.getAttribute("data-editor-identifier"),
     previousEditor = getPreviousEditor({ identifier }),
     nextEditor = getNextEditor({ identifier });
@@ -479,21 +531,24 @@ create_editor_button.addEventListener("mousedown",event => event.preventDefault(
 create_editor_button.addEventListener("click",() => createEditor({ auto_replace: false }));
 scaler.addEventListener("mousedown",event => {
   if (event.button != 0) return;
-  if (Editor.view() != "split") return;
+  if (Editor.view != "split") return;
   event.preventDefault();
-  document.body.setAttribute("data-scaling-change",true);
+  document.body.setAttribute("data-scaling-change","");
   document.addEventListener("mousemove",setScaling);
   document.addEventListener("mouseup",disableScaling);
 });
 scaler.addEventListener("touchstart",event => {
-  if (Editor.view() != "split" || event.touches.length != 1) return;
-  document.body.setAttribute("data-scaling-change",true);
+  if (Editor.view != "split" || event.touches.length != 1) return;
+  document.body.setAttribute("data-scaling-change","");
   document.addEventListener("touchmove",setScaling,{ passive: true });
   document.addEventListener("touchend",disableScaling,{ passive: true });
 },{ passive: true });
-card_backdrop.addEventListener("click",() => Editor.active_dialog.close());
+card_backdrop.addEventListener("click",() => {
+  if (Editor.active_dialog === null) return;
+  Editor.active_dialog.close();
+});
 preview_base_input.placeholder = document.baseURI;
-preview_base_input.setWidth = () => preview_base_input.style.setProperty("--input-count",preview_base_input.value.length);
+preview_base_input.setWidth = () => preview_base_input.style.setProperty("--input-count",preview_base_input.value.length.toString());
 preview_base_input.setValue = value => {
   preview_base_input.value = value;
   preview_base_input.setWidth();
@@ -504,9 +559,10 @@ preview_base_input.reset = () => {
   Editor.settings.remove("preview-base");
   refreshPreview({ force: true });
 };
-preview_base_input.style.setProperty("--placeholder-count",preview_base_input.placeholder.length);
-preview_base_input.addEventListener("input",event => event.target.setWidth());
+preview_base_input.style.setProperty("--placeholder-count",preview_base_input.placeholder.length.toString());
+preview_base_input.addEventListener("input",event => /** @type { typeof preview_base_input } */ (event.target).setWidth());
 preview_base_input.addEventListener("change",event => {
+  if (!(event.target instanceof HTMLInputElement)) return;
   var empty = event.target.matches(":placeholder-shown"), valid = event.target.matches(":valid");
   if (empty || !valid) Editor.settings.remove("preview-base");
   if (!empty && valid) Editor.settings.set("preview-base",event.target.value);
@@ -516,7 +572,7 @@ generator_output.addEventListener("click",() => generator_output.select());
 generator_output.addEventListener("keydown",() => generator_output.click());
 
 window.requestAnimationFrame(() => createEditor({ auto_created: true }));
-if (Editor.appearance().parent_window){
+if (Editor.appearance.parent_window){
   if (Editor.settings.get("default-orientation")){
     var value = Editor.settings.get("default-orientation");
     window.requestAnimationFrame(() => default_orientation_setting.select(value));
@@ -531,13 +587,13 @@ if (Editor.appearance().parent_window){
   if (Editor.settings.get("preview-base")) preview_base_input.setValue(Editor.settings.get("preview-base"));
   window.setTimeout(() => document.documentElement.classList.remove("startup-fade"),50);
 }
-if (Editor.support().file_handling && Editor.support().file_system){
+if (Editor.support.file_handling && Editor.support.file_system){
   window.launchQueue.setConsumer(params => {
     params.files.forEach(async handle => {
-      var file = await handle.getFile(), identifier = createEditor({ name: await file.name, value: await file.text() });
-      Editor.file_handles[identifier] = await handle;
+      var file = await handle.getFile(), identifier = createEditor({ name: file.name, value: await file.text() });
+      Editor.file_handles[identifier] = handle;
     });
-    if (!Editor.environment().touch_device) Editor.query().container.focus({ preventScroll: true });
+    if (!Editor.environment.touch_device) Editor.query().container.focus({ preventScroll: true });
   });
 }
 var queryParameters = new URLSearchParams(window.location.search);
@@ -550,14 +606,24 @@ if (queryParameters.get("settings")){
   removeQueryParameters(["settings"]);
 }
 function createEditor({ name = "Untitled.txt", value = "", open = true, auto_created = false, auto_replace = true } = {}){
-  var identifier = Math.random().toString(), tab = document.createElement("button"), editorName = document.createElement("span"), editorClose = document.createElement("button"), container = document.createElement("num-text"), previewOption = document.createElement("li"), focused_override, changeIdentifier = Math.random().toString();
+  let identifier = Math.random().toString(),
+    tab = document.createElement("button"),
+    editorName = document.createElement("span"),
+    editorClose = document.createElement("button"),
+    container = document.createElement("num-text"),
+    previewOption = document.createElement("li"),
+    /** @type { boolean } */
+    focused_override,
+    changeIdentifier = Math.random().toString();
+
   document.body.setAttribute("data-editor-change",changeIdentifier);
-  var transitionDuration = parseInt(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
+  var transitionDuration = parseInt(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000;
   if (!name.includes(".")) name = `${name}.txt`;
   tab.classList.add("tab");
   tab.setAttribute("data-editor-identifier",identifier);
-  if (value) tab.setAttribute("data-editor-refresh",true);
+  if (value) tab.setAttribute("data-editor-refresh","");
   tab.addEventListener("mousedown",event => {
+    if (document.activeElement === null) return;
     if (event.button != 0 || document.activeElement.matches("[data-editor-rename]")) return;
     event.preventDefault();
     if (tab != Editor.query().tab) openEditor({ identifier });
@@ -569,13 +635,13 @@ function createEditor({ name = "Untitled.txt", value = "", open = true, auto_cre
   });
   tab.addEventListener("contextmenu",event => {
     if (event.target != tab) return;
-    var editorRename = tab.querySelector("[data-editor-rename]");
+    var editorRename = /** @type { HTMLInputElement } */ (tab.querySelector("[data-editor-rename]"));
     if (!editorRename){
       editorRename = document.createElement("input");
     } else return editorRename.blur();
     editorRename.type = "text";
     editorRename.placeholder = Editor.query(identifier).getName();
-    editorRename.setAttribute("data-editor-rename",true);
+    editorRename.setAttribute("data-editor-rename","");
     editorRename.tabIndex = -1;
     editorRename.style.setProperty("--editor-name-width",`${editorName.offsetWidth}px`);
     editorRename.value = Editor.query(identifier).getName();
@@ -594,14 +660,14 @@ function createEditor({ name = "Untitled.txt", value = "", open = true, auto_cre
     });
     editorRename.addEventListener("blur",() => editorRename.remove());
     tab.insertBefore(editorRename,tab.firstChild);
-    applyEditingBehavior({ element: editorRename, advanced: false });
+    applyEditingBehavior({ element: editorRename });
     editorRename.focus();
     editorRename.select();
   });
   tab.addEventListener("dragover",event => {
     event.preventDefault();
     event.stopPropagation();
-    event.dataTransfer.dropEffect = "copy";
+    if (event.dataTransfer !== null) event.dataTransfer.dropEffect = "copy";
     if (tab != Editor.query().tab) openEditor({ identifier });
   });
   editorName.setAttribute("data-editor-name",name);
@@ -620,7 +686,7 @@ function createEditor({ name = "Untitled.txt", value = "", open = true, auto_cre
   container.classList.add("editor");
   container.setAttribute("data-editor-identifier",identifier);
   container.setAttribute("value",value);
-  previewOption.part = "option";
+  previewOption.part.add("option");
   previewOption.classList.add("option");
   previewOption.setAttribute("data-editor-identifier",identifier);
   previewOption.tabIndex = -1;
@@ -638,8 +704,8 @@ function createEditor({ name = "Untitled.txt", value = "", open = true, auto_cre
   workspace_editors.appendChild(container);
   container.editor.addEventListener("input",() => {
     if (tab.hasAttribute("data-editor-auto-created")) tab.removeAttribute("data-editor-auto-created");
-    if (!tab.hasAttribute("data-editor-refresh")) tab.setAttribute("data-editor-refresh",true);
-    if (!tab.hasAttribute("data-editor-unsaved")) tab.setAttribute("data-editor-unsaved",true);
+    if (!tab.hasAttribute("data-editor-refresh")) tab.setAttribute("data-editor-refresh","");
+    if (!tab.hasAttribute("data-editor-unsaved")) tab.setAttribute("data-editor-unsaved","");
     refreshPreview();
   });
   preview_menu.main.appendChild(previewOption);
@@ -652,23 +718,31 @@ function createEditor({ name = "Untitled.txt", value = "", open = true, auto_cre
   },transitionDuration);
   return identifier;
 }
-function openEditor({ identifier, auto_created = false, focused_override = false } = {}){
+/**
+ * @param { { identifier: string; auto_created?: boolean; focused_override?: boolean; } } options
+*/
+function openEditor({ identifier, auto_created = false, focused_override = false }){
   if (!identifier) return;
-  var { tab, container, textarea, getName } = Editor.query(identifier), focused = (document.activeElement == Editor.query().container) || focused_override;
+  const { tab, container, textarea, getName } = Editor.query(identifier),
+    focused = (document.activeElement == Editor.query().container) || focused_override;
   if (Editor.query().tab) Editor.query().tab.classList.remove("active");
   if (Editor.query().container) Editor.query().container.classList.remove("active");
   tab.classList.add("active");
-  if (auto_created) tab.setAttribute("data-editor-auto-created",true);
+  if (auto_created) tab.setAttribute("data-editor-auto-created","");
   container.classList.add("active");
   Editor.active_editor = identifier;
   setEditorTabsVisibility();
   setTitle({ content: getName() });
-  if ((((document.activeElement == document.body && !Editor.active_dialog) || auto_created) && !Editor.environment().touch_device && Editor.appearance().parent_window) || focused) container.focus({ preventScroll: true });
+  if ((((document.activeElement == document.body && !Editor.active_dialog) || auto_created) && !Editor.environment.touch_device && Editor.appearance.parent_window) || focused) container.focus({ preventScroll: true });
   if (Editor.preview_editor == "active-editor") refreshPreview({ force: (Editor.settings.get("automatic-refresh") != false) });
 }
 function closeEditor({ identifier = Editor.active_editor } = {}){
   if (!identifier) return;
-  var { tab, container, textarea, getName } = Editor.query(identifier), previewOption = preview_menu.main.querySelector(`.option[data-editor-identifier="${identifier}"]`), active = (tab.classList.contains("active")), focused = (document.activeElement == container), editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])"));
+  var { tab, container, textarea, getName } = Editor.query(identifier),
+    previewOption = preview_menu.main.querySelector(`.option[data-editor-identifier="${identifier}"]`),
+    active = (tab.classList.contains("active")),
+    focused = (document.activeElement == container),
+    editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])"));
   if (tab.hasAttribute("data-editor-unsaved")){
     if (!confirm(`Are you sure you would like to close "${getName()}"?\nRecent changes have not yet been saved.`)) return;
   }
@@ -691,7 +765,7 @@ function closeEditor({ identifier = Editor.active_editor } = {}){
   if (tab == editorTabs[editorTabs.length - 1] && tab != editorTabs[0] && tab.classList.contains("active")) openEditor({ identifier: editorTabs[editorTabs.length - 2].getAttribute("data-editor-identifier") });
   if (tab != editorTabs[0] && tab.classList.contains("active")) openEditor({ identifier: editorTabs[editorTabs.indexOf(tab) + 1].getAttribute("data-editor-identifier") });
   if (focused && Editor.query().textarea) Editor.query().container.focus({ preventScroll: true });
-  tab.setAttribute("data-editor-change",true);
+  tab.setAttribute("data-editor-change","");
   if (tab == document.activeElement) tab.blur();
   tab.tabIndex = -1;
   if (tab.classList.contains("active")) tab.classList.remove("active");
@@ -704,8 +778,18 @@ function closeEditor({ identifier = Editor.active_editor } = {}){
     if (document.body.getAttribute("data-editor-change") == changeIdentifier) document.body.removeAttribute("data-editor-change");
   }
 }
+/**
+ * @param { { name?: string; identifier?: string | null | undefined; } | undefined } options
+*/
 function renameEditor({ name, identifier = Editor.active_editor } = {}){
-  var { tab, container, getName } = Editor.query(identifier), editorName = tab.querySelector("[data-editor-name]"), previewOption = preview_menu.main.querySelector(`.option[data-editor-identifier="${identifier}"]`), currentName = getName(), base = getName("base"), extension = getName("extension"), rename = (name) ? name : prompt(`Enter a new file name for "${currentName}".`,currentName);
+  const { tab, container, getName } = Editor.query(identifier),
+    editorName = tab.querySelector("[data-editor-name]"),
+    previewOption = preview_menu.main.querySelector(`.option[data-editor-identifier="${identifier}"]`),
+    currentName = getName(),
+    base = getName("base"),
+    extension = getName("extension");
+  let rename = (name) ? name : prompt(`Enter a new file name for "${currentName}".`,currentName);
+
   if (!rename) return;
   if (!rename.includes(".")){
     rename = `${rename}.${extension}`;
@@ -723,11 +807,17 @@ function renameEditor({ name, identifier = Editor.active_editor } = {}){
 }
 /* Future feature: Add support to disable the wrapping behavior */
 function getPreviousEditor({ identifier = Editor.active_editor, wrap = true } = {}){
-  var { tab } = Editor.query(identifier), editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")), previousTab = editorTabs[(editorTabs.indexOf(tab) || editorTabs.length) - 1], previousEditor = previousTab.getAttribute("data-editor-identifier");
+  var { tab } = Editor.query(identifier),
+    editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")),
+    previousTab = editorTabs[(editorTabs.indexOf(tab) || editorTabs.length) - 1],
+    previousEditor = previousTab.getAttribute("data-editor-identifier");
   return previousEditor;
 }
 function getNextEditor({ identifier = Editor.active_editor, wrap = true } = {}){
-  var { tab } = Editor.query(identifier), editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")), nextTab = editorTabs[(editorTabs.indexOf(tab) != editorTabs.length - 1) ? editorTabs.indexOf(tab) + 1 : 0], nextEditor = nextTab.getAttribute("data-editor-identifier");
+  var { tab } = Editor.query(identifier),
+    editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")),
+    nextTab = editorTabs[(editorTabs.indexOf(tab) != editorTabs.length - 1) ? editorTabs.indexOf(tab) + 1 : 0],
+    nextEditor = nextTab.getAttribute("data-editor-identifier");
   return nextEditor;
 }
 function setEditorTabsVisibility({ identifier = Editor.active_editor } = {}){
@@ -742,34 +832,40 @@ function setEditorTabsVisibility({ identifier = Editor.active_editor } = {}){
     workspace_tabs.scrollTo(tab.offsetLeft + tab.clientWidth + spacingOffset - workspace_tabs.clientWidth,0);
   }
 }
-function setView({ type, force = false } = {}){
-  if ((Editor.orientation_change() && !force) || Editor.scaling_change()) return;
+/**
+ * @param { { type: string; force?: boolean; } } options
+*/
+function setView({ type, force = false }){
+  if ((Editor.orientation_change && !force) || Editor.scaling_change) return;
   var changeIdentifier = Math.random().toString();
   document.body.setAttribute("data-view-change",changeIdentifier);
-  var transitionDuration = parseInt(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000);
-  document.body.classList.remove(Editor.view());
+  var transitionDuration = parseInt(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000;
+  document.body.classList.remove(Editor.view);
   document.body.setAttribute("data-view",type);
-  document.body.classList.add(Editor.view());
+  document.body.classList.add(Editor.view);
   removeScaling();
-  view_menu.select(Editor.view());
+  view_menu.select(Editor.view);
   if (type != "preview") window.setTimeout(setEditorTabsVisibility,transitionDuration);
   window.setTimeout(() => {
     if (document.body.getAttribute("data-view-change") == changeIdentifier) document.body.removeAttribute("data-view-change");
   },transitionDuration);
   refreshPreview();
 }
+/**
+ * @param { "horizontal" | "vertical" } [orientation]
+*/
 function setOrientation(orientation){
-  if (Editor.orientation_change() || Editor.scaling_change()) return;
-  document.body.setAttribute("data-orientation-change",true);
-  var param = (orientation), transitionDuration = ((Editor.view() != "split") ? 0 : parseInt(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"") * 1000));
-  if (!param && Editor.view() == "split") setView({ type: "code", force: true });
-  if (!param && Editor.orientation() == "horizontal") orientation = "vertical";
-  if (!param && Editor.orientation() == "vertical") orientation = "horizontal";
+  if (Editor.orientation_change || Editor.scaling_change) return;
+  document.body.setAttribute("data-orientation-change","");
+  var param = (orientation), transitionDuration = ((Editor.view != "split") ? 0 : parseInt(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000);
+  if (!param && Editor.view == "split") setView({ type: "code", force: true });
+  if (!param && Editor.orientation == "horizontal") orientation = "vertical";
+  if (!param && Editor.orientation == "vertical") orientation = "horizontal";
   window.setTimeout(() => {
     setTransitionDurations("off");
-    document.body.classList.remove(Editor.orientation());
-    document.body.setAttribute("data-orientation",orientation);
-    document.body.classList.add(Editor.orientation());
+    document.body.classList.remove(Editor.orientation);
+    document.body.setAttribute("data-orientation",/** @type { string } */ (orientation));
+    document.body.classList.add(Editor.orientation);
     workspace.offsetHeight;
     scaler.offsetHeight;
     preview.offsetHeight;
@@ -777,6 +873,9 @@ function setOrientation(orientation){
     if (!param) setView({ type: "split", force: true });
     window.setTimeout(() => document.body.removeAttribute("data-orientation-change"),transitionDuration);
   },transitionDuration);
+  /**
+   * @param { "on" | "off" } state
+  */
   function setTransitionDurations(state){
     if (state == "on"){
       workspace.style.removeProperty("transition-duration");
@@ -790,40 +889,49 @@ function setOrientation(orientation){
     }
   }
 }
+/**
+ * @param { { identifier?: string; active_editor?: boolean; } } options
+*/
 function setPreviewSource({ identifier, active_editor }){
   if (!identifier && !active_editor) return;
   if ((!identifier && active_editor) || (Editor.preview_editor == identifier)){
     Editor.preview_editor = "active-editor";
     preview_menu.select("active-editor");
-  } else Editor.preview_editor = identifier;
+  } else Editor.preview_editor = /** @type { string } */ (identifier);
   refreshPreview({ force: true });
 }
+/**
+ * @param { boolean } state
+*/
 function setSyntaxHighlighting(state){
   state = (state != undefined) ? state : (Editor.settings.get("syntax-highlighting") != undefined);
   document.querySelectorAll("num-text").forEach(editor => {
     if (editor.syntaxLanguage in Prism.languages) (state) ? editor.syntaxHighlight.enable() : editor.syntaxHighlight.disable();
   });
-  Editor.settings.set("syntax-highlighting",state);
+  Editor.settings.set("syntax-highlighting",String(state));
 }
 function createWindow(){
-  var features = (Editor.appearance().standalone || Editor.appearance().fullscreen) ? "popup" : "", win = window.open(window.location.href,"_blank",features);
-  if (Editor.appearance().fullscreen){
+  const features = (Editor.appearance.standalone || Editor.appearance.fullscreen) ? "popup" : "",
+    win = window.open(window.location.href,"_blank",features);
+
+  if (win === null) throw new Error("Couldn't create a new Smart Text Editor window");
+  if (Editor.appearance.fullscreen){
     win.resizeTo(window.screen.width * 2/3,window.screen.height * 2/3);
     win.moveTo(window.screen.width / 6,window.screen.height / 6);
-  } else if (Editor.appearance().standalone){
+  } else if (Editor.appearance.standalone){
     win.resizeTo(window.outerWidth,window.outerHeight);
     win.moveTo(window.screenX,window.screenY);
   }
 }
 async function openFiles(){
-  if (!Editor.support().file_system){
+  if (!Editor.support.file_system){
     var input = document.createElement("input");
     input.type = "file";
     input.multiple = true;
-    input.addEventListener("change",() => Array.from(input.files).forEach(file => {
+    input.addEventListener("change",() => Array.from(input.files ?? []).forEach(file => {
       var reader = new FileReader();
       reader.readAsText(file,"UTF-8");
-      reader.addEventListener("loadend",() => createEditor({ name: file.name, value: reader.result }));
+      reader.addEventListener("loadend",() => createEditor({ name: file.name, value: /** @type { string } */ (reader.result) }));
     }));
     input.click();
   } else {
@@ -832,13 +940,16 @@ async function openFiles(){
     });
     if (!handles) return;
     handles.forEach(async handle => {
-      var file = await handle.getFile(), identifier = createEditor({ name: await file.name, value: await file.text() });
-      Editor.file_handles[identifier] = await handle;
+      var file = await handle.getFile(), identifier = createEditor({ name: file.name, value: await file.text() });
+      Editor.file_handles[identifier] = handle;
     });
   }
 }
+/**
+ * @param { string } [extension]
+*/
 async function saveFile(extension){
-  if (extension || !Editor.support().file_system){
+  if (extension || !Editor.support.file_system){
     if (!extension) extension = Editor.query().getName("extension");
     var anchor = document.createElement("a"), link = window.URL.createObjectURL(new Blob([Editor.query().textarea.value]));
     anchor.href = link;
@@ -847,12 +958,13 @@ async function saveFile(extension){
     window.URL.revokeObjectURL(link);
   } else {
     var identifier = Editor.active_editor, handle;
+    if (identifier === null) throw new Error("No editors are open, couldn't save anything!");
     if (!Editor.file_handles[identifier]){
       handle = await window.showSaveFilePicker({ suggestedName: Editor.query().getName(), startIn: (Editor.file_handles[identifier]) ? Editor.file_handles[identifier] : "desktop" }).catch(error => {
         if (error.message.toLowerCase().includes("abort")) return;
       });
       if (!handle) return;
-      Editor.file_handles[identifier] = await handle;
+      Editor.file_handles[identifier] = handle;
     } else handle = Editor.file_handles[identifier];
     var stream = await Editor.file_handles[identifier].createWritable().catch(error => {
       alert(`"${Editor.query().getName()}" could not be saved.`);
@@ -861,7 +973,7 @@ async function saveFile(extension){
     if (!stream) return;
     await stream.write(Editor.query().textarea.value);
     await stream.close();
-    var currentName = Editor.query().getName(), file = await handle.getFile(), rename = await file.name;
+    var currentName = Editor.query().getName(), file = await handle.getFile(), rename = file.name;
     if (currentName != rename) renameEditor({ name: rename });
   }
   if (Editor.query().tab.hasAttribute("data-editor-auto-created")) Editor.query().tab.removeAttribute("data-editor-auto-created");
@@ -873,48 +985,69 @@ function createDisplay(){
     height = window.screen.availHeight * 2/3,
     left = window.screen.availWidth / 2 + window.screen.availLeft - width / 2,
     top = window.screen.availHeight / 2 + window.screen.availTop - height / 2,
-    features = (Editor.appearance().standalone || Editor.appearance().fullscreen) ? "popup" : "",
+    features = (Editor.appearance.standalone || Editor.appearance.fullscreen) ? "popup" : "",
     baseURL = Editor.settings.get("preview-base") || null,
     source = Editor.query().textarea.value;
   if (baseURL) source = `<!DOCTYPE html>\n<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
   var link = window.URL.createObjectURL(new Blob([source],{ type: "text/html" })),
     win = window.open(link,"_blank",features);
+
+  if (win === null) throw new Error("Couldn't create a display window!");
   window.URL.revokeObjectURL(link);
   win.moveTo(left,top);
   win.resizeTo(width,height);
   Editor.child_windows.push(win);
   window.setTimeout(() => {
+    if (win === null) return;
     if (!win.document.title) win.document.title = Editor.query().getName();
   },20);
 }
+/**
+ * @param { HTMLElement } element
+ * @param { string } action
+*/
 async function callCommand(element,action){/* I think I may remove this, or do something else with it. document.execCommand() is broken in so many ways, what a shame */
   element.focus({ preventScroll: true });
   if (action == "paste"){
-    var clipboard = await navigator.clipboard.readText().catch(error => alert("Could not access the clipboard, please check site permissions for clipboard use."));
-    document.execCommand("insertText",false,await clipboard);
+    var clipboard = await navigator.clipboard.readText().catch(() => alert("Could not access the clipboard, please check site permissions for clipboard use."));
+    if (clipboard === undefined) return;
+    document.execCommand("insertText",false,clipboard);
   } else document.execCommand(action);
 }
-function getNavigableElements({ container, scope = false } = {}){
+/**
+ * @param { { container: HTMLElement; scope?: boolean | string; } } options
+*/
+function getNavigableElements({ container, scope = false }){
   scope = (scope) ? "" : ":scope > ";
+  /** @type { NodeListOf<HTMLElement> } */
   var navigable = container.querySelectorAll(`${scope}button:not([disabled]), ${scope}textarea:not([disabled]), ${scope}input:not([disabled]), ${scope}select:not([disabled]), ${scope}a[href]:not([disabled]), ${scope}[tabindex]:not([tabindex="-1"])`);
   return Array.from(navigable).filter(element => (getElementStyle({ element, property: "display" }) != "none"));
 }
-function getElementStyle({ element, pseudo = null, property } = {}){
+/**
+ * @param { { element: Element; pseudo?: string | null; property: string; } } options
+*/
+function getElementStyle({ element, pseudo = null, property }){
   return window.getComputedStyle(element,pseudo).getPropertyValue(property);
 }
-function applyEditingBehavior({ element, advanced = true } = {}){
+/**
+ * @param { { element: HTMLElement; } } options
+*/
+function applyEditingBehavior({ element }){
   var type = element.tagName.toLowerCase();
   element.addEventListener("dragover",event => {
     event.stopPropagation();
+    if (event.dataTransfer === null) return;
     event.dataTransfer.dropEffect = "copy";
   });
   element.addEventListener("drop",event => {
+    if (event.dataTransfer === null) return;
     if (Array.from(event.dataTransfer.items)[0].kind == "file") return;
     event.stopPropagation();
     document.querySelectorAll("menu-drop[data-open]").forEach(menu => menu.close());
   });
   if (type == "input"){
     element.spellcheck = false;
+    // @ts-expect-error
     element.autocomplete = "off";
     element.autocapitalize = "none";
     element.setAttribute("autocorrect","off");
@@ -924,17 +1057,25 @@ function applyEditingBehavior({ element, advanced = true } = {}){
     element.themes.remove("vanilla-appearance");
     var scrollbarStyles = document.createElement("style");
     scrollbarStyles.textContent = scrollbar_styles.textContent;
-    element.shadowRoot.insertBefore(scrollbarStyles,element.container);
+    element.shadowRoot?.insertBefore(scrollbarStyles,element.container);
   }
 }
-function sendShortcutAction({ control, command, shift, controlShift, shiftCommand, controlCommand, key } = {}){
+/**
+ * @param { { control?: boolean; command?: boolean; shift?: boolean; controlShift?: boolean; shiftCommand?: boolean; controlCommand?: boolean; key: string; } } options
+*/
+function sendShortcutAction({ control, command, shift, controlShift, shiftCommand, controlCommand, key }){
   if (!key) return;
-  var appleDevice = (Editor.environment().apple_device);
-  control = ((control && !appleDevice) || (controlShift && !appleDevice) || (controlCommand && appleDevice)), command = ((command && appleDevice) || (shiftCommand && appleDevice) || (controlCommand && appleDevice)), shift = (shift || (controlShift && !appleDevice) || (shiftCommand && appleDevice)), key = key.toString().toLowerCase();
+  var appleDevice = (Editor.environment.apple_device);
+
+  control = ((control && !appleDevice) || (controlShift && !appleDevice) || (controlCommand && appleDevice));
+  command = ((command && appleDevice) || (shiftCommand && appleDevice) || (controlCommand && appleDevice));
+  shift = (shift || (controlShift && !appleDevice) || (shiftCommand && appleDevice));
+  key = key.toString().toLowerCase();
+
   document.body.dispatchEvent(new KeyboardEvent("keydown",{ ctrlKey: control, metaKey: command, shiftKey: shift, key }));
 }
 function refreshPreview({ force = false } = {}){
-  if (Editor.view() == "code") return;
+  if (Editor.view == "code") return;
   var editor = (Editor.preview_editor == "active-editor") ? Editor.query() : Editor.query(Editor.preview_editor);
   if (!editor.textarea) return;
   var change = (editor.tab.hasAttribute("data-editor-refresh") && Editor.settings.get("automatic-refresh") != false);
@@ -942,26 +1083,38 @@ function refreshPreview({ force = false } = {}){
   var baseURL = Editor.settings.get("preview-base") || null, source = editor.textarea.value;
   if (baseURL) source = `<!DOCTYPE html>\n<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
   preview.addEventListener("load",() => {
-    preview.contentWindow.document.open();
-    preview.contentWindow.document.write(source);
-    preview.contentWindow.document.close();
+    preview.contentWindow?.document.open();
+    preview.contentWindow?.document.write(source);
+    preview.contentWindow?.document.close();
   },{ once: true });
   preview.src = "about:blank";
   if (change) editor.tab.removeAttribute("data-editor-refresh");
 }
-function setTitle({ content, reset = false } = {}){
+/**
+ * @param { { content?: string; reset?: boolean; } | undefined } options
+*/
+function setTitle({ content = "", reset = false } = {}){
   document.title = `${(content && !reset) ? `${content} - ` : ""}Smart Text Editor`;
 }
+/**
+ * @param { string[] } entries
+*/
 function addQueryParameters(entries){
   var parameters = new URLSearchParams(window.location.search);
-  entries.forEach(entry => parameters.set(entry,true));
+  entries.forEach(entry => parameters.set(entry,""));
   changeQueryParameters(parameters);
 }
+/**
+ * @param { string[] } entries
+*/
 function removeQueryParameters(entries){
   var parameters = new URLSearchParams(window.location.search);
   entries.forEach(entry => parameters.delete(entry));
   changeQueryParameters(parameters);
 }
+/**
+ * @param { URLSearchParams } parameters
+*/
 function changeQueryParameters(parameters){
   var query = parameters.toString();
   if (query) query = "?" + query;
@@ -969,6 +1122,7 @@ function changeQueryParameters(parameters){
   history.pushState(null,"",address);
 }
 function showInstallPrompt(){
+  if (Editor.install_prompt === null) return;
   Editor.install_prompt.prompt();
   Editor.install_prompt.userChoice.then(result => {
     if (result.outcome != "accepted") return;
@@ -977,21 +1131,32 @@ function showInstallPrompt(){
   });
 }
 function clearSiteCaches(){
+  if (navigator.serviceWorker.controller === null) return;
   if (confirm("Are you sure you would like to clear all app caches?\nSmart Text Editor will no longer work offline until an Internet connection is available.")) navigator.serviceWorker.controller.postMessage({ action: "clear-site-caches" });
 }
+/**
+ * @param { MouseEvent | TouchEvent } event
+*/
 function setScaling(event){
-  var { safe_area_insets: safeAreaInsets } = Editor.appearance(), scalingOffset, scalingRange = { minimum: ((Editor.orientation() == "vertical") ? workspace_tabs.offsetHeight : safeAreaInsets.left) + 80, maximum: ((Editor.orientation() == "horizontal") ? window.innerWidth - safeAreaInsets.right : (Editor.orientation() == "vertical") ? (window.innerHeight - header.offsetHeight - safeAreaInsets.bottom) : 0) - 80 }, touchEvent = (Editor.environment().touch_device && event instanceof TouchEvent);
-  if (Editor.orientation() == "horizontal") scalingOffset = (!touchEvent) ? event.pageX : event.touches[0].pageX;
-  if (Editor.orientation() == "vertical") scalingOffset = (!touchEvent) ? event.pageY - header.offsetHeight : event.touches[0].pageY - header.offsetHeight;
-  if (scalingOffset < scalingRange.minimum) scalingOffset = scalingRange.minimum;
-  if (scalingOffset > scalingRange.maximum) scalingOffset = scalingRange.maximum;
-  document.body.setAttribute("data-scaling-active",true);
+  var { safe_area_insets: safeAreaInsets } = Editor.appearance,
+    scalingOffset,
+    scalingRange = { minimum: ((Editor.orientation == "vertical") ? workspace_tabs.offsetHeight : safeAreaInsets.left) + 80,
+    maximum: ((Editor.orientation == "horizontal") ? window.innerWidth - safeAreaInsets.right : (Editor.orientation == "vertical") ? (window.innerHeight - header.offsetHeight - safeAreaInsets.bottom) : 0) - 80 },
+    touchEvent = (Editor.environment.touch_device && event instanceof TouchEvent);
+  if (Editor.orientation == "horizontal") scalingOffset = (!touchEvent) ? /** @type { MouseEvent } */ (event).pageX : /** @type { TouchEvent } */ (event).touches[0].pageX;
+  if (Editor.orientation == "vertical") scalingOffset = (!touchEvent) ? /** @type { MouseEvent } */ (event).pageY - header.offsetHeight : /** @type { TouchEvent } */ (event).touches[0].pageY - header.offsetHeight;
+  if (/** @type { number } */ (scalingOffset) < scalingRange.minimum) scalingOffset = scalingRange.minimum;
+  if (/** @type { number } */ (scalingOffset) > scalingRange.maximum) scalingOffset = scalingRange.maximum;
+  document.body.setAttribute("data-scaling-active","");
   workspace.style.setProperty("--scaling-offset",`${scalingOffset}px`);
   scaler.style.setProperty("--scaling-offset",`${scalingOffset}px`);
   preview.style.setProperty("--scaling-offset",`${scalingOffset}px`);
 }
+/**
+ * @param { MouseEvent | TouchEvent } event
+*/
 function disableScaling(event){
-  var touchEvent = (Editor.environment().touch_device && event instanceof TouchEvent);
+  var touchEvent = (Editor.environment.touch_device && event instanceof TouchEvent);
   document.removeEventListener((!touchEvent) ? "mousemove" : "touchmove",setScaling);
   document.removeEventListener((!touchEvent) ? "mouseup" : "touchend",disableScaling);
   document.body.removeAttribute("data-scaling-change");

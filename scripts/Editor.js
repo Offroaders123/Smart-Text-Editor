@@ -132,7 +132,7 @@ class Editor {
   }
 
   /**
-   * @param { number | null } identifier
+   * @param { string | null } identifier
   */
   static query(identifier = Editor.active_editor) {
     const tab = workspace_tabs.querySelector(`.tab[data-editor-identifier="${identifier}"]`);
@@ -140,11 +140,12 @@ class Editor {
     const textarea = (container) ? container.editor : null;
 
     /**
-     * @param { "base" | "extension" } section
+     * @param { "base" | "extension" } [section]
     */
     function getName(section){
       if ((document.querySelectorAll(`[data-editor-identifier="${identifier}"]:not([data-editor-change])`).length == 0) && (identifier != Editor.active_editor)) return null;
-      let name = workspace_tabs.querySelector(`.tab[data-editor-identifier="${identifier}"] [data-editor-name]`).innerText;
+      /** @type { string | string[] } */
+      let name = /** @type { HTMLSpanElement } */ (workspace_tabs.querySelector(`.tab[data-editor-identifier="${identifier}"] [data-editor-name]`)).innerText;
       if (!section || (!name.includes(".") && section == "base")) return name;
       if (section == "base"){
         name = name.split(".");
@@ -153,15 +154,17 @@ class Editor {
       }
       if (section == "extension"){
         if (!name.includes(".")) return "";
-        return name.split(".").pop();
+        return /** @type { string } */ (name.split(".").pop());
       }
+      // I don't think this is used, I had to add this to streamline the type to remove 'undefined'
+      return name;
     }
 
     return { tab, container, textarea, getName };
   }
 
   static get view() {
-    return document.body.getAttribute("data-view");
+    return document.body.getAttribute("data-view") ?? "code";
   }
 
   static get view_change() {
@@ -169,7 +172,7 @@ class Editor {
   }
 
   static get orientation() {
-    return document.body.getAttribute("data-orientation");
+    return document.body.getAttribute("data-orientation") ?? "horizontal";
   }
 
   static get orientation_change() {
@@ -186,10 +189,13 @@ class Editor {
 
   static preapproved_extensions = ["txt","html","css","js","php","json","webmanifest","bbmodel","xml","yaml","yml","dist","config","ini","md","markdown","mcmeta","lang","properties","uidx","material","h","fragment","vertex","fxh","hlsl","ihlsl","svg"];
   /**
-   * @type { number | null }
+   * @type { string | null }
   */
   static active_editor = null;
   static preview_editor = "active-editor";
+  /**
+   * @type { { [identifier: string]: FileSystemFileHandle } }
+  */
   static file_handles = {};
   /**
    * @type { Window[] }
@@ -253,10 +259,22 @@ class Editor {
     }
   }
 
+  /**
+   * @type { STECardElement | null }
+  */
   static active_dialog = null;
+  /**
+   * @type { STECardElement | null }
+  */
   static dialog_previous = null;
+  /**
+   * @type { STECardElement | null }
+  */
   static active_widget = null;
   static picker_color = null;
+  /**
+   * @type { BeforeInstallPromptEvent | null }
+  */
   static install_prompt = null;
 }
 
