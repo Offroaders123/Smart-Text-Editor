@@ -742,7 +742,7 @@ function openEditor({ identifier, auto_created = false, focused_override = false
 function closeEditor({ identifier = Editor.active_editor } = {}){
   if (!identifier) return;
   var { tab, container, textarea, getName } = Editor.query(identifier),
-    previewOption = preview_menu.main.querySelector(`.option[data-editor-identifier="${identifier}"]`),
+    previewOption = /** @type { Option } */ (preview_menu.main.querySelector(`.option[data-editor-identifier="${identifier}"]`)),
     active = (tab.classList.contains("active")),
     focused = (document.activeElement == container),
     editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])"));
@@ -787,7 +787,7 @@ function closeEditor({ identifier = Editor.active_editor } = {}){
 function renameEditor({ name, identifier = Editor.active_editor } = {}){
   const { tab, container, getName } = Editor.query(identifier),
     editorName = /** @type { HTMLSpanElement } */ (tab.querySelector("[data-editor-name]")),
-    previewOption = preview_menu.main.querySelector(`.option[data-editor-identifier="${identifier}"]`),
+    previewOption = /** @type { Option } */ (preview_menu.main.querySelector(`.option[data-editor-identifier="${identifier}"]`)),
     currentName = /** @type { string } */ (getName()),
     base = getName("base"),
     extension = getName("extension");
