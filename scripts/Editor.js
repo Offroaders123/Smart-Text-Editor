@@ -203,7 +203,7 @@ class Editor {
   static child_windows = [];
 
   static settings = {
-    entries: JSON.parse(window.localStorage.getItem("settings") ?? "") || {},
+    entries: JSON.parse(window.localStorage.getItem("settings") ?? "null") || {},
 
     /**
      * @param { string } key
