@@ -1,3 +1,6 @@
+/**
+ * The base component for the Alert, Dialog, and Widget card types.
+*/
 class STECardElement extends HTMLElement {
   constructor(){
     super();
@@ -9,7 +12,7 @@ class STECardElement extends HTMLElement {
     this.defined = true;
     this.addEventListener("keydown",event => {
       if (this.getAttribute("data-type") != "dialog" || event.key != "Tab") return;
-      var navigable = getNavigableElements({ container: this, scope: true });
+      var navigable = _getNavigableElements({ container: this, scope: true });
       if (!event.shiftKey){
         if (document.activeElement != navigable[navigable.length - 1]) return;
         event.preventDefault();
@@ -80,7 +83,7 @@ class STECardElement extends HTMLElement {
       },4000);
     }
     if (this.type == "dialog"){
-      document.body.addEventListener("keydown",catchCardNavigation);
+      document.body.addEventListener("keydown",_catchCardNavigation);
       card_backdrop.classList.add("active");
       if (!STE.activeDialog && !STE.dialogPrevious){
         STE.dialogPrevious = /** @type { STECardElement } */ (document.activeElement);
@@ -136,7 +139,7 @@ class STECardElement extends HTMLElement {
       window.setTimeout(() => this.minimize(),transitionDuration);
     }
     if (this.type == "dialog"){
-      document.body.removeEventListener("keydown",catchCardNavigation);
+      document.body.removeEventListener("keydown",_catchCardNavigation);
       card_backdrop.classList.remove("active");
       STE.activeDialog = null;
       if (STE.dialogPrevious){
@@ -151,10 +154,12 @@ class STECardElement extends HTMLElement {
 
 /**
  * @param { KeyboardEvent } event
+ * 
+ * @private
 */
-function catchCardNavigation(event){
+function _catchCardNavigation(event){
   if (!STE.activeDialog || event.key != "Tab" || document.activeElement != document.body) return;
-  var navigable = getNavigableElements({ container: STE.activeDialog, scope: true });
+  var navigable = _getNavigableElements({ container: STE.activeDialog, scope: true });
   event.preventDefault();
   navigable[((!event.shiftKey) ? 0 : navigable.length - 1)].focus();
 }
@@ -181,7 +186,13 @@ document.querySelectorAll("img").forEach(image => image.draggable = false);
   option.addEventListener("mousedown",event => event.preventDefault());
 });
 
+/**
+ * A global object with static properties to work with the various tools provided the app.
+*/
 class Tools {
+  /**
+   * A namespace with functions for the Replace Text widget.
+  */
   static replaceText = {
     replace() {
       var { container: editor } = STE.query();
@@ -199,6 +210,9 @@ class Tools {
     }
   }
 
+  /**
+   * A namespace with functions for the JSON Formatter widget.
+  */
   static jsonFormatter = {
     format(spacing = "  ") {
       try {
@@ -242,6 +256,9 @@ class Tools {
     }
   }
 
+  /**
+   * A namespace with functions for the URI Encoder widget.
+  */
   static uriEncoder = {
     encode() {
       var encodingType = (!encoder_type.checked) ? encodeURI : encodeURIComponent;
@@ -258,6 +275,9 @@ class Tools {
     }
   }
 
+  /**
+   * A namespace with functions for the UUID Generator widget.
+  */
   static uuidGenerator = (() => {
     /** @type { string[] } */
     var lut = [];
@@ -271,7 +291,9 @@ class Tools {
   })()
 
   /**
-   * @param { { type: string; } } options
+   * Creates a new Editor from a given template type.
+   * 
+   * @param { { type: "html" | "pack-manifest-bedrock"; } } options
   */
   static insertTemplate({ type }) {
     var template, editor = STE.query(), name;
@@ -646,6 +668,11 @@ if (queryParameters.get("settings")){
   removeQueryParameters(["settings"]);
 }
 
+/**
+ * Creates a new Editor within the Workspace.
+ * 
+ * @returns The identifier for the given Editor.
+*/
 function createEditor({ name = "Untitled.txt", value = "", open = true, auto_created = false, auto_replace = true } = {}){
   let identifier = Math.random().toString(),
     tab = document.createElement("button"),
@@ -761,6 +788,8 @@ function createEditor({ name = "Untitled.txt", value = "", open = true, auto_cre
 }
 
 /**
+ * Opens an Editor from a given identifier.
+ * 
  * @param { { identifier: string; auto_created?: boolean; focused_override?: boolean; } } options
 */
 function openEditor({ identifier, auto_created = false, focused_override = false }){
@@ -779,6 +808,9 @@ function openEditor({ identifier, auto_created = false, focused_override = false
   if (STE.previewEditor == "active-editor") refreshPreview({ force: (STE.settings.get("automatic-refresh") != false) });
 }
 
+/**
+ * Closes an Editor from a given identifier.
+*/
 function closeEditor({ identifier = STE.activeEditor } = {}){
   if (!identifier) return;
   var { tab, container, textarea, getName } = STE.query(identifier),
@@ -823,6 +855,8 @@ function closeEditor({ identifier = STE.activeEditor } = {}){
 }
 
 /**
+ * Renames an Editor from a given identifier.
+ * 
  * @param { { name?: string; identifier?: string | null | undefined; } | undefined } options
 */
 function renameEditor({ name, identifier = STE.activeEditor } = {}){
@@ -851,6 +885,11 @@ function renameEditor({ name, identifier = STE.activeEditor } = {}){
 }
 
 /* Future feature: Add support to disable the wrapping behavior */
+/**
+ * Gets the previous Editor to the left of the currently opened Editor.
+ * 
+ * If the active Editor is the first one in the Workspace, it will wrap around to give the last Editor in the Workspace.
+*/
 function getPreviousEditor({ identifier = STE.activeEditor, wrap = true } = {}){
   var { tab } = STE.query(identifier),
     editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")),
@@ -859,6 +898,11 @@ function getPreviousEditor({ identifier = STE.activeEditor, wrap = true } = {}){
   return previousEditor;
 }
 
+/**
+ * Gets the next Editor to the right of the currently opened Editor.
+ * 
+ * If the active Editor is the last one in the Workspace, it will wrap around to give the first Editor in the Workspace.
+*/
 function getNextEditor({ identifier = STE.activeEditor, wrap = true } = {}){
   var { tab } = STE.query(identifier),
     editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")),
@@ -867,6 +911,11 @@ function getNextEditor({ identifier = STE.activeEditor, wrap = true } = {}){
   return nextEditor;
 }
 
+/**
+ * Updates the horizontal scroll position of the Workspace Tabs section to show a given Editor, by it's given identifier.
+ * 
+ * If the given identifier is already fully in view, no scrolling will happen.
+*/
 function setEditorTabsVisibility({ identifier = STE.activeEditor } = {}){
   if (!STE.activeEditor) return;
   var { tab } = STE.query(identifier), obstructedLeft = (tab.offsetLeft <= workspace_tabs.scrollLeft), obstructedRight = ((tab.offsetLeft + tab.clientWidth) >= (workspace_tabs.scrollLeft + workspace_tabs.clientWidth)), spacingOffset = 0;
@@ -881,7 +930,9 @@ function setEditorTabsVisibility({ identifier = STE.activeEditor } = {}){
 }
 
 /**
- * @param { { type: string; force?: boolean; } } options
+ * Sets the View state of the app. If a View change is already in progress, and the force option is not set to `true`, the call will be skipped.
+ * 
+ * @param { { type: "code" | "split" | "preview"; force?: boolean; } } options
 */
 function setView({ type, force = false }){
   if ((STE.orientationChange && !force) || STE.scalingChange) return;
@@ -901,7 +952,9 @@ function setView({ type, force = false }){
 }
 
 /**
- * @param { "horizontal" | "vertical" } [orientation]
+ * Sets the Orientation state of the app. If an Orientation change is already in progress, the call will be skipped.
+ * 
+ * @param { "horizontal" | "vertical" } [orientation] - If an Orientation type is not provided, the current state will be toggled to the other option.
 */
 function setOrientation(orientation){
   if (STE.orientationChange || STE.scalingChange) return;
@@ -941,6 +994,8 @@ function setOrientation(orientation){
 }
 
 /**
+ * Sets the source for the Preview to a given Editor.
+ * 
  * @param { { identifier?: string; active_editor?: boolean; } } options
 */
 function setPreviewSource({ identifier, active_editor }){
@@ -953,6 +1008,8 @@ function setPreviewSource({ identifier, active_editor }){
 }
 
 /**
+ * Enables or disables syntax highlighting for all Num Text elements.
+ * 
  * @param { boolean } state
 */
 function setSyntaxHighlighting(state){
@@ -963,6 +1020,9 @@ function setSyntaxHighlighting(state){
   STE.settings.set("syntax-highlighting",String(state));
 }
 
+/**
+ * Creates a new Smart Text Editor window.
+*/
 function createWindow(){
   const features = (STE.appearance.standalone || STE.appearance.fullscreen) ? "popup" : "",
     win = window.open(window.location.href,"_blank",features);
@@ -977,6 +1037,11 @@ function createWindow(){
   }
 }
 
+/**
+ * Creates new Editors in the Workspace from files chosen by the user through a file system file picker.
+ * 
+ * If the File System Access API is supported in the user's browser, it will use that. If not, it will fall back to using an `<input type="file">` element.
+*/
 async function openFiles(){
   if (!STE.support.fileSystem){
     var input = document.createElement("input");
@@ -1001,6 +1066,12 @@ async function openFiles(){
 }
 
 /**
+ * Saves an Editor as a file back to the user's file system.
+ * 
+ * If the File System Access API is supported in the user's browser, the Editor's current value will be rewritten directly to the file system.
+ * 
+ * If the File System Access API is not supported, or if a custom file extension is provided for the current file, a Save As dialog will be shown using an `<a download href="blob:">` element.
+ * 
  * @param { string } [extension]
 */
 async function saveFile(extension){
@@ -1036,6 +1107,9 @@ async function saveFile(extension){
   refreshPreview({ force: true });
 }
 
+/**
+ * Creates a new Display window for the active Editor.
+*/
 function createDisplay(){
   var width = window.screen.availWidth * 2/3,
     height = window.screen.availHeight * 2/3,
@@ -1060,8 +1134,12 @@ function createDisplay(){
 }
 
 /**
+ * Calls a `document.execCommand()` action on a given element.
+ * 
  * @param { HTMLElement } element
  * @param { string } action
+ * 
+ * @deprecated
 */
 async function callCommand(element,action){/* I think I may remove this, or do something else with it. document.execCommand() is broken in so many ways, what a shame */
   element.focus({ preventScroll: true });
@@ -1073,9 +1151,11 @@ async function callCommand(element,action){/* I think I may remove this, or do s
 }
 
 /**
- * @param { { container: HTMLElement; scope?: boolean | string; } } options
+ * Gets all navigable elements within a given parent element.
+ * 
+ * @param { { container: HTMLElement; scope?: boolean | string; } } options - If the scope option is set to `true`, only direct children within the parent element will be selected.
 */
-function getNavigableElements({ container, scope = false }){
+function _getNavigableElements({ container, scope = false }){
   scope = (scope) ? "" : ":scope > ";
   /** @type { NodeListOf<HTMLElement> } */
   var navigable = container.querySelectorAll(`${scope}button:not([disabled]), ${scope}textarea:not([disabled]), ${scope}input:not([disabled]), ${scope}select:not([disabled]), ${scope}a[href]:not([disabled]), ${scope}[tabindex]:not([tabindex="-1"])`);
@@ -1083,6 +1163,8 @@ function getNavigableElements({ container, scope = false }){
 }
 
 /**
+ * Gets a style property value for a given element.
+ * 
  * @param { { element: Element; pseudo?: string | null; property: string; } } options
 */
 function getElementStyle({ element, pseudo = null, property }){
@@ -1090,6 +1172,8 @@ function getElementStyle({ element, pseudo = null, property }){
 }
 
 /**
+ * Applies the app's behavior defaults, like Drag and Drop handling, to `<input>` and `<num-text>` elements.
+ * 
  * @param { { element: HTMLInputElement | NumTextElement; } } options
 */
 function applyEditingBehavior({ element }){
@@ -1123,6 +1207,8 @@ function applyEditingBehavior({ element }){
 }
 
 /**
+ * Dispatches a `KeyboardEvent` on the `<body>` from a given key combination.
+ * 
  * @param { { control?: boolean; command?: boolean; shift?: boolean; controlShift?: boolean; shiftCommand?: boolean; controlCommand?: boolean; key: string; } } options
 */
 function sendShortcutAction({ control, command, shift, controlShift, shiftCommand, controlCommand, key }){
@@ -1137,6 +1223,9 @@ function sendShortcutAction({ control, command, shift, controlShift, shiftComman
   document.body.dispatchEvent(new KeyboardEvent("keydown",{ ctrlKey: control, metaKey: command, shiftKey: shift, key }));
 }
 
+/**
+ * Refreshes the Preview with the latest source from the source Editor.
+*/
 function refreshPreview({ force = false } = {}){
   if (STE.view == "code") return;
   var editor = (STE.previewEditor == "active-editor") ? STE.query() : STE.query(STE.previewEditor);
@@ -1155,6 +1244,8 @@ function refreshPreview({ force = false } = {}){
 }
 
 /**
+ * Sets the title of the window.
+ * 
  * @param { { content?: string; reset?: boolean; } | undefined } options
 */
 function setTitle({ content = "", reset = false } = {}){
@@ -1162,6 +1253,8 @@ function setTitle({ content = "", reset = false } = {}){
 }
 
 /**
+ * Adds additional boolean query parameters to the app's URL.
+ * 
  * @param { string[] } entries
 */
 function addQueryParameters(entries){
@@ -1171,6 +1264,8 @@ function addQueryParameters(entries){
 }
 
 /**
+ * Removes query parameters from the app's URL.
+ * 
  * @param { string[] } entries
 */
 function removeQueryParameters(entries){
@@ -1180,6 +1275,8 @@ function removeQueryParameters(entries){
 }
 
 /**
+ * Updates the app's URL query parameters to a new `URLSearchParams` object.
+ * 
  * @param { URLSearchParams } parameters
 */
 function changeQueryParameters(parameters){
@@ -1189,6 +1286,9 @@ function changeQueryParameters(parameters){
   history.pushState(null,"",address);
 }
 
+/**
+ * Shows the PWA Install Prompt, if the `BeforeInstallPrompt` event was fired when the app first started.
+*/
 function showInstallPrompt(){
   if (STE.installPrompt === null) return;
   STE.installPrompt.prompt();
@@ -1199,12 +1299,17 @@ function showInstallPrompt(){
   });
 }
 
+/**
+ * Clears the Service Worker cache, if the user confirms doing so.
+*/
 function clearSiteCaches(){
   if (navigator.serviceWorker.controller === null) return;
   if (confirm("Are you sure you would like to clear all app caches?\nSmart Text Editor will no longer work offline until an Internet connection is available.")) navigator.serviceWorker.controller.postMessage({ action: "clear-site-caches" });
 }
 
 /**
+ * Sets the Split mode scaling when called from the Scaler's moving event listeners.
+ * 
  * @param { MouseEvent | TouchEvent } event
 */
 function setScaling(event){
@@ -1224,6 +1329,8 @@ function setScaling(event){
 }
 
 /**
+ * Removes the Split mode scale handling when the user finishes moving the Scaler.
+ * 
  * @param { MouseEvent | TouchEvent } event
 */
 function disableScaling(event){
@@ -1233,6 +1340,9 @@ function disableScaling(event){
   document.body.removeAttribute("data-scaling-change");
 }
 
+/**
+ * Resets the Split mode scaling offsets, making the Workspace responsive again.
+*/
 function removeScaling(){
   if (!document.body.hasAttribute("data-scaling-active")) return;
   document.body.removeAttribute("data-scaling-active");
