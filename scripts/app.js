@@ -148,6 +148,7 @@ class STECardElement extends HTMLElement {
     if (this.type == "widget") STE.activeWidget = null;
   }
 }
+
 /**
  * @param { KeyboardEvent } event
 */
@@ -157,6 +158,7 @@ function catchCardNavigation(event){
   event.preventDefault();
   navigable[((!event.shiftKey) ? 0 : navigable.length - 1)].focus();
 }
+
 window.customElements.define("ste-card",STECardElement);
 
 document.querySelectorAll("img").forEach(image => image.draggable = false);
@@ -178,6 +180,7 @@ document.querySelectorAll("img").forEach(image => image.draggable = false);
   option.tabIndex = -1;
   option.addEventListener("mousedown",event => event.preventDefault());
 });
+
 class Tools {
   static replaceText = {
     replace() {
@@ -287,6 +290,7 @@ class Tools {
     if (STE.view == "preview") setView({ type: "split" });
   }
 };
+
 window.addEventListener("load",() => {
   if (STE.environment.fileProtocol) return;
   if (window.location.href.includes("index.html")) history.pushState(null,"",window.location.href.replace(/index.html/,""));
@@ -315,27 +319,34 @@ window.addEventListener("load",() => {
     /** @type { HTMLLinkElement } */ (document.querySelector("link[rel='manifest']")).href = "manifest.webmanifest";
   }
 });
+
 window.addEventListener("beforeinstallprompt",event => {
   event.preventDefault();
   STE.installPrompt = event;
   document.documentElement.classList.add("install-prompt-available");
   theme_button.childNodes[0].textContent = "Theme";
 });
+
 window.addEventListener("beforeunload",event => {
   if (STE.unsavedWork) return;
   event.preventDefault();
   event.returnValue = "";
 });
+
 window.addEventListener("unload",() => STE.childWindows.forEach(window => window.close()));
+
 window.addEventListener("resize",event => {
   STE.appearance.refreshDevicePixelRatio();
   if (STE.view != "preview") setEditorTabsVisibility();
   if (STE.view == "split" && document.body.hasAttribute("data-scaling-active")) setView({ type: "split" });
 });
+
 window.addEventListener("blur",() => {
   if (STE.appearance.parentWindow) /** @type { NodeListOf<MenuDropElement> } */ (document.querySelectorAll("menu-drop[data-open]")).forEach(menu => menu.close());
 });
+
 if (STE.support.windowControlsOverlay) navigator.windowControlsOverlay.addEventListener("geometrychange",() => STE.appearance.refreshWindowControlsOverlay());
+
 document.body.addEventListener("keydown",event => {
   /**
    * @param { string } key
@@ -474,17 +485,21 @@ document.body.addEventListener("keydown",event => {
     settings_card.open();
   }
 },{ capture: true });
+
 document.body.addEventListener("mousedown",event => {
   if (event.button != 2) return;
   event.preventDefault();
   event.stopPropagation();
 });
+
 document.body.addEventListener("contextmenu",event => event.preventDefault());
+
 document.body.addEventListener("dragover",event => {
   event.preventDefault();
   if (event.dataTransfer === null || !(event.target instanceof Element)) return;
   event.dataTransfer.dropEffect = (event.target.matches("menu-drop, header, .card") || event.target.closest("menu-drop, header, .card")) ? "none" : "copy";
 });
+
 document.body.addEventListener("drop",event => {
   event.preventDefault();
   /** @type { NodeListOf<MenuDropElement> } */ (document.querySelectorAll("menu-drop[data-open]")).forEach(menu => menu.close());
@@ -506,6 +521,7 @@ document.body.addEventListener("drop",event => {
     } else if (item.kind == "string" && index == 0 && event.dataTransfer?.getData("text") != "") createEditor({ value: event.dataTransfer?.getData("text") });
   });
 });
+
 var appToolbar = /** @type { HTMLDivElement } */ (document.querySelector("header .app-menubar"));
 /** @type { NodeListOf<MenuDropElement> } */ (appToolbar.querySelectorAll("menu-drop")).forEach(menu => {
   menu.addEventListener("pointerenter",event => {
@@ -516,6 +532,7 @@ var appToolbar = /** @type { HTMLDivElement } */ (document.querySelector("header
     menu.open();
   });
 });
+
 workspace_tabs.addEventListener("keydown",event => {
   if (event.key != "ArrowLeft" && event.key != "ArrowRight") return;
   if (!workspace_tabs.contains(document.activeElement) || !(document.activeElement instanceof HTMLElement)) return;
@@ -526,12 +543,16 @@ workspace_tabs.addEventListener("keydown",event => {
   if (event.key == "ArrowLeft") STE.query(previousEditor).tab.focus();
   if (event.key == "ArrowRight") STE.query(nextEditor).tab.focus();
 });
+
 create_editor_button.addEventListener("keydown",event => {
   if (event.key != "Enter") return;
   if (event.repeat) event.preventDefault();
 });
+
 create_editor_button.addEventListener("mousedown",event => event.preventDefault());
+
 create_editor_button.addEventListener("click",() => createEditor({ auto_replace: false }));
+
 scaler.addEventListener("mousedown",event => {
   if (event.button != 0) return;
   if (STE.view != "split") return;
@@ -540,30 +561,39 @@ scaler.addEventListener("mousedown",event => {
   document.addEventListener("mousemove",setScaling);
   document.addEventListener("mouseup",disableScaling);
 });
+
 scaler.addEventListener("touchstart",event => {
   if (STE.view != "split" || event.touches.length != 1) return;
   document.body.setAttribute("data-scaling-change","");
   document.addEventListener("touchmove",setScaling,{ passive: true });
   document.addEventListener("touchend",disableScaling,{ passive: true });
 },{ passive: true });
+
 card_backdrop.addEventListener("click",() => {
   if (STE.activeDialog === null) return;
   STE.activeDialog.close();
 });
+
 preview_base_input.placeholder = document.baseURI;
+
 preview_base_input.setWidth = () => preview_base_input.style.setProperty("--input-count",preview_base_input.value.length.toString());
+
 preview_base_input.setValue = value => {
   preview_base_input.value = value;
   preview_base_input.setWidth();
 };
+
 preview_base_input.reset = () => {
   preview_base_input.setValue("");
   if (!STE.settings.has("preview-base")) return;
   STE.settings.remove("preview-base");
   refreshPreview({ force: true });
 };
+
 preview_base_input.style.setProperty("--placeholder-count",preview_base_input.placeholder.length.toString());
+
 preview_base_input.addEventListener("input",event => /** @type { typeof preview_base_input } */ (event.target).setWidth());
+
 preview_base_input.addEventListener("change",event => {
   if (!(event.target instanceof HTMLInputElement)) return;
   var empty = event.target.matches(":placeholder-shown"), valid = event.target.matches(":valid");
@@ -571,10 +601,13 @@ preview_base_input.addEventListener("change",event => {
   if (!empty && valid) STE.settings.set("preview-base",event.target.value);
   if (empty || valid) refreshPreview({ force: true });
 });
+
 generator_output.addEventListener("click",() => generator_output.select());
+
 generator_output.addEventListener("keydown",() => generator_output.click());
 
 window.requestAnimationFrame(() => createEditor({ auto_created: true }));
+
 if (STE.appearance.parentWindow){
   if (STE.settings.get("default-orientation")){
     var value = STE.settings.get("default-orientation");
@@ -590,6 +623,7 @@ if (STE.appearance.parentWindow){
   if (STE.settings.get("preview-base")) preview_base_input.setValue(STE.settings.get("preview-base"));
   window.setTimeout(() => document.documentElement.classList.remove("startup-fade"),50);
 }
+
 if (STE.support.fileHandling && STE.support.fileSystem){
   window.launchQueue.setConsumer(params => {
     params.files.forEach(async handle => {
@@ -599,15 +633,19 @@ if (STE.support.fileHandling && STE.support.fileSystem){
     if (!STE.environment.touchDevice) STE.query().container.focus({ preventScroll: true });
   });
 }
+
 var queryParameters = new URLSearchParams(window.location.search);
+
 if (queryParameters.get("template")){
   Tools.insertTemplate({ type: "html" });
   removeQueryParameters(["template"]);
 }
+
 if (queryParameters.get("settings")){
   settings_card.open();
   removeQueryParameters(["settings"]);
 }
+
 function createEditor({ name = "Untitled.txt", value = "", open = true, auto_created = false, auto_replace = true } = {}){
   let identifier = Math.random().toString(),
     tab = document.createElement("button"),
@@ -721,6 +759,7 @@ function createEditor({ name = "Untitled.txt", value = "", open = true, auto_cre
   },transitionDuration);
   return identifier;
 }
+
 /**
  * @param { { identifier: string; auto_created?: boolean; focused_override?: boolean; } } options
 */
@@ -739,6 +778,7 @@ function openEditor({ identifier, auto_created = false, focused_override = false
   if ((((document.activeElement == document.body && !STE.activeDialog) || auto_created) && !STE.environment.touchDevice && STE.appearance.parentWindow) || focused) container.focus({ preventScroll: true });
   if (STE.previewEditor == "active-editor") refreshPreview({ force: (STE.settings.get("automatic-refresh") != false) });
 }
+
 function closeEditor({ identifier = STE.activeEditor } = {}){
   if (!identifier) return;
   var { tab, container, textarea, getName } = STE.query(identifier),
@@ -781,6 +821,7 @@ function closeEditor({ identifier = STE.activeEditor } = {}){
     if (document.body.getAttribute("data-editor-change") == changeIdentifier) document.body.removeAttribute("data-editor-change");
   }
 }
+
 /**
  * @param { { name?: string; identifier?: string | null | undefined; } | undefined } options
 */
@@ -808,6 +849,7 @@ function renameEditor({ name, identifier = STE.activeEditor } = {}){
   if ((STE.previewEditor == "active-editor" && STE.activeEditor == identifier) || STE.previewEditor == identifier) refreshPreview({ force: true });
   return rename;
 }
+
 /* Future feature: Add support to disable the wrapping behavior */
 function getPreviousEditor({ identifier = STE.activeEditor, wrap = true } = {}){
   var { tab } = STE.query(identifier),
@@ -816,6 +858,7 @@ function getPreviousEditor({ identifier = STE.activeEditor, wrap = true } = {}){
     previousEditor = previousTab.getAttribute("data-editor-identifier");
   return previousEditor;
 }
+
 function getNextEditor({ identifier = STE.activeEditor, wrap = true } = {}){
   var { tab } = STE.query(identifier),
     editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")),
@@ -823,6 +866,7 @@ function getNextEditor({ identifier = STE.activeEditor, wrap = true } = {}){
     nextEditor = nextTab.getAttribute("data-editor-identifier");
   return nextEditor;
 }
+
 function setEditorTabsVisibility({ identifier = STE.activeEditor } = {}){
   if (!STE.activeEditor) return;
   var { tab } = STE.query(identifier), obstructedLeft = (tab.offsetLeft <= workspace_tabs.scrollLeft), obstructedRight = ((tab.offsetLeft + tab.clientWidth) >= (workspace_tabs.scrollLeft + workspace_tabs.clientWidth)), spacingOffset = 0;
@@ -835,6 +879,7 @@ function setEditorTabsVisibility({ identifier = STE.activeEditor } = {}){
     workspace_tabs.scrollTo(tab.offsetLeft + tab.clientWidth + spacingOffset - workspace_tabs.clientWidth,0);
   }
 }
+
 /**
  * @param { { type: string; force?: boolean; } } options
 */
@@ -854,6 +899,7 @@ function setView({ type, force = false }){
   },transitionDuration);
   refreshPreview();
 }
+
 /**
  * @param { "horizontal" | "vertical" } [orientation]
 */
@@ -876,6 +922,7 @@ function setOrientation(orientation){
     if (!param) setView({ type: "split", force: true });
     window.setTimeout(() => document.body.removeAttribute("data-orientation-change"),transitionDuration);
   },transitionDuration);
+
   /**
    * @param { "on" | "off" } state
   */
@@ -892,6 +939,7 @@ function setOrientation(orientation){
     }
   }
 }
+
 /**
  * @param { { identifier?: string; active_editor?: boolean; } } options
 */
@@ -903,6 +951,7 @@ function setPreviewSource({ identifier, active_editor }){
   } else STE.previewEditor = /** @type { string } */ (identifier);
   refreshPreview({ force: true });
 }
+
 /**
  * @param { boolean } state
 */
@@ -913,6 +962,7 @@ function setSyntaxHighlighting(state){
   });
   STE.settings.set("syntax-highlighting",String(state));
 }
+
 function createWindow(){
   const features = (STE.appearance.standalone || STE.appearance.fullscreen) ? "popup" : "",
     win = window.open(window.location.href,"_blank",features);
@@ -926,6 +976,7 @@ function createWindow(){
     win.moveTo(window.screenX,window.screenY);
   }
 }
+
 async function openFiles(){
   if (!STE.support.fileSystem){
     var input = document.createElement("input");
@@ -948,6 +999,7 @@ async function openFiles(){
     });
   }
 }
+
 /**
  * @param { string } [extension]
 */
@@ -983,6 +1035,7 @@ async function saveFile(extension){
   if (STE.query().tab.hasAttribute("data-editor-unsaved")) STE.query().tab.removeAttribute("data-editor-unsaved");
   refreshPreview({ force: true });
 }
+
 function createDisplay(){
   var width = window.screen.availWidth * 2/3,
     height = window.screen.availHeight * 2/3,
@@ -1005,6 +1058,7 @@ function createDisplay(){
     if (!win.document.title) win.document.title = /** @type { string } */ (STE.query().getName());
   },20);
 }
+
 /**
  * @param { HTMLElement } element
  * @param { string } action
@@ -1017,6 +1071,7 @@ async function callCommand(element,action){/* I think I may remove this, or do s
     document.execCommand("insertText",false,clipboard);
   } else document.execCommand(action);
 }
+
 /**
  * @param { { container: HTMLElement; scope?: boolean | string; } } options
 */
@@ -1026,12 +1081,14 @@ function getNavigableElements({ container, scope = false }){
   var navigable = container.querySelectorAll(`${scope}button:not([disabled]), ${scope}textarea:not([disabled]), ${scope}input:not([disabled]), ${scope}select:not([disabled]), ${scope}a[href]:not([disabled]), ${scope}[tabindex]:not([tabindex="-1"])`);
   return Array.from(navigable).filter(element => (getElementStyle({ element, property: "display" }) != "none"));
 }
+
 /**
  * @param { { element: Element; pseudo?: string | null; property: string; } } options
 */
 function getElementStyle({ element, pseudo = null, property }){
   return window.getComputedStyle(element,pseudo).getPropertyValue(property);
 }
+
 /**
  * @param { { element: HTMLInputElement | NumTextElement; } } options
 */
@@ -1064,6 +1121,7 @@ function applyEditingBehavior({ element }){
     element.shadowRoot?.insertBefore(scrollbarStyles,element.container);
   }
 }
+
 /**
  * @param { { control?: boolean; command?: boolean; shift?: boolean; controlShift?: boolean; shiftCommand?: boolean; controlCommand?: boolean; key: string; } } options
 */
@@ -1078,6 +1136,7 @@ function sendShortcutAction({ control, command, shift, controlShift, shiftComman
 
   document.body.dispatchEvent(new KeyboardEvent("keydown",{ ctrlKey: control, metaKey: command, shiftKey: shift, key }));
 }
+
 function refreshPreview({ force = false } = {}){
   if (STE.view == "code") return;
   var editor = (STE.previewEditor == "active-editor") ? STE.query() : STE.query(STE.previewEditor);
@@ -1094,12 +1153,14 @@ function refreshPreview({ force = false } = {}){
   preview.src = "about:blank";
   if (change) editor.tab.removeAttribute("data-editor-refresh");
 }
+
 /**
  * @param { { content?: string; reset?: boolean; } | undefined } options
 */
 function setTitle({ content = "", reset = false } = {}){
   document.title = `${(content && !reset) ? `${content} - ` : ""}Smart Text Editor`;
 }
+
 /**
  * @param { string[] } entries
 */
@@ -1108,6 +1169,7 @@ function addQueryParameters(entries){
   entries.forEach(entry => parameters.set(entry,""));
   changeQueryParameters(parameters);
 }
+
 /**
  * @param { string[] } entries
 */
@@ -1116,6 +1178,7 @@ function removeQueryParameters(entries){
   entries.forEach(entry => parameters.delete(entry));
   changeQueryParameters(parameters);
 }
+
 /**
  * @param { URLSearchParams } parameters
 */
@@ -1125,6 +1188,7 @@ function changeQueryParameters(parameters){
   var address = window.location.pathname + query;
   history.pushState(null,"",address);
 }
+
 function showInstallPrompt(){
   if (STE.installPrompt === null) return;
   STE.installPrompt.prompt();
@@ -1134,10 +1198,12 @@ function showInstallPrompt(){
     theme_button.childNodes[0].textContent = "Customize Theme";
   });
 }
+
 function clearSiteCaches(){
   if (navigator.serviceWorker.controller === null) return;
   if (confirm("Are you sure you would like to clear all app caches?\nSmart Text Editor will no longer work offline until an Internet connection is available.")) navigator.serviceWorker.controller.postMessage({ action: "clear-site-caches" });
 }
+
 /**
  * @param { MouseEvent | TouchEvent } event
 */
@@ -1156,6 +1222,7 @@ function setScaling(event){
   scaler.style.setProperty("--scaling-offset",`${scalingOffset}px`);
   preview.style.setProperty("--scaling-offset",`${scalingOffset}px`);
 }
+
 /**
  * @param { MouseEvent | TouchEvent } event
 */
@@ -1165,6 +1232,7 @@ function disableScaling(event){
   document.removeEventListener((!touchEvent) ? "mouseup" : "touchend",disableScaling);
   document.body.removeAttribute("data-scaling-change");
 }
+
 function removeScaling(){
   if (!document.body.hasAttribute("data-scaling-active")) return;
   document.body.removeAttribute("data-scaling-active");

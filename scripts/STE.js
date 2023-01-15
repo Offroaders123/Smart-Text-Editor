@@ -188,15 +188,19 @@ class STE {
   }
 
   static preapprovedExtensions = ["txt","html","css","js","php","json","webmanifest","bbmodel","xml","yaml","yml","dist","config","ini","md","markdown","mcmeta","lang","properties","uidx","material","h","fragment","vertex","fxh","hlsl","ihlsl","svg"];
+  
   /**
    * @type { string | null }
   */
   static activeEditor = null;
+  
   static previewEditor = "active-editor";
+  
   /**
    * @type { { [identifier: string]: FileSystemFileHandle } }
   */
   static fileHandles = {};
+  
   /**
    * @type { Window[] }
   */
@@ -263,15 +267,19 @@ class STE {
    * @type { STECardElement | null }
   */
   static activeDialog = null;
+  
   /**
    * @type { STECardElement | null }
   */
   static dialogPrevious = null;
+  
   /**
    * @type { STECardElement | null }
   */
   static activeWidget = null;
+  
   static pickerColor = null;
+  
   /**
    * @type { BeforeInstallPromptEvent | null }
   */
