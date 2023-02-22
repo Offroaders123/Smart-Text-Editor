@@ -67,7 +67,7 @@ class STECardElement extends HTMLElement {
         if (card.type != "dialog" && card.type != this.type) return;
         card.close();
         if (!card.matches(".minimize")) return;
-        var transitionDuration = parseInt(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000;
+        var transitionDuration = parseInt(`${Number(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
         window.setTimeout(() => card.minimize(),transitionDuration);
       });
     }
@@ -89,7 +89,7 @@ class STECardElement extends HTMLElement {
         STE.dialogPrevious = /** @type { STECardElement } */ (document.activeElement);
       }
       /** @type { NodeListOf<MenuDropElement> } */ (document.querySelectorAll("menu-drop[data-open]")).forEach(menu => menu.close());
-      var transitionDuration = parseInt(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 500;
+      var transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 500}`);
       window.setTimeout(() => {
         if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
         if (previous) /** @type { HTMLElement } */ (this.querySelector(`[data-card-previous="${previous.id}"]`)).focus();
@@ -103,11 +103,11 @@ class STECardElement extends HTMLElement {
     var icon = /** @type { SVGUseElement } */ (this.controls?.minimize.querySelector("svg use")), main = /** @type { HTMLDivElement } */ (this.querySelector(".main")), changeIdentifier = Math.random().toString();
     this.setAttribute("data-minimize-change",changeIdentifier);
     workspace_tabs.setAttribute("data-minimize-change",changeIdentifier);
-    var transitionDuration = parseInt(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000;
+    var transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
     if (!this.matches(".minimize")){
       this.classList.add("minimize");
       if (this.controls === undefined) return;
-      this.style.setProperty("--card-minimize-width",`${this.controls?.minimize.querySelector("svg")?.clientWidth ?? "" + parseInt(getElementStyle({ element: this.controls.minimize, property: "--control-padding" }),10) * 2}px`);
+      this.style.setProperty("--card-minimize-width",`${/** @type { SVGSVGElement } */ (this.controls.minimize.querySelector("svg")).clientWidth + parseInt(getElementStyle({ element: this.controls.minimize, property: "--control-padding" }),10) * 2}px`);
       this.style.setProperty("--card-main-width",`${main.clientWidth}px`);
       this.style.setProperty("--card-main-height",`${main.clientHeight}px`);
       icon.setAttribute("href","#arrow_icon");
@@ -135,7 +135,7 @@ class STECardElement extends HTMLElement {
   close(){
     this.classList.remove("active");
     if (this.matches(".minimize")){
-      var transitionDuration = parseInt(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000;
+      var transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
       window.setTimeout(() => this.minimize(),transitionDuration);
     }
     if (this.type == "dialog"){
@@ -685,7 +685,7 @@ function createEditor({ name = "Untitled.txt", value = "", open = true, auto_cre
     changeIdentifier = Math.random().toString();
 
   document.body.setAttribute("data-editor-change",changeIdentifier);
-  var transitionDuration = parseInt(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000;
+  var transitionDuration = parseInt(`${Number(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
   if (!name.includes(".")) name = `${name}.txt`;
   tab.classList.add("tab");
   tab.setAttribute("data-editor-identifier",identifier);
@@ -829,7 +829,7 @@ function closeEditor({ identifier = STE.activeEditor } = {}){
     document.body.removeAttribute("data-editor-change");
     workspace_tabs.querySelectorAll(".tab[data-editor-change]").forEach(tab => workspace_tabs.removeChild(tab));
   }
-  var transitionDuration = (document.body.hasAttribute("data-editor-change")) ? parseInt(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000 : 0;
+  var transitionDuration = (document.body.hasAttribute("data-editor-change")) ? parseInt(`${Number(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`) : 0;
   if (tab == editorTabs[0] && editorTabs.length == 1){
     STE.activeEditor = null;
     setTitle({ reset: true });
@@ -938,7 +938,7 @@ function setView({ type, force = false }){
   if ((STE.orientationChange && !force) || STE.scalingChange) return;
   var changeIdentifier = Math.random().toString();
   document.body.setAttribute("data-view-change",changeIdentifier);
-  var transitionDuration = parseInt(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000;
+  var transitionDuration = parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
   document.body.classList.remove(STE.view);
   document.body.setAttribute("data-view",type);
   document.body.classList.add(STE.view);
@@ -959,7 +959,7 @@ function setView({ type, force = false }){
 function setOrientation(orientation){
   if (STE.orientationChange || STE.scalingChange) return;
   document.body.setAttribute("data-orientation-change","");
-  var param = (orientation), transitionDuration = ((STE.view != "split") ? 0 : parseInt(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000);
+  var param = (orientation), transitionDuration = ((STE.view != "split") ? 0 : parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`));
   if (!param && STE.view == "split") setView({ type: "code", force: true });
   if (!param && STE.orientation == "horizontal") orientation = "vertical";
   if (!param && STE.orientation == "vertical") orientation = "horizontal";
