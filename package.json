@@ -1,9 +1,10 @@
 {
   "name": "smart-text-editor",
+  "private": true,
   "devDependencies": {
     "@types/prismjs": "^1.26.0",
     "menu-drop": "github:Offroaders123/Menu-Drop-Component#legacy-types",
-    "new-javascript": "^0.1.14",
+    "new-javascript": "^0.1.16",
     "num-text": "github:Offroaders123/Num-Text-Component#legacy-types"
   }
 }
