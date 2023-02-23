@@ -228,19 +228,24 @@ globalThis.Tools = class Tools {
       try {
         var formatted = JSON.stringify(JSON.parse(formatter_input.value),null,spacing);
         if (formatted != formatter_input.value) formatter_input.value = formatted;
-      } catch (/** @type { any } */ error){/* Make matching for "position" optional, as Safari doesn't give JSON parsing error data, it only says that an error occurred. */
-        var message = error.toString().match(/^(.+?)position /)[0],
-          errorIndex = error.toString().match(/position (\d+)/)[1],
+      } catch (/** @type { any } */ error){
+        /* ~~Make~~ Made matching for "position" optional, as Safari doesn't give JSON parsing error data, it only says that an error occurred. */
+        try {
+          var message = error.toString().match(/^(.+?)position /)[0],
+            errorIndex = error.toString().match(/position (\d+)/)[1],
 
-          errorLine,
-          errorLineIndex = (() => {
-            var lineIndexes = indexi("\n",formatter_input.value);
-            errorLine = formatter_input.value.substring(0,errorIndex).split("\n").length - 1;
-            return lineIndexes[errorLine - 1] || 1;
-          })(),
-          errorPosition = errorIndex - errorLineIndex + 1;
+            errorLine,
+            errorLineIndex = (() => {
+              var lineIndexes = indexi("\n",formatter_input.value);
+              errorLine = formatter_input.value.substring(0,errorIndex).split("\n").length - 1;
+              return lineIndexes[errorLine - 1] || 1;
+            })(),
+            errorPosition = errorIndex - errorLineIndex + 1;
 
-        alert(`Could not parse JSON, an error occurred.\n${message}line ${errorLine + 1} position ${errorPosition}`);
+          alert(`Could not parse JSON, a syntax error occurred.\n${message}line ${errorLine + 1} position ${errorPosition}`);
+        } catch {
+          alert("Could not parse JSON, a syntax error occurred.");
+        }
       }
 
 
