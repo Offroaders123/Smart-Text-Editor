@@ -65,11 +65,18 @@ class STE {
      * Gets the inset values for the screen Safe Area.
     */
     get safeAreaInsets() {
+      /**
+       * @private
+       * @param { string } section
+      */
+      function getSafeAreaInset(section){
+        return parseInt(getComputedStyle(document.documentElement).getPropertyValue(`--safe-area-inset-${section}`),10);
+      }
       return {
-        left: this._getSafeAreaInset("left"),
-        right: this._getSafeAreaInset("right"),
-        top: this._getSafeAreaInset("top"),
-        bottom: this._getSafeAreaInset("bottom"),
+        left: getSafeAreaInset("left"),
+        right: getSafeAreaInset("right"),
+        top: getSafeAreaInset("top"),
+        bottom: getSafeAreaInset("bottom"),
       };
     },
 
@@ -77,11 +84,20 @@ class STE {
      * Gets the inset values for the window Title Bar Areas when Window Controls Overlay is enabled.
     */
     get titleBarAreaInsets() {
+      /**
+       * @private
+       * @param { "top" | "width-left" | "width-right" | "height" } section
+      */
+      function getTitleBarAreaInset(section){
+        var value = getComputedStyle(document.documentElement).getPropertyValue(`--titlebar-area-inset-${section}`);
+        if (value.includes("calc")) value = Function(`"use strict"; return (${value.replace(/calc/g,"").replace(/100vw/g,`${window.innerWidth}px`).replace(/px/g,"")})`)();
+        return parseInt(value,10);
+      }
       return {
-        top: this._getTitlebarAreaInset("top"),
-        width_left: this._getTitlebarAreaInset("width-left"),
-        width_right: this._getTitlebarAreaInset("width-right"),
-        height: this._getTitlebarAreaInset("height"),
+        top: getTitleBarAreaInset("top"),
+        width_left: getTitleBarAreaInset("width-left"),
+        width_right: getTitleBarAreaInset("width-right"),
+        height: getTitleBarAreaInset("height"),
       };
     },
 
@@ -98,34 +114,8 @@ class STE {
      * This is used to make the App Omnibox symmetrical to the Title Bar Area when Window Controls Overlay is enabled.
     */
     refreshDevicePixelRatio() {
-      var ratio = STE.appearance.devicePixelRatio, styling = this._getRootStyleProperty("--device-pixel-ratio");
+      var ratio = STE.appearance.devicePixelRatio, styling = getComputedStyle(document.documentElement).getPropertyValue("--device-pixel-ratio");
       if (ratio != styling) document.documentElement.style.setProperty("--device-pixel-ratio",ratio);
-    },
-
-    /**
-     * @private
-     * @param { string } section
-    */
-    _getSafeAreaInset(section){
-      return parseInt(this._getRootStyleProperty(`--safe-area-inset-${section}`),10);
-    },
-
-    /**
-     * @private
-     * @param { string } section
-    */
-    _getTitlebarAreaInset(section){
-      var value = this._getRootStyleProperty(`--titlebar-area-inset-${section}`);
-      if (value.includes("calc")) value = Function(`"use strict"; return (${value.replace(/calc/g,"").replace(/100vw/g,`${window.innerWidth}px`).replace(/px/g,"")})`)();
-      return parseInt(value,10);
-    },
-
-    /**
-     * @private
-     * @param { string } template
-    */
-    _getRootStyleProperty(template){
-      return window.getComputedStyle(document.documentElement).getPropertyValue(template);
     },
 
     /**

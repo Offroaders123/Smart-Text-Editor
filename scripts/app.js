@@ -12,7 +12,7 @@ export class STECardElement extends HTMLElement {
     this.defined = true;
     this.addEventListener("keydown",event => {
       if (this.getAttribute("data-type") != "dialog" || event.key != "Tab") return;
-      var navigable = _getNavigableElements({ container: this, scope: true });
+      var navigable = STECardElement.#getNavigableElements({ container: this, scope: true });
       if (!event.shiftKey){
         if (document.activeElement != navigable[navigable.length - 1]) return;
         event.preventDefault();
@@ -83,7 +83,7 @@ export class STECardElement extends HTMLElement {
       },4000);
     }
     if (this.type == "dialog"){
-      document.body.addEventListener("keydown",_catchCardNavigation);
+      document.body.addEventListener("keydown",STECardElement.#catchCardNavigation);
       card_backdrop.classList.add("active");
       if (!STE.activeDialog && !STE.dialogPrevious){
         STE.dialogPrevious = /** @type { STECardElement } */ (document.activeElement);
@@ -139,7 +139,7 @@ export class STECardElement extends HTMLElement {
       window.setTimeout(() => this.minimize(),transitionDuration);
     }
     if (this.type == "dialog"){
-      document.body.removeEventListener("keydown",_catchCardNavigation);
+      document.body.removeEventListener("keydown",STECardElement.#catchCardNavigation);
       card_backdrop.classList.remove("active");
       STE.activeDialog = null;
       if (STE.dialogPrevious){
@@ -150,18 +150,28 @@ export class STECardElement extends HTMLElement {
     }
     if (this.type == "widget") STE.activeWidget = null;
   }
-}
 
-/**
- * @param { KeyboardEvent } event
- * 
- * @private
-*/
-function _catchCardNavigation(event){
-  if (!STE.activeDialog || event.key != "Tab" || document.activeElement != document.body) return;
-  var navigable = _getNavigableElements({ container: STE.activeDialog, scope: true });
-  event.preventDefault();
-  navigable[((!event.shiftKey) ? 0 : navigable.length - 1)].focus();
+  /**
+   * Gets all navigable elements within a given parent element.
+   * 
+   * @param { { container: HTMLElement; scope?: boolean | string; } } options - If the scope option is set to `true`, only direct children within the parent element will be selected.
+  */
+  static #getNavigableElements({ container, scope = false }){
+    scope = (scope) ? "" : ":scope > ";
+    /** @type { NodeListOf<HTMLElement> } */
+    var navigable = container.querySelectorAll(`${scope}button:not([disabled]), ${scope}textarea:not([disabled]), ${scope}input:not([disabled]), ${scope}select:not([disabled]), ${scope}a[href]:not([disabled]), ${scope}[tabindex]:not([tabindex="-1"])`);
+    return Array.from(navigable).filter(element => (getElementStyle({ element, property: "display" }) != "none"));
+  }
+
+  /**
+   * @param { KeyboardEvent } event
+  */
+  static #catchCardNavigation(event){
+    if (!STE.activeDialog || event.key != "Tab" || document.activeElement != document.body) return;
+    var navigable = STECardElement.#getNavigableElements({ container: STE.activeDialog, scope: true });
+    event.preventDefault();
+    navigable[((!event.shiftKey) ? 0 : navigable.length - 1)].focus();
+  }
 }
 
 window.customElements.define("ste-card",STECardElement);
@@ -1121,35 +1131,6 @@ globalThis.createDisplay = function createDisplay(){
 }
 
 /**
- * Calls a `document.execCommand()` action on a given element.
- * 
- * @param { HTMLElement } element
- * @param { string } action
- * 
- * @deprecated
-*/
-async function callCommand(element,action){/* I think I may remove this, or do something else with it. document.execCommand() is broken in so many ways, what a shame */
-  element.focus({ preventScroll: true });
-  if (action == "paste"){
-    var clipboard = await navigator.clipboard.readText().catch(() => alert("Could not access the clipboard, please check site permissions for clipboard use."));
-    if (clipboard === undefined) return;
-    document.execCommand("insertText",false,clipboard);
-  } else document.execCommand(action);
-}
-
-/**
- * Gets all navigable elements within a given parent element.
- * 
- * @param { { container: HTMLElement; scope?: boolean | string; } } options - If the scope option is set to `true`, only direct children within the parent element will be selected.
-*/
-function _getNavigableElements({ container, scope = false }){
-  scope = (scope) ? "" : ":scope > ";
-  /** @type { NodeListOf<HTMLElement> } */
-  var navigable = container.querySelectorAll(`${scope}button:not([disabled]), ${scope}textarea:not([disabled]), ${scope}input:not([disabled]), ${scope}select:not([disabled]), ${scope}a[href]:not([disabled]), ${scope}[tabindex]:not([tabindex="-1"])`);
-  return Array.from(navigable).filter(element => (getElementStyle({ element, property: "display" }) != "none"));
-}
-
-/**
  * Gets a style property value for a given element.
  * 
  * @param { { element: Element; pseudo?: string | null; property: string; } } options
@@ -1194,23 +1175,6 @@ function applyEditingBehavior({ element }){
 }
 
 /**
- * Dispatches a `KeyboardEvent` on the `<body>` from a given key combination.
- * 
- * @param { { control?: boolean; command?: boolean; shift?: boolean; controlShift?: boolean; shiftCommand?: boolean; controlCommand?: boolean; key: string; } } options
-*/
-function sendShortcutAction({ control, command, shift, controlShift, shiftCommand, controlCommand, key }){
-  if (!key) return;
-  var appleDevice = (STE.environment.appleDevice);
-
-  control = ((control && !appleDevice) || (controlShift && !appleDevice) || (controlCommand && appleDevice));
-  command = ((command && appleDevice) || (shiftCommand && appleDevice) || (controlCommand && appleDevice));
-  shift = (shift || (controlShift && !appleDevice) || (shiftCommand && appleDevice));
-  key = key.toString().toLowerCase();
-
-  document.body.dispatchEvent(new KeyboardEvent("keydown",{ ctrlKey: control, metaKey: command, shiftKey: shift, key }));
-}
-
-/**
  * Refreshes the Preview with the latest source from the source Editor.
 */
 globalThis.refreshPreview = function refreshPreview({ force = false } = {}){
@@ -1237,17 +1201,6 @@ globalThis.refreshPreview = function refreshPreview({ force = false } = {}){
 */
 function setTitle({ content = "", reset = false } = {}){
   document.title = `${(content && !reset) ? `${content} - ` : ""}Smart Text Editor`;
-}
-
-/**
- * Adds additional boolean query parameters to the app's URL.
- * 
- * @param { string[] } entries
-*/
-function addQueryParameters(entries){
-  var parameters = new URLSearchParams(window.location.search);
-  entries.forEach(entry => parameters.set(entry,""));
-  changeQueryParameters(parameters);
 }
 
 /**
