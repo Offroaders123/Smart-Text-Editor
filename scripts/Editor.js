@@ -1,4 +1,5 @@
 import { getElementStyle, applyEditingBehavior, setTitle } from "./app.js";
+import { setPreviewSource, refreshPreview } from "./Workspace.js";
 
 globalThis.createEditor = createEditor;
 globalThis.renameEditor = renameEditor;
