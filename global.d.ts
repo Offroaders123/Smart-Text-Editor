@@ -1,4 +1,4 @@
-import type { STECardElement } from "./scripts/app.js";
+import type { Card } from "./scripts/Card.js";
 
 declare global {
   interface Navigator {
@@ -42,38 +42,38 @@ declare global {
   var scaler: HTMLDivElement;
   var preview: HTMLIFrameElement;
   var card_backdrop: HTMLDivElement;
-  var settings_card: STECardElement;
+  var settings_card: Card;
   var default_orientation_setting: MenuDropElement;
   var syntax_highlighting_setting: HTMLInputElement;
   var automatic_refresh_setting: HTMLInputElement;
   var install_button: HTMLButtonElement;
   var theme_button: HTMLButtonElement;
   var clear_site_caches_button: HTMLButtonElement;
-  var theme_card: STECardElement;
+  var theme_card: Card;
   var theme_setting: NumTextElement;
-  var preview_base_card: STECardElement;
+  var preview_base_card: Card;
   var preview_base_input: HTMLInputElement & {
     setWidth(): void;
     setValue(value: string): void;
     reset(): void;
   };
-  var reset_settings_card: STECardElement;
-  var cleared_cache_card: STECardElement;
-  var replace_text_card: STECardElement;
+  var reset_settings_card: Card;
+  var cleared_cache_card: Card;
+  var replace_text_card: Card;
   var replacer_find: NumTextElement;
   var replacer_replace: NumTextElement;
-  var color_picker_card: STECardElement;
+  var color_picker_card: Card;
   var picker_preview: HTMLDivElement;
   var picker_input: HTMLInputElement;
   var red_channel: HTMLInputElement;
   var green_channel: HTMLInputElement;
   var blue_channel: HTMLInputElement;
-  var json_formatter_card: STECardElement;
+  var json_formatter_card: Card;
   var formatter_input: NumTextElement;
-  var uri_encoder_card: STECardElement;
+  var uri_encoder_card: Card;
   var encoder_input: NumTextElement;
   var encoder_type: HTMLInputElement;
-  var uuid_generator_card: STECardElement;
+  var uuid_generator_card: Card;
   var generator_output: HTMLInputElement;
 }
 

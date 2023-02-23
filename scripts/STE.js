@@ -1,5 +1,5 @@
 /**
- * @typedef { import("./app.js").STECardElement } STECardElement
+ * @typedef { import("./Card.js").default } Card
 */
 
 /**
@@ -419,21 +419,21 @@ class STE {
   /**
    * A reference to the currently opened Dialog.
    * 
-   * @type { STECardElement | null }
+   * @type { Card | null }
   */
   static activeDialog = null;
   
   /**
    * A reference to the previously opened Dialog, if the active one has a back button.
    * 
-   * @type { STECardElement | null }
+   * @type { Card | null }
   */
   static dialogPrevious = null;
   
   /**
    * A reference to the currently opened Widget.
    * 
-   * @type { STECardElement | null }
+   * @type { Card | null }
   */
   static activeWidget = null;
   
