@@ -223,7 +223,7 @@
         <li part="install-option" onclick="showInstallPrompt();"><img src="resources/install.svg" alt="">Install</li>
         <li onclick="theme_card.open();"><img src="resources/template.svg" alt="">Theme Settings</li>
         <li part="clear-site-caches-option" onclick="clearSiteCaches();"><img src="resources/settings.svg" alt="">Clear Cache</li>
-        <li onclick="Editor.settings.reset({ confirm: true });"><img src="resources/settings.svg" alt="">Reset Settings</li>
+        <li onclick="STE.settings.reset({ confirm: true });"><img src="resources/settings.svg" alt="">Reset Settings</li>
       </ul>
     </menu-drop>
   </div>
@@ -256,17 +256,17 @@
             <menu-drop id="default_orientation_setting" data-select>
               <button>Horizontal</button>
               <ul>
-                <li data-value="horizontal" onclick="Editor.settings.set('default-orientation','horizontal');" data-selected>Horizontal</li>
-                <li data-value="vertical" onclick="Editor.settings.set('default-orientation','vertical');">Vertical</li>
+                <li data-value="horizontal" onclick="STE.settings.set('default-orientation','horizontal');" data-selected>Horizontal</li>
+                <li data-value="vertical" onclick="STE.settings.set('default-orientation','vertical');">Vertical</li>
               </ul>
             </menu-drop>
           </div>
           <div class="checkbox">
-            <input id="syntax_highlighting_setting" type="checkbox" oninput="setSyntaxHighlighting(this.checked);">
+            <input id="syntax_highlighting_setting" type="checkbox" oninput="STE.appearance.setSyntaxHighlighting(this.checked);">
             <label for="syntax_highlighting_setting"><svg class="check"><use href="#check_icon"/></svg>Syntax Highlighting (Beta)</label>
           </div>
           <div class="checkbox">
-            <input id="automatic_refresh_setting" type="checkbox" oninput="Editor.settings.set('automatic-refresh',this.checked);" checked>
+            <input id="automatic_refresh_setting" type="checkbox" oninput="STE.settings.set('automatic-refresh',this.checked);" checked>
             <label for="automatic_refresh_setting"><svg class="check"><use href="#check_icon"/></svg>Automatically Refresh Preview</label>
           </div>
         </div>
@@ -277,7 +277,7 @@
       </div>
       <div class="options">
         <button id="clear_site_caches_button" class="warning" onclick="clearSiteCaches();">Clear Cache</button>
-        <button class="warning" onclick="Editor.settings.reset({ confirm: true });">Reset Settings</button>
+        <button class="warning" onclick="STE.settings.reset({ confirm: true });">Reset Settings</button>
       </div>
     </div>
   </ste-card>
@@ -437,7 +437,7 @@
   </ste-card>
 </main>
 
-<script src="./scripts/app.js"></script>
+<script type="module" src="./scripts/app.js"></script>
 
 </body>
 

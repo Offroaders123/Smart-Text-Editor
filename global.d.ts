@@ -1,8 +1,6 @@
-declare global {
-  interface Window {
-    Prism: typeof import("prismjs");
-  }
+import type { STECardElement } from "./scripts/app.js";
 
+declare global {
   interface Navigator {
     readonly standalone: boolean;
   }
@@ -11,6 +9,8 @@ declare global {
     readonly availLeft: number;
     readonly availTop: number;
   }
+
+  const Prism: typeof import("prismjs");
 
   var theme_color: HTMLMetaElement;
   var scrollbar_styles: HTMLStyleElement;

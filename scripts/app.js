@@ -1,7 +1,7 @@
 /**
  * The base component for the Alert, Dialog, and Widget card types.
 */
-class STECardElement extends HTMLElement {
+export class STECardElement extends HTMLElement {
   constructor(){
     super();
     this.defined = false;
@@ -189,7 +189,7 @@ document.querySelectorAll("img").forEach(image => image.draggable = false);
 /**
  * A global object with static properties to work with the various tools provided the app.
 */
-class Tools {
+globalThis.Tools = class Tools {
   /**
    * A namespace with functions for the Replace Text widget.
   */
@@ -638,7 +638,7 @@ if (STE.appearance.parentWindow){
   }
   if (STE.settings.get("syntax-highlighting") != undefined){
     var state = STE.settings.get("syntax-highlighting");
-    setSyntaxHighlighting(state);
+    STE.appearance.setSyntaxHighlighting(state);
     syntax_highlighting_setting.checked = state;
   }
   if (STE.settings.get("automatic-refresh") != undefined) automatic_refresh_setting.checked = STE.settings.get("automatic-refresh");
@@ -673,7 +673,7 @@ if (queryParameters.get("settings")){
  * 
  * @returns The identifier for the given Editor.
 */
-function createEditor({ name = "Untitled.txt", value = "", open = true, auto_created = false, auto_replace = true } = {}){
+globalThis.createEditor = function createEditor({ name = "Untitled.txt", value = "", open = true, auto_created = false, auto_replace = true } = {}){
   let identifier = Math.random().toString(),
     tab = document.createElement("button"),
     editorName = document.createElement("span"),
@@ -859,7 +859,7 @@ function closeEditor({ identifier = STE.activeEditor } = {}){
  * 
  * @param { { name?: string; identifier?: string | null | undefined; } | undefined } options
 */
-function renameEditor({ name, identifier = STE.activeEditor } = {}){
+globalThis.renameEditor = function renameEditor({ name, identifier = STE.activeEditor } = {}){
   const { tab, container, getName } = STE.query(identifier),
     editorName = /** @type { HTMLSpanElement } */ (tab.querySelector("[data-editor-name]")),
     previewOption = /** @type { Option } */ (preview_menu.main.querySelector(`.option[data-editor-identifier="${identifier}"]`)),
@@ -934,7 +934,7 @@ function setEditorTabsVisibility({ identifier = STE.activeEditor } = {}){
  * 
  * @param { { type: "code" | "split" | "preview"; force?: boolean; } } options
 */
-function setView({ type, force = false }){
+globalThis.setView = function setView({ type, force = false }){
   if ((STE.orientationChange && !force) || STE.scalingChange) return;
   var changeIdentifier = Math.random().toString();
   document.body.setAttribute("data-view-change",changeIdentifier);
@@ -956,7 +956,7 @@ function setView({ type, force = false }){
  * 
  * @param { "horizontal" | "vertical" } [orientation] - If an Orientation type is not provided, the current state will be toggled to the other option.
 */
-function setOrientation(orientation){
+globalThis.setOrientation = function setOrientation(orientation){
   if (STE.orientationChange || STE.scalingChange) return;
   document.body.setAttribute("data-orientation-change","");
   var param = (orientation), transitionDuration = ((STE.view != "split") ? 0 : parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`));
@@ -998,7 +998,7 @@ function setOrientation(orientation){
  * 
  * @param { { identifier?: string; active_editor?: boolean; } } options
 */
-function setPreviewSource({ identifier, active_editor }){
+globalThis.setPreviewSource = function setPreviewSource({ identifier, active_editor }){
   if (!identifier && !active_editor) return;
   if ((!identifier && active_editor) || (STE.previewEditor == identifier)){
     STE.previewEditor = "active-editor";
@@ -1008,22 +1008,9 @@ function setPreviewSource({ identifier, active_editor }){
 }
 
 /**
- * Enables or disables syntax highlighting for all Num Text elements.
- * 
- * @param { boolean } state
-*/
-function setSyntaxHighlighting(state){
-  state = (state != undefined) ? state : (STE.settings.get("syntax-highlighting") != undefined);
-  /** @type { NodeListOf<NumTextElement> } */ (document.querySelectorAll("num-text")).forEach(editor => {
-    if (editor.syntaxLanguage in Prism.languages) (state) ? editor.syntaxHighlight.enable() : editor.syntaxHighlight.disable();
-  });
-  STE.settings.set("syntax-highlighting",String(state));
-}
-
-/**
  * Creates a new Smart Text Editor window.
 */
-function createWindow(){
+globalThis.createWindow = function createWindow(){
   const features = (STE.appearance.standalone || STE.appearance.fullscreen) ? "popup" : "",
     win = window.open(window.location.href,"_blank",features);
 
@@ -1042,7 +1029,7 @@ function createWindow(){
  * 
  * If the File System Access API is supported in the user's browser, it will use that. If not, it will fall back to using an `<input type="file">` element.
 */
-async function openFiles(){
+globalThis.openFiles = async function openFiles(){
   if (!STE.support.fileSystem){
     var input = document.createElement("input");
     input.type = "file";
@@ -1074,7 +1061,7 @@ async function openFiles(){
  * 
  * @param { string } [extension]
 */
-async function saveFile(extension){
+globalThis.saveFile = async function saveFile(extension){
   if (extension || !STE.support.fileSystem){
     if (!extension) extension = STE.query().getName("extension") ?? "";
     var anchor = document.createElement("a"), link = window.URL.createObjectURL(new Blob([STE.query().textarea?.value ?? ""]));
@@ -1110,7 +1097,7 @@ async function saveFile(extension){
 /**
  * Creates a new Display window for the active Editor.
 */
-function createDisplay(){
+globalThis.createDisplay = function createDisplay(){
   var width = window.screen.availWidth * 2/3,
     height = window.screen.availHeight * 2/3,
     left = window.screen.availWidth / 2 + window.screen.availLeft - width / 2,
@@ -1226,7 +1213,7 @@ function sendShortcutAction({ control, command, shift, controlShift, shiftComman
 /**
  * Refreshes the Preview with the latest source from the source Editor.
 */
-function refreshPreview({ force = false } = {}){
+globalThis.refreshPreview = function refreshPreview({ force = false } = {}){
   if (STE.view == "code") return;
   var editor = (STE.previewEditor == "active-editor") ? STE.query() : STE.query(STE.previewEditor);
   if (!editor.textarea) return;
@@ -1289,7 +1276,7 @@ function changeQueryParameters(parameters){
 /**
  * Shows the PWA Install Prompt, if the `BeforeInstallPrompt` event was fired when the app first started.
 */
-function showInstallPrompt(){
+globalThis.showInstallPrompt = function showInstallPrompt(){
   if (STE.installPrompt === null) return;
   STE.installPrompt.prompt();
   STE.installPrompt.userChoice.then(result => {
@@ -1302,7 +1289,7 @@ function showInstallPrompt(){
 /**
  * Clears the Service Worker cache, if the user confirms doing so.
 */
-function clearSiteCaches(){
+globalThis.clearSiteCaches = function clearSiteCaches(){
   if (navigator.serviceWorker.controller === null) return;
   if (confirm("Are you sure you would like to clear all app caches?\nSmart Text Editor will no longer work offline until an Internet connection is available.")) navigator.serviceWorker.controller.postMessage({ action: "clear-site-caches" });
 }

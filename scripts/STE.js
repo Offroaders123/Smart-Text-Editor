@@ -1,4 +1,8 @@
 /**
+ * @typedef { import("./app.js").STECardElement } STECardElement
+*/
+
+/**
  * A global object with static properties that help with managing the state within Smart Text Editor.
 */
 class STE {
@@ -122,6 +126,19 @@ class STE {
     */
     _getRootStyleProperty(template){
       return window.getComputedStyle(document.documentElement).getPropertyValue(template);
+    },
+
+    /**
+     * Enables or disables syntax highlighting for all Num Text elements.
+     * 
+     * @param { boolean } state
+    */
+    setSyntaxHighlighting(state){
+      state = (state != undefined) ? state : (STE.settings.get("syntax-highlighting") != undefined);
+      /** @type { NodeListOf<NumTextElement> } */ (document.querySelectorAll("num-text")).forEach(editor => {
+        if (editor.syntaxLanguage in Prism.languages) (state) ? editor.syntaxHighlight.enable() : editor.syntaxHighlight.disable();
+      });
+      STE.settings.set("syntax-highlighting",String(state));
     }
   }
 
@@ -398,7 +415,7 @@ class STE {
         if (!confirm("Are you sure you would like to reset all settings?")) return false;
       }
       default_orientation_setting.select("horizontal");
-      setSyntaxHighlighting(false);
+      STE.appearance.setSyntaxHighlighting(false);
       syntax_highlighting_setting.checked = false;
       automatic_refresh_setting.checked = true;
       preview_base_input.reset();
