@@ -1,5 +1,6 @@
 import { getElementStyle } from "./app.js";
 import { createEditor, renameEditor, setEditorTabsVisibility } from "./Editor.js";
+import { read, stringify } from "../node_modules/nbtify/dist/index.js";
 
 globalThis.setView = setView;
 globalThis.setOrientation = setOrientation;
@@ -112,15 +113,32 @@ export function createWindow(){
 */
 export async function openFiles(){
   if (!STE.support.fileSystem){
-    var input = document.createElement("input");
-    input.type = "file";
-    input.multiple = true;
-    input.addEventListener("change",() => Array.from(input.files ?? []).forEach(file => {
-      var reader = new FileReader();
-      reader.readAsText(file,"UTF-8");
-      reader.addEventListener("loadend",() => createEditor({ name: file.name, value: /** @type { string } */ (reader.result) }));
+    const input = Object.assign(document.createElement("input"),{
+      type: "file",
+      multiple: true
+    });
+
+    await new Promise(resolve => {
+      input.addEventListener("change",resolve,{ once: true });
+      input.click();
+    });
+
+    if (input.files === null) return;
+
+    const results = await Promise.allSettled([...input.files].map(async file => {
+      const { name } = file;
+      const value = (name.match(/.(nbt|dat)$/)) ? await file.arrayBuffer().then(read).then(({ data }) => stringify(data,{ space: 2 })) : await file.text();
+      return { name, value };
     }));
-    input.click();
+
+    const files = results
+      .filter(/** @returns { result is PromiseFulfilledResult<{ name: string; value: string; }> } */
+        (result) => result.status === "fulfilled")
+      .map(result => result.value);
+
+    for (const file of files){
+      createEditor(file);
+    }
   } else {
     var handles = await window.showOpenFilePicker({ multiple: true }).catch(error => {
       if (error.message.toLowerCase().includes("abort")) return;
