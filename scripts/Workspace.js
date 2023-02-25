@@ -186,7 +186,7 @@ export async function saveFile(extension){
     await stream.write(STE.query().textarea?.value ?? "");
     await stream.close();
     var currentName = STE.query().getName(), file = await handle.getFile(), rename = file.name;
-    if (currentName != rename) renameEditor({ name: rename });
+    if (currentName != rename) Editor.rename(identifier,rename);
   }
   if (STE.query().tab.hasAttribute("data-editor-auto-created")) STE.query().tab.removeAttribute("data-editor-auto-created");
   if (STE.query().tab.hasAttribute("data-editor-unsaved")) STE.query().tab.removeAttribute("data-editor-unsaved");

@@ -22,6 +22,51 @@ import { setPreviewSource, refreshPreview } from "./Workspace.js";
  * Creates a new Editor within the Workspace.
 */
 export class Editor {
+  /**
+   * @type { { [identifier: string]: Editor; } }
+  */
+  static #editors = {};
+
+  /**
+   * Opens an Editor from a given identifier.
+   * 
+   * @param { string } identifier
+   * @param { EditorOpenOptions } options
+  */
+  static open(identifier,options = {}) {
+    const editor = this.#editors[identifier];
+    editor.open(options);
+  }
+
+  /**
+   * Closes an Editor from a given identifier.
+   * 
+   * @param { string } identifier
+  */
+  static async close(identifier) {
+    const editor = this.#editors[identifier];
+    await editor.close();
+  }
+
+  /**
+   * Renames an Editor from a given identifier.
+   * 
+   * @param { string } identifier
+   * @param { string } [rename] - If a new name isn't provided, the user is prompted to provide one.
+  */
+  static rename(identifier,rename) {
+    const editor = this.#editors[identifier];
+    const currentName = editor.#name;
+
+    if (!rename){
+      const result = prompt(`Enter a new file name for "${currentName}".`,currentName);
+      if (result === null) return;
+      rename = result;
+    }
+
+    editor.name = rename;
+  }
+
   #name;
 
   /**
@@ -196,6 +241,8 @@ export class Editor {
     workspace_editors.append(this.container);
     preview_menu.main.append(this.previewOption);
 
+    Editor.#editors[this.identifier] = this;
+
     applyEditingBehavior({ element: this.container });
 
     this.previewOption.addEventListener("click",() => {
@@ -244,6 +291,8 @@ export class Editor {
   }
 
   /**
+   * Opens the editor in the workspace.
+   * 
    * @param { EditorOpenOptions } options
   */
   open({ autoCreated = false, focusedOverride = false } = {}) {
@@ -275,6 +324,9 @@ export class Editor {
     }
   }
 
+  /**
+   * Closes the editor in the workspace
+  */
   async close() {
     if (this.tab.hasAttribute("data-editor-unsaved")){
       if (!confirm(`Are you sure you would like to close "${this.#name}"?\nRecent changes have not yet been saved.`)) return;
@@ -305,15 +357,15 @@ export class Editor {
 
     if (this.tab === editorTabs[0] && editorTabs[1] && this.tab.classList.contains("active")){
       const identifier = /** @type { string } */ (editorTabs[1].getAttribute("data-editor-identifier"));
-      openEditor({ identifier });
+      Editor.open(identifier);
     }
     if (this.tab === editorTabs[editorTabs.length - 1] && this.tab !== editorTabs[0] && this.tab.classList.contains("active")){
       const identifier = /** @type { string } */ (editorTabs[editorTabs.length - 2].getAttribute("data-editor-identifier"));
-      openEditor({ identifier });
+      Editor.open(identifier);
     }
     if (this.tab !== editorTabs[0] && this.tab.classList.contains("active")){
       const identifier = /** @type { string } */ (editorTabs[editorTabs.indexOf(this.tab) + 1].getAttribute("data-editor-identifier"));
-      openEditor({ identifier });
+      Editor.open(identifier);
     }
 
     if (focused && STE.query().textarea !== null){
@@ -329,6 +381,8 @@ export class Editor {
 
     workspace_editors.removeChild(this.container);
     preview_menu.main.removeChild(this.previewOption);
+
+    delete Editor.#editors[this.identifier];
 
     if (STE.fileHandles[this.identifier]){
       delete STE.fileHandles[this.identifier];
@@ -351,7 +405,6 @@ export class Editor {
 
   set name(rename) {
     const { getName } = STE.query(this.identifier);
-    const currentName = this.#name;
     const base = getName("base");
     const extension = getName("extension");
 

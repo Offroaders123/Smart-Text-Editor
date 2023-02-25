@@ -106,20 +106,22 @@ document.body.addEventListener("keydown",event => {
     event.preventDefault();
     if (event.repeat) return;
     /* Future feature: If an editor tab is focused, close that editor instead of only the active editor */
-    closeEditor();
+    if (STE.activeEditor !== null){
+      Editor.close(STE.activeEditor);
+    }
   }
   if (((controlShift || (event.ctrlKey && shift && !command && STE.environment.appleDevice)) && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("[") || pressed("{")))){
     event.preventDefault();
     if (event.repeat) return;
     // For both of these expected errors, I need to add handling for when there aren't any Editors opened, since it will throw an error trying to open the next editor, when there isn't one there. There's not even one to start from in that case, either!
     // @ts-expect-error
-    openEditor({ identifier: getPreviousEditor() });
+    Editor.open(getPreviousEditor);
   }
   if (((control || (event.ctrlKey && !command && STE.environment.appleDevice)) && !shift && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("]") || pressed("}")))){
     event.preventDefault();
     if (event.repeat) return;
     // @ts-expect-error
-    openEditor({ identifier: getNextEditor() });
+    Editor.open(getNextEditor);
   }
   if (((controlShift || shiftCommand) && pressed("n")) || ((controlShift || shiftCommand) && pressed("c"))){
     event.preventDefault();
@@ -134,7 +136,9 @@ document.body.addEventListener("keydown",event => {
   if ((controlShift || shiftCommand) && pressed("r")){
     event.preventDefault();
     if (event.repeat) return;
-    renameEditor();
+    if (STE.activeEditor !== null){
+      Editor.rename(STE.activeEditor);
+    }
   }
   if ((control || command) && !shift && pressed("s")){
     event.preventDefault();
