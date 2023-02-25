@@ -1,6 +1,6 @@
 import "./Card.js";
 import Tools from "./Tools.js";
-import { Editor, getPreviousEditor, getNextEditor, setEditorTabsVisibility } from "./Editor.js";
+import { Editor, setEditorTabsVisibility } from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview, setScaling, disableScaling } from "./Workspace.js";
 
 document.querySelectorAll("img").forEach(image => image.draggable = false);
@@ -113,15 +113,18 @@ document.body.addEventListener("keydown",event => {
   if (((controlShift || (event.ctrlKey && shift && !command && STE.environment.appleDevice)) && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("[") || pressed("{")))){
     event.preventDefault();
     if (event.repeat) return;
-    // For both of these expected errors, I need to add handling for when there aren't any Editors opened, since it will throw an error trying to open the next editor, when there isn't one there. There's not even one to start from in that case, either!
-    // @ts-expect-error
-    Editor.open(getPreviousEditor);
+    if (STE.activeEditor === null) return;
+    const previous = Editor.getPrevious(STE.activeEditor);
+    if (previous === null) return;
+    Editor.open(previous);
   }
   if (((control || (event.ctrlKey && !command && STE.environment.appleDevice)) && !shift && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("]") || pressed("}")))){
     event.preventDefault();
     if (event.repeat) return;
-    // @ts-expect-error
-    Editor.open(getNextEditor);
+    if (STE.activeEditor === null) return;
+    const next = Editor.getNext(STE.activeEditor);
+    if (next === null) return;
+    Editor.open(next);
   }
   if (((controlShift || shiftCommand) && pressed("n")) || ((controlShift || shiftCommand) && pressed("c"))){
     event.preventDefault();
@@ -272,9 +275,10 @@ var appToolbar = /** @type { HTMLDivElement } */ (document.querySelector("header
 workspace_tabs.addEventListener("keydown",event => {
   if (event.key != "ArrowLeft" && event.key != "ArrowRight") return;
   if (!workspace_tabs.contains(document.activeElement) || !(document.activeElement instanceof HTMLElement)) return;
-  var identifier = document.activeElement.getAttribute("data-editor-identifier"),
-    previousEditor = getPreviousEditor({ identifier }),
-    nextEditor = getNextEditor({ identifier });
+  const identifier = document.activeElement.getAttribute("data-editor-identifier");
+  if (identifier === null) return;
+  const previousEditor = Editor.getPrevious(identifier);
+  const nextEditor = Editor.getNext(identifier);
   event.preventDefault();
   if (event.key == "ArrowLeft") STE.query(previousEditor).tab.focus();
   if (event.key == "ArrowRight") STE.query(nextEditor).tab.focus();

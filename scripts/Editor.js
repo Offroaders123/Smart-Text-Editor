@@ -67,6 +67,39 @@ export class Editor {
     editor.name = rename;
   }
 
+  /* Future feature: Add support to disable the wrapping behavior */
+  /**
+   * Gets the previous Editor to the left of the currently opened Editor.
+   * 
+   * If the active Editor is the first one in the Workspace, it will wrap around to give the last Editor in the Workspace.
+   * 
+   * @param { string } identifier
+   * @param { boolean } wrap
+  */
+  static getPrevious(identifier,wrap = true) {
+    const { tab } = STE.query(identifier);
+    const editorTabs = [...workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")];
+    const previousTab = editorTabs[(editorTabs.indexOf(tab) || editorTabs.length) - 1];
+    const previousEditor = previousTab.getAttribute("data-editor-identifier");
+    return previousEditor;
+  }
+
+  /**
+   * Gets the next Editor to the right of the currently opened Editor.
+   * 
+   * If the active Editor is the last one in the Workspace, it will wrap around to give the first Editor in the Workspace.
+   * 
+   * @param { string } identifier
+   * @param { boolean } wrap
+  */
+  static getNext(identifier,wrap = true) {
+    const { tab } = STE.query(identifier);
+    const editorTabs = [...workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")];
+    const nextTab = editorTabs[(editorTabs.indexOf(tab) !== editorTabs.length - 1) ? editorTabs.indexOf(tab) + 1 : 0];
+    const nextEditor = nextTab.getAttribute("data-editor-identifier");
+    return nextEditor;
+  }
+
   #name;
 
   /**
@@ -447,33 +480,6 @@ export class Editor {
 }
 
 globalThis.Editor = Editor;
-
-/* Future feature: Add support to disable the wrapping behavior */
-/**
- * Gets the previous Editor to the left of the currently opened Editor.
- * 
- * If the active Editor is the first one in the Workspace, it will wrap around to give the last Editor in the Workspace.
-*/
-export function getPreviousEditor({ identifier = STE.activeEditor, wrap = true } = {}){
-  var { tab } = STE.query(identifier),
-    editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")),
-    previousTab = editorTabs[(editorTabs.indexOf(tab) || editorTabs.length) - 1],
-    previousEditor = previousTab.getAttribute("data-editor-identifier");
-  return previousEditor;
-}
-
-/**
- * Gets the next Editor to the right of the currently opened Editor.
- * 
- * If the active Editor is the last one in the Workspace, it will wrap around to give the first Editor in the Workspace.
-*/
-export function getNextEditor({ identifier = STE.activeEditor, wrap = true } = {}){
-  var { tab } = STE.query(identifier),
-    editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")),
-    nextTab = editorTabs[(editorTabs.indexOf(tab) != editorTabs.length - 1) ? editorTabs.indexOf(tab) + 1 : 0],
-    nextEditor = nextTab.getAttribute("data-editor-identifier");
-  return nextEditor;
-}
 
 /**
  * Updates the horizontal scroll position of the Workspace Tabs section to show a given Editor, by it's given identifier.
