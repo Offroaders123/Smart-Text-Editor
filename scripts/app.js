@@ -1,6 +1,6 @@
 import "./Card.js";
 import Tools from "./Tools.js";
-import { createEditor, openEditor, closeEditor, renameEditor, getPreviousEditor, getNextEditor, setEditorTabsVisibility } from "./Editor.js";
+import { Editor, getPreviousEditor, getNextEditor, setEditorTabsVisibility } from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview, setScaling, disableScaling } from "./Workspace.js";
 
 document.querySelectorAll("img").forEach(image => image.draggable = false);
@@ -36,7 +36,7 @@ window.addEventListener("load",() => {
         event.data.files.forEach(/** @param { File } file */ file => {
           var reader = new FileReader();
           reader.readAsText(file,"UTF-8");
-          reader.addEventListener("loadend",() => createEditor({ name: file.name, value: /** @type { string } */ (reader.result) }));
+          reader.addEventListener("loadend",() => new Editor({ name: file.name, value: /** @type { string } */ (reader.result) }));
         });
       }
     });
@@ -99,7 +99,7 @@ document.body.addEventListener("keydown",event => {
   if (((control || command) && !shift && pressed("n")) || ((controlShift || shiftCommand) && pressed("x"))){
     event.preventDefault();
     if (event.repeat) return;
-    createEditor({ auto_replace: false });
+    new Editor({ autoReplace: false });
   }
   if (((control || command) && pressed("w")) || ((controlShift || shiftCommand) && pressed("d"))){
     if (shift && pressed("w")) return window.close();
@@ -242,15 +242,15 @@ document.body.addEventListener("drop",event => {
         var file = item.getAsFile(), reader = new FileReader();
         if (file === null) return;
         reader.readAsText(file,"UTF-8");
-        reader.addEventListener("loadend",() => createEditor({ name: file?.name, value: /** @type { string } */ (reader.result) }));
+        reader.addEventListener("loadend",() => new Editor({ name: file?.name, value: /** @type { string } */ (reader.result) }));
       } else {
         var handle = await item.getAsFileSystemHandle();
         if (handle === null) return;
         if (handle.kind != "file" || !(handle instanceof FileSystemFileHandle)) return;
-        let file = await handle.getFile(), identifier = createEditor({ name: file.name, value: await file.text() });
+        let file = await handle.getFile(), { identifier } = new Editor({ name: file.name, value: await file.text() });
         STE.fileHandles[identifier] = handle;
       }
-    } else if (item.kind == "string" && index == 0 && event.dataTransfer?.getData("text") != "") createEditor({ value: event.dataTransfer?.getData("text") });
+    } else if (item.kind == "string" && index == 0 && event.dataTransfer?.getData("text") != "") new Editor({ value: event.dataTransfer?.getData("text") });
   });
 });
 
@@ -283,7 +283,7 @@ create_editor_button.addEventListener("keydown",event => {
 
 create_editor_button.addEventListener("mousedown",event => event.preventDefault());
 
-create_editor_button.addEventListener("click",() => createEditor({ auto_replace: false }));
+create_editor_button.addEventListener("click",() => new Editor({ autoReplace: false }));
 
 scaler.addEventListener("mousedown",event => {
   if (event.button != 0) return;
@@ -338,7 +338,7 @@ generator_output.addEventListener("click",() => generator_output.select());
 
 generator_output.addEventListener("keydown",() => generator_output.click());
 
-window.requestAnimationFrame(() => createEditor({ auto_created: true }));
+window.requestAnimationFrame(() => new Editor({ autoCreated: true }));
 
 if (STE.appearance.parentWindow){
   if (STE.settings.get("default-orientation")){
@@ -359,7 +359,7 @@ if (STE.appearance.parentWindow){
 if (STE.support.fileHandling && STE.support.fileSystem){
   window.launchQueue.setConsumer(params => {
     params.files.forEach(async handle => {
-      var file = await handle.getFile(), identifier = createEditor({ name: file.name, value: await file.text() });
+      var file = await handle.getFile(), { identifier } = new Editor({ name: file.name, value: await file.text() });
       STE.fileHandles[identifier] = handle;
     });
     if (!STE.environment.touchDevice) STE.query().container.focus({ preventScroll: true });

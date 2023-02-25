@@ -143,7 +143,7 @@
     <menu-drop id="file_menu">
       <button>File</button>
       <ul>
-        <li onclick="createEditor({ auto_replace: false });" data-shortcuts='{ "default": "Ctrl+Shift+X", "macOS": "Shift+Cmd+X" }'>New Editor</li>
+        <li onclick="new Editor({ autoReplace: false });" data-shortcuts='{ "default": "Ctrl+Shift+X", "macOS": "Shift+Cmd+X" }'>New Editor</li>
         <li part="create-window-option" onclick="createWindow();" data-shortcuts='{ "default": "Ctrl+Shift+C", "macOS": "Shift+Cmd+C" }'>New Window</li>
         <li onclick="openFiles();" data-shortcuts='{ "default": "Ctrl+O", "macOS": "Cmd+O" }'>Open</li>
         <li onclick="window.setTimeout(renameEditor,10);" data-shortcuts='{ "default": "Ctrl+Shift+R", "macOS": "Shift+Cmd+R" }'>Rename</li>

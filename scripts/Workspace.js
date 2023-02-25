@@ -1,5 +1,5 @@
 import { getElementStyle } from "./app.js";
-import { createEditor, renameEditor, setEditorTabsVisibility } from "./Editor.js";
+import { Editor, setEditorTabsVisibility } from "./Editor.js";
 import { read, stringify } from "../node_modules/nbtify/dist/index.js";
 
 globalThis.setView = setView;
@@ -137,7 +137,7 @@ export async function openFiles(){
       .map(result => result.value);
 
     for (const file of files){
-      createEditor(file);
+      new Editor(file);
     }
   } else {
     var handles = await window.showOpenFilePicker({ multiple: true }).catch(error => {
@@ -145,7 +145,7 @@ export async function openFiles(){
     });
     if (!handles) return;
     handles.forEach(async handle => {
-      var file = await handle.getFile(), identifier = createEditor({ name: file.name, value: await file.text() });
+      var file = await handle.getFile(), { identifier } = new Editor({ name: file.name, value: await file.text() });
       STE.fileHandles[identifier] = handle;
     });
   }

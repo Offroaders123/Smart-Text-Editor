@@ -1,224 +1,399 @@
 import { getElementStyle, applyEditingBehavior, setTitle } from "./app.js";
 import { setPreviewSource, refreshPreview } from "./Workspace.js";
 
-globalThis.createEditor = createEditor;
-globalThis.renameEditor = renameEditor;
+/**
+ * @typedef EditorOptions
+ * 
+ * @property { string } [name]
+ * @property { string } [value]
+ * @property { boolean } [open]
+ * @property { boolean } [autoCreated]
+ * @property { boolean } [autoReplace]
+*/
+
+/**
+ * @typedef EditorOpenOptions
+ * 
+ * @property { boolean } [autoCreated]
+ * @property { boolean } [focusedOverride]
+*/
 
 /**
  * Creates a new Editor within the Workspace.
- * 
- * @returns The identifier for the given Editor.
 */
-export function createEditor({ name = "Untitled.txt", value = "", open = true, auto_created = false, auto_replace = true } = {}){
-  let identifier = Math.random().toString(),
-    tab = document.createElement("button"),
-    editorName = document.createElement("span"),
-    editorClose = document.createElement("button"),
-    container = /** @type { NumTextElement } */ (document.createElement("num-text")),
-    previewOption = document.createElement("li"),
-    /** @type { boolean | undefined } */
-    focused_override,
-    changeIdentifier = Math.random().toString();
+export class Editor {
+  #name;
 
-  document.body.setAttribute("data-editor-change",changeIdentifier);
-  var transitionDuration = parseInt(`${Number(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
-  if (!name.includes(".")) name = `${name}.txt`;
-  tab.classList.add("tab");
-  tab.setAttribute("data-editor-identifier",identifier);
-  if (value) tab.setAttribute("data-editor-refresh","");
-  tab.addEventListener("mousedown",event => {
-    if (document.activeElement === null) return;
-    if (event.button != 0 || document.activeElement.matches("[data-editor-rename]")) return;
-    event.preventDefault();
-    if (tab != STE.query().tab) openEditor({ identifier });
-  });
-  tab.addEventListener("keydown",event => {
-    if (event.key != " " && event.key != "Enter") return;
-    event.preventDefault();
-    if (tab != STE.query().tab) openEditor({ identifier });
-  });
-  tab.addEventListener("contextmenu",event => {
-    if (event.target != tab) return;
-    var editorRename = /** @type { HTMLInputElement } */ (tab.querySelector("[data-editor-rename]"));
-    if (!editorRename){
-      editorRename = document.createElement("input");
-    } else return editorRename.blur();
-    editorRename.type = "text";
-    editorRename.placeholder = /** @type { string } */ (STE.query(identifier).getName());
-    editorRename.setAttribute("data-editor-rename","");
-    editorRename.tabIndex = -1;
-    editorRename.style.setProperty("--editor-name-width",`${editorName.offsetWidth}px`);
-    editorRename.value = /** @type { string } */ (STE.query(identifier).getName());
-    editorRename.addEventListener("keydown",event => {
-      if (event.key == "Escape") editorRename.blur();
+  /**
+   * @readonly
+  */
+  identifier = Math.random().toString();
+
+  /**
+   * @readonly
+  */
+  tab = document.createElement("button");
+
+  /**
+   * @readonly
+  */
+  editorName = document.createElement("span");
+
+  /**
+   * @readonly
+  */
+  editorClose = document.createElement("button");
+
+  /**
+   * @readonly
+  */
+  container = /** @type { NumTextElement } */ (document.createElement("num-text"));
+
+  /**
+   * @type { Option }
+   * @readonly
+  */
+  previewOption = document.createElement("li");
+
+  /**
+   * @param { EditorOptions } options
+  */
+  constructor({ name = "Untitled.txt", value = "", open = true, autoCreated = false, autoReplace = true } = {}) {
+    this.#name = (!name.includes(".")) ? `${name}.txt` : name;
+    this.value = value;
+    this.isOpen = open;
+    this.autoCreated = autoCreated;
+    this.autoReplace = autoReplace;
+
+    /**
+     * @type { boolean | undefined }
+    */
+    let focusedOverride;
+    const changeIdentifier = Math.random().toString();
+    const transitionDuration = parseInt(`${Number(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
+
+    this.tab.classList.add("tab");
+    this.tab.setAttribute("data-editor-identifier",this.identifier);
+    if (value) this.tab.setAttribute("data-editor-refresh","");
+
+    this.tab.addEventListener("mousedown",event => {
+      if (document.activeElement === null) return;
+      if (event.button !== 0 || document.activeElement.matches("[data-editor-rename]")) return;
+
+      event.preventDefault();
+      if (this.tab !== STE.query().tab){
+        this.open();
+      }
     });
-    editorRename.addEventListener("input",() => {
-      editorRename.style.width = "0px";
-      editorRename.offsetWidth;
-      editorRename.style.setProperty("--editor-rename-width",`${editorRename.scrollWidth + 1}px`);
-      editorRename.style.removeProperty("width");
+
+    this.tab.addEventListener("keydown",event => {
+      // This is where the accidental Enter key trapping for Editor renaming is being taken over.
+      // Add a check to this to only apply this key handling if the Editor isn't currently being renamed in the Editor tab.
+      if (event.key === " " || event.key === "Enter"){
+        event.preventDefault();
+        if (this.tab !== STE.query().tab){
+          this.open();
+        }
+      }
     });
-    editorRename.addEventListener("change",() => {
-      if (editorRename.value) renameEditor({ name: editorRename.value, identifier });
-      editorRename.blur();
+
+    this.tab.addEventListener("contextmenu",event => {
+      if (event.target !== this.tab) return;
+
+      let editorRename = /** @type { HTMLInputElement | null } */ (this.tab.querySelector("[data-editor-rename]"));
+      if (editorRename === null){
+        editorRename = document.createElement("input");
+      } else {
+        return editorRename.blur();
+      }
+
+      Object.assign(editorRename,{
+        type: "text",
+        placeholder: this.#name,
+        tabIndex: -1,
+        value: this.#name
+      });
+      editorRename.setAttribute("data-editor-rename","");
+      editorRename.style.setProperty("--editor-name-width",`${this.editorName.offsetWidth}px`);
+
+      editorRename.addEventListener("keydown",event => {
+        if (editorRename === null) return;
+        if (event.key === "Escape"){
+          editorRename.blur();
+        }
+      });
+
+      editorRename.addEventListener("input",() => {
+        if (editorRename === null) return;
+        editorRename.style.width = "0px";
+        editorRename.offsetWidth;
+        editorRename.style.setProperty("--editor-rename-width",`${editorRename.scrollWidth + 1}px`);
+        editorRename.style.removeProperty("width");
+      });
+
+      editorRename.addEventListener("change",() => {
+        if (editorRename === null) return;
+        const { value: name } = editorRename;
+        if (editorRename.value){
+          this.name = name;
+        }
+        editorRename.blur();
+      });
+
+      editorRename.addEventListener("blur",() => {
+        if (editorRename === null) return;
+        editorRename.remove();
+      });
+
+      this.tab.insertBefore(editorRename,this.tab.firstChild);
+      applyEditingBehavior({ element: editorRename });
+
+      editorRename.focus();
+      editorRename.select();
     });
-    editorRename.addEventListener("blur",() => editorRename.remove());
-    tab.insertBefore(editorRename,tab.firstChild);
-    applyEditingBehavior({ element: editorRename });
-    editorRename.focus();
-    editorRename.select();
-  });
-  tab.addEventListener("dragover",event => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (event.dataTransfer !== null) event.dataTransfer.dropEffect = "copy";
-    if (tab != STE.query().tab) openEditor({ identifier });
-  });
-  editorName.setAttribute("data-editor-name",name);
-  editorName.innerText = name;
-  editorClose.classList.add("option");
-  editorClose.tabIndex = -1;
-  editorClose.innerHTML = "<svg><use href='#close_icon'/></svg>";
-  editorClose.addEventListener("mousedown",event => {
-    event.preventDefault();
-    event.stopPropagation();
-  });
-  editorClose.addEventListener("click",event => {
-    event.stopPropagation();
-    closeEditor({ identifier });
-  });
-  container.classList.add("editor");
-  container.setAttribute("data-editor-identifier",identifier);
-  container.setAttribute("value",value);
-  previewOption.part.add("option");
-  previewOption.classList.add("option");
-  previewOption.setAttribute("data-editor-identifier",identifier);
-  previewOption.tabIndex = -1;
-  previewOption.innerText = name;
-  previewOption.addEventListener("click",() => setPreviewSource({ identifier }));
-  if ((STE.activeEditor) ? STE.query().tab.hasAttribute("data-editor-auto-created") : false){
-    if (document.activeElement == STE.query().container) focused_override = true;
-    if (auto_replace){
-      closeEditor();
-    } else STE.query().tab.removeAttribute("data-editor-auto-created");
+
+    this.tab.addEventListener("dragover",event => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (event.dataTransfer !== null){
+        event.dataTransfer.dropEffect = "copy";
+      }
+      if (this.tab !== STE.query().tab){
+        this.open();
+      }
+    });
+
+    this.editorName.setAttribute("data-editor-name",this.#name);
+    this.editorName.innerText = this.#name;
+
+    this.editorClose.classList.add("option");
+    this.editorClose.tabIndex = -1;
+    this.editorClose.innerHTML = "<svg><use href='#close_icon'/></svg>";
+
+    this.editorClose.addEventListener("mousedown",event => {
+      event.preventDefault();
+      event.stopPropagation();
+    });
+
+    this.editorClose.addEventListener("click",async event => {
+      event.stopPropagation();
+      await this.close();
+    });
+
+    this.container.classList.add("editor");
+    this.container.setAttribute("data-editor-identifier",this.identifier);
+    this.container.setAttribute("value",this.value);
+
+    this.previewOption.part.add("option");
+    this.previewOption.classList.add("option");
+    this.previewOption.setAttribute("data-editor-identifier",this.identifier);
+    this.previewOption.tabIndex = -1;
+    this.previewOption.innerText = this.#name;
+
+    this.tab.append(this.editorName,this.editorClose);
+    workspace_tabs.insertBefore(this.tab,create_editor_button);
+    workspace_editors.append(this.container);
+    preview_menu.main.append(this.previewOption);
+
+    applyEditingBehavior({ element: this.container });
+
+    this.previewOption.addEventListener("click",() => {
+      const { identifier } = this;
+      setPreviewSource({ identifier });
+    });
+
+    this.container.editor.addEventListener("input",() => {
+      if (this.tab.hasAttribute("data-editor-auto-created")){
+        this.tab.removeAttribute("data-editor-auto-created");
+      }
+      if (!this.tab.hasAttribute("data-editor-refresh")){
+        this.tab.setAttribute("data-editor-refresh","");
+      }
+      if (!this.tab.hasAttribute("data-editor-unsaved")){
+        this.tab.setAttribute("data-editor-unsaved","");
+      }
+      refreshPreview();
+    });
+
+    if (STE.activeEditor !== null && STE.query().tab.hasAttribute("data-editor-auto-created")){
+      if (document.activeElement === STE.query().container){
+        focusedOverride = true;
+      }
+      if (autoReplace){
+        this.close();
+      } else {
+        STE.query().tab.removeAttribute("data-editor-auto-created");
+      }
+    }
+
+    if (open || STE.activeEditor === null){
+      this.open({ autoCreated, focusedOverride });
+    }
+
+    this.container.syntaxLanguage = /** @type { string } */ (STE.query(this.identifier).getName("extension"));
+    if ((STE.settings.get("syntax-highlighting") === true) && (this.container.syntaxLanguage in Prism.languages)){
+      this.container.syntaxHighlight.enable();
+    }
+    
+    setTimeout(() => {
+      if (document.body.getAttribute("data-editor-change") === changeIdentifier){
+        document.body.removeAttribute("data-editor-change");
+      }
+    },transitionDuration);
   }
-  tab.appendChild(editorName);
-  tab.appendChild(editorClose);
-  workspace_tabs.insertBefore(tab,create_editor_button);
-  workspace_editors.appendChild(container);
-  container.editor.addEventListener("input",() => {
-    if (tab.hasAttribute("data-editor-auto-created")) tab.removeAttribute("data-editor-auto-created");
-    if (!tab.hasAttribute("data-editor-refresh")) tab.setAttribute("data-editor-refresh","");
-    if (!tab.hasAttribute("data-editor-unsaved")) tab.setAttribute("data-editor-unsaved","");
-    refreshPreview();
-  });
-  preview_menu.main.appendChild(previewOption);
-  applyEditingBehavior({ element: container });
-  if (open || !STE.activeEditor) openEditor({ identifier, auto_created, focused_override });
-  container.syntaxLanguage = /** @type { string } */ (STE.query(identifier).getName("extension"));
-  if ((STE.settings.get("syntax-highlighting") == true) && (container.syntaxLanguage in Prism.languages)) container.syntaxHighlight.enable();
-  window.setTimeout(() => {
-    if (document.body.getAttribute("data-editor-change") == changeIdentifier) document.body.removeAttribute("data-editor-change");
-  },transitionDuration);
-  return identifier;
+
+  /**
+   * @param { EditorOpenOptions } options
+  */
+  open({ autoCreated = false, focusedOverride = false } = {}) {
+    const focused = (document.activeElement === STE.query().container) || focusedOverride;
+
+    if (STE.query().tab){
+      STE.query().tab.classList.remove("active");
+    }
+    if (STE.query().container){
+      STE.query().container.classList.remove("active");
+    }
+
+    this.tab.classList.add("active");
+    if (autoCreated){
+      this.tab.setAttribute("data-editor-auto-created","");
+    }
+    this.container.classList.add("active");
+    STE.activeEditor = this.identifier;
+
+    setEditorTabsVisibility();
+    setTitle({ content: this.#name });
+
+    if ((((document.activeElement === document.body && STE.activeDialog !== null) || autoCreated) && !STE.environment.touchDevice && STE.appearance.parentWindow) || focused){
+      this.container.focus({ preventScroll: true });
+    }
+
+    if (STE.previewEditor === "active-editor"){
+      refreshPreview({ force: (STE.settings.get("automatic-refresh") !== false) });
+    }
+  }
+
+  async close() {
+    if (this.tab.hasAttribute("data-editor-unsaved")){
+      if (!confirm(`Are you sure you would like to close "${this.#name}"?\nRecent changes have not yet been saved.`)) return;
+    }
+
+    const editorTabs = [...workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")];
+    const changeIdentifier = Math.random().toString();
+    const focused = (document.activeElement === this.container);
+    const transitionDuration = (document.body.hasAttribute("data-editor-change")) ? parseInt(`${Number(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`) : 0;
+
+    if (editorTabs.length !== 1){
+      document.body.setAttribute("data-editor-change",changeIdentifier);
+      this.tab.style.setProperty("--tab-margin-right",`-${this.tab.offsetWidth}px`);
+    } else if (document.body.hasAttribute("data-editor-change")){
+      document.body.removeAttribute("data-editor-change");
+      workspace_tabs.querySelectorAll(".tab[data-editor-change]").forEach(tab => tab.remove());
+    }
+
+    if (this.tab === editorTabs[0] && editorTabs.length === 1){
+      STE.activeEditor = null;
+      setTitle({ reset: true });
+      preview.src = "about:blank";
+    }
+
+    if (STE.previewEditor === this.identifier){
+      setPreviewSource({ active_editor: true });
+    }
+
+    if (this.tab === editorTabs[0] && editorTabs[1] && this.tab.classList.contains("active")){
+      const identifier = /** @type { string } */ (editorTabs[1].getAttribute("data-editor-identifier"));
+      openEditor({ identifier });
+    }
+    if (this.tab === editorTabs[editorTabs.length - 1] && this.tab !== editorTabs[0] && this.tab.classList.contains("active")){
+      const identifier = /** @type { string } */ (editorTabs[editorTabs.length - 2].getAttribute("data-editor-identifier"));
+      openEditor({ identifier });
+    }
+    if (this.tab !== editorTabs[0] && this.tab.classList.contains("active")){
+      const identifier = /** @type { string } */ (editorTabs[editorTabs.indexOf(this.tab) + 1].getAttribute("data-editor-identifier"));
+      openEditor({ identifier });
+    }
+
+    if (focused && STE.query().textarea !== null){
+      STE.query().container.focus({ preventScroll: true });
+    }
+
+    this.tab.setAttribute("data-editor-change","");
+    if (this.tab === document.activeElement){
+      this.tab.blur();
+    }
+    this.tab.tabIndex = -1;
+    this.tab.classList.remove("active");
+
+    workspace_editors.removeChild(this.container);
+    preview_menu.main.removeChild(this.previewOption);
+
+    if (STE.fileHandles[this.identifier]){
+      delete STE.fileHandles[this.identifier];
+    }
+
+    if (transitionDuration !== 0){
+      await new Promise(resolve => setTimeout(resolve,transitionDuration));
+    }
+    if (workspace_tabs.contains(this.tab)){
+      workspace_tabs.removeChild(this.tab);
+    }
+    if (document.body.getAttribute("data-editor-change") === changeIdentifier){
+      document.body.removeAttribute("data-editor-change");
+    }
+  }
+
+  get name() {
+    return this.#name;
+  }
+
+  set name(rename) {
+    const { getName } = STE.query(this.identifier);
+    const currentName = this.#name;
+    const base = getName("base");
+    const extension = getName("extension");
+
+    if (!rename.includes(".")){
+      rename = `${rename}.${extension}`;
+    } else if (rename.charAt(0) === "."){
+      rename = `${base}${rename}`;
+    }
+
+    this.editorName.innerText = rename;
+    this.previewOption.innerText = rename;
+
+    const syntaxLanguage = /** @type { string } */ (STE.query(this.identifier).getName("extension"));
+    const isLoadedLanguage = syntaxLanguage in Prism.languages;
+
+    if (isLoadedLanguage){
+      this.container.syntaxLanguage = syntaxLanguage;
+    }
+    if (STE.settings.get("syntax-highlighting") === true && isLoadedLanguage){
+      this.container.syntaxHighlight.enable();
+    } else {
+      this.container.syntaxHighlight.disable();
+    }
+    if (syntaxLanguage !== this.container.syntaxLanguage){
+      this.container.syntaxLanguage = syntaxLanguage;
+    }
+
+    if (this.tab.hasAttribute("data-editor-auto-created")){
+      this.tab.removeAttribute("data-editor-auto-created");
+    }
+
+    if (this.tab === STE.query().tab){
+      setTitle({ content: rename });
+    }
+
+    if ((STE.previewEditor === "active-editor" && STE.activeEditor === this.identifier) || STE.previewEditor === this.identifier){
+      refreshPreview({ force: true });
+    }
+  }
 }
 
-/**
- * Opens an Editor from a given identifier.
- * 
- * @param { { identifier: string; auto_created?: boolean; focused_override?: boolean; } } options
-*/
-export function openEditor({ identifier, auto_created = false, focused_override = false }){
-  if (!identifier) return;
-  const { tab, container, textarea, getName } = STE.query(identifier),
-    focused = (document.activeElement == STE.query().container) || focused_override;
-  if (STE.query().tab) STE.query().tab.classList.remove("active");
-  if (STE.query().container) STE.query().container.classList.remove("active");
-  tab.classList.add("active");
-  if (auto_created) tab.setAttribute("data-editor-auto-created","");
-  container.classList.add("active");
-  STE.activeEditor = identifier;
-  setEditorTabsVisibility();
-  setTitle({ content: /** @type { string } */ (getName()) });
-  if ((((document.activeElement == document.body && !STE.activeDialog) || auto_created) && !STE.environment.touchDevice && STE.appearance.parentWindow) || focused) container.focus({ preventScroll: true });
-  if (STE.previewEditor == "active-editor") refreshPreview({ force: (STE.settings.get("automatic-refresh") != false) });
-}
-
-/**
- * Closes an Editor from a given identifier.
-*/
-export function closeEditor({ identifier = STE.activeEditor } = {}){
-  if (!identifier) return;
-  var { tab, container, textarea, getName } = STE.query(identifier),
-    previewOption = /** @type { Option } */ (preview_menu.main.querySelector(`.option[data-editor-identifier="${identifier}"]`)),
-    active = (tab.classList.contains("active")),
-    focused = (document.activeElement == container),
-    editorTabs = Array.from(workspace_tabs.querySelectorAll(".tab:not([data-editor-change])"));
-  if (tab.hasAttribute("data-editor-unsaved")){
-    if (!confirm(`Are you sure you would like to close "${getName()}"?\nRecent changes have not yet been saved.`)) return;
-  }
-  var changeIdentifier = Math.random().toString();
-  if (editorTabs.length != 1){
-    document.body.setAttribute("data-editor-change",changeIdentifier);
-    tab.style.setProperty("--tab-margin-right",`-${tab.offsetWidth}px`);
-  } else if (document.body.hasAttribute("data-editor-change")){
-    document.body.removeAttribute("data-editor-change");
-    workspace_tabs.querySelectorAll(".tab[data-editor-change]").forEach(tab => workspace_tabs.removeChild(tab));
-  }
-  var transitionDuration = (document.body.hasAttribute("data-editor-change")) ? parseInt(`${Number(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`) : 0;
-  if (tab == editorTabs[0] && editorTabs.length == 1){
-    STE.activeEditor = null;
-    setTitle({ reset: true });
-    preview.src = "about:blank";
-  }
-  if (STE.previewEditor == identifier) setPreviewSource({ active_editor: true });
-  if (tab == editorTabs[0] && editorTabs[1] && tab.classList.contains("active")) openEditor({ identifier: /** @type { string } */ (editorTabs[1].getAttribute("data-editor-identifier")) });
-  if (tab == editorTabs[editorTabs.length - 1] && tab != editorTabs[0] && tab.classList.contains("active")) openEditor({ identifier: /** @type { string } */ (editorTabs[editorTabs.length - 2].getAttribute("data-editor-identifier")) });
-  if (tab != editorTabs[0] && tab.classList.contains("active")) openEditor({ identifier: /** @type { string } */ (editorTabs[editorTabs.indexOf(tab) + 1].getAttribute("data-editor-identifier")) });
-  if (focused && STE.query().textarea) STE.query().container.focus({ preventScroll: true });
-  tab.setAttribute("data-editor-change","");
-  if (tab == document.activeElement) tab.blur();
-  tab.tabIndex = -1;
-  if (tab.classList.contains("active")) tab.classList.remove("active");
-  workspace_editors.removeChild(container);
-  preview_menu.main.removeChild(previewOption);
-  (transitionDuration) ? window.setTimeout(removeEditorTab,transitionDuration) : removeEditorTab();
-  if (STE.fileHandles[identifier]) delete STE.fileHandles[identifier];
-  function removeEditorTab(){
-    if (workspace_tabs.contains(tab)) workspace_tabs.removeChild(tab);
-    if (document.body.getAttribute("data-editor-change") == changeIdentifier) document.body.removeAttribute("data-editor-change");
-  }
-}
-
-/**
- * Renames an Editor from a given identifier.
- * 
- * @param { { name?: string; identifier?: string | null | undefined; } | undefined } options
-*/
-export function renameEditor({ name, identifier = STE.activeEditor } = {}){
-  const { tab, container, getName } = STE.query(identifier),
-    editorName = /** @type { HTMLSpanElement } */ (tab.querySelector("[data-editor-name]")),
-    previewOption = /** @type { Option } */ (preview_menu.main.querySelector(`.option[data-editor-identifier="${identifier}"]`)),
-    currentName = /** @type { string } */ (getName()),
-    base = getName("base"),
-    extension = getName("extension");
-  let rename = (name) ? name : prompt(`Enter a new file name for "${currentName}".`,currentName);
-
-  if (!rename) return;
-  if (!rename.includes(".")){
-    rename = `${rename}.${extension}`;
-  } else if (rename.charAt(0) == ".") rename = `${base}${rename}`;
-  editorName.innerText = rename;
-  previewOption.innerText = rename;
-  var syntaxLanguage = /** @type { string } */ (STE.query(identifier).getName("extension"));
-  if (syntaxLanguage in Prism.languages) container.syntaxLanguage = syntaxLanguage;
-  ((STE.settings.get("syntax-highlighting") == true) && (syntaxLanguage in Prism.languages)) ? container.syntaxHighlight.enable() : container.syntaxHighlight.disable();
-  if (syntaxLanguage != container.syntaxLanguage) container.syntaxLanguage = syntaxLanguage;
-  if (tab.hasAttribute("data-editor-auto-created")) tab.removeAttribute("data-editor-auto-created");
-  if (tab == STE.query().tab) setTitle({ content: rename });
-  if ((STE.previewEditor == "active-editor" && STE.activeEditor == identifier) || STE.previewEditor == identifier) refreshPreview({ force: true });
-  return rename;
-}
+globalThis.Editor = Editor;
 
 /* Future feature: Add support to disable the wrapping behavior */
 /**
