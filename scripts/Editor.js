@@ -226,7 +226,7 @@ export class Editor {
       });
 
       this.tab.insertBefore(editorRename,this.tab.firstChild);
-      applyEditingBehavior({ element: editorRename });
+      applyEditingBehavior(editorRename);
 
       editorRename.focus();
       editorRename.select();
@@ -278,7 +278,7 @@ export class Editor {
 
     Editor.#editors[this.identifier] = this;
 
-    applyEditingBehavior({ element: this.container });
+    applyEditingBehavior(this.container);
 
     this.previewOption.addEventListener("click",() => {
       const { identifier } = this;

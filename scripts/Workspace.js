@@ -12,11 +12,22 @@ globalThis.createDisplay = createDisplay;
 globalThis.refreshPreview = refreshPreview;
 
 /**
+ * @typedef { "code" | "split" | "preview" } View
+*/
+
+/**
+ * @typedef SetViewOptions
+ * 
+ * @property { boolean } [force]
+*/
+
+/**
  * Sets the View state of the app. If a View change is already in progress, and the force option is not set to `true`, the call will be skipped.
  * 
- * @param { { type: "code" | "split" | "preview"; force?: boolean; } } options
+ * @param { View } type
+ * @param { SetViewOptions } options
 */
-export function setView({ type, force = false }){
+export function setView(type,{ force = false } = {}){
   if ((STE.orientationChange && !force) || STE.scalingChange) return;
   var changeIdentifier = Math.random().toString();
   document.body.setAttribute("data-view-change",changeIdentifier);
@@ -34,15 +45,19 @@ export function setView({ type, force = false }){
 }
 
 /**
+ * @typedef { "horizontal" | "vertical" } Orientation
+*/
+
+/**
  * Sets the Orientation state of the app. If an Orientation change is already in progress, the call will be skipped.
  * 
- * @param { "horizontal" | "vertical" } [orientation] - If an Orientation type is not provided, the current state will be toggled to the other option.
+ * @param { Orientation } [orientation] - If an Orientation type is not provided, the current state will be toggled to the other option.
 */
 export function setOrientation(orientation){
   if (STE.orientationChange || STE.scalingChange) return;
   document.body.setAttribute("data-orientation-change","");
   var param = (orientation), transitionDuration = ((STE.view != "split") ? 0 : parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`));
-  if (!param && STE.view == "split") setView({ type: "code", force: true });
+  if (!param && STE.view == "split") setView("code",{ force: true });
   if (!param && STE.orientation == "horizontal") orientation = "vertical";
   if (!param && STE.orientation == "vertical") orientation = "horizontal";
   window.setTimeout(() => {
@@ -54,7 +69,7 @@ export function setOrientation(orientation){
     scaler.offsetHeight;
     preview.offsetHeight;
     setTransitionDurations("on");
-    if (!param) setView({ type: "split", force: true });
+    if (!param) setView("split",{ force: true });
     window.setTimeout(() => document.body.removeAttribute("data-orientation-change"),transitionDuration);
   },transitionDuration);
 

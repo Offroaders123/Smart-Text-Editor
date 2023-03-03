@@ -3,6 +3,10 @@
 */
 
 /**
+ * @typedef { import("./Workspace.js").View } View
+*/
+
+/**
  * A global object with static properties that help with managing the state within Smart Text Editor.
 */
 class STE {
@@ -78,7 +82,7 @@ class STE {
      * @param { boolean } state
     */
     setSyntaxHighlighting(state){
-      state = (state != undefined) ? state : (STE.settings.get("syntax-highlighting") != undefined);
+      state = (state != undefined) ? state : (STE.settings.get("syntax-highlighting") !== undefined);
       /** @type { NodeListOf<NumTextElement> } */ (document.querySelectorAll("num-text")).forEach(editor => {
         if (editor.syntaxLanguage in Prism.languages) (state) ? editor.syntaxHighlight.enable() : editor.syntaxHighlight.disable();
       });
@@ -191,16 +195,16 @@ class STE {
      * @param { "base" | "extension" } [section] - The `"base"` flag provides the name before the extension, and the `"extension"` flag provides only the extension. If omitted, the full file name is returned.
     */
     function getName(section){
-      if ((document.querySelectorAll(`[data-editor-identifier="${identifier}"]:not([data-editor-change])`).length == 0) && (identifier != STE.activeEditor)) return null;
+      if ((document.querySelectorAll(`[data-editor-identifier="${identifier}"]:not([data-editor-change])`).length === 0) && (identifier !== STE.activeEditor)) return null;
       /** @type { string | string[] } */
       let name = /** @type { HTMLSpanElement } */ (workspace_tabs.querySelector(`.tab[data-editor-identifier="${identifier}"] [data-editor-name]`)).innerText;
-      if (!section || (!name.includes(".") && section == "base")) return name;
-      if (section == "base"){
+      if (!section || (!name.includes(".") && section === "base")) return name;
+      if (section === "base"){
         name = name.split(".");
         name.pop();
         return name.join(".");
       }
-      if (section == "extension"){
+      if (section === "extension"){
         if (!name.includes(".")) return "";
         return /** @type { string } */ (name.split(".").pop());
       }
@@ -215,7 +219,7 @@ class STE {
    * Gets the current View layout.
   */
   static get view() {
-    return document.body.getAttribute("data-view") ?? "code";
+    return /** @type { View } */ (document.body.getAttribute("data-view")) ?? "code";
   }
 
   /**

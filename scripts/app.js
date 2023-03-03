@@ -3,11 +3,21 @@ import Tools from "./Tools.js";
 import { Editor, setEditorTabsVisibility } from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview, setScaling, disableScaling } from "./Workspace.js";
 
-document.querySelectorAll("img").forEach(image => image.draggable = false);
-/** @type { NodeListOf<NumTextElement> } */ (document.querySelectorAll("num-text")).forEach(textarea => applyEditingBehavior({ element: textarea }));
-/** @type { NodeListOf<HTMLInputElement> } */ (document.querySelectorAll("input:is([type='text'],[type='url'])")).forEach(input => applyEditingBehavior({ element: input }));
-/** @type { NodeListOf<HTMLDivElement> } */ (document.querySelectorAll(".checkbox")).forEach(checkbox => {
-  var input = /** @type { HTMLInputElement } */ (checkbox.querySelector("input[type='checkbox']"));
+for (const image of document.querySelectorAll("img")){
+  image.draggable = false;
+}
+
+for (const numText of /** @type { NodeListOf<NumTextElement> } */ (document.querySelectorAll("num-text"))){
+  applyEditingBehavior(numText);
+}
+
+for (const input of /** @type { NodeListOf<HTMLInputElement> } */ (document.querySelectorAll("input:is([type='text'],[type='url'])"))){
+  applyEditingBehavior(input);
+}
+
+for (const checkbox of /** @type { NodeListOf<HTMLDivElement> } */ (document.querySelectorAll(".checkbox"))){
+  const input = /** @type { HTMLInputElement } */ (checkbox.querySelector("input[type='checkbox']"));
+
   checkbox.addEventListener("click",() => input.click());
   checkbox.addEventListener("keydown",event => {
     if (!event.repeat && event.key == "Enter") input.click();
@@ -16,41 +26,55 @@ document.querySelectorAll("img").forEach(image => image.draggable = false);
     if (event.key == " ") input.click();
   });
   checkbox.tabIndex = 0;
+
   input.addEventListener("click",event => event.stopPropagation());
-});
+}
+
 new ResizeObserver(() => {
   if (!STE.appearance.windowControlsOverlay) return;
   app_omnibox.style.setProperty("--device-pixel-ratio",window.devicePixelRatio.toFixed(2));
 }).observe(app_omnibox);
-/** @type { NodeListOf<HTMLButtonElement | HTMLAnchorElement> } */ (app_omnibox.querySelectorAll(".option")).forEach(option => {
+
+for (const option of /** @type { NodeListOf<HTMLButtonElement | HTMLAnchorElement> } */ (app_omnibox.querySelectorAll(".option"))){
   option.tabIndex = -1;
   option.addEventListener("mousedown",event => event.preventDefault());
-});
+}
 
-window.addEventListener("load",() => {
+window.addEventListener("load",async () => {
   if (STE.environment.fileProtocol) return;
   if (window.location.href.includes("index.html")) history.pushState(null,"",window.location.href.replace(/index.html/,""));
+
   if (!("serviceWorker" in navigator) || !STE.appearance.parentWindow) return;
-  navigator.serviceWorker.register("service-worker.js").then(() => {
-    if ((navigator.serviceWorker.controller) ? (navigator.serviceWorker.controller.state == "activated") : false) activateManifest();
-    navigator.serviceWorker.addEventListener("message",event => {
-      if (event.data.action == "service-worker-activated") activateManifest();
-      if (event.data.action == "clear-site-caches-complete") cleared_cache_card.open();
-      if (event.data.action == "share-target"){
-        event.data.files.forEach(/** @param { File } file */ file => {
-          var reader = new FileReader();
-          reader.readAsText(file,"UTF-8");
-          reader.addEventListener("loadend",() => new Editor({ name: file.name, value: /** @type { string } */ (reader.result) }));
-        });
+  await navigator.serviceWorker.register("service-worker.js");
+
+  if (navigator.serviceWorker.controller === null) return;
+
+  if (navigator.serviceWorker.controller.state === "activated"){
+    activateManifest();
+  }
+
+  navigator.serviceWorker.addEventListener("message",async event => {
+    switch (event.data.action){
+      case "service-worker-activated": activateManifest(); break;
+      case "clear-site-caches-complete": cleared_cache_card.open(); break;
+      case "share-target": {
+        for (const file of /** @type { File[] } */ (event.data.files)){
+          const { name } = file;
+          const value = await file.text();
+          new Editor({ name, value });
+        }
+        break;
       }
-    });
-    document.documentElement.classList.add("service-worker-activated");
-    if (queryParameters.get("share-target")){
-      if (navigator.serviceWorker.controller === null) return;
-      navigator.serviceWorker.controller.postMessage({ action: "share-target" });
-      removeQueryParameters(["share-target"]);
     }
   });
+
+  document.documentElement.classList.add("service-worker-activated");
+
+  if (queryParameters.get("share-target") !== null){
+    navigator.serviceWorker.controller.postMessage({ action: "share-target" });
+    removeQueryParameters(["share-target"]);
+  }
+
   function activateManifest(){
     /** @type { HTMLLinkElement } */ (document.querySelector("link[rel='manifest']")).href = "manifest.webmanifest";
   }
@@ -69,28 +93,42 @@ window.addEventListener("beforeunload",event => {
   event.returnValue = "";
 });
 
-window.addEventListener("unload",() => STE.childWindows.forEach(window => window.close()));
+window.addEventListener("unload",() => {
+  for (const window of STE.childWindows){
+    window.close();
+  }
+});
 
-window.addEventListener("resize",event => {
-  if (STE.view != "preview") setEditorTabsVisibility();
-  if (STE.view == "split" && document.body.hasAttribute("data-scaling-active")) setView({ type: "split" });
+window.addEventListener("resize",() => {
+  if (STE.view !== "preview"){
+    setEditorTabsVisibility();
+  }
+  if (STE.view === "split" && document.body.hasAttribute("data-scaling-active")){
+    setView("split");
+  }
 });
 
 window.addEventListener("blur",() => {
-  if (STE.appearance.parentWindow) /** @type { NodeListOf<MenuDropElement> } */ (document.querySelectorAll("menu-drop[data-open]")).forEach(menu => menu.close());
+  if (!STE.appearance.parentWindow) return;
+  for (const menu of /** @type { NodeListOf<MenuDropElement> } */ (document.querySelectorAll("menu-drop[data-open]"))){
+    menu.close();
+  }
 });
 
 document.body.addEventListener("keydown",event => {
+  const control = (event.ctrlKey && !STE.environment.appleDevice);
+  const command = (event.metaKey && STE.environment.appleDevice);
+  const shift = (event.shiftKey || ((event.key.toUpperCase() === event.key) && (event.key + event.key === String(Number(event.key) * 2))));
+  const controlShift = (control && shift);
+  const shiftCommand = (shift && command);
+  const controlCommand = (event.ctrlKey && command);
+
   /**
    * @param { string } key
   */
-  var pressed = key => (event.key.toLowerCase() == key.toLowerCase()),
-    control = (event.ctrlKey && !STE.environment.appleDevice),
-    command = (event.metaKey && STE.environment.appleDevice),
-    shift = (event.shiftKey || ((event.key.toUpperCase() == event.key) && (event.key + event.key == String(Number(event.key) * 2)))),
-    controlShift = (control && shift),
-    shiftCommand = (shift && command),
-    controlCommand = (event.ctrlKey && command);
+  function pressed(key){
+    return event.key.toLowerCase() === key.toLowerCase();
+  }
 
   if (pressed("Escape")){
     event.preventDefault();
@@ -152,17 +190,17 @@ document.body.addEventListener("keydown",event => {
   if ((controlShift || controlCommand) && (pressed("1") || pressed("!"))){
     event.preventDefault();
     if (event.repeat) return;
-    setView({ type: "code" });
+    setView("code");
   }
   if ((controlShift || controlCommand) && (pressed("2") || pressed("@"))){
     event.preventDefault();
     if (event.repeat) return;
-    setView({ type: "split" });
+    setView("split");
   }
   if ((controlShift || controlCommand) && (pressed("3") || pressed("#"))){
     event.preventDefault();
     if (event.repeat) return;
-    setView({ type: "preview" });
+    setView("preview");
   }
   if ((controlShift || controlCommand) && (pressed("4") || pressed("$"))){
     event.preventDefault();
@@ -212,12 +250,14 @@ document.body.addEventListener("keydown",event => {
   if ((controlShift || shiftCommand) && pressed("h")){
     event.preventDefault();
     if (event.repeat) return;
-    Tools.insertTemplate({ type: "html" });
+    Tools.insertTemplate("html");
   }
   if ((controlShift || shiftCommand) && pressed("m")){
     event.preventDefault();
     if (event.repeat || !STE.activeWidget) return;
-    if (STE.activeWidget) STE.activeWidget.minimize();
+    if (STE.activeWidget){
+      STE.activeWidget.minimize();
+    }
   }
   if ((control || command) && (pressed(",") || pressed("<"))){
     event.preventDefault();
@@ -227,12 +267,14 @@ document.body.addEventListener("keydown",event => {
 },{ capture: true });
 
 document.body.addEventListener("mousedown",event => {
-  if (event.button != 2) return;
+  if (event.button !== 2) return;
   event.preventDefault();
   event.stopPropagation();
 });
 
-document.body.addEventListener("contextmenu",event => event.preventDefault());
+document.body.addEventListener("contextmenu",event => {
+  event.preventDefault();
+});
 
 document.body.addEventListener("dragover",event => {
   event.preventDefault();
@@ -242,61 +284,91 @@ document.body.addEventListener("dragover",event => {
 
 document.body.addEventListener("drop",event => {
   event.preventDefault();
-  /** @type { NodeListOf<MenuDropElement> } */ (document.querySelectorAll("menu-drop[data-open]")).forEach(menu => menu.close());
+  for (const menu of /** @type { NodeListOf<MenuDropElement> } */ (document.querySelectorAll("menu-drop[data-open]"))){
+    menu.close();
+  }
   if (event.dataTransfer === null) return;
-  Array.from(event.dataTransfer.items).forEach(async (item,index) => {
-    if (item.kind == "file"){
-      if (!STE.support.fileSystem || !("getAsFileSystemHandle")){
-        var file = item.getAsFile(), reader = new FileReader();
-        if (file === null) return;
-        reader.readAsText(file,"UTF-8");
-        reader.addEventListener("loadend",() => new Editor({ name: file?.name, value: /** @type { string } */ (reader.result) }));
-      } else {
-        var handle = await item.getAsFileSystemHandle();
-        if (handle === null) return;
-        if (handle.kind != "file" || !(handle instanceof FileSystemFileHandle)) return;
-        let file = await handle.getFile(), { identifier } = new Editor({ name: file.name, value: await file.text() });
-        STE.fileHandles[identifier] = handle;
+
+  [...event.dataTransfer.items].forEach(async (item,index) => {
+    switch (item.kind){
+      case "file": {
+        if (!STE.support.fileSystem || !("getAsFileSystemHandle")){
+          const file = item.getAsFile();
+          if (file === null) break;
+          const { name } = file;
+          const value = await file.text();
+          new Editor({ name, value });
+        } else {
+          const handle = await item.getAsFileSystemHandle();
+          if (!(handle instanceof FileSystemFileHandle)) break;
+          const file = await handle.getFile();
+          const { name } = file;
+          const value = await file.text();
+          const { identifier } = new Editor({ name, value });
+          STE.fileHandles[identifier] = handle;
+        }
+        break;
       }
-    } else if (item.kind == "string" && index == 0 && event.dataTransfer?.getData("text") != "") new Editor({ value: event.dataTransfer?.getData("text") });
+      case "string": {
+        if (index !== 0) break;
+        const value = event.dataTransfer?.getData("text");
+        if (value !== "") break;
+        new Editor({ value });
+        break;
+      }
+    }
   });
 });
 
-var appToolbar = /** @type { HTMLDivElement } */ (document.querySelector("header .app-menubar"));
-/** @type { NodeListOf<MenuDropElement> } */ (appToolbar.querySelectorAll("menu-drop")).forEach(menu => {
+for (const menu of /** @type { NodeListOf<MenuDropElement> } */ (app_menubar.querySelectorAll("menu-drop"))){
   menu.addEventListener("pointerenter",event => {
-    if (event.pointerType != "mouse") return;
-    if (appToolbar.querySelectorAll("menu-drop:not([data-alternate])[data-open]").length == 0 || menu.matches("[data-alternate]") || menu.matches("[data-open]")) return;
+    if (event.pointerType !== "mouse") return;
+    if (app_menubar.querySelectorAll("menu-drop:not([data-alternate])[data-open]").length === 0 || menu.matches("[data-alternate]") || menu.matches("[data-open]")) return;
     menu.opener.focus();
-    /** @type { NodeListOf<MenuDropElement> } */ (appToolbar.querySelectorAll("menu-drop[data-open]")).forEach(menu => menu.close());
+    for (const menu of /** @type { NodeListOf<MenuDropElement> } */ (app_menubar.querySelectorAll("menu-drop[data-open]"))){
+      menu.close();
+    }
     menu.open();
   });
-});
+}
 
 workspace_tabs.addEventListener("keydown",event => {
-  if (event.key != "ArrowLeft" && event.key != "ArrowRight") return;
+  if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
   if (!workspace_tabs.contains(document.activeElement) || !(document.activeElement instanceof HTMLElement)) return;
+
   const identifier = document.activeElement.getAttribute("data-editor-identifier");
   if (identifier === null) return;
+
   const previousEditor = Editor.getPrevious(identifier);
   const nextEditor = Editor.getNext(identifier);
   event.preventDefault();
-  if (event.key == "ArrowLeft") STE.query(previousEditor).tab?.focus();
-  if (event.key == "ArrowRight") STE.query(nextEditor).tab?.focus();
+
+  if (event.key === "ArrowLeft"){
+    STE.query(previousEditor).tab?.focus();
+  }
+  if (event.key === "ArrowRight"){
+    STE.query(nextEditor).tab?.focus();
+  }
 });
 
 create_editor_button.addEventListener("keydown",event => {
-  if (event.key != "Enter") return;
-  if (event.repeat) event.preventDefault();
+  if (event.key !== "Enter") return;
+  if (event.repeat){
+    event.preventDefault();
+  }
 });
 
-create_editor_button.addEventListener("mousedown",event => event.preventDefault());
+create_editor_button.addEventListener("mousedown",event => {
+  event.preventDefault();
+});
 
-create_editor_button.addEventListener("click",() => new Editor({ autoReplace: false }));
+create_editor_button.addEventListener("click",() => {
+  new Editor({ autoReplace: false });
+});
 
 scaler.addEventListener("mousedown",event => {
-  if (event.button != 0) return;
-  if (STE.view != "split") return;
+  if (event.button !== 0) return;
+  if (STE.view !== "split") return;
   event.preventDefault();
   document.body.setAttribute("data-scaling-change","");
   document.addEventListener("mousemove",setScaling);
@@ -304,7 +376,7 @@ scaler.addEventListener("mousedown",event => {
 });
 
 scaler.addEventListener("touchstart",event => {
-  if (STE.view != "split" || event.touches.length != 1) return;
+  if (STE.view !== "split" || event.touches.length !== 1) return;
   document.body.setAttribute("data-scaling-change","");
   document.addEventListener("touchmove",setScaling,{ passive: true });
   document.addEventListener("touchend",disableScaling,{ passive: true });
@@ -317,7 +389,9 @@ card_backdrop.addEventListener("click",() => {
 
 preview_base_input.placeholder = document.baseURI;
 
-preview_base_input.setWidth = () => preview_base_input.style.setProperty("--input-count",preview_base_input.value.length.toString());
+preview_base_input.setWidth = () => {
+  preview_base_input.style.setProperty("--input-count",preview_base_input.value.length.toString());
+};
 
 preview_base_input.setValue = value => {
   preview_base_input.value = value;
@@ -333,52 +407,81 @@ preview_base_input.reset = () => {
 
 preview_base_input.style.setProperty("--placeholder-count",preview_base_input.placeholder.length.toString());
 
-preview_base_input.addEventListener("input",event => /** @type { typeof preview_base_input } */ (event.target).setWidth());
+preview_base_input.addEventListener("input",() => {
+  preview_base_input.setWidth();
+});
 
 preview_base_input.addEventListener("change",event => {
   if (!(event.target instanceof HTMLInputElement)) return;
-  var empty = event.target.matches(":placeholder-shown"), valid = event.target.matches(":valid");
-  if (empty || !valid) STE.settings.remove("preview-base");
-  if (!empty && valid) STE.settings.set("preview-base",event.target.value);
-  if (empty || valid) refreshPreview({ force: true });
+  const empty = event.target.matches(":placeholder-shown");
+  const valid = event.target.matches(":valid");
+
+  if (empty || !valid){
+    STE.settings.remove("preview-base");
+  }
+  if (!empty && valid){
+    STE.settings.set("preview-base",event.target.value);
+  }
+  if (empty || valid){
+    refreshPreview({ force: true });
+  }
 });
 
-generator_output.addEventListener("click",() => generator_output.select());
+generator_output.addEventListener("click",() => {
+  generator_output.select();
+});
 
-generator_output.addEventListener("keydown",() => generator_output.click());
+generator_output.addEventListener("keydown",() => {
+  generator_output.click();
+});
 
-window.requestAnimationFrame(() => new Editor({ autoCreated: true }));
+window.requestAnimationFrame(() => {
+  new Editor({ autoCreated: true });
+});
 
 if (STE.appearance.parentWindow){
   if (STE.settings.get("default-orientation")){
-    var value = STE.settings.get("default-orientation");
-    window.requestAnimationFrame(() => default_orientation_setting.select(value));
+    const value = STE.settings.get("default-orientation");
+    window.requestAnimationFrame(() => {
+      default_orientation_setting.select(value);
+    });
     setOrientation(value);
   }
-  if (STE.settings.get("syntax-highlighting") != undefined){
-    var state = STE.settings.get("syntax-highlighting");
+  if (STE.settings.get("syntax-highlighting") !== undefined){
+    const state = STE.settings.get("syntax-highlighting");
     STE.appearance.setSyntaxHighlighting(state);
     syntax_highlighting_setting.checked = state;
   }
-  if (STE.settings.get("automatic-refresh") != undefined) automatic_refresh_setting.checked = STE.settings.get("automatic-refresh");
-  if (STE.settings.get("preview-base")) preview_base_input.setValue(STE.settings.get("preview-base"));
-  window.setTimeout(() => document.documentElement.classList.remove("startup-fade"),50);
+  if (STE.settings.get("automatic-refresh") !== undefined){
+    automatic_refresh_setting.checked = STE.settings.get("automatic-refresh");
+  }
+  if (STE.settings.get("preview-base")){
+    preview_base_input.setValue(STE.settings.get("preview-base"));
+  }
+  window.setTimeout(() => {
+    document.documentElement.classList.remove("startup-fade");
+  },50);
 }
 
 if (STE.support.fileHandling && STE.support.fileSystem){
-  window.launchQueue.setConsumer(params => {
-    params.files.forEach(async handle => {
-      var file = await handle.getFile(), { identifier } = new Editor({ name: file.name, value: await file.text() });
+  window.launchQueue.setConsumer(async ({ files: handles }) => {
+    for (const handle of handles){
+      const file = await handle.getFile();
+      const { name } = file;
+      const value = await file.text();
+      const { identifier } = new Editor({ name, value });
       STE.fileHandles[identifier] = handle;
-    });
-    if (!STE.environment.touchDevice) STE.query().container?.focus({ preventScroll: true });
+    }
+    if (!STE.environment.touchDevice){
+      STE.query().container?.focus({ preventScroll: true });
+    }
   });
 }
 
-var queryParameters = new URLSearchParams(window.location.search);
+const queryParameters = new URLSearchParams(window.location.search);
 
 if (queryParameters.get("template")){
-  Tools.insertTemplate({ type: "html" });
+  Tools.insertTemplate("html");
   removeQueryParameters(["template"]);
 }
 
@@ -399,33 +502,39 @@ export function getElementStyle({ element, pseudo = null, property }){
 /**
  * Applies the app's behavior defaults, like Drag and Drop handling, to `<input>` and `<num-text>` elements.
  * 
- * @param { { element: HTMLInputElement | NumTextElement; } } options
+ * @param { HTMLInputElement | NumTextElement } element
 */
-export function applyEditingBehavior({ element }){
-  var type = element.tagName.toLowerCase();
+export function applyEditingBehavior(element){
+  const type = element.tagName.toLowerCase();
+
   /** @type { HTMLElement } */ (element).addEventListener("dragover",event => {
     event.stopPropagation();
     if (event.dataTransfer === null) return;
     event.dataTransfer.dropEffect = "copy";
   });
+
   /** @type { HTMLElement } */ (element).addEventListener("drop",event => {
     if (event.dataTransfer === null) return;
-    if (Array.from(event.dataTransfer.items)[0].kind == "file") return;
+    if ([...event.dataTransfer.items][0].kind === "file") return;
     event.stopPropagation();
-    /** @type { NodeListOf<MenuDropElement> } */ (document.querySelectorAll("menu-drop[data-open]")).forEach(menu => menu.close());
+    for (const menu of /** @type { NodeListOf<MenuDropElement> } */ (document.querySelectorAll("menu-drop[data-open]"))){
+      menu.close();
+    }
   });
-  if (type == "input"){
+
+  if (type === "input"){
     element.spellcheck = false;
     // @ts-expect-error
     element.autocomplete = "off";
     element.autocapitalize = "none";
     element.setAttribute("autocorrect","off");
   }
-  if (type == "num-text"){
+
+  if (type === "num-text"){
     if (!(element instanceof NumTextElement)) return;
     element.colorScheme.set("dark");
     element.themes.remove("vanilla-appearance");
-    var scrollbarStyles = document.createElement("style");
+    const scrollbarStyles = document.createElement("style");
     scrollbarStyles.textContent = scrollbar_styles.textContent;
     element.shadowRoot?.insertBefore(scrollbarStyles,element.container);
   }
@@ -446,8 +555,10 @@ export function setTitle({ content = "", reset = false } = {}){
  * @param { string[] } entries
 */
 function removeQueryParameters(entries){
-  var parameters = new URLSearchParams(window.location.search);
-  entries.forEach(entry => parameters.delete(entry));
+  const parameters = new URLSearchParams(window.location.search);
+  for (const entry of entries){
+    parameters.delete(entry);
+  }
   changeQueryParameters(parameters);
 }
 
@@ -457,29 +568,30 @@ function removeQueryParameters(entries){
  * @param { URLSearchParams } parameters
 */
 function changeQueryParameters(parameters){
-  var query = parameters.toString();
+  let query = parameters.toString();
   if (query) query = "?" + query;
-  var address = window.location.pathname + query;
+  const address = window.location.pathname + query;
   history.pushState(null,"",address);
 }
 
 /**
  * Shows the PWA Install Prompt, if the `BeforeInstallPrompt` event was fired when the app first started.
 */
-globalThis.showInstallPrompt = function showInstallPrompt(){
+globalThis.showInstallPrompt = async function showInstallPrompt(){
   if (STE.installPrompt === null) return;
   STE.installPrompt.prompt();
-  STE.installPrompt.userChoice.then(result => {
-    if (result.outcome != "accepted") return;
-    document.documentElement.classList.remove("install-prompt-available");
-    theme_button.childNodes[0].textContent = "Customize Theme";
-  });
+  const result = await STE.installPrompt.userChoice;
+  if (result.outcome !== "accepted") return;
+  document.documentElement.classList.remove("install-prompt-available");
+  theme_button.childNodes[0].textContent = "Customize Theme";
 }
 
 /**
  * Clears the Service Worker cache, if the user confirms doing so.
 */
 globalThis.clearSiteCaches = function clearSiteCaches(){
-  if (navigator.serviceWorker.controller === null) return;
-  if (confirm("Are you sure you would like to clear all app caches?\nSmart Text Editor will no longer work offline until an Internet connection is available.")) navigator.serviceWorker.controller.postMessage({ action: "clear-site-caches" });
+  const hasConfirmed = confirm("Are you sure you would like to clear all app caches?\nSmart Text Editor will no longer work offline until an Internet connection is available.");
+  if (hasConfirmed){
+    navigator.serviceWorker.controller?.postMessage({ action: "clear-site-caches" });
+  }
 }
