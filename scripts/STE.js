@@ -43,15 +43,7 @@ class STE {
      * Checks whether the app is running in standalone mode with Window Controls Overlay enabled.
     */
     get windowControlsOverlay() {
-      return ((("windowControlsOverlay" in navigator) ? navigator.windowControlsOverlay.visible : false) && STE.appearance.standalone);
-    },
-
-    /**
-     * Updates the app's custom styling to handle Window Controls Overlay based on the current state of `STE.appearance.windowControlsOverlay`.
-    */
-    refreshWindowControlsOverlay() {
-      var visibility = STE.appearance.windowControlsOverlay, styling = document.documentElement.classList.contains("window-controls-overlay");
-      if (visibility != styling) (visibility) ? document.documentElement.classList.add("window-controls-overlay") : document.documentElement.classList.remove("window-controls-overlay");
+      return navigator.windowControlsOverlay?.visible ?? false;
     },
 
     /**
@@ -78,44 +70,6 @@ class STE {
         top: getSafeAreaInset("top"),
         bottom: getSafeAreaInset("bottom"),
       };
-    },
-
-    /**
-     * Gets the inset values for the window Title Bar Areas when Window Controls Overlay is enabled.
-    */
-    get titleBarAreaInsets() {
-      /**
-       * @private
-       * @param { "top" | "width-left" | "width-right" | "height" } section
-      */
-      function getTitleBarAreaInset(section){
-        var value = getComputedStyle(document.documentElement).getPropertyValue(`--titlebar-area-inset-${section}`);
-        if (value.includes("calc")) value = Function(`"use strict"; return (${value.replace(/calc/g,"").replace(/100vw/g,`${window.innerWidth}px`).replace(/px/g,"")})`)();
-        return parseInt(value,10);
-      }
-      return {
-        top: getTitleBarAreaInset("top"),
-        width_left: getTitleBarAreaInset("width-left"),
-        width_right: getTitleBarAreaInset("width-right"),
-        height: getTitleBarAreaInset("height"),
-      };
-    },
-
-    /**
-     * Gets the pixel ratio of the user's display.
-    */
-    get devicePixelRatio() {
-      return window.devicePixelRatio.toFixed(2);
-    },
-
-    /**
-     * Updates the app's custom styling to work with the pixel ratio of the user's display.
-     * 
-     * This is used to make the App Omnibox symmetrical to the Title Bar Area when Window Controls Overlay is enabled.
-    */
-    refreshDevicePixelRatio() {
-      var ratio = STE.appearance.devicePixelRatio, styling = getComputedStyle(document.documentElement).getPropertyValue("--device-pixel-ratio");
-      if (ratio != styling) document.documentElement.style.setProperty("--device-pixel-ratio",ratio);
     },
 
     /**
@@ -227,8 +181,8 @@ class STE {
    * @param { string | null } identifier - Defaults to the currently opened Editor.
   */
   static query(identifier = STE.activeEditor) {
-    const tab = /** @type { HTMLButtonElement } */ (workspace_tabs.querySelector(`.tab[data-editor-identifier="${identifier}"]`));
-    const container = /** @type { NumTextElement } */ (workspace_editors.querySelector(`.editor[data-editor-identifier="${identifier}"]`));
+    const tab = /** @type { HTMLButtonElement | null } */ (workspace_tabs.querySelector(`.tab[data-editor-identifier="${identifier}"]`));
+    const container = /** @type { NumTextElement | null } */ (workspace_editors.querySelector(`.editor[data-editor-identifier="${identifier}"]`));
     const textarea = (container) ? container.editor : null;
 
     /**
@@ -458,6 +412,3 @@ if (STE.environment.touchDevice) document.documentElement.classList.add("touch-d
 if (STE.environment.appleDevice) document.documentElement.classList.add("apple-device");
 if (STE.environment.macOSDevice) document.documentElement.classList.add("macOS-device");
 if (STE.support.webSharing) document.documentElement.classList.add("web-sharing");
-
-STE.appearance.refreshWindowControlsOverlay();
-STE.appearance.refreshDevicePixelRatio();

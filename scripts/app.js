@@ -18,7 +18,11 @@ document.querySelectorAll("img").forEach(image => image.draggable = false);
   checkbox.tabIndex = 0;
   input.addEventListener("click",event => event.stopPropagation());
 });
-/** @type { NodeListOf<HTMLButtonElement | HTMLAnchorElement> } */ (document.querySelectorAll("header .app-omnibox .option")).forEach(option => {
+new ResizeObserver(() => {
+  if (!STE.appearance.windowControlsOverlay) return;
+  app_omnibox.style.setProperty("--device-pixel-ratio",window.devicePixelRatio.toFixed(2));
+}).observe(app_omnibox);
+/** @type { NodeListOf<HTMLButtonElement | HTMLAnchorElement> } */ (app_omnibox.querySelectorAll(".option")).forEach(option => {
   option.tabIndex = -1;
   option.addEventListener("mousedown",event => event.preventDefault());
 });
@@ -68,7 +72,6 @@ window.addEventListener("beforeunload",event => {
 window.addEventListener("unload",() => STE.childWindows.forEach(window => window.close()));
 
 window.addEventListener("resize",event => {
-  STE.appearance.refreshDevicePixelRatio();
   if (STE.view != "preview") setEditorTabsVisibility();
   if (STE.view == "split" && document.body.hasAttribute("data-scaling-active")) setView({ type: "split" });
 });
@@ -76,8 +79,6 @@ window.addEventListener("resize",event => {
 window.addEventListener("blur",() => {
   if (STE.appearance.parentWindow) /** @type { NodeListOf<MenuDropElement> } */ (document.querySelectorAll("menu-drop[data-open]")).forEach(menu => menu.close());
 });
-
-if (STE.support.windowControlsOverlay) navigator.windowControlsOverlay.addEventListener("geometrychange",() => STE.appearance.refreshWindowControlsOverlay());
 
 document.body.addEventListener("keydown",event => {
   /**
@@ -280,8 +281,8 @@ workspace_tabs.addEventListener("keydown",event => {
   const previousEditor = Editor.getPrevious(identifier);
   const nextEditor = Editor.getNext(identifier);
   event.preventDefault();
-  if (event.key == "ArrowLeft") STE.query(previousEditor).tab.focus();
-  if (event.key == "ArrowRight") STE.query(nextEditor).tab.focus();
+  if (event.key == "ArrowLeft") STE.query(previousEditor).tab?.focus();
+  if (event.key == "ArrowRight") STE.query(nextEditor).tab?.focus();
 });
 
 create_editor_button.addEventListener("keydown",event => {
@@ -370,7 +371,7 @@ if (STE.support.fileHandling && STE.support.fileSystem){
       var file = await handle.getFile(), { identifier } = new Editor({ name: file.name, value: await file.text() });
       STE.fileHandles[identifier] = handle;
     });
-    if (!STE.environment.touchDevice) STE.query().container.focus({ preventScroll: true });
+    if (!STE.environment.touchDevice) STE.query().container?.focus({ preventScroll: true });
   });
 }
 
@@ -436,7 +437,7 @@ export function applyEditingBehavior({ element }){
  * @param { { content?: string; reset?: boolean; } | undefined } options
 */
 export function setTitle({ content = "", reset = false } = {}){
-  document.title = `${(content && !reset) ? `${content} - ` : ""}Smart Text Editor`;
+  document.title = `Smart Text Editor${(content && !reset) ? ` - ${content}` : ""}`;
 }
 
 /**

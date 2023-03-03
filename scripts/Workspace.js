@@ -188,8 +188,8 @@ export async function saveFile(extension){
     var currentName = STE.query().getName(), file = await handle.getFile(), rename = file.name;
     if (currentName != rename) Editor.rename(identifier,rename);
   }
-  if (STE.query().tab.hasAttribute("data-editor-auto-created")) STE.query().tab.removeAttribute("data-editor-auto-created");
-  if (STE.query().tab.hasAttribute("data-editor-unsaved")) STE.query().tab.removeAttribute("data-editor-unsaved");
+  if (STE.query().tab?.hasAttribute("data-editor-auto-created")) STE.query().tab?.removeAttribute("data-editor-auto-created");
+  if (STE.query().tab?.hasAttribute("data-editor-unsaved")) STE.query().tab?.removeAttribute("data-editor-unsaved");
   refreshPreview({ force: true });
 }
 
@@ -225,7 +225,7 @@ export function createDisplay(){
 export function refreshPreview({ force = false } = {}){
   if (STE.view == "code") return;
   var editor = (STE.previewEditor == "active-editor") ? STE.query() : STE.query(STE.previewEditor);
-  if (!editor.textarea) return;
+  if (!editor.tab || !editor.textarea) return;
   var change = (editor.tab.hasAttribute("data-editor-refresh") && STE.settings.get("automatic-refresh") != false);
   if (!change && !force) return;
   var baseURL = STE.settings.get("preview-base") || null, source = editor.textarea.value;

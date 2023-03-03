@@ -78,6 +78,7 @@ export class Editor {
   */
   static getPrevious(identifier,wrap = true) {
     const { tab } = STE.query(identifier);
+    if (tab === null) return tab;
     const editorTabs = [...workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")];
     const previousTab = editorTabs[(editorTabs.indexOf(tab) || editorTabs.length) - 1];
     const previousEditor = previousTab.getAttribute("data-editor-identifier");
@@ -94,6 +95,7 @@ export class Editor {
   */
   static getNext(identifier,wrap = true) {
     const { tab } = STE.query(identifier);
+    if (tab === null) return tab;
     const editorTabs = [...workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")];
     const nextTab = editorTabs[(editorTabs.indexOf(tab) !== editorTabs.length - 1) ? editorTabs.indexOf(tab) + 1 : 0];
     const nextEditor = nextTab.getAttribute("data-editor-identifier");
@@ -296,14 +298,14 @@ export class Editor {
       refreshPreview();
     });
 
-    if (STE.activeEditor !== null && STE.query().tab.hasAttribute("data-editor-auto-created")){
+    if (STE.activeEditor !== null && STE.query().tab?.hasAttribute("data-editor-auto-created")){
       if (document.activeElement === STE.query().container){
         focusedOverride = true;
       }
       if (autoReplace){
         this.close();
       } else {
-        STE.query().tab.removeAttribute("data-editor-auto-created");
+        STE.query().tab?.removeAttribute("data-editor-auto-created");
       }
     }
 
@@ -332,10 +334,10 @@ export class Editor {
     const focused = (document.activeElement === STE.query().container) || focusedOverride;
 
     if (STE.query().tab){
-      STE.query().tab.classList.remove("active");
+      STE.query().tab?.classList.remove("active");
     }
     if (STE.query().container){
-      STE.query().container.classList.remove("active");
+      STE.query().container?.classList.remove("active");
     }
 
     this.tab.classList.add("active");
@@ -402,7 +404,7 @@ export class Editor {
     }
 
     if (focused && STE.query().textarea !== null){
-      STE.query().container.focus({ preventScroll: true });
+      STE.query().container?.focus({ preventScroll: true });
     }
 
     this.tab.setAttribute("data-editor-change","");
@@ -488,7 +490,11 @@ globalThis.Editor = Editor;
 */
 export function setEditorTabsVisibility({ identifier = STE.activeEditor } = {}){
   if (!STE.activeEditor) return;
-  var { tab } = STE.query(identifier), obstructedLeft = (tab.offsetLeft <= workspace_tabs.scrollLeft), obstructedRight = ((tab.offsetLeft + tab.clientWidth) >= (workspace_tabs.scrollLeft + workspace_tabs.clientWidth)), spacingOffset = 0;
+  const { tab } = STE.query(identifier);
+  if (tab === null) return;
+  const obstructedLeft = (tab.offsetLeft <= workspace_tabs.scrollLeft);
+  const obstructedRight = ((tab.offsetLeft + tab.clientWidth) >= (workspace_tabs.scrollLeft + workspace_tabs.clientWidth));
+  let spacingOffset = 0;
   if ((workspace_tabs.clientWidth < tab.clientWidth) && !obstructedLeft) return;
   if (obstructedLeft){
     spacingOffset = parseInt(getElementStyle({ element: workspace_tabs, pseudo: "::before", property: "width" }),10) * 3;

@@ -14,8 +14,8 @@
   --titlebar-area-inset-width-right: calc(100vw - env(titlebar-area-width,100vw) - var(--titlebar-area-inset-width-left));
   --titlebar-area-inset-height: env(titlebar-area-height,0px);
 }
-@media not (display-mode: fullscreen) {
-  :root:not(.window-controls-overlay) {
+@media not (display-mode: window-controls-overlay) {
+  :root {
     --titlebar-area-inset-width-left: 0px;
     --titlebar-area-inset-width-right: 0px;
     --titlebar-area-inset-top: 0px;
@@ -120,15 +120,19 @@ header .app-region {
   z-index: -1;
   -webkit-app-region: drag;
 }
-:root.window-controls-overlay header .app-region {
-  --app-region-margin: calc(var(--titlebar-area-inset-height) * 0.12);
+@media (display-mode: window-controls-overlay) {
+  :root header .app-region {
+    --app-region-margin: calc(var(--titlebar-area-inset-height) * 0.12);
+  }
 }
 header .app-icon {
   flex-shrink: 0;
   display: flex;
 }
-:root.window-controls-overlay.macOS-device header .app-icon {
-  display: none;
+@media (display-mode: window-controls-overlay) {
+  :root.macOS-device header .app-icon {
+    display: none;
+  }
 }
 header .app-icon img {
   width: 16px;
@@ -166,16 +170,18 @@ header .app-omnibox {
   gap: var(--header-gap);
   color: #ffffff;
 }
-:root.window-controls-overlay header .app-omnibox {
-  height: var(--titlebar-area-inset-height);
-  gap: calc(var(--header-gap) / var(--device-pixel-ratio));
-  z-index: 5;
-}
-:root:not(.macOS-device).window-controls-overlay header .app-omnibox {
-  margin-right: calc(var(--header-gap) * -1);
-}
-:root.macOS-device.window-controls-overlay header .app-omnibox {
-  margin-right: -4px;
+@media (display-mode: window-controls-overlay) {
+  :root:not(.startup-fade) header .app-omnibox {
+    height: var(--titlebar-area-inset-height);
+    gap: calc(var(--header-gap) / var(--device-pixel-ratio));
+    z-index: 5;
+  }
+  :root:not(.macOS-device) header .app-omnibox {
+    margin-right: calc(var(--header-gap) * -1);
+  }
+  :root.macOS-device header .app-omnibox {
+    margin-right: -4px;
+  }
 }
 header .app-omnibox button {
   background: none;
@@ -195,8 +201,10 @@ header .app-omnibox .option {
   transition: background-color 250ms linear;
   -webkit-app-region: no-drag;
 }
-:root.window-controls-overlay header .app-omnibox .option {
-  padding: calc(5px / var(--device-pixel-ratio));
+@media (display-mode: window-controls-overlay) {
+  :root header .app-omnibox .option {
+    padding: calc(5px / var(--device-pixel-ratio));
+  }
 }
 header .app-omnibox .option:hover {
   background-color: #ffffff14;
@@ -211,9 +219,11 @@ header .app-omnibox .option svg {
   flex-shrink: 0;
   fill: currentColor;
 }
-:root.window-controls-overlay header .app-omnibox .option svg {
-  width: calc(14px / var(--device-pixel-ratio));
-  height: calc(14px / var(--device-pixel-ratio));
+@media (display-mode: window-controls-overlay) {
+  :root header .app-omnibox .option svg {
+    width: calc(14px / var(--device-pixel-ratio));
+    height: calc(14px / var(--device-pixel-ratio));
+  }
 }
 main {
   padding: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
