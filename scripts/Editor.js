@@ -152,6 +152,8 @@ export class Editor {
     const changeIdentifier = Math.random().toString();
     const transitionDuration = parseInt(`${Number(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
 
+    document.body.setAttribute("data-editor-change",changeIdentifier);
+
     this.tab.classList.add("tab");
     this.tab.setAttribute("data-editor-identifier",this.identifier);
     if (value) this.tab.setAttribute("data-editor-refresh","");
@@ -303,7 +305,7 @@ export class Editor {
         focusedOverride = true;
       }
       if (autoReplace){
-        this.close();
+        Editor.close(STE.activeEditor);
       } else {
         STE.query().tab?.removeAttribute("data-editor-auto-created");
       }
@@ -317,7 +319,7 @@ export class Editor {
     if ((STE.settings.get("syntax-highlighting") === true) && (this.container.syntaxLanguage in Prism.languages)){
       this.container.syntaxHighlight.enable();
     }
-    
+
     setTimeout(() => {
       if (document.body.getAttribute("data-editor-change") === changeIdentifier){
         document.body.removeAttribute("data-editor-change");
@@ -370,15 +372,18 @@ export class Editor {
     const editorTabs = [...workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")];
     const changeIdentifier = Math.random().toString();
     const focused = (document.activeElement === this.container);
-    const transitionDuration = (document.body.hasAttribute("data-editor-change")) ? parseInt(`${Number(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`) : 0;
 
     if (editorTabs.length !== 1){
       document.body.setAttribute("data-editor-change",changeIdentifier);
       this.tab.style.setProperty("--tab-margin-right",`-${this.tab.offsetWidth}px`);
     } else if (document.body.hasAttribute("data-editor-change")){
       document.body.removeAttribute("data-editor-change");
-      workspace_tabs.querySelectorAll(".tab[data-editor-change]").forEach(tab => tab.remove());
+      for (const tab of workspace_tabs.querySelectorAll(".tab[data-editor-change]")){
+        tab.remove();
+      }
     }
+
+    const transitionDuration = (document.body.hasAttribute("data-editor-change")) ? parseInt(`${Number(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`) : 0;
 
     if (this.tab === editorTabs[0] && editorTabs.length === 1){
       STE.activeEditor = null;
