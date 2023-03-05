@@ -150,9 +150,9 @@ export class Editor {
     */
     let focusedOverride;
     const changeIdentifier = Math.random().toString();
-    const transitionDuration = parseInt(`${Number(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
 
     document.body.setAttribute("data-editor-change",changeIdentifier);
+    const transitionDuration = parseInt(`${Number(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
 
     this.tab.classList.add("tab");
     this.tab.setAttribute("data-editor-identifier",this.identifier);
@@ -273,19 +273,25 @@ export class Editor {
     this.previewOption.tabIndex = -1;
     this.previewOption.innerText = this.#name;
 
-    this.tab.append(this.editorName,this.editorClose);
-    workspace_tabs.insertBefore(this.tab,create_editor_button);
-    workspace_editors.append(this.container);
-    preview_menu.main.append(this.previewOption);
-
-    Editor.#editors[this.identifier] = this;
-
-    applyEditingBehavior(this.container);
-
     this.previewOption.addEventListener("click",() => {
       const { identifier } = this;
       setPreviewSource({ identifier });
     });
+
+    if (STE.activeEditor !== null && STE.query().tab?.hasAttribute("data-editor-auto-created")){
+      if (document.activeElement === STE.query().container){
+        focusedOverride = true;
+      }
+      if (autoReplace){
+        Editor.close(STE.activeEditor);
+      } else {
+        STE.query().tab?.removeAttribute("data-editor-auto-created");
+      }
+    }
+
+    this.tab.append(this.editorName,this.editorClose);
+    workspace_tabs.insertBefore(this.tab,create_editor_button);
+    workspace_editors.append(this.container);
 
     this.container.editor.addEventListener("input",() => {
       if (this.tab.hasAttribute("data-editor-auto-created")){
@@ -300,23 +306,17 @@ export class Editor {
       refreshPreview();
     });
 
-    if (STE.activeEditor !== null && STE.query().tab?.hasAttribute("data-editor-auto-created")){
-      if (document.activeElement === STE.query().container){
-        focusedOverride = true;
-      }
-      if (autoReplace){
-        Editor.close(STE.activeEditor);
-      } else {
-        STE.query().tab?.removeAttribute("data-editor-auto-created");
-      }
-    }
+    preview_menu.main.append(this.previewOption);
+
+    applyEditingBehavior(this.container);
+    Editor.#editors[this.identifier] = this;
 
     if (open || STE.activeEditor === null){
       this.open({ autoCreated, focusedOverride });
     }
 
     this.container.syntaxLanguage = /** @type { string } */ (STE.query(this.identifier).getName("extension"));
-    if ((STE.settings.get("syntax-highlighting") === true) && (this.container.syntaxLanguage in Prism.languages)){
+    if ((STE.settings.get("syntax-highlighting") == "true") && (this.container.syntaxLanguage in Prism.languages)){
       this.container.syntaxHighlight.enable();
     }
 
@@ -357,7 +357,7 @@ export class Editor {
     }
 
     if (STE.previewEditor === "active-editor"){
-      refreshPreview({ force: (STE.settings.get("automatic-refresh") !== false) });
+      refreshPreview({ force: (STE.settings.get("automatic-refresh") != "false") });
     }
   }
 
@@ -463,7 +463,7 @@ export class Editor {
     if (isLoadedLanguage){
       this.container.syntaxLanguage = syntaxLanguage;
     }
-    if (STE.settings.get("syntax-highlighting") === true && isLoadedLanguage){
+    if (STE.settings.get("syntax-highlighting") == "true" && isLoadedLanguage){
       this.container.syntaxHighlight.enable();
     } else {
       this.container.syntaxHighlight.disable();

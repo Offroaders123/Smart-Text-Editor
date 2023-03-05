@@ -241,7 +241,7 @@ export function refreshPreview({ force = false } = {}){
   if (STE.view == "code") return;
   var editor = (STE.previewEditor == "active-editor") ? STE.query() : STE.query(STE.previewEditor);
   if (!editor.tab || !editor.textarea) return;
-  var change = (editor.tab.hasAttribute("data-editor-refresh") && STE.settings.get("automatic-refresh") != false);
+  var change = (editor.tab.hasAttribute("data-editor-refresh") && STE.settings.get("automatic-refresh") != "false");
   if (!change && !force) return;
   var baseURL = STE.settings.get("preview-base") || null, source = editor.textarea.value;
   if (baseURL) source = `<!DOCTYPE html>\n<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;

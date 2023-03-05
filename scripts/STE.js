@@ -82,7 +82,7 @@ class STE {
      * @param { boolean } state
     */
     setSyntaxHighlighting(state){
-      state = (state != undefined) ? state : (STE.settings.get("syntax-highlighting") !== undefined);
+      state = (state != undefined) ? state : (STE.settings.get("syntax-highlighting") != undefined);
       /** @type { NodeListOf<NumTextElement> } */ (document.querySelectorAll("num-text")).forEach(editor => {
         if (editor.syntaxLanguage in Prism.languages) (state) ? editor.syntaxHighlight.enable() : editor.syntaxHighlight.disable();
       });
@@ -303,7 +303,7 @@ class STE {
     /**
      * A session-mirror of the app settings present in Local Storage.
      * 
-     * @type { { [setting: string]: any; } }
+     * @type { { [setting: string]: string | undefined; } }
     */
     entries: JSON.parse(window.localStorage.getItem("settings") ?? "null") || {},
 

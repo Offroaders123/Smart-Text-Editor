@@ -1,3 +1,7 @@
+/**
+ * @typedef { import("./Workspace.js").Orientation } Orientation
+*/
+
 import "./Card.js";
 import Tools from "./Tools.js";
 import { Editor, setEditorTabsVisibility } from "./Editor.js";
@@ -441,22 +445,22 @@ window.requestAnimationFrame(() => {
 
 if (STE.appearance.parentWindow){
   if (STE.settings.get("default-orientation")){
-    const value = STE.settings.get("default-orientation");
+    const value = /** @type { Orientation } */ (STE.settings.get("default-orientation"));
     window.requestAnimationFrame(() => {
       default_orientation_setting.select(value);
     });
     setOrientation(value);
   }
-  if (STE.settings.get("syntax-highlighting") !== undefined){
-    const state = STE.settings.get("syntax-highlighting");
+  if (STE.settings.get("syntax-highlighting") != undefined){
+    const state = Boolean(/** @type { string } */ (STE.settings.get("syntax-highlighting")));
     STE.appearance.setSyntaxHighlighting(state);
     syntax_highlighting_setting.checked = state;
   }
-  if (STE.settings.get("automatic-refresh") !== undefined){
-    automatic_refresh_setting.checked = STE.settings.get("automatic-refresh");
+  if (STE.settings.get("automatic-refresh") != undefined){
+    automatic_refresh_setting.checked = Boolean(/** @type { string } */ (STE.settings.get("automatic-refresh")));
   }
   if (STE.settings.get("preview-base")){
-    preview_base_input.setValue(STE.settings.get("preview-base"));
+    preview_base_input.setValue(/** @type { string } */ (STE.settings.get("preview-base")));
   }
   window.setTimeout(() => {
     document.documentElement.classList.remove("startup-fade");
