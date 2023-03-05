@@ -1,6 +1,11 @@
 import { getElementStyle } from "./app.js";
 import { Editor, setEditorTabsVisibility } from "./Editor.js";
-import { read, stringify } from "../node_modules/nbtify/dist/index.js";
+
+const { read, stringify } = await import("../node_modules/nbtify/dist/index.js").catch(error => {
+  console.warn(error);
+  console.log("Loaded NBTify from JSDelivr instead");
+  return import("https://cdn.jsdelivr.net/npm/nbtify@1.20.0/dist/index.min.js");
+});
 
 globalThis.setView = setView;
 globalThis.setOrientation = setOrientation;
