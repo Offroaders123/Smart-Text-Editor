@@ -44,9 +44,13 @@ for (const option of /** @type { NodeListOf<HTMLButtonElement | HTMLAnchorElemen
   option.addEventListener("mousedown",event => event.preventDefault());
 }
 
-window.addEventListener("load",async () => {
+const queryParameters = new URLSearchParams(window.location.search);
+
+await (async () => {
   if (STE.environment.fileProtocol) return;
-  if (window.location.href.includes("index.html")) history.pushState(null,"",window.location.href.replace(/index.html/,""));
+  if (window.location.href.includes("index.html")){
+    history.pushState(null,"",window.location.href.replace(/index.html/,""));
+  }
 
   if (!("serviceWorker" in navigator) || !STE.appearance.parentWindow) return;
   await navigator.serviceWorker.register("service-worker.js");
@@ -82,7 +86,7 @@ window.addEventListener("load",async () => {
   function activateManifest(){
     /** @type { HTMLLinkElement } */ (document.querySelector("link[rel='manifest']")).href = "manifest.webmanifest";
   }
-});
+})();
 
 window.addEventListener("beforeinstallprompt",event => {
   event.preventDefault();
@@ -481,8 +485,6 @@ if (STE.support.fileHandling && STE.support.fileSystem){
     }
   });
 }
-
-const queryParameters = new URLSearchParams(window.location.search);
 
 if (queryParameters.get("template")){
   Tools.insertTemplate("html");
