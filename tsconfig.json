@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "allowJs": true,
-    "checkJs": true,
+    "rootDir": "./src",
+    "outDir": "./dist",
     "module": "ESNext",
     "moduleResolution": "Node",
     "target": "ESNext",
@@ -10,7 +10,7 @@
       "new-javascript",
       "num-text"
     ],
-    "noEmit": true,
+    "skipLibCheck": true,
     "strict": true
   }
 }
