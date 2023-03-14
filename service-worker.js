@@ -1,15 +1,13 @@
-// @ts-nocheck
-///// <reference lib="WebWorker"/>
-
-(async () => {
-
-var self = /** @type { ServiceWorkerGlobalScope } */ (/** @type { unknown } */ (globalThis.self));
+// @ts-check
+/// <reference no-default-lib="true"/>
+/// <reference types="better-typescript/worker"/>
 
 const STE = {
-  version: "Smart Text Editor v4.0.0",
+  version: "Smart Text Editor v4.8.0",
   cache: true,
   environment: {
     get macOSDevice() {
+      // @ts-expect-error
       return (/(macOS|Mac)/i.test(navigator.userAgentData?.platform || navigator.platform) && navigator.standalone === undefined);
     }
   },
@@ -118,5 +116,3 @@ async function messageClients(message,options = {}){
     client.postMessage(message,options);
   }
 }
-
-})();
