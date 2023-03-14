@@ -1,7 +1,4 @@
-/**
- * @typedef { import("./Workspace.js").Orientation } Orientation
-*/
-
+import type { Orientation } from "./Workspace.js";
 import "./Card.js";
 import Tools from "./Tools.js";
 import { Editor, setEditorTabsVisibility } from "./Editor.js";
@@ -11,16 +8,16 @@ for (const image of document.querySelectorAll("img")){
   image.draggable = false;
 }
 
-for (const numText of /** @type { NodeListOf<NumTextElement> } */ (document.querySelectorAll("num-text"))){
+for (const numText of document.querySelectorAll<NumTextElement>("num-text")){
   applyEditingBehavior(numText);
 }
 
-for (const input of /** @type { NodeListOf<HTMLInputElement> } */ (document.querySelectorAll("input:is([type='text'],[type='url'])"))){
+for (const input of document.querySelectorAll<HTMLInputElement>("input:is([type='text'],[type='url'])")){
   applyEditingBehavior(input);
 }
 
-for (const checkbox of /** @type { NodeListOf<HTMLDivElement> } */ (document.querySelectorAll(".checkbox"))){
-  const input = /** @type { HTMLInputElement } */ (checkbox.querySelector("input[type='checkbox']"));
+for (const checkbox of document.querySelectorAll<HTMLDivElement>(".checkbox")){
+  const input = checkbox.querySelector<HTMLInputElement>("input[type='checkbox']")!;
 
   checkbox.addEventListener("click",() => input.click());
   checkbox.addEventListener("keydown",event => {
@@ -39,7 +36,7 @@ new ResizeObserver(() => {
   app_omnibox.style.setProperty("--device-pixel-ratio",window.devicePixelRatio.toFixed(2));
 }).observe(app_omnibox);
 
-for (const option of /** @type { NodeListOf<HTMLButtonElement | HTMLAnchorElement> } */ (app_omnibox.querySelectorAll(".option"))){
+for (const option of app_omnibox.querySelectorAll<HTMLButtonElement | HTMLAnchorElement>(".option")){
   option.tabIndex = -1;
   option.addEventListener("mousedown",event => event.preventDefault());
 }
@@ -66,7 +63,7 @@ await (async () => {
       case "service-worker-activated": activateManifest(); break;
       case "clear-site-caches-complete": cleared_cache_card.open(); break;
       case "share-target": {
-        for (const file of /** @type { File[] } */ (event.data.files)){
+        for (const file of event.data.files as File[]){
           const { name } = file;
           const value = await file.text();
           new Editor({ name, value });
@@ -84,7 +81,7 @@ await (async () => {
   }
 
   function activateManifest(){
-    /** @type { HTMLLinkElement } */ (document.querySelector("link[rel='manifest']")).href = "manifest.webmanifest";
+    document.querySelector<HTMLLinkElement>("link[rel='manifest']")!.href = "manifest.webmanifest";
   }
 })();
 
@@ -118,7 +115,7 @@ window.addEventListener("resize",() => {
 
 window.addEventListener("blur",() => {
   if (!STE.appearance.parentWindow) return;
-  for (const menu of /** @type { NodeListOf<MenuDropElement> } */ (document.querySelectorAll("menu-drop[data-open]"))){
+  for (const menu of document.querySelectorAll<MenuDropElement>("menu-drop[data-open]")){
     menu.close();
   }
 });
@@ -131,10 +128,7 @@ document.body.addEventListener("keydown",event => {
   const shiftCommand = (shift && command);
   const controlCommand = (event.ctrlKey && command);
 
-  /**
-   * @param { string } key
-  */
-  function pressed(key){
+  function pressed(key: string){
     return event.key.toLowerCase() === key.toLowerCase();
   }
 
@@ -292,7 +286,7 @@ document.body.addEventListener("dragover",event => {
 
 document.body.addEventListener("drop",event => {
   event.preventDefault();
-  for (const menu of /** @type { NodeListOf<MenuDropElement> } */ (document.querySelectorAll("menu-drop[data-open]"))){
+  for (const menu of document.querySelectorAll<MenuDropElement>("menu-drop[data-open]")){
     menu.close();
   }
   if (event.dataTransfer === null) return;
@@ -328,12 +322,12 @@ document.body.addEventListener("drop",event => {
   });
 });
 
-for (const menu of /** @type { NodeListOf<MenuDropElement> } */ (app_menubar.querySelectorAll("menu-drop"))){
+for (const menu of app_menubar.querySelectorAll<MenuDropElement>("menu-drop")){
   menu.addEventListener("pointerenter",event => {
     if (event.pointerType !== "mouse") return;
     if (app_menubar.querySelectorAll("menu-drop:not([data-alternate])[data-open]").length === 0 || menu.matches("[data-alternate]") || menu.matches("[data-open]")) return;
     menu.opener.focus();
-    for (const menu of /** @type { NodeListOf<MenuDropElement> } */ (app_menubar.querySelectorAll("menu-drop[data-open]"))){
+    for (const menu of app_menubar.querySelectorAll<MenuDropElement>("menu-drop[data-open]")){
       menu.close();
     }
     menu.open();
@@ -449,22 +443,22 @@ window.requestAnimationFrame(() => {
 
 if (STE.appearance.parentWindow){
   if (STE.settings.get("default-orientation")){
-    const value = /** @type { Orientation } */ (STE.settings.get("default-orientation"));
+    const value = STE.settings.get("default-orientation") as Orientation;
     window.requestAnimationFrame(() => {
       default_orientation_setting.select(value);
     });
     setOrientation(value);
   }
   if (STE.settings.get("syntax-highlighting") != undefined){
-    const state = Boolean(/** @type { string } */ (STE.settings.get("syntax-highlighting")));
+    const state = Boolean(STE.settings.get("syntax-highlighting")!);
     STE.appearance.setSyntaxHighlighting(state);
     syntax_highlighting_setting.checked = state;
   }
   if (STE.settings.get("automatic-refresh") != undefined){
-    automatic_refresh_setting.checked = Boolean(/** @type { string } */ (STE.settings.get("automatic-refresh")));
+    automatic_refresh_setting.checked = Boolean(STE.settings.get("automatic-refresh")!);
   }
   if (STE.settings.get("preview-base")){
-    preview_base_input.setValue(/** @type { string } */ (STE.settings.get("preview-base")));
+    preview_base_input.setValue(STE.settings.get("preview-base")!);
   }
   window.setTimeout(() => {
     document.documentElement.classList.remove("startup-fade");
@@ -498,32 +492,28 @@ if (queryParameters.get("settings")){
 
 /**
  * Gets a style property value for a given element.
- * 
- * @param { { element: Element; pseudo?: string | null; property: string; } } options
 */
-export function getElementStyle({ element, pseudo = null, property }){
+export function getElementStyle({ element, pseudo = null, property }: { element: Element; pseudo?: string | null; property: string; }){
   return window.getComputedStyle(element,pseudo).getPropertyValue(property);
 }
 
 /**
  * Applies the app's behavior defaults, like Drag and Drop handling, to `<input>` and `<num-text>` elements.
- * 
- * @param { HTMLInputElement | NumTextElement } element
 */
-export function applyEditingBehavior(element){
+export function applyEditingBehavior(element: HTMLInputElement | NumTextElement){
   const type = element.tagName.toLowerCase();
 
-  /** @type { HTMLElement } */ (element).addEventListener("dragover",event => {
+  (element as HTMLElement).addEventListener("dragover",event => {
     event.stopPropagation();
     if (event.dataTransfer === null) return;
     event.dataTransfer.dropEffect = "copy";
   });
 
-  /** @type { HTMLElement } */ (element).addEventListener("drop",event => {
+  (element as HTMLElement).addEventListener("drop",event => {
     if (event.dataTransfer === null) return;
     if ([...event.dataTransfer.items][0].kind === "file") return;
     event.stopPropagation();
-    for (const menu of /** @type { NodeListOf<MenuDropElement> } */ (document.querySelectorAll("menu-drop[data-open]"))){
+    for (const menu of document.querySelectorAll<MenuDropElement>("menu-drop[data-open]")){
       menu.close();
     }
   });
@@ -548,19 +538,15 @@ export function applyEditingBehavior(element){
 
 /**
  * Sets the title of the window.
- * 
- * @param { { content?: string; reset?: boolean; } | undefined } options
 */
-export function setTitle({ content = "", reset = false } = {}){
+export function setTitle({ content = "", reset = false }: { content?: string; reset?: boolean; } | undefined = {}){
   document.title = `Smart Text Editor${(content && !reset) ? ` - ${content}` : ""}`;
 }
 
 /**
  * Removes query parameters from the app's URL.
- * 
- * @param { string[] } entries
 */
-function removeQueryParameters(entries){
+function removeQueryParameters(entries: string[]){
   const parameters = new URLSearchParams(window.location.search);
   for (const entry of entries){
     parameters.delete(entry);
@@ -570,10 +556,8 @@ function removeQueryParameters(entries){
 
 /**
  * Updates the app's URL query parameters to a new `URLSearchParams` object.
- * 
- * @param { URLSearchParams } parameters
 */
-function changeQueryParameters(parameters){
+function changeQueryParameters(parameters: URLSearchParams){
   let query = parameters.toString();
   if (query) query = "?" + query;
   const address = window.location.pathname + query;
@@ -583,7 +567,7 @@ function changeQueryParameters(parameters){
 /**
  * Shows the PWA Install Prompt, if the `BeforeInstallPrompt` event was fired when the app first started.
 */
-globalThis.showInstallPrompt = async function showInstallPrompt(){
+export async function showInstallPrompt(){
   if (STE.installPrompt === null) return;
   STE.installPrompt.prompt();
   const result = await STE.installPrompt.userChoice;
@@ -595,9 +579,19 @@ globalThis.showInstallPrompt = async function showInstallPrompt(){
 /**
  * Clears the Service Worker cache, if the user confirms doing so.
 */
-globalThis.clearSiteCaches = function clearSiteCaches(){
+export function clearSiteCaches(){
   const hasConfirmed = confirm("Are you sure you would like to clear all app caches?\nSmart Text Editor will no longer work offline until an Internet connection is available.");
   if (hasConfirmed){
     navigator.serviceWorker.controller?.postMessage({ action: "clear-site-caches" });
+  }
+}
+
+window.showInstallPrompt = showInstallPrompt;
+window.clearSiteCaches = clearSiteCaches;
+
+declare global {
+  interface Window {
+    showInstallPrompt: typeof showInstallPrompt;
+    clearSiteCaches: typeof clearSiteCaches;
   }
 }

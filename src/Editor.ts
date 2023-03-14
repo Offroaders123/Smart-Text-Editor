@@ -1,49 +1,37 @@
 import { getElementStyle, applyEditingBehavior, setTitle } from "./app.js";
 import { setPreviewSource, refreshPreview } from "./Workspace.js";
 
-/**
- * @typedef EditorOptions
- * 
- * @property { string } [name]
- * @property { string } [value]
- * @property { boolean } [open]
- * @property { boolean } [autoCreated]
- * @property { boolean } [autoReplace]
-*/
+export interface EditorOptions {
+  name?: string;
+  value?: string;
+  open?: boolean;
+  autoCreated?: boolean;
+  autoReplace?: boolean;
+}
 
-/**
- * @typedef EditorOpenOptions
- * 
- * @property { boolean } [autoCreated]
- * @property { boolean } [focusedOverride]
-*/
+export interface EditorOpenOptions {
+  autoCreated?: boolean;
+  focusedOverride?: boolean;
+}
 
 /**
  * Creates a new Editor within the Workspace.
 */
 export class Editor {
-  /**
-   * @type { { [identifier: string]: Editor; } }
-  */
-  static #editors = {};
+  static #editors: { [identifier: string]: Editor; } = {};
 
   /**
    * Opens an Editor from a given identifier.
-   * 
-   * @param { string } identifier
-   * @param { EditorOpenOptions } options
   */
-  static open(identifier,options = {}) {
+  static open(identifier: string, options: EditorOpenOptions = {}) {
     const editor = this.#editors[identifier];
     editor.open(options);
   }
 
   /**
    * Closes an Editor from a given identifier.
-   * 
-   * @param { string } identifier
   */
-  static async close(identifier) {
+  static async close(identifier: string) {
     const editor = this.#editors[identifier];
     await editor.close();
   }
@@ -51,10 +39,9 @@ export class Editor {
   /**
    * Renames an Editor from a given identifier.
    * 
-   * @param { string } identifier
-   * @param { string } [rename] - If a new name isn't provided, the user is prompted to provide one.
+   * @param rename - If a new name isn't provided, the user is prompted to provide one.
   */
-  static rename(identifier,rename) {
+  static rename(identifier: string, rename?: string) {
     const editor = this.#editors[identifier];
     const currentName = editor.#name;
 
@@ -72,11 +59,8 @@ export class Editor {
    * Gets the previous Editor to the left of the currently opened Editor.
    * 
    * If the active Editor is the first one in the Workspace, it will wrap around to give the last Editor in the Workspace.
-   * 
-   * @param { string } identifier
-   * @param { boolean } wrap
   */
-  static getPrevious(identifier,wrap = true) {
+  static getPrevious(identifier: string, wrap: boolean = true) {
     const { tab } = STE.query(identifier);
     if (tab === null) return tab;
     const editorTabs = [...workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")];
@@ -89,11 +73,8 @@ export class Editor {
    * Gets the next Editor to the right of the currently opened Editor.
    * 
    * If the active Editor is the last one in the Workspace, it will wrap around to give the first Editor in the Workspace.
-   * 
-   * @param { string } identifier
-   * @param { boolean } wrap
   */
-  static getNext(identifier,wrap = true) {
+  static getNext(identifier: string, wrap: boolean = true) {
     const { tab } = STE.query(identifier);
     if (tab === null) return tab;
     const editorTabs = [...workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")];
@@ -104,51 +85,31 @@ export class Editor {
 
   #name;
 
-  /**
-   * @readonly
-  */
-  identifier = Math.random().toString();
+  readonly identifier = Math.random().toString();
 
-  /**
-   * @readonly
-  */
-  tab = document.createElement("button");
+  readonly tab = document.createElement("button");
 
-  /**
-   * @readonly
-  */
-  editorName = document.createElement("span");
+  readonly editorName = document.createElement("span");
 
-  /**
-   * @readonly
-  */
-  editorClose = document.createElement("button");
+  readonly editorClose = document.createElement("button");
 
-  /**
-   * @readonly
-  */
-  container = /** @type { NumTextElement } */ (document.createElement("num-text"));
+  readonly container = document.createElement("num-text") as NumTextElement;
 
-  /**
-   * @type { Option }
-   * @readonly
-  */
-  previewOption = document.createElement("li");
+  readonly previewOption: Option = document.createElement("li");
 
-  /**
-   * @param { EditorOptions } options
-  */
-  constructor({ name = "Untitled.txt", value = "", open = true, autoCreated = false, autoReplace = true } = {}) {
+  declare readonly value;
+  declare readonly isOpen;
+  declare readonly autoCreated;
+  declare readonly autoReplace;
+
+  constructor({ name = "Untitled.txt", value = "", open = true, autoCreated = false, autoReplace = true }: EditorOptions = {}) {
     this.#name = (!name.includes(".")) ? `${name}.txt` : name;
     this.value = value;
     this.isOpen = open;
     this.autoCreated = autoCreated;
     this.autoReplace = autoReplace;
 
-    /**
-     * @type { boolean | undefined }
-    */
-    let focusedOverride;
+    let focusedOverride: boolean | undefined;
     const changeIdentifier = Math.random().toString();
 
     document.body.setAttribute("data-editor-change",changeIdentifier);
@@ -182,7 +143,7 @@ export class Editor {
     this.tab.addEventListener("contextmenu",event => {
       if (event.target !== this.tab) return;
 
-      let editorRename = /** @type { HTMLInputElement | null } */ (this.tab.querySelector("[data-editor-rename]"));
+      let editorRename = this.tab.querySelector<HTMLInputElement>("[data-editor-rename]");
       if (editorRename === null){
         editorRename = document.createElement("input");
       } else {
@@ -315,7 +276,7 @@ export class Editor {
       this.open({ autoCreated, focusedOverride });
     }
 
-    this.container.syntaxLanguage = /** @type { string } */ (STE.query(this.identifier).getName("extension"));
+    this.container.syntaxLanguage = STE.query(this.identifier).getName("extension")!;
     if ((STE.settings.get("syntax-highlighting") == "true") && (this.container.syntaxLanguage in Prism.languages)){
       this.container.syntaxHighlight.enable();
     }
@@ -329,10 +290,8 @@ export class Editor {
 
   /**
    * Opens the editor in the workspace.
-   * 
-   * @param { EditorOpenOptions } options
   */
-  open({ autoCreated = false, focusedOverride = false } = {}) {
+  open({ autoCreated = false, focusedOverride = false }: EditorOpenOptions = {}) {
     const focused = (document.activeElement === STE.query().container) || focusedOverride;
 
     if (STE.query().tab){
@@ -396,15 +355,15 @@ export class Editor {
     }
 
     if (this.tab === editorTabs[0] && editorTabs[1] && this.tab.classList.contains("active")){
-      const identifier = /** @type { string } */ (editorTabs[1].getAttribute("data-editor-identifier"));
+      const identifier = editorTabs[1].getAttribute("data-editor-identifier")!;
       Editor.open(identifier);
     }
     if (this.tab === editorTabs[editorTabs.length - 1] && this.tab !== editorTabs[0] && this.tab.classList.contains("active")){
-      const identifier = /** @type { string } */ (editorTabs[editorTabs.length - 2].getAttribute("data-editor-identifier"));
+      const identifier = editorTabs[editorTabs.length - 2].getAttribute("data-editor-identifier")!;
       Editor.open(identifier);
     }
     if (this.tab !== editorTabs[0] && this.tab.classList.contains("active")){
-      const identifier = /** @type { string } */ (editorTabs[editorTabs.indexOf(this.tab) + 1].getAttribute("data-editor-identifier"));
+      const identifier = editorTabs[editorTabs.indexOf(this.tab) + 1].getAttribute("data-editor-identifier")!;
       Editor.open(identifier);
     }
 
@@ -457,7 +416,7 @@ export class Editor {
     this.editorName.innerText = rename;
     this.previewOption.innerText = rename;
 
-    const syntaxLanguage = /** @type { string } */ (STE.query(this.identifier).getName("extension"));
+    const syntaxLanguage = STE.query(this.identifier).getName("extension")!;
     const isLoadedLanguage = syntaxLanguage in Prism.languages;
 
     if (isLoadedLanguage){
@@ -486,7 +445,13 @@ export class Editor {
   }
 }
 
-globalThis.Editor = Editor;
+declare global {
+  interface Window {
+    Editor: typeof Editor;
+  }
+}
+
+window.Editor = Editor;
 
 /**
  * Updates the horizontal scroll position of the Workspace Tabs section to show a given Editor, by it's given identifier.

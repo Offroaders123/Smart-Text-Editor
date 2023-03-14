@@ -1,10 +1,6 @@
-/**
- * @typedef { import("./Card.js").default } Card
-*/
-
-/**
- * @typedef { import("./Workspace.js").View } View
-*/
+type Card = import("./Card.js").default;
+type View = import("./Workspace.js").View;
+type Orientation = import("./Workspace.js").Orientation;
 
 /**
  * A global object with static properties that help with managing the state within Smart Text Editor.
@@ -61,11 +57,7 @@ class STE {
      * Gets the inset values for the screen Safe Area.
     */
     get safeAreaInsets() {
-      /**
-       * @private
-       * @param { string } section
-      */
-      function getSafeAreaInset(section){
+      function getSafeAreaInset(section: string){
         return parseInt(getComputedStyle(document.documentElement).getPropertyValue(`--safe-area-inset-${section}`),10);
       }
       return {
@@ -78,12 +70,10 @@ class STE {
 
     /**
      * Enables or disables syntax highlighting for all Num Text elements.
-     * 
-     * @param { boolean } state
     */
-    setSyntaxHighlighting(state){
+    setSyntaxHighlighting(state: boolean){
       state = (state != undefined) ? state : (STE.settings.get("syntax-highlighting") != undefined);
-      /** @type { NodeListOf<NumTextElement> } */ (document.querySelectorAll("num-text")).forEach(editor => {
+      document.querySelectorAll<NumTextElement>("num-text").forEach(editor => {
         if (editor.syntaxLanguage in Prism.languages) (state) ? editor.syntaxHighlight.enable() : editor.syntaxHighlight.disable();
       });
       STE.settings.set("syntax-highlighting",String(state));
@@ -182,22 +172,21 @@ class STE {
   /**
    * Selects an Editor by it's identifier.
    * 
-   * @param { string | null } identifier - Defaults to the currently opened Editor.
+   * @param identifier - Defaults to the currently opened Editor.
   */
-  static query(identifier = STE.activeEditor) {
-    const tab = /** @type { HTMLButtonElement | null } */ (workspace_tabs.querySelector(`.tab[data-editor-identifier="${identifier}"]`));
-    const container = /** @type { NumTextElement | null } */ (workspace_editors.querySelector(`.editor[data-editor-identifier="${identifier}"]`));
+  static query(identifier: string | null = STE.activeEditor) {
+    const tab = workspace_tabs.querySelector<HTMLButtonElement>(`.tab[data-editor-identifier="${identifier}"]`);
+    const container = workspace_editors.querySelector<NumTextElement>(`.editor[data-editor-identifier="${identifier}"]`);
     const textarea = (container) ? container.editor : null;
 
     /**
      * Get the file name of the selected Editor.
      * 
-     * @param { "base" | "extension" } [section] - The `"base"` flag provides the name before the extension, and the `"extension"` flag provides only the extension. If omitted, the full file name is returned.
+     * @param section - The `"base"` flag provides the name before the extension, and the `"extension"` flag provides only the extension. If omitted, the full file name is returned.
     */
-    function getName(section){
+    function getName(section?: "base" | "extension"){
       if ((document.querySelectorAll(`[data-editor-identifier="${identifier}"]:not([data-editor-change])`).length === 0) && (identifier !== STE.activeEditor)) return null;
-      /** @type { string | string[] } */
-      let name = /** @type { HTMLSpanElement } */ (workspace_tabs.querySelector(`.tab[data-editor-identifier="${identifier}"] [data-editor-name]`)).innerText;
+      let name: string | string[] = workspace_tabs.querySelector<HTMLSpanElement>(`.tab[data-editor-identifier="${identifier}"] [data-editor-name]`)!.innerText;
       if (!section || (!name.includes(".") && section === "base")) return name;
       if (section === "base"){
         name = name.split(".");
@@ -206,7 +195,7 @@ class STE {
       }
       if (section === "extension"){
         if (!name.includes(".")) return "";
-        return /** @type { string } */ (name.split(".").pop());
+        return name.split(".").pop()!;
       }
       // I don't think this is used, I had to add this to streamline the type to remove 'undefined'
       return name;
@@ -219,7 +208,7 @@ class STE {
    * Gets the current View layout.
   */
   static get view() {
-    return /** @type { View } */ (document.body.getAttribute("data-view")) ?? "code";
+    return document.body.getAttribute("data-view") as View | null ?? "code";
   }
 
   /**
@@ -228,14 +217,14 @@ class STE {
    * This has to do with the View layout transition.
   */
   static get viewChange() {
-    return (document.body.hasAttribute("data-view-change"));
+    return document.body.hasAttribute("data-view-change");
   }
 
   /**
    * Gets the current Orientation layout.
   */
   static get orientation() {
-    return document.body.getAttribute("data-orientation") ?? "horizontal";
+    return document.body.getAttribute("data-orientation") as Orientation | null ?? "horizontal";
   }
 
   /**
@@ -244,14 +233,14 @@ class STE {
    * This has to do with the Orientation layout transition.
   */
   static get orientationChange() {
-    return (document.body.hasAttribute("data-orientation-change"));
+    return document.body.hasAttribute("data-orientation-change");
   }
 
   /**
    * Gets the state of whether the Workspace is being resized with the Scaler handle.
   */
   static get scalingChange() {
-    return (document.body.hasAttribute("data-scaling-change"));
+    return document.body.hasAttribute("data-scaling-change");
   }
 
   /**
@@ -264,37 +253,31 @@ class STE {
   /**
    * A list of known extensions that can be opened with Smart Text Editor.
   */
-  static preapprovedExtensions = ["txt","html","css","js","php","json","webmanifest","bbmodel","xml","yaml","yml","dist","config","ini","md","markdown","mcmeta","lang","properties","uidx","material","h","fragment","vertex","fxh","hlsl","ihlsl","svg"];
-  
+  static preapprovedExtensions = ["txt","html","css","js","php","json","webmanifest","bbmodel","xml","yaml","yml","dist","config","ini","md","markdown","mcmeta","lang","properties","uidx","material","h","fragment","vertex","fxh","hlsl","ihlsl","svg"] as const;
+
   /**
    * The identifier of the currently opened Editor.
-   * 
-   * @type { string | null }
   */
-  static activeEditor = null;
-  
+  static activeEditor: string | null = null;
+
   /**
    * The identifier of the Editor to be used within the Preview.
    * 
    * The value can also be `"active-editor"`. If it is set to that, then references to `STE.previewEditor` will be pointed to `STE.activeEditor`.
   */
   static previewEditor = "active-editor";
-  
+
   /**
    * An object that pairs an Editor identifier with it's `FileSystemFileHandle`, if it was opened from the file system directly.
-   * 
-   * @type { { [identifier: string]: FileSystemFileHandle } }
   */
-  static fileHandles = {};
-  
+  static fileHandles: { [identifier: string]: FileSystemFileHandle; } = {};
+
   /**
    * An array of all windows opened during the current session.
    * 
    * When the top Smart Text Editor window is closed, all child windows will automatically be closed also.
-   * 
-   * @type { Window[] }
   */
-  static childWindows = [];
+  static childWindows: Window[] = [];
 
   /**
    * A namespace of functions to work with the app's settings.
@@ -302,18 +285,13 @@ class STE {
   static settings = {
     /**
      * A session-mirror of the app settings present in Local Storage.
-     * 
-     * @type { { [setting: string]: string | undefined; } }
     */
-    entries: JSON.parse(window.localStorage.getItem("settings") ?? "null") || {},
+    entries: (JSON.parse(window.localStorage.getItem("settings") ?? "null") || {}) as { [setting: string]: string | undefined; },
 
     /**
      * Sets the given key and value to the app settings.
-     * 
-     * @param { string } key
-     * @param { string } value
     */
-    set(key,value) {
+    set(key: string, value: string) {
       if (!STE.support.localStorage) return;
       STE.settings.entries[key] = value;
       window.localStorage.setItem("settings",JSON.stringify(STE.settings.entries,null,"  "));
@@ -322,10 +300,8 @@ class STE {
 
     /**
      * Removes the given key from the app settings.
-     * 
-     * @param { string } key
     */
-    remove(key) {
+    remove(key: string) {
       if (!STE.support.localStorage) return;
       delete STE.settings.entries[key];
       window.localStorage.setItem("settings",JSON.stringify(STE.settings.entries,null,"  "));
@@ -334,19 +310,15 @@ class STE {
 
     /**
      * Queries if a given key is present in the app settings.
-     * 
-     * @param { string } key
     */
-    has(key) {
+    has(key: string) {
       return (key in STE.settings.entries);
     },
 
     /**
      * Gets the value of a given key from the app settings.
-     * 
-     * @param { string } key
     */
-    get(key) {
+    get(key: string) {
       if (!STE.support.localStorage) return;
       if (!STE.settings.has(key)) return;
       return STE.settings.entries[key];
@@ -355,9 +327,9 @@ class STE {
     /**
      * Removes all key-value pairs from the app's settings.
      * 
-     * @param { { confirm?: boolean; } } options - Accepts an option to show the user a prompt to confirm that the settings should be reset.
+     * @param options - Accepts an option to show the user a prompt to confirm that the settings should be reset.
     */
-    reset({ confirm: showPrompt = false } = {}) {
+    reset({ confirm: showPrompt = false }: { confirm?: boolean; } = {}) {
       if (!STE.support.localStorage) return false;
       if (showPrompt){
         if (!confirm("Are you sure you would like to reset all settings?")) return false;
@@ -376,38 +348,28 @@ class STE {
 
   /**
    * A reference to the currently opened Dialog.
-   * 
-   * @type { Card | null }
   */
-  static activeDialog = null;
+  static activeDialog: Card | null = null;
   
   /**
    * A reference to the previously opened Dialog, if the active one has a back button.
-   * 
-   * @type { Card | null }
   */
-  static dialogPrevious = null;
+  static dialogPrevious: Card | null = null;
   
   /**
    * A reference to the currently opened Widget.
-   * 
-   * @type { Card | null }
   */
-  static activeWidget = null;
+  static activeWidget: Card | null = null;
   
   /**
    * The color the Color Picker Widget is currently set to.
-   * 
-   * @type { string | null }
   */
-  static pickerColor = null;
+  static pickerColor: string | null = null;
   
   /**
    * A reference to the `BeforeInstallPrompt` event that was received when the Install App banner is shown, on Chromium browsers.
-   * 
-   * @type { BeforeInstallPromptEvent | null }
   */
-  static installPrompt = null;
+  static installPrompt: BeforeInstallPromptEvent | null = null;
 }
 
 if (STE.appearance.parentWindow) document.documentElement.classList.add("startup-fade");

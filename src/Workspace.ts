@@ -1,38 +1,39 @@
 import { getElementStyle } from "./app.js";
 import { Editor, setEditorTabsVisibility } from "./Editor.js";
+import { read, stringify } from "nbtify";
 
-const { read, stringify } = await import("../node_modules/nbtify/dist/index.js").catch(error => {
-  console.warn(error);
-  console.log("Loaded NBTify from JSDelivr instead");
-  return import("https://cdn.jsdelivr.net/npm/nbtify@1.20.0/dist/index.min.js");
-});
+declare global {
+  interface Window {
+    setView: typeof setView;
+    setOrientation: typeof setOrientation;
+    setPreviewSource: typeof setPreviewSource;
+    createWindow: typeof createWindow;
+    openFiles: typeof openFiles;
+    saveFile: typeof saveFile;
+    createDisplay: typeof createDisplay;
+    refreshPreview: typeof refreshPreview;
+  }
+}
 
-globalThis.setView = setView;
-globalThis.setOrientation = setOrientation;
-globalThis.setPreviewSource = setPreviewSource;
-globalThis.createWindow = createWindow;
-globalThis.openFiles = openFiles;
-globalThis.saveFile = saveFile;
-globalThis.createDisplay = createDisplay;
-globalThis.refreshPreview = refreshPreview;
+window.setView = setView;
+window.setOrientation = setOrientation;
+window.setPreviewSource = setPreviewSource;
+window.createWindow = createWindow;
+window.openFiles = openFiles;
+window.saveFile = saveFile;
+window.createDisplay = createDisplay;
+window.refreshPreview = refreshPreview;
 
-/**
- * @typedef { "code" | "split" | "preview" } View
-*/
+export type View = "code" | "split" | "preview";
 
-/**
- * @typedef SetViewOptions
- * 
- * @property { boolean } [force]
-*/
+export interface SetViewOptions {
+  force?: boolean;
+}
 
 /**
  * Sets the View state of the app. If a View change is already in progress, and the force option is not set to `true`, the call will be skipped.
- * 
- * @param { View } type
- * @param { SetViewOptions } options
 */
-export function setView(type,{ force = false } = {}){
+export function setView(type: View, { force = false }: SetViewOptions = {}){
   if ((STE.orientationChange && !force) || STE.scalingChange) return;
   var changeIdentifier = Math.random().toString();
   document.body.setAttribute("data-view-change",changeIdentifier);
@@ -49,16 +50,14 @@ export function setView(type,{ force = false } = {}){
   refreshPreview();
 }
 
-/**
- * @typedef { "horizontal" | "vertical" } Orientation
-*/
+export type Orientation = "horizontal" | "vertical";
 
 /**
  * Sets the Orientation state of the app. If an Orientation change is already in progress, the call will be skipped.
  * 
- * @param { Orientation } [orientation] - If an Orientation type is not provided, the current state will be toggled to the other option.
+ * @param orientation - If an Orientation type is not provided, the current state will be toggled to the other option.
 */
-export function setOrientation(orientation){
+export function setOrientation(orientation?: Orientation){
   if (STE.orientationChange || STE.scalingChange) return;
   document.body.setAttribute("data-orientation-change","");
   var param = (orientation), transitionDuration = ((STE.view != "split") ? 0 : parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`));
@@ -68,7 +67,7 @@ export function setOrientation(orientation){
   window.setTimeout(() => {
     setTransitionDurations("off");
     document.body.classList.remove(STE.orientation);
-    document.body.setAttribute("data-orientation",/** @type { string } */ (orientation));
+    document.body.setAttribute("data-orientation",orientation!);
     document.body.classList.add(STE.orientation);
     workspace.offsetHeight;
     scaler.offsetHeight;
@@ -78,10 +77,7 @@ export function setOrientation(orientation){
     window.setTimeout(() => document.body.removeAttribute("data-orientation-change"),transitionDuration);
   },transitionDuration);
 
-  /**
-   * @param { "on" | "off" } state
-  */
-  function setTransitionDurations(state){
+  function setTransitionDurations(state: "on" | "off"){
     if (state == "on"){
       workspace.style.removeProperty("transition-duration");
       scaler.style.removeProperty("transition-duration");
@@ -97,15 +93,13 @@ export function setOrientation(orientation){
 
 /**
  * Sets the source for the Preview to a given Editor.
- * 
- * @param { { identifier?: string; active_editor?: boolean; } } options
 */
-export function setPreviewSource({ identifier, active_editor }){
+export function setPreviewSource({ identifier, active_editor }: { identifier?: string; active_editor?: boolean; }){
   if (!identifier && !active_editor) return;
   if ((!identifier && active_editor) || (STE.previewEditor == identifier)){
     STE.previewEditor = "active-editor";
     preview_menu.select("active-editor");
-  } else STE.previewEditor = /** @type { string } */ (identifier);
+  } else STE.previewEditor = identifier!;
   refreshPreview({ force: true });
 }
 
@@ -153,7 +147,7 @@ export async function openFiles(){
 
     const files = results
       .filter(/** @returns { result is PromiseFulfilledResult<{ name: string; value: string; }> } */
-        (result) => result.status === "fulfilled")
+        (result): result is PromiseFulfilledResult<{ name: string; value: string; }> => result.status === "fulfilled")
       .map(result => result.value);
 
     for (const file of files){
@@ -177,10 +171,8 @@ export async function openFiles(){
  * If the File System Access API is supported in the user's browser, the Editor's current value will be rewritten directly to the file system.
  * 
  * If the File System Access API is not supported, or if a custom file extension is provided for the current file, a Save As dialog will be shown using an `<a download href="blob:">` element.
- * 
- * @param { string } [extension]
 */
-export async function saveFile(extension){
+export async function saveFile(extension?: string){
   if (extension || !STE.support.fileSystem){
     if (!extension) extension = STE.query().getName("extension") ?? "";
     var anchor = document.createElement("a"), link = window.URL.createObjectURL(new Blob([STE.query().textarea?.value ?? ""]));
@@ -192,7 +184,7 @@ export async function saveFile(extension){
     var identifier = STE.activeEditor, handle;
     if (identifier === null) throw new Error("No editors are open, couldn't save anything!");
     if (!STE.fileHandles[identifier]){
-      handle = await window.showSaveFilePicker({ suggestedName: /** @type { string } */ (STE.query().getName()), startIn: (STE.fileHandles[identifier]) ? STE.fileHandles[identifier] : "desktop" }).catch(error => {
+      handle = await window.showSaveFilePicker({ suggestedName: STE.query().getName()!, startIn: (STE.fileHandles[identifier]) ? STE.fileHandles[identifier] : "desktop" }).catch(error => {
         if (error.message.toLowerCase().includes("abort")) return;
       });
       if (!handle) return;
@@ -235,7 +227,7 @@ export function createDisplay(){
   STE.childWindows.push(win);
   window.setTimeout(() => {
     if (win === null) return;
-    if (!win.document.title) win.document.title = /** @type { string } */ (STE.query().getName());
+    if (!win.document.title) win.document.title = STE.query().getName()!;
   },20);
 }
 
@@ -261,19 +253,20 @@ export function refreshPreview({ force = false } = {}){
 
 /**
  * Sets the Split mode scaling when called from the Scaler's moving event listeners.
- * 
- * @param { MouseEvent | TouchEvent } event
 */
-export function setScaling(event){
-  var { safeAreaInsets: safeAreaInsets } = STE.appearance,
-    scalingOffset,
-    scalingRange = { minimum: ((STE.orientation == "vertical") ? workspace_tabs.offsetHeight : safeAreaInsets.left) + 80,
-    maximum: ((STE.orientation == "horizontal") ? window.innerWidth - safeAreaInsets.right : (STE.orientation == "vertical") ? (window.innerHeight - header.offsetHeight - safeAreaInsets.bottom) : 0) - 80 },
-    touchEvent = (STE.environment.touchDevice && event instanceof TouchEvent);
-  if (STE.orientation == "horizontal") scalingOffset = (!touchEvent) ? /** @type { MouseEvent } */ (event).pageX : /** @type { TouchEvent } */ (event).touches[0].pageX;
-  if (STE.orientation == "vertical") scalingOffset = (!touchEvent) ? /** @type { MouseEvent } */ (event).pageY - header.offsetHeight : /** @type { TouchEvent } */ (event).touches[0].pageY - header.offsetHeight;
-  if (/** @type { number } */ (scalingOffset) < scalingRange.minimum) scalingOffset = scalingRange.minimum;
-  if (/** @type { number } */ (scalingOffset) > scalingRange.maximum) scalingOffset = scalingRange.maximum;
+export function setScaling(event: MouseEvent | TouchEvent){
+  const { safeAreaInsets: safeAreaInsets } = STE.appearance;
+  let scalingOffset = 0;
+  const scalingRange = {
+    minimum: ((STE.orientation == "vertical") ? workspace_tabs.offsetHeight : safeAreaInsets.left) + 80,
+    maximum: ((STE.orientation == "horizontal") ? window.innerWidth - safeAreaInsets.right : (STE.orientation == "vertical") ? (window.innerHeight - header.offsetHeight - safeAreaInsets.bottom) : 0) - 80
+  };
+  const touchEvent = (STE.environment.touchDevice && event instanceof TouchEvent);
+
+  if (STE.orientation == "horizontal") scalingOffset = (!touchEvent) ? (event as MouseEvent).pageX : (event as TouchEvent).touches[0].pageX;
+  if (STE.orientation == "vertical") scalingOffset = (!touchEvent) ? (event as MouseEvent).pageY - header.offsetHeight : (event as TouchEvent).touches[0].pageY - header.offsetHeight;
+  if (scalingOffset < scalingRange.minimum) scalingOffset = scalingRange.minimum;
+  if (scalingOffset > scalingRange.maximum) scalingOffset = scalingRange.maximum;
   document.body.setAttribute("data-scaling-active","");
   workspace.style.setProperty("--scaling-offset",`${scalingOffset}px`);
   scaler.style.setProperty("--scaling-offset",`${scalingOffset}px`);
@@ -282,10 +275,8 @@ export function setScaling(event){
 
 /**
  * Removes the Split mode scale handling when the user finishes moving the Scaler.
- * 
- * @param { MouseEvent | TouchEvent } event
 */
-export function disableScaling(event){
+export function disableScaling(event: MouseEvent | TouchEvent){
   var touchEvent = (STE.environment.touchDevice && event instanceof TouchEvent);
   document.removeEventListener((!touchEvent) ? "mousemove" : "touchmove",setScaling);
   document.removeEventListener((!touchEvent) ? "mouseup" : "touchend",disableScaling);

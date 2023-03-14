@@ -5,6 +5,14 @@ import { setEditorTabsVisibility } from "./Editor.js";
  * The base component for the Alert, Dialog, and Widget card types.
 */
 export class Card extends HTMLElement {
+  declare defined;
+
+  declare type: string | null;
+  declare header: HTMLDivElement;
+  declare back: HTMLButtonElement;
+  declare heading: HTMLDivElement;
+  declare controls: HTMLDivElement & { minimize: HTMLButtonElement; close: HTMLButtonElement; };
+
   constructor(){
     super();
     this.defined = false;
@@ -26,13 +34,13 @@ export class Card extends HTMLElement {
       }
     });
     this.type = this.getAttribute("data-type");
-    this.header = /** @type { HTMLDivElement } */ (this.querySelector(".header"));
+    this.header = this.querySelector<HTMLDivElement>(".header")!;
     this.back = document.createElement("button");
     this.back.classList.add("card-back");
     this.back.innerHTML = `<svg><use href="#back_icon"/></svg>`;
-    this.back.addEventListener("click",() => /** @type { Card } */ (document.querySelector(`#${this.header?.getAttribute("data-card-parent")}`)).open(this));
-    this.heading = /** @type { HTMLDivElement } */ (this.header.querySelector(".heading"));
-    this.controls = /** @type { HTMLDivElement & { minimize: HTMLButtonElement; close: HTMLButtonElement; } } */ (document.createElement("div"));
+    this.back.addEventListener("click",() => document.querySelector<Card>(`#${this.header?.getAttribute("data-card-parent")}`)!.open(this));
+    this.heading = this.header.querySelector<HTMLDivElement>(".heading")!;
+    this.controls = document.createElement("div") as typeof this.controls;
     this.controls.classList.add("card-controls");
     this.controls.minimize = document.createElement("button");
     this.controls.minimize.classList.add("control");
@@ -60,13 +68,10 @@ export class Card extends HTMLElement {
     }
   }
 
-  /**
-   * @param { Card } [previous]
-  */
-  open(previous){
+  open(previous?: Card){
     if (this.matches(".active") && !this.hasAttribute("data-alert-timeout")) return this.close();
     if (this.type != "alert"){
-      /** @type { NodeListOf<Card> } */ (document.querySelectorAll(`.card.active`)).forEach(card => {
+      document.querySelectorAll<Card>(`.card.active`).forEach(card => {
         if (card.type != "dialog" && card.type != this.type) return;
         card.close();
         if (!card.matches(".minimize")) return;
@@ -89,13 +94,13 @@ export class Card extends HTMLElement {
       document.body.addEventListener("keydown",Card.#catchCardNavigation);
       card_backdrop.classList.add("active");
       if (!STE.activeDialog && !STE.dialogPrevious){
-        STE.dialogPrevious = /** @type { Card } */ (document.activeElement);
+        STE.dialogPrevious = document.activeElement as Card;
       }
-      /** @type { NodeListOf<MenuDropElement> } */ (document.querySelectorAll("menu-drop[data-open]")).forEach(menu => menu.close());
+      document.querySelectorAll<MenuDropElement>("menu-drop[data-open]").forEach(menu => menu.close());
       var transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 500}`);
       window.setTimeout(() => {
         if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
-        if (previous) /** @type { HTMLElement } */ (this.querySelector(`[data-card-previous="${previous.id}"]`)).focus();
+        if (previous) this.querySelector<HTMLElement>(`[data-card-previous="${previous.id}"]`)!.focus();
       },transitionDuration);
       STE.activeDialog = this;
     }
@@ -103,14 +108,17 @@ export class Card extends HTMLElement {
   }
 
   minimize(){
-    var icon = /** @type { SVGUseElement } */ (this.controls?.minimize.querySelector("svg use")), main = /** @type { HTMLDivElement } */ (this.querySelector(".main")), changeIdentifier = Math.random().toString();
+    const icon = this.controls.minimize.querySelector<SVGUseElement>("svg use")!;
+    const main = this.querySelector<HTMLDivElement>(".main")!;
+    const changeIdentifier = Math.random().toString();
+
     this.setAttribute("data-minimize-change",changeIdentifier);
     workspace_tabs.setAttribute("data-minimize-change",changeIdentifier);
     var transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
     if (!this.matches(".minimize")){
       this.classList.add("minimize");
       if (this.controls === undefined) return;
-      this.style.setProperty("--card-minimize-width",`${/** @type { SVGSVGElement } */ (this.controls.minimize.querySelector("svg")).clientWidth + parseInt(getElementStyle({ element: this.controls.minimize, property: "--control-padding" }),10) * 2}px`);
+      this.style.setProperty("--card-minimize-width",`${this.controls.minimize.querySelector("svg")!.clientWidth + parseInt(getElementStyle({ element: this.controls.minimize, property: "--control-padding" }),10) * 2}px`);
       this.style.setProperty("--card-main-width",`${main.clientWidth}px`);
       this.style.setProperty("--card-main-height",`${main.clientHeight}px`);
       icon.setAttribute("href","#arrow_icon");
@@ -157,19 +165,15 @@ export class Card extends HTMLElement {
   /**
    * Gets all navigable elements within a given parent element.
    * 
-   * @param { { container: HTMLElement; scope?: boolean | string; } } options - If the scope option is set to `true`, only direct children within the parent element will be selected.
+   * @param options - If the scope option is set to `true`, only direct children within the parent element will be selected.
   */
-  static #getNavigableElements({ container, scope = false }){
+  static #getNavigableElements({ container, scope = false }: { container: HTMLElement; scope?: boolean | string; }){
     scope = (scope) ? "" : ":scope > ";
-    /** @type { NodeListOf<HTMLElement> } */
-    var navigable = container.querySelectorAll(`${scope}button:not([disabled]), ${scope}textarea:not([disabled]), ${scope}input:not([disabled]), ${scope}select:not([disabled]), ${scope}a[href]:not([disabled]), ${scope}[tabindex]:not([tabindex="-1"])`);
+    var navigable: NodeListOf<HTMLElement> = container.querySelectorAll(`${scope}button:not([disabled]), ${scope}textarea:not([disabled]), ${scope}input:not([disabled]), ${scope}select:not([disabled]), ${scope}a[href]:not([disabled]), ${scope}[tabindex]:not([tabindex="-1"])`);
     return Array.from(navigable).filter(element => (getElementStyle({ element, property: "display" }) != "none"));
   }
 
-  /**
-   * @param { KeyboardEvent } event
-  */
-  static #catchCardNavigation(event){
+  static #catchCardNavigation(event: KeyboardEvent){
     if (!STE.activeDialog || event.key != "Tab" || document.activeElement != document.body) return;
     var navigable = Card.#getNavigableElements({ container: STE.activeDialog, scope: true });
     event.preventDefault();
@@ -178,5 +182,11 @@ export class Card extends HTMLElement {
 }
 
 window.customElements.define("ste-card",Card);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "ste-card": Card;
+  }
+}
 
 export default Card;

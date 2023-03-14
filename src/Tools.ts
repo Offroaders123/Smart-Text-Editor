@@ -1,9 +1,7 @@
 import { Editor } from "./Editor.js";
 import { setView } from "./Workspace.js";
 
-/**
- * @typedef { "html" | "pack-manifest-bedrock" } TemplateType
-*/
+export type TemplateType = "html" | "pack-manifest-bedrock";
 
 /**
  * A global object with static properties to work with the various tools provided the app.
@@ -33,11 +31,11 @@ export class Tools {
    * A namespace with functions for the JSON Formatter widget.
   */
   static jsonFormatter = {
-    format(spacing = "  ") {
+    format(spacing: string = "  ") {
       try {
         var formatted = JSON.stringify(JSON.parse(formatter_input.value),null,spacing);
         if (formatted != formatter_input.value) formatter_input.value = formatted;
-      } catch (/** @type { any } */ error){
+      } catch (error: any){
         /* ~~Make~~ Made matching for "position" optional, as Safari doesn't give JSON parsing error data, it only says that an error occurred. */
         try {
           var message = error.toString().match(/^(.+?)position /)[0],
@@ -58,11 +56,7 @@ export class Tools {
       }
 
 
-    /**
-     * @param { string } char
-     * @param { string } str
-    */
-    function indexi(char,str){
+    function indexi(char: string, str: string){
       var list = [], i = -1;
       while ((i = str.indexOf(char,i + 1)) >= 0) list.push(i + 1);
       return list;
@@ -103,8 +97,7 @@ export class Tools {
    * A namespace with functions for the UUID Generator widget.
   */
   static uuidGenerator = (() => {
-    /** @type { string[] } */
-    var lut = [];
+    var lut: string[] = [];
     for (var i = 0; i < 256; i++) lut[i] = ((i < 16) ? "0" : "") + i.toString(16);
     return {
       generate: () => {
@@ -116,14 +109,10 @@ export class Tools {
 
   /**
    * Creates a new Editor from a given template type.
-   * 
-   * @param { TemplateType } type
   */
-  static insertTemplate(type) {
-    /** @type { string | undefined } */
-    let value;
-    /** @type { string | undefined } */
-    let name;
+  static insertTemplate(type: TemplateType) {
+    let value: string | undefined;
+    let name: string | undefined;
 
     switch (type){
       case "html": {
@@ -150,6 +139,10 @@ export class Tools {
       setView("split");
     }
   }
+}
+
+declare global {
+  var Tools: Tools;
 }
 
 globalThis.Tools = Tools;
