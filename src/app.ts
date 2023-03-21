@@ -8,7 +8,7 @@ for (const image of document.querySelectorAll("img")){
   image.draggable = false;
 }
 
-for (const numText of document.querySelectorAll<NumTextElement>("num-text")){
+for (const numText of document.querySelectorAll("num-text")){
   applyEditingBehavior(numText);
 }
 

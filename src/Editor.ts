@@ -93,7 +93,7 @@ export class Editor {
 
   readonly editorClose = document.createElement("button");
 
-  readonly container = document.createElement("num-text") as NumTextElement;
+  readonly container = document.createElement("num-text");
 
   readonly previewOption: Option = document.createElement("li");
 

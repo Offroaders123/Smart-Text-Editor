@@ -73,7 +73,7 @@ class STE {
     */
     setSyntaxHighlighting(state: boolean){
       state = (state != undefined) ? state : (STE.settings.get("syntax-highlighting") != undefined);
-      document.querySelectorAll<NumTextElement>("num-text").forEach(editor => {
+      document.querySelectorAll("num-text").forEach(editor => {
         if (editor.syntaxLanguage in Prism.languages) (state) ? editor.syntaxHighlight.enable() : editor.syntaxHighlight.disable();
       });
       STE.settings.set("syntax-highlighting",String(state));
