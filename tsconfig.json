@@ -8,7 +8,7 @@
     "types": [
       "menu-drop",
       "new-javascript",
-      "num-text"
+      "@stedit/num-text"
     ],
     "skipLibCheck": true,
     "strict": true
