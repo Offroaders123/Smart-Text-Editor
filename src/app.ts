@@ -322,7 +322,7 @@ document.body.addEventListener("drop",event => {
   });
 });
 
-for (const menu of app_menubar.querySelectorAll<MenuDropElement>("menu-drop")){
+for (const menu of app_menubar.querySelectorAll("menu-drop")){
   menu.addEventListener("pointerenter",event => {
     if (event.pointerType !== "mouse") return;
     if (app_menubar.querySelectorAll("menu-drop:not([data-alternate])[data-open]").length === 0 || menu.matches("[data-alternate]") || menu.matches("[data-open]")) return;

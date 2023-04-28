@@ -95,7 +95,7 @@ export class Editor {
 
   readonly container = document.createElement("num-text");
 
-  readonly previewOption: Option = document.createElement("li");
+  readonly previewOption: MenuDropOption = document.createElement("li");
 
   declare readonly value;
   declare readonly isOpen;
