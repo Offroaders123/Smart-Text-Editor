@@ -7,10 +7,10 @@
     "target": "ESNext",
     "types": [
       "@stedit/menu-drop",
-      "new-javascript",
-      "@stedit/num-text"
+      "@stedit/num-text",
+      "new-javascript"
     ],
-    "skipLibCheck": true,
-    "strict": true
+    "strict": true,
+    "noImplicitOverride": true
   }
 }

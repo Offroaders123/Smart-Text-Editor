@@ -1,4 +1,4 @@
-import type { Card } from "./scripts/Card.js";
+import type { Card } from "./Card.js";
 
 declare global {
   interface Navigator {

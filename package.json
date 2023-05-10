@@ -2,9 +2,9 @@
   "name": "smart-text-editor",
   "private": true,
   "type": "module",
-  "browser": "./dist/app.js",
   "scripts": {
-    "build": "npx tsc"
+    "build": "tsc",
+    "dev": "tsc -w"
   },
   "dependencies": {
     "@stedit/menu-drop": "^1.0.0",
@@ -13,7 +13,8 @@
   },
   "devDependencies": {
     "@types/prismjs": "^1.26.0",
-    "better-typescript": "^0.0.7",
-    "new-javascript": "^0.2.4"
+    "better-typescript": "^0.1.2",
+    "new-javascript": "^0.3.1",
+    "typescript": "^5.0.4"
   }
 }
