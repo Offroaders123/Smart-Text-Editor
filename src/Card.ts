@@ -23,7 +23,7 @@ export class Card extends HTMLElement {
     this.defined = true;
     this.addEventListener("keydown",event => {
       if (this.getAttribute("data-type") != "dialog" || event.key != "Tab") return;
-      var navigable = Card.#getNavigableElements({ container: this, scope: true });
+      const navigable = Card.#getNavigableElements({ container: this, scope: true });
       if (!event.shiftKey){
         if (document.activeElement != navigable[navigable.length - 1]) return;
         event.preventDefault();
@@ -75,14 +75,14 @@ export class Card extends HTMLElement {
         if (card.type != "dialog" && card.type != this.type) return;
         card.close();
         if (!card.matches(".minimize")) return;
-        var transitionDuration = parseInt(`${Number(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
+        const transitionDuration = parseInt(`${Number(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
         window.setTimeout(() => card.minimize(),transitionDuration);
       });
     }
     this.classList.add("active");
     if (this.type == "widget" && card_backdrop.matches(".active")) card_backdrop.classList.remove("active");
     if (this.type == "alert"){
-      var timeoutIdentifier = Math.random().toString();
+      const timeoutIdentifier = Math.random().toString();
       this.setAttribute("data-alert-timeout",timeoutIdentifier);
       window.setTimeout(() => {
         if (this.getAttribute("data-alert-timeout") != timeoutIdentifier) return;
@@ -97,7 +97,7 @@ export class Card extends HTMLElement {
         STE.dialogPrevious = document.activeElement as Card;
       }
       document.querySelectorAll<MenuDropElement>("menu-drop[data-open]").forEach(menu => menu.close());
-      var transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 500}`);
+      const transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 500}`);
       window.setTimeout(() => {
         if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
         if (previous) this.querySelector<HTMLElement>(`[data-card-previous="${previous.id}"]`)!.focus();
@@ -114,7 +114,7 @@ export class Card extends HTMLElement {
 
     this.setAttribute("data-minimize-change",changeIdentifier);
     workspace_tabs.setAttribute("data-minimize-change",changeIdentifier);
-    var transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
+    const transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
     if (!this.matches(".minimize")){
       this.classList.add("minimize");
       if (this.controls === undefined) return;
@@ -146,7 +146,7 @@ export class Card extends HTMLElement {
   close(){
     this.classList.remove("active");
     if (this.matches(".minimize")){
-      var transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
+      const transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
       window.setTimeout(() => this.minimize(),transitionDuration);
     }
     if (this.type == "dialog"){
@@ -154,7 +154,7 @@ export class Card extends HTMLElement {
       card_backdrop.classList.remove("active");
       STE.activeDialog = null;
       if (STE.dialogPrevious){
-        var hidden = (getElementStyle({ element: STE.dialogPrevious, property: "visibility" }) == "hidden");
+        const hidden = (getElementStyle({ element: STE.dialogPrevious, property: "visibility" }) == "hidden");
         (!workspace_editors.contains(STE.dialogPrevious) && !hidden) ? STE.dialogPrevious.focus({ preventScroll: true }) : STE.query().container?.focus({ preventScroll: true });
         STE.dialogPrevious = null;
       }
@@ -167,18 +167,23 @@ export class Card extends HTMLElement {
    * 
    * @param options - If the scope option is set to `true`, only direct children within the parent element will be selected.
   */
-  static #getNavigableElements({ container, scope = false }: { container: HTMLElement; scope?: boolean | string; }){
+  static #getNavigableElements({ container, scope = false }: GetNavigableElementsOptions){
     scope = (scope) ? "" : ":scope > ";
-    var navigable: NodeListOf<HTMLElement> = container.querySelectorAll(`${scope}button:not([disabled]), ${scope}textarea:not([disabled]), ${scope}input:not([disabled]), ${scope}select:not([disabled]), ${scope}a[href]:not([disabled]), ${scope}[tabindex]:not([tabindex="-1"])`);
+    const navigable: NodeListOf<HTMLElement> = container.querySelectorAll(`${scope}button:not([disabled]), ${scope}textarea:not([disabled]), ${scope}input:not([disabled]), ${scope}select:not([disabled]), ${scope}a[href]:not([disabled]), ${scope}[tabindex]:not([tabindex="-1"])`);
     return Array.from(navigable).filter(element => (getElementStyle({ element, property: "display" }) != "none"));
   }
 
   static #catchCardNavigation(event: KeyboardEvent){
     if (!STE.activeDialog || event.key != "Tab" || document.activeElement != document.body) return;
-    var navigable = Card.#getNavigableElements({ container: STE.activeDialog, scope: true });
+    const navigable = Card.#getNavigableElements({ container: STE.activeDialog, scope: true });
     event.preventDefault();
     navigable[((!event.shiftKey) ? 0 : navigable.length - 1)].focus();
   }
+}
+
+export interface GetNavigableElementsOptions {
+  container: HTMLElement;
+  scope?: boolean | string;
 }
 
 window.customElements.define("ste-card",Card);

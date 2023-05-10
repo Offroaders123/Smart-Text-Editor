@@ -329,7 +329,7 @@ class STE {
      * 
      * @param options - Accepts an option to show the user a prompt to confirm that the settings should be reset.
     */
-    reset({ confirm: showPrompt = false }: { confirm?: boolean; } = {}) {
+    reset({ confirm: showPrompt = false }: ResetSettingsOptions = {}) {
       if (!STE.support.localStorage) return false;
       if (showPrompt){
         if (!confirm("Are you sure you would like to reset all settings?")) return false;
@@ -370,6 +370,10 @@ class STE {
    * A reference to the `BeforeInstallPrompt` event that was received when the Install App banner is shown, on Chromium browsers.
   */
   static installPrompt: BeforeInstallPromptEvent | null = null;
+}
+
+interface ResetSettingsOptions {
+  confirm?: boolean;
 }
 
 if (STE.appearance.parentWindow) document.documentElement.classList.add("startup-fade");

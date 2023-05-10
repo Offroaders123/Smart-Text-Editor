@@ -351,7 +351,7 @@ export class Editor {
     }
 
     if (STE.previewEditor === this.identifier){
-      setPreviewSource({ active_editor: true });
+      setPreviewSource({ activeEditor: true });
     }
 
     if (this.tab === editorTabs[0] && editorTabs[1] && this.tab.classList.contains("active")){

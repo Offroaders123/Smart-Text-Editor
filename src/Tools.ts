@@ -12,9 +12,9 @@ export class Tools {
   */
   static replaceText = {
     replace() {
-      var { container: editor } = STE.query();
+      const { container: editor } = STE.query();
       if (!editor) return;
-      var replaced = editor.value.split(replacer_find.value).join(replacer_replace.value);
+      const replaced = editor.value.split(replacer_find.value).join(replacer_replace.value);
       if (replaced != editor.value) editor.value = replaced;
     },
 
@@ -33,17 +33,17 @@ export class Tools {
   static jsonFormatter = {
     format(spacing: string = "  ") {
       try {
-        var formatted = JSON.stringify(JSON.parse(formatter_input.value),null,spacing);
+        const formatted = JSON.stringify(JSON.parse(formatter_input.value),null,spacing);
         if (formatted != formatter_input.value) formatter_input.value = formatted;
       } catch (error: any){
         /* ~~Make~~ Made matching for "position" optional, as Safari doesn't give JSON parsing error data, it only says that an error occurred. */
         try {
-          var message = error.toString().match(/^(.+?)position /)[0],
-            errorIndex = error.toString().match(/position (\d+)/)[1],
+          const message = error.toString().match(/^(.+?)position /)[0],
+            errorIndex = error.toString().match(/position (\d+)/)[1];
 
-            errorLine,
-            errorLineIndex = (() => {
-              var lineIndexes = indexi("\n",formatter_input.value);
+          let errorLine: number;
+          const errorLineIndex = (() => {
+              const lineIndexes = indexi("\n",formatter_input.value);
               errorLine = formatter_input.value.substring(0,errorIndex).split("\n").length - 1;
               return lineIndexes[errorLine - 1] || 1;
             })(),
@@ -57,7 +57,8 @@ export class Tools {
 
 
     function indexi(char: string, str: string){
-      var list = [], i = -1;
+      const list: number[] = [];
+      let i = -1;
       while ((i = str.indexOf(char,i + 1)) >= 0) list.push(i + 1);
       return list;
     }
@@ -79,12 +80,12 @@ export class Tools {
   */
   static uriEncoder = {
     encode() {
-      var encodingType = (!encoder_type.checked) ? encodeURI : encodeURIComponent;
+      const encodingType = (!encoder_type.checked) ? encodeURI : encodeURIComponent;
       encoder_input.value = encodingType(encoder_input.value);
     },
 
     decode() {
-      var decodingType = (!encoder_type.checked) ? decodeURI : decodeURIComponent;
+      const decodingType = (!encoder_type.checked) ? decodeURI : decodeURIComponent;
       encoder_input.value = decodingType(encoder_input.value);
     },
 
@@ -97,11 +98,11 @@ export class Tools {
    * A namespace with functions for the UUID Generator widget.
   */
   static uuidGenerator = (() => {
-    var lut: string[] = [];
-    for (var i = 0; i < 256; i++) lut[i] = ((i < 16) ? "0" : "") + i.toString(16);
+    const lut: string[] = [];
+    for (let i = 0; i < 256; i++) lut[i] = ((i < 16) ? "0" : "") + i.toString(16);
     return {
       generate: () => {
-        var d0 = (Math.random() * 0xffffffff) | 0, d1 = (Math.random() * 0xffffffff) | 0, d2 = (Math.random() * 0xffffffff) | 0, d3 = (Math.random() * 0xffffffff) | 0;
+        const d0 = (Math.random() * 0xffffffff) | 0, d1 = (Math.random() * 0xffffffff) | 0, d2 = (Math.random() * 0xffffffff) | 0, d3 = (Math.random() * 0xffffffff) | 0;
         return `${lut[d0 & 0xff]}${lut[(d0 >> 8) & 0xff]}${lut[(d0 >> 16) & 0xff]}${lut[(d0 >> 24) & 0xff]}-${lut[d1 & 0xff]}${lut[(d1 >> 8) & 0xff]}-${lut[((d1 >> 16) & 0x0f) | 0x40]}${lut[(d1 >> 24) & 0xff]}-${lut[(d2 & 0x3f) | 0x80]}${lut[(d2 >> 8) & 0xff]}-${lut[(d2 >> 16) & 0xff]}${lut[(d2 >> 24) & 0xff]}${lut[d3 & 0xff]}${lut[(d3 >> 8) & 0xff]}${lut[(d3 >> 16) & 0xff]}${lut[(d3 >> 24) & 0xff]}`;
       }
     };
@@ -116,7 +117,7 @@ export class Tools {
 
     switch (type){
       case "html": {
-        let language = navigator.language;
+        let { language } = navigator;
         if (language.includes("-")){
           language = language.replace(/[^-]+$/g,code => code.toUpperCase());
         }

@@ -1,8 +1,9 @@
-import type { Orientation } from "./Workspace.js";
 import "./Card.js";
 import Tools from "./Tools.js";
 import { Editor, setEditorTabsVisibility } from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview, setScaling, disableScaling } from "./Workspace.js";
+
+import type { Orientation } from "./Workspace.js";
 
 for (const image of document.querySelectorAll("img")){
   image.draggable = false;
@@ -490,11 +491,17 @@ if (queryParameters.get("settings")){
   removeQueryParameters(["settings"]);
 }
 
+export interface GetElementStyleOptions {
+  element: Element;
+  property: string;
+  pseudo?: string;
+}
+
 /**
  * Gets a style property value for a given element.
 */
-export function getElementStyle({ element, pseudo = null, property }: { element: Element; pseudo?: string | null; property: string; }){
-  return window.getComputedStyle(element,pseudo).getPropertyValue(property);
+export function getElementStyle({ element, property, pseudo }: GetElementStyleOptions){
+  return getComputedStyle(element,pseudo).getPropertyValue(property);
 }
 
 /**
@@ -536,11 +543,19 @@ export function applyEditingBehavior(element: HTMLInputElement | NumTextElement)
   }
 }
 
+export type SetTitleOptions =
+  | { content: string; }
+  | { reset: true; }
+
 /**
  * Sets the title of the window.
 */
-export function setTitle({ content = "", reset = false }: { content?: string; reset?: boolean; } | undefined = {}){
-  document.title = `Smart Text Editor${(content && !reset) ? ` - ${content}` : ""}`;
+export function setTitle(options: SetTitleOptions){
+  if ("content" in options){
+    document.title = `Smart Text Editor - ${options.content}`;
+  } else {
+    document.title = "Smart Text Editor";
+  }
 }
 
 /**

@@ -35,9 +35,9 @@ export interface SetViewOptions {
 */
 export function setView(type: View, { force = false }: SetViewOptions = {}){
   if ((STE.orientationChange && !force) || STE.scalingChange) return;
-  var changeIdentifier = Math.random().toString();
+  const changeIdentifier = Math.random().toString();
   document.body.setAttribute("data-view-change",changeIdentifier);
-  var transitionDuration = parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
+  const transitionDuration = parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
   document.body.classList.remove(STE.view);
   document.body.setAttribute("data-view",type);
   document.body.classList.add(STE.view);
@@ -60,7 +60,7 @@ export type Orientation = "horizontal" | "vertical";
 export function setOrientation(orientation?: Orientation){
   if (STE.orientationChange || STE.scalingChange) return;
   document.body.setAttribute("data-orientation-change","");
-  var param = (orientation), transitionDuration = ((STE.view != "split") ? 0 : parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`));
+  const param = (orientation), transitionDuration = ((STE.view != "split") ? 0 : parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`));
   if (!param && STE.view == "split") setView("code",{ force: true });
   if (!param && STE.orientation == "horizontal") orientation = "vertical";
   if (!param && STE.orientation == "vertical") orientation = "horizontal";
@@ -91,15 +91,21 @@ export function setOrientation(orientation?: Orientation){
   }
 }
 
+export type SetPreviewSourceOptions =
+  | { identifier: string; }
+  | { activeEditor: true; }
+
 /**
  * Sets the source for the Preview to a given Editor.
 */
-export function setPreviewSource({ identifier, active_editor }: { identifier?: string; active_editor?: boolean; }){
-  if (!identifier && !active_editor) return;
-  if ((!identifier && active_editor) || (STE.previewEditor == identifier)){
+export function setPreviewSource(options: SetPreviewSourceOptions){
+  if ("activeEditor" in options || STE.previewEditor === options.identifier){
     STE.previewEditor = "active-editor";
     preview_menu.select("active-editor");
-  } else STE.previewEditor = identifier!;
+  } else {
+    STE.previewEditor = options.identifier;
+  }
+
   refreshPreview({ force: true });
 }
 
@@ -154,12 +160,12 @@ export async function openFiles(){
       new Editor(file);
     }
   } else {
-    var handles = await window.showOpenFilePicker({ multiple: true }).catch(error => {
+    const handles = await window.showOpenFilePicker({ multiple: true }).catch(error => {
       if (error.message.toLowerCase().includes("abort")) return;
     });
     if (!handles) return;
     handles.forEach(async handle => {
-      var file = await handle.getFile(), { identifier } = new Editor({ name: file.name, value: await file.text() });
+      const file = await handle.getFile(), { identifier } = new Editor({ name: file.name, value: await file.text() });
       STE.fileHandles[identifier] = handle;
     });
   }
@@ -175,13 +181,14 @@ export async function openFiles(){
 export async function saveFile(extension?: string){
   if (extension || !STE.support.fileSystem){
     if (!extension) extension = STE.query().getName("extension") ?? "";
-    var anchor = document.createElement("a"), link = window.URL.createObjectURL(new Blob([STE.query().textarea?.value ?? ""]));
+    const anchor = document.createElement("a"), link = window.URL.createObjectURL(new Blob([STE.query().textarea?.value ?? ""]));
     anchor.href = link;
     anchor.download = `${STE.query().getName("base")}.${extension}`;
     anchor.click();
     window.URL.revokeObjectURL(link);
   } else {
-    var identifier = STE.activeEditor, handle;
+    const identifier = STE.activeEditor;
+    let handle: void | FileSystemFileHandle;
     if (identifier === null) throw new Error("No editors are open, couldn't save anything!");
     if (!STE.fileHandles[identifier]){
       handle = await window.showSaveFilePicker({ suggestedName: STE.query().getName()!, startIn: (STE.fileHandles[identifier]) ? STE.fileHandles[identifier] : "desktop" }).catch(error => {
@@ -190,14 +197,14 @@ export async function saveFile(extension?: string){
       if (!handle) return;
       STE.fileHandles[identifier] = handle;
     } else handle = STE.fileHandles[identifier];
-    var stream = await STE.fileHandles[identifier].createWritable().catch(error => {
+    const stream = await STE.fileHandles[identifier].createWritable().catch(error => {
       alert(`"${STE.query().getName()}" could not be saved.`);
       if (error.toString().toLowerCase().includes("not allowed")) return;
     });
     if (!stream) return;
     await stream.write(STE.query().textarea?.value ?? "");
     await stream.close();
-    var currentName = STE.query().getName(), file = await handle.getFile(), rename = file.name;
+    const currentName = STE.query().getName(), file = await handle.getFile(), rename = file.name;
     if (currentName != rename) Editor.rename(identifier,rename);
   }
   if (STE.query().tab?.hasAttribute("data-editor-auto-created")) STE.query().tab?.removeAttribute("data-editor-auto-created");
@@ -209,15 +216,15 @@ export async function saveFile(extension?: string){
  * Creates a new Display window for the active Editor.
 */
 export function createDisplay(){
-  var width = window.screen.availWidth * 2/3,
+  const width = window.screen.availWidth * 2/3,
     height = window.screen.availHeight * 2/3,
     left = window.screen.availWidth / 2 + window.screen.availLeft - width / 2,
     top = window.screen.availHeight / 2 + window.screen.availTop - height / 2,
     features = (STE.appearance.standalone || STE.appearance.fullscreen) ? "popup" : "",
-    baseURL = STE.settings.get("preview-base") || null,
-    source = STE.query().textarea?.value ?? "";
+    baseURL = STE.settings.get("preview-base") || null;
+  let source = STE.query().textarea?.value ?? "";
   if (baseURL) source = `<!DOCTYPE html>\n<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
-  var link = window.URL.createObjectURL(new Blob([source],{ type: "text/html" })),
+  const link = window.URL.createObjectURL(new Blob([source],{ type: "text/html" })),
     win = window.open(link,"_blank",features);
 
   if (win === null) throw new Error("Couldn't create a display window!");
@@ -231,16 +238,21 @@ export function createDisplay(){
   },20);
 }
 
+export interface RefreshPreviewOptions {
+  force?: boolean;
+}
+
 /**
  * Refreshes the Preview with the latest source from the source Editor.
 */
-export function refreshPreview({ force = false } = {}){
+export function refreshPreview({ force = false }: RefreshPreviewOptions = {}){
   if (STE.view == "code") return;
-  var editor = (STE.previewEditor == "active-editor") ? STE.query() : STE.query(STE.previewEditor);
+  const editor = (STE.previewEditor == "active-editor") ? STE.query() : STE.query(STE.previewEditor);
   if (!editor.tab || !editor.textarea) return;
-  var change = (editor.tab.hasAttribute("data-editor-refresh") && STE.settings.get("automatic-refresh") != "false");
+  const change = (editor.tab.hasAttribute("data-editor-refresh") && STE.settings.get("automatic-refresh") != "false");
   if (!change && !force) return;
-  var baseURL = STE.settings.get("preview-base") || null, source = editor.textarea.value;
+  const baseURL = STE.settings.get("preview-base") || null;
+  let source = editor.textarea.value;
   if (baseURL) source = `<!DOCTYPE html>\n<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
   preview.addEventListener("load",() => {
     preview.contentWindow?.document.open();
@@ -255,7 +267,7 @@ export function refreshPreview({ force = false } = {}){
  * Sets the Split mode scaling when called from the Scaler's moving event listeners.
 */
 export function setScaling(event: MouseEvent | TouchEvent){
-  const { safeAreaInsets: safeAreaInsets } = STE.appearance;
+  const { safeAreaInsets } = STE.appearance;
   let scalingOffset = 0;
   const scalingRange = {
     minimum: ((STE.orientation == "vertical") ? workspace_tabs.offsetHeight : safeAreaInsets.left) + 80,
@@ -277,7 +289,7 @@ export function setScaling(event: MouseEvent | TouchEvent){
  * Removes the Split mode scale handling when the user finishes moving the Scaler.
 */
 export function disableScaling(event: MouseEvent | TouchEvent){
-  var touchEvent = (STE.environment.touchDevice && event instanceof TouchEvent);
+  const touchEvent = (STE.environment.touchDevice && event instanceof TouchEvent);
   document.removeEventListener((!touchEvent) ? "mousemove" : "touchmove",setScaling);
   document.removeEventListener((!touchEvent) ? "mouseup" : "touchend",disableScaling);
   document.body.removeAttribute("data-scaling-change");
