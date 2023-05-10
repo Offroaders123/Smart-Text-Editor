@@ -165,7 +165,7 @@ export class Card extends HTMLElement {
   /**
    * Gets all navigable elements within a given parent element.
    * 
-   * @param options - If the scope option is set to `true`, only direct children within the parent element will be selected.
+   * @param options If the scope option is set to `true`, only direct children within the parent element will be selected.
   */
   static #getNavigableElements({ container, scope = false }: GetNavigableElementsOptions){
     scope = (scope) ? "" : ":scope > ";

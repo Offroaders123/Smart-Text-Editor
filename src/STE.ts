@@ -28,8 +28,7 @@ class STE {
      * Checks whether the app is running in standalone mode on iOS and iPadOS devices.
     */
     get appleHomeScreen() {
-      // @ts-expect-error
-      return (/(macOS|Mac|iPhone|iPad|iPod)/i.test(("userAgentData" in navigator) ? navigator.userAgentData.platform : navigator.platform) && "standalone" in navigator && navigator.standalone);
+      return (/(macOS|Mac|iPhone|iPad|iPod)/i.test(navigator.userAgentData?.platform ?? navigator.platform) && navigator.standalone === true);
     },
 
     /**
@@ -102,16 +101,14 @@ class STE {
      * Checks if the app is running on an Apple device.
     */
     get appleDevice() {
-      // @ts-expect-error
-      return (/(macOS|Mac|iPhone|iPad|iPod)/i.test(("userAgentData" in navigator) ? navigator.userAgentData.platform : navigator.platform));
+      return (/(macOS|Mac|iPhone|iPad|iPod)/i.test(navigator.userAgentData?.platform ?? navigator.platform));
     },
 
     /**
      * Checks if the app is running on a macOS device.
     */
     get macOSDevice() {
-      // @ts-expect-error
-      return (/(macOS|Mac)/i.test(("userAgentData" in navigator) ? navigator.userAgentData.platform : navigator.platform) && navigator.standalone == undefined);
+      return (/(macOS|Mac)/i.test(navigator.userAgentData?.platform ?? navigator.platform) && navigator.standalone == undefined);
     },
 
     /**
@@ -172,7 +169,7 @@ class STE {
   /**
    * Selects an Editor by it's identifier.
    * 
-   * @param identifier - Defaults to the currently opened Editor.
+   * @param identifier Defaults to the currently opened Editor.
   */
   static query(identifier: string | null = STE.activeEditor) {
     const tab = workspace_tabs.querySelector<HTMLButtonElement>(`.tab[data-editor-identifier="${identifier}"]`);
@@ -182,7 +179,7 @@ class STE {
     /**
      * Get the file name of the selected Editor.
      * 
-     * @param section - The `"base"` flag provides the name before the extension, and the `"extension"` flag provides only the extension. If omitted, the full file name is returned.
+     * @param section The `"base"` flag provides the name before the extension, and the `"extension"` flag provides only the extension. If omitted, the full file name is returned.
     */
     function getName(section?: "base" | "extension"){
       if ((document.querySelectorAll(`[data-editor-identifier="${identifier}"]:not([data-editor-change])`).length === 0) && (identifier !== STE.activeEditor)) return null;
@@ -327,7 +324,7 @@ class STE {
     /**
      * Removes all key-value pairs from the app's settings.
      * 
-     * @param options - Accepts an option to show the user a prompt to confirm that the settings should be reset.
+     * @param options Accepts an option to show the user a prompt to confirm that the settings should be reset.
     */
     reset({ confirm: showPrompt = false }: ResetSettingsOptions = {}) {
       if (!STE.support.localStorage) return false;

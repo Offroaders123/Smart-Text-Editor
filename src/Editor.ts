@@ -39,7 +39,7 @@ export class Editor {
   /**
    * Renames an Editor from a given identifier.
    * 
-   * @param rename - If a new name isn't provided, the user is prompted to provide one.
+   * @param rename If a new name isn't provided, the user is prompted to provide one.
   */
   static rename(identifier: string, rename?: string) {
     const editor = this.#editors[identifier];

@@ -55,7 +55,7 @@ export type Orientation = "horizontal" | "vertical";
 /**
  * Sets the Orientation state of the app. If an Orientation change is already in progress, the call will be skipped.
  * 
- * @param orientation - If an Orientation type is not provided, the current state will be toggled to the other option.
+ * @param orientation If an Orientation type is not provided, the current state will be toggled to the other option.
 */
 export function setOrientation(orientation?: Orientation){
   if (STE.orientationChange || STE.scalingChange) return;
