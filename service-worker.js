@@ -3,7 +3,7 @@
 /// <reference types="better-typescript/worker"/>
 
 const STE = {
-  version: "Smart Text Editor v4.10.0",
+  version: "Smart Text Editor v4.10.1",
   cache: true,
   environment: {
     get macOSDevice() {
