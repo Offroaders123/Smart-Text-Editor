@@ -454,6 +454,8 @@ declare global {
 
 window.Editor = Editor;
 
+export default Editor;
+
 /**
  * Updates the horizontal scroll position of the Workspace Tabs section to show a given Editor, by it's given identifier.
  * 

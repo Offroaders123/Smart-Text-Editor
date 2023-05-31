@@ -1,10 +1,10 @@
-// @ts-check
 /// <reference no-default-lib="true"/>
-/// <reference types="better-typescript/worker"/>
+/// <reference types="better-typescript/worker.d.ts"/>
 
-const CACHE_VERSION = "Smart Text Editor v4.13.0";
+var self = /** @type { ServiceWorkerGlobalScope } */ (/** @type { unknown } */ (globalThis));
 
-// @ts-expect-error
+const CACHE_VERSION = "Smart Text Editor v4.20.0";
+
 const IS_MACOS_DEVICE = (/(macOS|Mac)/i.test(navigator.userAgentData?.platform ?? navigator.platform) && navigator.standalone === undefined);
 
 /** @type { File[] } */

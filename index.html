@@ -141,7 +141,7 @@
 <header id="header">
   <div class="app-region"></div>
   <div class="app-icon">
-    <img src="resources/icon.svg" alt="">
+    <img src="./resources/icon.svg" alt="">
   </div>
   <div id="app_menubar" class="app-menubar">
     <menu-drop id="file_menu">
@@ -208,15 +208,15 @@
         </li>
         <li>Online Resources...
           <ul data-show-icons>
-            <li><a href="https://webformatter.com"><img src="resources/web-formatter.svg" alt="">Code Formatter</a></li>
-            <li><a href="https://www.sharedrop.io"><img part="invert" src="resources/sharedrop.svg" alt="">File Transferer</a></li>
-            <li><a href="https://www.diffchecker.com/"><img src="resources/diffchecker.svg" alt="">Difference Finder</a></li>
-            <li><a href="https://caniuse.com/"><img src="resources/caniuse.svg" alt="">Compatibility Checker</a></li>
-            <li><a href="https://web.dev/measure/"><img src="resources/webdev.svg" alt="">Performance Tester</a></li>
-            <li><a href="https://realfavicongenerator.net/"><img part="rounded" src="resources/real-favicon-generator.svg" alt="">Favicon Generator</a></li>
-            <li><a href="https://appsco.pe/developer/splash-screens/"><img part="invert" src="resources/appscope.svg" alt="">Splash Generator</a></li>
-            <li><a href="https://www.svgminify.com/"><img src="resources/svgminify.svg" alt="">SVG Simplifier</a></li>
-            <li><a href="https://cryptii.com/"><img src="resources/cryptii.svg" alt="">Text Encryptor</a></li>
+            <li><a href="https://webformatter.com"><img src="./resources/web-formatter.svg" alt="">Code Formatter</a></li>
+            <li><a href="https://www.sharedrop.io"><img part="invert" src="./resources/sharedrop.svg" alt="">File Transferer</a></li>
+            <li><a href="https://www.diffchecker.com/"><img src="./resources/diffchecker.svg" alt="">Difference Finder</a></li>
+            <li><a href="https://caniuse.com/"><img src="./resources/caniuse.svg" alt="">Compatibility Checker</a></li>
+            <li><a href="https://web.dev/measure/"><img src="./resources/webdev.svg" alt="">Performance Tester</a></li>
+            <li><a href="https://realfavicongenerator.net/"><img part="rounded" src="./resources/real-favicon-generator.svg" alt="">Favicon Generator</a></li>
+            <li><a href="https://appsco.pe/developer/splash-screens/"><img part="invert" src="./resources/appscope.svg" alt="">Splash Generator</a></li>
+            <li><a href="https://www.svgminify.com/"><img src="./resources/svgminify.svg" alt="">SVG Simplifier</a></li>
+            <li><a href="https://cryptii.com/"><img src="./resources/cryptii.svg" alt="">Text Encryptor</a></li>
           </ul>
         </li>
       </ul>
@@ -224,10 +224,10 @@
     <menu-drop id="settings_menu" data-alternate>
       <button onclick="settings_card.open();">Settings</button>
       <ul data-show-icons>
-        <li part="install-option" onclick="showInstallPrompt();"><img src="resources/install.svg" alt="">Install</li>
-        <li onclick="theme_card.open();"><img src="resources/template.svg" alt="">Theme Settings</li>
-        <li part="clear-site-caches-option" onclick="clearSiteCaches();"><img src="resources/settings.svg" alt="">Clear Cache</li>
-        <li onclick="STE.settings.reset({ confirm: true });"><img src="resources/settings.svg" alt="">Reset Settings</li>
+        <li part="install-option" onclick="showInstallPrompt();"><img src="./resources/install.svg" alt="">Install</li>
+        <li onclick="theme_card.open();"><img src="./resources/template.svg" alt="">Theme Settings</li>
+        <li part="clear-site-caches-option" onclick="clearSiteCaches();"><img src="./resources/settings.svg" alt="">Clear Cache</li>
+        <li onclick="STE.settings.reset({ confirm: true });"><img src="./resources/settings.svg" alt="">Reset Settings</li>
       </ul>
     </menu-drop>
   </div>
@@ -320,7 +320,7 @@
   </ste-card>
   <ste-card id="reset_settings_card" class="card alert" data-type="alert">
     <div class="header">
-      <img class="icon" src="resources/settings.svg" alt="">
+      <img class="icon" src="./resources/settings.svg" alt="">
       <span class="heading">Reset Settings</span>
     </div>
     <div class="main">
@@ -331,7 +331,7 @@
   </ste-card>
   <ste-card id="cleared_cache_card" class="card alert" data-type="alert">
     <div class="header">
-      <img class="icon" src="resources/template.svg" alt="">
+      <img class="icon" src="./resources/template.svg" alt="">
       <span class="heading">Cleared Cache</span>
     </div>
     <div class="main">
@@ -441,17 +441,7 @@
   </ste-card>
 </main>
 
-<script async src="https://cdn.jsdelivr.net/npm/es-module-shims@1.7.0/dist/es-module-shims.js"></script>
-
-<script type="importmap">
-  {
-    "imports": {
-      "nbtify": "https://cdn.jsdelivr.net/npm/nbtify@1.20.1/dist/index.js"
-    }
-  }
-</script>
-
-<script type="module" src="./dist/app.js"></script>
+<script type="module" src="./src/app.ts"></script>
 
 </body>
 

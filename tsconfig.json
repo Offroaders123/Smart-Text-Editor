@@ -1,16 +1,22 @@
 {
   "compilerOptions": {
-    "rootDir": "./src",
-    "outDir": "./dist",
+    "allowJs": true,
+    "checkJs": true,
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "NodeNext",
+    "isolatedModules": true,
     "target": "ESNext",
     "types": [
       "@stedit/menu-drop",
       "@stedit/num-text",
       "new-javascript"
     ],
+    "noEmit": true,
+    "skipLibCheck": true,
     "strict": true,
     "noImplicitOverride": true
-  }
+  },
+  "exclude": [
+    "./dist"
+  ]
 }

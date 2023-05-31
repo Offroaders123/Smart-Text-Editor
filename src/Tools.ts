@@ -1,5 +1,5 @@
 import STE from "./STE.js";
-import { Editor } from "./Editor.js";
+import Editor from "./Editor.js";
 import { setView } from "./Workspace.js";
 
 export type TemplateType = "html" | "pack-manifest-bedrock";

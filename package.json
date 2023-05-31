@@ -3,8 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc -w"
+    "build": "tsc; vite build --base ./ --target esnext",
+    "dev": "vite --host --port 5500 --base ./",
+    "preview": "vite preview --host --port 5500 --base ./"
   },
   "dependencies": {
     "@stedit/menu-drop": "^1.0.1",
@@ -15,6 +16,7 @@
     "@types/prismjs": "^1.26.0",
     "better-typescript": "^0.1.2",
     "new-javascript": "^0.3.1",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "vite": "^4.3.9"
   }
 }

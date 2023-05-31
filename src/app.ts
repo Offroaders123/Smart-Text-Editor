@@ -1,7 +1,7 @@
 import STE from "./STE.js";
 import "./Card.js";
 import Tools from "./Tools.js";
-import { Editor, setEditorTabsVisibility } from "./Editor.js";
+import Editor, { setEditorTabsVisibility } from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview, setScaling, disableScaling } from "./Workspace.js";
 
 import type { Orientation } from "./Workspace.js";
