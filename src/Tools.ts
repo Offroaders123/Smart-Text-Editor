@@ -1,3 +1,4 @@
+import STE from "./STE.js";
 import { Editor } from "./Editor.js";
 import { setView } from "./Workspace.js";
 

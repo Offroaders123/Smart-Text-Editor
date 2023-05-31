@@ -1,3 +1,4 @@
+import STE from "./STE.js";
 import { getElementStyle } from "./app.js";
 import { Editor, setEditorTabsVisibility } from "./Editor.js";
 import { read, stringify } from "nbtify";

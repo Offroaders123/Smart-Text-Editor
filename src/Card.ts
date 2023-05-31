@@ -1,3 +1,4 @@
+import STE from "./STE.js";
 import { getElementStyle } from "./app.js";
 import { setEditorTabsVisibility } from "./Editor.js";
 

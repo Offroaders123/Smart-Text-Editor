@@ -1,11 +1,11 @@
-type Card = import("./Card.js").default;
-type View = import("./Workspace.js").View;
-type Orientation = import("./Workspace.js").Orientation;
+import type Card from "./Card.js";
+import type { View } from "./Workspace.js";
+import type { Orientation } from "./Workspace.js";
 
 /**
  * A global object with static properties that help with managing the state within Smart Text Editor.
 */
-class STE {
+export class STE {
   /**
    * A namespace with properties that query the app's appearance.
   */
@@ -369,11 +369,21 @@ class STE {
   static installPrompt: BeforeInstallPromptEvent | null = null;
 }
 
+declare global {
+  interface Window {
+    STE: typeof STE;
+  }
+}
+
+window.STE = STE;
+
+export default STE;
+
 interface ResetSettingsOptions {
   confirm?: boolean;
 }
 
-if (STE.appearance.parentWindow) document.documentElement.classList.add("startup-fade");
+// if (STE.appearance.parentWindow) document.documentElement.classList.add("startup-fade");
 if (STE.appearance.appleHomeScreen) document.documentElement.classList.add("apple-home-screen");
 if (STE.environment.touchDevice) document.documentElement.classList.add("touch-device");
 if (STE.environment.appleDevice) document.documentElement.classList.add("apple-device");

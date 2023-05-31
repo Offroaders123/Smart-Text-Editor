@@ -1,3 +1,4 @@
+import STE from "./STE.js";
 import { getElementStyle, applyEditingBehavior, setTitle } from "./app.js";
 import { setPreviewSource, refreshPreview } from "./Workspace.js";
 

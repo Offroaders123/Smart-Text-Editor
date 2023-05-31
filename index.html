@@ -56,7 +56,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js" data-manual></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-json.min.js"></script>
 
-<script src="./dist/STE.js"></script>
+<script>
+  if (window.self === window.top){
+    document.documentElement.classList.add("startup-fade");
+  }
+</script>
 
 <link rel="stylesheet" href="./styles/styles.css">
 

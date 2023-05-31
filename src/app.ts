@@ -1,3 +1,4 @@
+import STE from "./STE.js";
 import "./Card.js";
 import Tools from "./Tools.js";
 import { Editor, setEditorTabsVisibility } from "./Editor.js";
@@ -461,9 +462,14 @@ if (STE.appearance.parentWindow){
   if (STE.settings.get("preview-base")){
     preview_base_input.setValue(STE.settings.get("preview-base")!);
   }
-  window.setTimeout(() => {
-    document.documentElement.classList.remove("startup-fade");
-  },50);
+  // window.setTimeout(() => {
+  //   document.documentElement.classList.remove("startup-fade");
+  // },50);
+  Promise.all(["menu-drop","num-text","ste-card"].map(tag => window.customElements.whenDefined(tag)))
+    .then(async () => {
+      // await new Promise(resolve => setTimeout(resolve,50));
+      document.documentElement.classList.remove("startup-fade");
+    });
 }
 
 if (STE.support.fileHandling && STE.support.fileSystem){
