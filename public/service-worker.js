@@ -3,7 +3,7 @@
 
 var self = /** @type { ServiceWorkerGlobalScope } */ (/** @type { unknown } */ (globalThis));
 
-const CACHE_VERSION = "Smart Text Editor v4.20.0";
+const CACHE_VERSION = "Smart Text Editor v4.22.0";
 
 const IS_MACOS_DEVICE = (/(macOS|Mac)/i.test(navigator.userAgentData?.platform ?? navigator.platform) && navigator.standalone === undefined);
 
