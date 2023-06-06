@@ -19,7 +19,7 @@ export interface EditorOpenOptions {
 /**
  * Creates a new Editor within the Workspace.
 */
-export class Editor {
+export class Editor extends NumTextElement {
   static #editors: { [identifier: string]: Editor; } = {};
 
   /**
@@ -95,16 +95,15 @@ export class Editor {
 
   readonly editorClose = document.createElement("button");
 
-  readonly container = document.createElement("num-text");
-
   readonly previewOption: MenuDropOption = document.createElement("li");
 
-  declare readonly value;
   declare readonly isOpen;
   declare readonly autoCreated;
   declare readonly autoReplace;
 
   constructor({ name = "Untitled.txt", value = "", open = true, autoCreated = false, autoReplace = true }: EditorOptions = {}) {
+    super();
+
     this.#name = (!name.includes(".")) ? `${name}.txt` : name;
     this.value = value;
     this.isOpen = open;
@@ -226,9 +225,9 @@ export class Editor {
       await this.close();
     });
 
-    this.container.classList.add("editor");
-    this.container.setAttribute("data-editor-identifier",this.identifier);
-    this.container.setAttribute("value",this.value);
+    this.classList.add("editor");
+    this.setAttribute("data-editor-identifier",this.identifier);
+    this.setAttribute("value",this.value);
 
     this.previewOption.part.add("option");
     this.previewOption.classList.add("option");
@@ -254,9 +253,9 @@ export class Editor {
 
     this.tab.append(this.editorName,this.editorClose);
     workspace_tabs.insertBefore(this.tab,create_editor_button);
-    workspace_editors.append(this.container);
+    workspace_editors.append(this);
 
-    this.container.editor.addEventListener("input",() => {
+    this.editor.addEventListener("input",() => {
       if (this.tab.hasAttribute("data-editor-auto-created")){
         this.tab.removeAttribute("data-editor-auto-created");
       }
@@ -271,16 +270,16 @@ export class Editor {
 
     preview_menu.main.append(this.previewOption);
 
-    applyEditingBehavior(this.container);
+    applyEditingBehavior(this);
     Editor.#editors[this.identifier] = this;
 
     if (open || STE.activeEditor === null){
       this.open({ autoCreated, focusedOverride });
     }
 
-    this.container.syntaxLanguage = STE.query(this.identifier).getName("extension")!;
-    if ((STE.settings.get("syntax-highlighting") == "true") && (this.container.syntaxLanguage in Prism.languages)){
-      this.container.syntaxHighlight.enable();
+    this.syntaxLanguage = STE.query(this.identifier).getName("extension")!;
+    if ((STE.settings.get("syntax-highlighting") == "true") && (this.syntaxLanguage in Prism.languages)){
+      this.syntaxHighlight.enable();
     }
 
     setTimeout(() => {
@@ -307,14 +306,14 @@ export class Editor {
     if (autoCreated){
       this.tab.setAttribute("data-editor-auto-created","");
     }
-    this.container.classList.add("active");
+    this.classList.add("active");
     STE.activeEditor = this.identifier;
 
     setEditorTabsVisibility();
     setTitle({ content: this.#name });
 
     if ((((document.activeElement === document.body && STE.activeDialog !== null) || autoCreated) && !STE.environment.touchDevice && STE.appearance.parentWindow) || focused){
-      this.container.focus({ preventScroll: true });
+      this.focus({ preventScroll: true });
     }
 
     if (STE.previewEditor === "active-editor"){
@@ -332,7 +331,7 @@ export class Editor {
 
     const editorTabs = [...workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")];
     const changeIdentifier = Math.random().toString();
-    const focused = (document.activeElement === this.container);
+    const focused = (document.activeElement === this);
 
     if (editorTabs.length !== 1){
       document.body.setAttribute("data-editor-change",changeIdentifier);
@@ -380,7 +379,7 @@ export class Editor {
     this.tab.tabIndex = -1;
     this.tab.classList.remove("active");
 
-    workspace_editors.removeChild(this.container);
+    workspace_editors.removeChild(this);
     preview_menu.main.removeChild(this.previewOption);
 
     delete Editor.#editors[this.identifier];
@@ -422,15 +421,15 @@ export class Editor {
     const isLoadedLanguage = syntaxLanguage in Prism.languages;
 
     if (isLoadedLanguage){
-      this.container.syntaxLanguage = syntaxLanguage;
+      this.syntaxLanguage = syntaxLanguage;
     }
     if (STE.settings.get("syntax-highlighting") == "true" && isLoadedLanguage){
-      this.container.syntaxHighlight.enable();
+      this.syntaxHighlight.enable();
     } else {
-      this.container.syntaxHighlight.disable();
+      this.syntaxHighlight.disable();
     }
-    if (syntaxLanguage !== this.container.syntaxLanguage){
-      this.container.syntaxLanguage = syntaxLanguage;
+    if (syntaxLanguage !== this.syntaxLanguage){
+      this.syntaxLanguage = syntaxLanguage;
     }
 
     if (this.tab.hasAttribute("data-editor-auto-created")){
@@ -447,7 +446,13 @@ export class Editor {
   }
 }
 
+window.customElements.define("ste-editor",Editor);
+
 declare global {
+  interface HTMLElementTagNameMap {
+    "ste-editor": Editor;
+  }
+
   interface Window {
     Editor: typeof Editor;
   }

@@ -515,8 +515,6 @@ export function getElementStyle({ element, property, pseudo }: GetElementStyleOp
  * Applies the app's behavior defaults, like Drag and Drop handling, to `<input>` and `<num-text>` elements.
 */
 export function applyEditingBehavior(element: HTMLInputElement | NumTextElement){
-  const type = element.tagName.toLowerCase();
-
   (element as HTMLElement).addEventListener("dragover",event => {
     event.stopPropagation();
     if (event.dataTransfer === null) return;
@@ -532,21 +530,19 @@ export function applyEditingBehavior(element: HTMLInputElement | NumTextElement)
     }
   });
 
-  if (type === "input"){
+  if (element instanceof HTMLInputElement){
     element.spellcheck = false;
-    // @ts-expect-error
     element.autocomplete = "off";
     element.autocapitalize = "none";
     element.setAttribute("autocorrect","off");
   }
 
-  if (type === "num-text"){
-    if (!(element instanceof NumTextElement)) return;
+  if (element instanceof NumTextElement){
     element.colorScheme.set("dark");
     element.themes.remove("vanilla-appearance");
     const scrollbarStyles = document.createElement("style");
     scrollbarStyles.textContent = scrollbar_styles.textContent;
-    element.shadowRoot?.insertBefore(scrollbarStyles,element.container);
+    element.shadowRoot.insertBefore(scrollbarStyles,element.container);
   }
 }
 
