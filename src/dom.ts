@@ -93,14 +93,14 @@ export interface GetElementStyleOptions {
 /**
  * Gets a style property value for a given element.
 */
-export function getElementStyle({ element, property, pseudo }: GetElementStyleOptions){
+export function getElementStyle({ element, property, pseudo }: GetElementStyleOptions): string {
   return getComputedStyle(element,pseudo).getPropertyValue(property);
 }
 
 /**
  * Applies the app's behavior defaults, like Drag and Drop handling, to `<input>` and `<num-text>` elements.
 */
-export function applyEditingBehavior(element: HTMLInputElement | NumTextElement){
+export function applyEditingBehavior(element: HTMLInputElement | NumTextElement): void {
   (element as HTMLElement).addEventListener("dragover",event => {
     event.stopPropagation();
     if (event.dataTransfer === null) return;
@@ -139,7 +139,7 @@ export type SetTitleOptions =
 /**
  * Sets the title of the window.
 */
-export function setTitle(options: SetTitleOptions){
+export function setTitle(options: SetTitleOptions): void {
   if ("content" in options){
     document.title = `Smart Text Editor - ${options.content}`;
   } else {
@@ -150,7 +150,7 @@ export function setTitle(options: SetTitleOptions){
 /**
  * Shows the PWA Install Prompt, if the `BeforeInstallPrompt` event was fired when the app first started.
 */
-export async function showInstallPrompt(){
+export async function showInstallPrompt(): Promise<void> {
   if (STE.installPrompt === null) return;
   STE.installPrompt.prompt();
   const result = await STE.installPrompt.userChoice;
@@ -162,7 +162,7 @@ export async function showInstallPrompt(){
 /**
  * Clears the Service Worker cache, if the user confirms doing so.
 */
-export function clearSiteCaches(){
+export function clearSiteCaches(): void {
   const hasConfirmed = confirm("Are you sure you would like to clear all app caches?\nSmart Text Editor will no longer work offline until an Internet connection is available.");
   if (hasConfirmed){
     navigator.serviceWorker.controller?.postMessage({ action: "clear-site-caches" });

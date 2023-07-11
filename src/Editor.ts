@@ -25,7 +25,7 @@ export class Editor extends NumTextElement {
   /**
    * Opens an Editor from a given identifier.
   */
-  static open(identifier: string, options: EditorOpenOptions = {}) {
+  static open(identifier: string, options: EditorOpenOptions = {}): void {
     const editor = this.#editors[identifier];
     editor.open(options);
   }
@@ -33,7 +33,7 @@ export class Editor extends NumTextElement {
   /**
    * Closes an Editor from a given identifier.
   */
-  static async close(identifier: string) {
+  static async close(identifier: string): Promise<void> {
     const editor = this.#editors[identifier];
     await editor.close();
   }
@@ -43,7 +43,7 @@ export class Editor extends NumTextElement {
    * 
    * @param rename If a new name isn't provided, the user is prompted to provide one.
   */
-  static rename(identifier: string, rename?: string) {
+  static rename(identifier: string, rename?: string): void {
     const editor = this.#editors[identifier];
     const currentName = editor.#name;
 
@@ -62,7 +62,7 @@ export class Editor extends NumTextElement {
    * 
    * If the active Editor is the first one in the Workspace, it will wrap around to give the last Editor in the Workspace.
   */
-  static getPrevious(identifier: string, wrap: boolean = true) {
+  static getPrevious(identifier: string, wrap: boolean = true): string | null {
     const { tab } = STE.query(identifier);
     if (tab === null) return tab;
     const editorTabs = [...workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")];
@@ -76,7 +76,7 @@ export class Editor extends NumTextElement {
    * 
    * If the active Editor is the last one in the Workspace, it will wrap around to give the first Editor in the Workspace.
   */
-  static getNext(identifier: string, wrap: boolean = true) {
+  static getNext(identifier: string, wrap: boolean = true): string | null {
     const { tab } = STE.query(identifier);
     if (tab === null) return tab;
     const editorTabs = [...workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")];
@@ -85,7 +85,29 @@ export class Editor extends NumTextElement {
     return nextEditor;
   }
 
-  #name;
+  /**
+   * Updates the horizontal scroll position of the Workspace Tabs section to show a given Editor, by it's given identifier.
+   * 
+   * If the given identifier is already fully in view, no scrolling will happen.
+  */
+  static setTabsVisibility(identifier: string | null = STE.activeEditor): void {
+    if (!STE.activeEditor) return;
+    const { tab } = STE.query(identifier);
+    if (tab === null) return;
+    const obstructedLeft = (tab.offsetLeft <= workspace_tabs.scrollLeft);
+    const obstructedRight = ((tab.offsetLeft + tab.clientWidth) >= (workspace_tabs.scrollLeft + workspace_tabs.clientWidth));
+    let spacingOffset = 0;
+    if ((workspace_tabs.clientWidth < tab.clientWidth) && !obstructedLeft) return;
+    if (obstructedLeft){
+      spacingOffset = parseInt(getElementStyle({ element: workspace_tabs, pseudo: "::before", property: "width" }),10) * 3;
+      workspace_tabs.scrollTo(tab.offsetLeft - spacingOffset,0);
+    } else if (obstructedRight){
+      spacingOffset = parseInt(getElementStyle({ element: workspace_tabs, pseudo: "::after", property: "width" }),10) * 3;
+      workspace_tabs.scrollTo(tab.offsetLeft + tab.clientWidth + spacingOffset - workspace_tabs.clientWidth,0);
+    }
+  }
+
+  #name: string;
 
   readonly identifier = Math.random().toString();
 
@@ -293,7 +315,7 @@ export class Editor extends NumTextElement {
   /**
    * Opens the editor in the workspace.
   */
-  open({ autoCreated = false, focusedOverride = false }: EditorOpenOptions = {}) {
+  open({ autoCreated = false, focusedOverride = false }: EditorOpenOptions = {}): void {
     const focused = (document.activeElement === STE.query().container) || focusedOverride;
 
     if (STE.query().tab){
@@ -310,7 +332,7 @@ export class Editor extends NumTextElement {
     this.classList.add("active");
     STE.activeEditor = this.identifier;
 
-    setEditorTabsVisibility();
+    Editor.setTabsVisibility();
     setTitle({ content: this.#name });
 
     if ((((document.activeElement === document.body && STE.activeDialog !== null) || autoCreated) && !STE.environment.touchDevice && STE.appearance.parentWindow) || focused){
@@ -325,7 +347,7 @@ export class Editor extends NumTextElement {
   /**
    * Closes the editor in the workspace
   */
-  async close() {
+  async close(): Promise<void> {
     if (this.tab.hasAttribute("data-editor-unsaved")){
       if (!confirm(`Are you sure you would like to close "${this.#name}"?\nRecent changes have not yet been saved.`)) return;
     }
@@ -400,7 +422,7 @@ export class Editor extends NumTextElement {
     }
   }
 
-  get name() {
+  get name(): string {
     return this.#name;
   }
 
@@ -462,25 +484,3 @@ declare global {
 window.Editor = Editor;
 
 export default Editor;
-
-/**
- * Updates the horizontal scroll position of the Workspace Tabs section to show a given Editor, by it's given identifier.
- * 
- * If the given identifier is already fully in view, no scrolling will happen.
-*/
-export function setEditorTabsVisibility({ identifier = STE.activeEditor } = {}){
-  if (!STE.activeEditor) return;
-  const { tab } = STE.query(identifier);
-  if (tab === null) return;
-  const obstructedLeft = (tab.offsetLeft <= workspace_tabs.scrollLeft);
-  const obstructedRight = ((tab.offsetLeft + tab.clientWidth) >= (workspace_tabs.scrollLeft + workspace_tabs.clientWidth));
-  let spacingOffset = 0;
-  if ((workspace_tabs.clientWidth < tab.clientWidth) && !obstructedLeft) return;
-  if (obstructedLeft){
-    spacingOffset = parseInt(getElementStyle({ element: workspace_tabs, pseudo: "::before", property: "width" }),10) * 3;
-    workspace_tabs.scrollTo(tab.offsetLeft - spacingOffset,0);
-  } else if (obstructedRight){
-    spacingOffset = parseInt(getElementStyle({ element: workspace_tabs, pseudo: "::after", property: "width" }),10) * 3;
-    workspace_tabs.scrollTo(tab.offsetLeft + tab.clientWidth + spacingOffset - workspace_tabs.clientWidth,0);
-  }
-}

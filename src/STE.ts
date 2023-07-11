@@ -4,6 +4,24 @@ import type Card from "./Card.js";
 import type { View } from "./Workspace.js";
 import type { Orientation } from "./Workspace.js";
 
+export interface SafeAreaInsets {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+}
+
+export interface EditorQuery {
+  tab: HTMLButtonElement | null;
+  container: NumTextElement | null;
+  textarea: HTMLTextAreaElement | null;
+  getName(section?: "base" | "extension"): string | null;
+}
+
+interface ResetSettingsOptions {
+  confirm?: boolean;
+}
+
 /**
  * A global object with static properties that help with managing the state within Smart Text Editor.
 */
@@ -15,49 +33,49 @@ export class STE {
     /**
      * Checks whether the app window is the top-most window.
     */
-    get parentWindow() {
+    get parentWindow(): boolean {
       return (window.self == window.top);
     },
 
     /**
      * Checks whether the app window is in the standalone display mode.
     */
-    get standalone() {
+    get standalone(): boolean {
       return (window.matchMedia("(display-mode: standalone)").matches || navigator.standalone || !window.menubar.visible);
     },
 
     /**
      * Checks whether the app is running in standalone mode on iOS and iPadOS devices.
     */
-    get appleHomeScreen() {
+    get appleHomeScreen(): boolean {
       return (/(macOS|Mac|iPhone|iPad|iPod)/i.test(navigator.userAgentData?.platform ?? navigator.platform) && navigator.standalone === true);
     },
 
     /**
      * Checks if the app takes up the entire real estate of the current window.
     */
-    get hiddenChrome() {
+    get hiddenChrome(): boolean {
       return (window.outerWidth == window.innerWidth && window.outerHeight == window.innerHeight);
     },
 
     /**
      * Checks whether the app is running in standalone mode with Window Controls Overlay enabled.
     */
-    get windowControlsOverlay() {
+    get windowControlsOverlay(): boolean {
       return navigator.windowControlsOverlay?.visible ?? false;
     },
 
     /**
      * Checks whether the app is in fullscreen.
     */
-    get fullscreen() {
+    get fullscreen(): boolean {
       return (window.matchMedia("(display-mode: fullscreen)").matches || (!window.screenY && !window.screenTop && STE.appearance.hiddenChrome) || (!window.screenY && !window.screenTop && STE.appearance.standalone));
     },
 
     /**
      * Gets the inset values for the screen Safe Area.
     */
-    get safeAreaInsets() {
+    get safeAreaInsets(): SafeAreaInsets {
       function getSafeAreaInset(section: string){
         return parseInt(getComputedStyle(document.documentElement).getPropertyValue(`--safe-area-inset-${section}`),10);
       }
@@ -72,7 +90,7 @@ export class STE {
     /**
      * Enables or disables syntax highlighting for all Num Text elements.
     */
-    setSyntaxHighlighting(state: boolean){
+    setSyntaxHighlighting(state: boolean): void {
       state = (state != undefined) ? state : (STE.settings.get("syntax-highlighting") != undefined);
       document.querySelectorAll("num-text").forEach(editor => {
         if (editor.syntaxLanguage in Prism.languages) (state) ? editor.syntaxHighlight.enable() : editor.syntaxHighlight.disable();
@@ -86,37 +104,30 @@ export class STE {
   */
   static environment = {
     /**
-     * Checks whether the app is running over the File Prototcol.
-    */
-    get fileProtocol() {
-      return (window.location.protocol == "file:");
-    },
-
-    /**
      * Checks if the app is running on a touch-supported device.
     */
-    get touchDevice() {
+    get touchDevice(): boolean {
       return ("ontouchstart" in window);
     },
 
     /**
      * Checks if the app is running on an Apple device.
     */
-    get appleDevice() {
+    get appleDevice(): boolean {
       return (/(macOS|Mac|iPhone|iPad|iPod)/i.test(navigator.userAgentData?.platform ?? navigator.platform));
     },
 
     /**
      * Checks if the app is running on a macOS device.
     */
-    get macOSDevice() {
+    get macOSDevice(): boolean {
       return (/(macOS|Mac)/i.test(navigator.userAgentData?.platform ?? navigator.platform) && navigator.standalone == undefined);
     },
 
     /**
      * Checks if the app is running in a Firefox-based browser.
     */
-    get mozillaBrowser() {
+    get mozillaBrowser(): boolean {
       return (CSS.supports("-moz-appearance: none"));
     }
   }
@@ -128,42 +139,42 @@ export class STE {
     /**
      * Queries if Local Storage can be used on the current URL Protocol.
     */
-    get localStorage() {
-      return (window.location.protocol != "blob:") ? window.localStorage : null;
+    get localStorage(): boolean {
+      return ((window.location.protocol != "blob:") ? window.localStorage : null) !== null;
     },
 
     /**
      * Queries if the File System Access API is supported.
     */
-    get fileSystem() {
+    get fileSystem(): boolean {
       return ("showOpenFilePicker" in window);
     },
 
     /**
      * Queries if the File Handling API is supported.
     */
-    get fileHandling() {
+    get fileHandling(): boolean {
       return ("launchQueue" in window && "LaunchParams" in window);
     },
 
     /**
      * Queries if the Window Controls Overlay API is supported.
     */
-    get windowControlsOverlay() {
+    get windowControlsOverlay(): boolean {
       return ("windowControlsOverlay" in navigator);
     },
 
     /**
      * Queries if `document.execCommand()` calls are supported in `<textarea>` and `<input>` elements.
     */
-    get editingCommands() {
+    get editingCommands(): boolean {
       return (!STE.environment.mozillaBrowser);
     },
 
     /**
      * Queries if the Web Share API is supported.
     */
-    get webSharing() {
+    get webSharing(): boolean {
       return ("share" in navigator);
     }
   }
@@ -172,8 +183,9 @@ export class STE {
    * Selects an Editor by it's identifier.
    * 
    * @param identifier Defaults to the currently opened Editor.
+   * @deprecated Need to move this functionality to individual Editor components instead.
   */
-  static query(identifier: string | null = STE.activeEditor) {
+  static query(identifier: string | null = STE.activeEditor): EditorQuery {
     const tab = workspace_tabs.querySelector<HTMLButtonElement>(`.tab[data-editor-identifier="${identifier}"]`);
     const container = workspace_editors.querySelector<NumTextElement>(`.editor[data-editor-identifier="${identifier}"]`);
     const textarea = (container) ? container.editor : null;
@@ -183,7 +195,7 @@ export class STE {
      * 
      * @param section The `"base"` flag provides the name before the extension, and the `"extension"` flag provides only the extension. If omitted, the full file name is returned.
     */
-    function getName(section?: "base" | "extension"){
+    function getName(section?: "base" | "extension"): string | null {
       if ((document.querySelectorAll(`[data-editor-identifier="${identifier}"]:not([data-editor-change])`).length === 0) && (identifier !== STE.activeEditor)) return null;
       let name: string | string[] = workspace_tabs.querySelector<HTMLSpanElement>(`.tab[data-editor-identifier="${identifier}"] [data-editor-name]`)!.innerText;
       if (!section || (!name.includes(".") && section === "base")) return name;
@@ -206,7 +218,7 @@ export class STE {
   /**
    * Gets the current View layout.
   */
-  static get view() {
+  static get view(): View {
     return document.body.getAttribute("data-view") as View | null ?? "code";
   }
 
@@ -215,14 +227,14 @@ export class STE {
    * 
    * This has to do with the View layout transition.
   */
-  static get viewChange() {
+  static get viewChange(): boolean {
     return document.body.hasAttribute("data-view-change");
   }
 
   /**
    * Gets the current Orientation layout.
   */
-  static get orientation() {
+  static get orientation(): Orientation {
     return document.body.getAttribute("data-orientation") as Orientation | null ?? "horizontal";
   }
 
@@ -231,21 +243,21 @@ export class STE {
    * 
    * This has to do with the Orientation layout transition.
   */
-  static get orientationChange() {
+  static get orientationChange(): boolean {
     return document.body.hasAttribute("data-orientation-change");
   }
 
   /**
    * Gets the state of whether the Workspace is being resized with the Scaler handle.
   */
-  static get scalingChange() {
+  static get scalingChange(): boolean {
     return document.body.hasAttribute("data-scaling-change");
   }
 
   /**
    * Checks if any Editors haven't been saved since their last edits.
   */
-  static get unsavedWork() {
+  static get unsavedWork(): boolean {
     return (!STE.appearance.parentWindow || (workspace_tabs.querySelectorAll(".tab:not([data-editor-change])[data-editor-unsaved]").length == 0));
   }
 
@@ -264,7 +276,7 @@ export class STE {
    * 
    * The value can also be `"active-editor"`. If it is set to that, then references to `STE.previewEditor` will be pointed to `STE.activeEditor`.
   */
-  static previewEditor = "active-editor";
+  static previewEditor: string = "active-editor";
 
   /**
    * An object that pairs an Editor identifier with it's `FileSystemFileHandle`, if it was opened from the file system directly.
@@ -290,8 +302,8 @@ export class STE {
     /**
      * Sets the given key and value to the app settings.
     */
-    set(key: string, value: string) {
-      if (!STE.support.localStorage) return;
+    set(key: string, value: string): string | null {
+      if (!STE.support.localStorage) return null;
       STE.settings.entries[key] = value;
       window.localStorage.setItem("settings",JSON.stringify(STE.settings.entries,null,"  "));
       return value;
@@ -300,8 +312,8 @@ export class STE {
     /**
      * Removes the given key from the app settings.
     */
-    remove(key: string) {
-      if (!STE.support.localStorage) return;
+    remove(key: string): true | null {
+      if (!STE.support.localStorage) return null;
       delete STE.settings.entries[key];
       window.localStorage.setItem("settings",JSON.stringify(STE.settings.entries,null,"  "));
       return true;
@@ -310,16 +322,16 @@ export class STE {
     /**
      * Queries if a given key is present in the app settings.
     */
-    has(key: string) {
+    has(key: string): boolean {
       return (key in STE.settings.entries);
     },
 
     /**
      * Gets the value of a given key from the app settings.
     */
-    get(key: string) {
-      if (!STE.support.localStorage) return;
-      if (!STE.settings.has(key)) return;
+    get(key: string): string | null | undefined {
+      if (!STE.support.localStorage) return null;
+      if (!STE.settings.has(key)) return null;
       return STE.settings.entries[key];
     },
 
@@ -328,7 +340,7 @@ export class STE {
      * 
      * @param options Accepts an option to show the user a prompt to confirm that the settings should be reset.
     */
-    reset({ confirm: showPrompt = false }: ResetSettingsOptions = {}) {
+    reset({ confirm: showPrompt = false }: ResetSettingsOptions = {}): boolean {
       if (!STE.support.localStorage) return false;
       if (showPrompt){
         if (!confirm("Are you sure you would like to reset all settings?")) return false;
@@ -380,10 +392,6 @@ declare global {
 window.STE = STE;
 
 export default STE;
-
-interface ResetSettingsOptions {
-  confirm?: boolean;
-}
 
 // if (STE.appearance.parentWindow) document.documentElement.classList.add("startup-fade");
 if (STE.appearance.appleHomeScreen) document.documentElement.classList.add("apple-home-screen");

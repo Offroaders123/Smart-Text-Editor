@@ -1,5 +1,5 @@
 import STE from "./STE.js";
-import Editor, { setEditorTabsVisibility } from "./Editor.js";
+import Editor from "./Editor.js";
 import { workspace, view_menu, scaler, preview, preview_menu, workspace_tabs, header, getElementStyle } from "./dom.js";
 import { read, stringify } from "nbtify";
 
@@ -44,7 +44,7 @@ export function setView(type: View, { force = false }: SetViewOptions = {}){
   document.body.classList.add(STE.view);
   removeScaling();
   view_menu.select(STE.view);
-  if (type != "preview") window.setTimeout(setEditorTabsVisibility,transitionDuration);
+  if (type != "preview") window.setTimeout(Editor.setTabsVisibility,transitionDuration);
   window.setTimeout(() => {
     if (document.body.getAttribute("data-view-change") == changeIdentifier) document.body.removeAttribute("data-view-change");
   },transitionDuration);

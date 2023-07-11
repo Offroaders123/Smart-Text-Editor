@@ -1,7 +1,7 @@
 import STE from "./STE.js";
 import "./Card.js";
 import Tools from "./Tools.js";
-import Editor, { setEditorTabsVisibility } from "./Editor.js";
+import Editor from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview, setScaling, disableScaling } from "./Workspace.js";
 import { app_omnibox, cleared_cache_card, theme_button, preview_base_card, replace_text_card, json_formatter_card, uri_encoder_card, uuid_generator_card, settings_card, app_menubar, workspace_tabs, create_editor_button, scaler, card_backdrop, preview_base_input, generator_output, default_orientation_setting, syntax_highlighting_setting, automatic_refresh_setting, scrollbar_styles, applyEditingBehavior } from "./dom.js";
 
@@ -47,14 +47,12 @@ for (const option of app_omnibox.querySelectorAll<HTMLButtonElement | HTMLAnchor
 const queryParameters = new URLSearchParams(window.location.search);
 
 (async () => {
-  if (STE.environment.fileProtocol) return;
   if (window.location.href.includes("index.html")){
     history.pushState(null,"",window.location.href.replace(/index.html/,""));
   }
 
   if (!("serviceWorker" in navigator) || !STE.appearance.parentWindow) return;
   await navigator.serviceWorker.register("service-worker.js");
-
   if (navigator.serviceWorker.controller === null) return;
 
   if (navigator.serviceWorker.controller.state === "activated"){
@@ -83,7 +81,7 @@ const queryParameters = new URLSearchParams(window.location.search);
     removeQueryParameters(["share-target"]);
   }
 
-  function activateManifest(){
+  function activateManifest(): void {
     document.querySelector<HTMLLinkElement>("link[rel='manifest']")!.href = "manifest.webmanifest";
   }
 })();
@@ -102,14 +100,14 @@ window.addEventListener("beforeunload",event => {
 });
 
 window.addEventListener("unload",() => {
-  for (const window of STE.childWindows){
-    window.close();
+  for (const childWindow of STE.childWindows){
+    childWindow.close();
   }
 });
 
 window.addEventListener("resize",() => {
   if (STE.view !== "preview"){
-    setEditorTabsVisibility();
+    Editor.setTabsVisibility();
   }
   if (STE.view === "split" && document.body.hasAttribute("data-scaling-active")){
     setView("split");
@@ -131,7 +129,7 @@ document.body.addEventListener("keydown",event => {
   const shiftCommand = (shift && command);
   const controlCommand = (event.ctrlKey && command);
 
-  function pressed(key: string){
+  function pressed(key: string): boolean {
     return event.key.toLowerCase() === key.toLowerCase();
   }
 
@@ -499,7 +497,7 @@ if (queryParameters.get("settings")){
 /**
  * Removes query parameters from the app's URL.
 */
-function removeQueryParameters(entries: string[]){
+function removeQueryParameters(entries: string[]): void {
   const parameters = new URLSearchParams(window.location.search);
   for (const entry of entries){
     parameters.delete(entry);
@@ -510,7 +508,7 @@ function removeQueryParameters(entries: string[]){
 /**
  * Updates the app's URL query parameters to a new `URLSearchParams` object.
 */
-function changeQueryParameters(parameters: URLSearchParams){
+function changeQueryParameters(parameters: URLSearchParams): void {
   let query = parameters.toString();
   if (query) query = "?" + query;
   const address = window.location.pathname + query;

@@ -1,5 +1,5 @@
 import STE from "./STE.js";
-import { setEditorTabsVisibility } from "./Editor.js";
+import Editor from "./Editor.js";
 import { card_backdrop, workspace_tabs, workspace_editors, getElementStyle } from "./dom.js";
 
 /**
@@ -14,12 +14,12 @@ export class Card extends HTMLElement {
   declare heading: HTMLDivElement;
   declare controls: HTMLDivElement & { minimize: HTMLButtonElement; close: HTMLButtonElement; };
 
-  constructor(){
+  constructor() {
     super();
     this.defined = false;
   }
 
-  connectedCallback(){
+  connectedCallback(): void {
     if (this.defined || !this.isConnected) return;
     this.defined = true;
     this.addEventListener("keydown",event => {
@@ -69,7 +69,7 @@ export class Card extends HTMLElement {
     }
   }
 
-  open(previous?: Card){
+  open(previous?: Card): void {
     if (this.matches(".active") && !this.hasAttribute("data-alert-timeout")) return this.close();
     if (this.type != "alert"){
       document.querySelectorAll<Card>(`.card.active`).forEach(card => {
@@ -108,7 +108,7 @@ export class Card extends HTMLElement {
     if (this.type == "widget") STE.activeWidget = this;
   }
 
-  minimize(){
+  minimize(): void {
     const icon = this.controls.minimize.querySelector<SVGUseElement>("svg use")!;
     const main = this.querySelector<HTMLDivElement>(".main")!;
     const changeIdentifier = Math.random().toString();
@@ -125,7 +125,7 @@ export class Card extends HTMLElement {
       icon.setAttribute("href","#arrow_icon");
       window.setTimeout(() => {
         workspace_tabs.style.setProperty("--minimize-tab-width",getElementStyle({ element: this, property: "width" }));
-        setEditorTabsVisibility();
+        Editor.setTabsVisibility();
       },transitionDuration);
       if (this.contains(document.activeElement) && document.activeElement != this.controls.minimize) this.controls.minimize.focus();
     } else {
@@ -144,7 +144,7 @@ export class Card extends HTMLElement {
     },transitionDuration);
   }
 
-  close(){
+  close(): void {
     this.classList.remove("active");
     if (this.matches(".minimize")){
       const transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
@@ -168,13 +168,13 @@ export class Card extends HTMLElement {
    * 
    * @param options If the scope option is set to `true`, only direct children within the parent element will be selected.
   */
-  static #getNavigableElements({ container, scope = false }: GetNavigableElementsOptions){
+  static #getNavigableElements({ container, scope = false }: GetNavigableElementsOptions): HTMLElement[] {
     scope = (scope) ? "" : ":scope > ";
     const navigable: NodeListOf<HTMLElement> = container.querySelectorAll(`${scope}button:not([disabled]), ${scope}textarea:not([disabled]), ${scope}input:not([disabled]), ${scope}select:not([disabled]), ${scope}a[href]:not([disabled]), ${scope}[tabindex]:not([tabindex="-1"])`);
     return Array.from(navigable).filter(element => (getElementStyle({ element, property: "display" }) != "none"));
   }
 
-  static #catchCardNavigation(event: KeyboardEvent){
+  static #catchCardNavigation(event: KeyboardEvent): void {
     if (!STE.activeDialog || event.key != "Tab" || document.activeElement != document.body) return;
     const navigable = Card.#getNavigableElements({ container: STE.activeDialog, scope: true });
     event.preventDefault();
