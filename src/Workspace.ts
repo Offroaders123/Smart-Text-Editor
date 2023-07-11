@@ -166,8 +166,8 @@ export async function openFiles(){
     });
     if (!handles) return;
     handles.forEach(async handle => {
-      const file = await handle.getFile(), { identifier } = new Editor({ name: file.name, value: await file.text() });
-      STE.fileHandles[identifier] = handle;
+      const file = await handle.getFile();
+      new Editor({ name: file.name, value: await file.text(), handle });
     });
   }
 }

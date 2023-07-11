@@ -10,13 +10,13 @@
   "dependencies": {
     "@stedit/menu-drop": "^1.0.1",
     "@stedit/num-text": "^1.0.1",
-    "nbtify": "^1.35.3"
+    "nbtify": "^1.60.2"
   },
   "devDependencies": {
     "@types/prismjs": "^1.26.0",
     "better-typescript": "^0.1.2",
-    "new-javascript": "^0.3.1",
-    "typescript": "^5.0.4",
-    "vite": "^4.3.9"
+    "new-javascript": "^0.3.5",
+    "typescript": "^5.1.6",
+    "vite": "^4.4.2"
   }
 }

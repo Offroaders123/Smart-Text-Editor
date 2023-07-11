@@ -309,8 +309,7 @@ document.body.addEventListener("drop",event => {
           const file = await handle.getFile();
           const { name } = file;
           const value = await file.text();
-          const { identifier } = new Editor({ name, value });
-          STE.fileHandles[identifier] = handle;
+          new Editor({ name, value, handle });
         }
         break;
       }
@@ -479,8 +478,7 @@ if (STE.support.fileHandling && STE.support.fileSystem){
       const file = await handle.getFile();
       const { name } = file;
       const value = await file.text();
-      const { identifier } = new Editor({ name, value });
-      STE.fileHandles[identifier] = handle;
+      new Editor({ name, value, handle });
     }
     if (!STE.environment.touchDevice){
       STE.query().container?.focus({ preventScroll: true });

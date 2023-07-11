@@ -5,6 +5,7 @@ import { workspace_tabs, create_editor_button, workspace_editors, preview_menu, 
 export interface EditorOptions {
   name?: string;
   value?: string;
+  handle?: FileSystemFileHandle;
   open?: boolean;
   autoCreated?: boolean;
   autoReplace?: boolean;
@@ -100,7 +101,7 @@ export class Editor extends NumTextElement {
   declare readonly autoCreated;
   declare readonly autoReplace;
 
-  constructor({ name = "Untitled.txt", value = "", open = true, autoCreated = false, autoReplace = true }: EditorOptions = {}) {
+  constructor({ name = "Untitled.txt", value = "", handle, open = true, autoCreated = false, autoReplace = true }: EditorOptions = {}) {
     super();
 
     this.#name = (!name.includes(".")) ? `${name}.txt` : name;
@@ -271,6 +272,7 @@ export class Editor extends NumTextElement {
 
     applyEditingBehavior(this);
     Editor.#editors[this.identifier] = this;
+    if (handle !== undefined) STE.fileHandles[this.identifier] = handle;
 
     if (open || STE.activeEditor === null){
       this.open({ autoCreated, focusedOverride });
