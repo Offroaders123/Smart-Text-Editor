@@ -1,7 +1,6 @@
 import STE from "./STE.js";
-import { getElementStyle } from "./app.js";
 import Editor, { setEditorTabsVisibility } from "./Editor.js";
-import { workspace, view_menu, scaler, preview, preview_menu, workspace_tabs, header } from "./dom.js";
+import { workspace, view_menu, scaler, preview, preview_menu, workspace_tabs, header, getElementStyle } from "./dom.js";
 import { read, stringify } from "nbtify";
 
 declare global {

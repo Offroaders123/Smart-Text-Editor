@@ -1,7 +1,6 @@
 import STE from "./STE.js";
-import { getElementStyle, applyEditingBehavior, setTitle } from "./app.js";
 import { setPreviewSource, refreshPreview } from "./Workspace.js";
-import { workspace_tabs, create_editor_button, workspace_editors, preview_menu, preview } from "./dom.js";
+import { workspace_tabs, create_editor_button, workspace_editors, preview_menu, preview, getElementStyle, applyEditingBehavior, setTitle } from "./dom.js";
 
 export interface EditorOptions {
   name?: string;
@@ -105,7 +104,7 @@ export class Editor extends NumTextElement {
     super();
 
     this.#name = (!name.includes(".")) ? `${name}.txt` : name;
-    this.value = value;
+    this.editor.value = value;
     this.isOpen = open;
     this.autoCreated = autoCreated;
     this.autoReplace = autoReplace;

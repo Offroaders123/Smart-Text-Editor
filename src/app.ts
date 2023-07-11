@@ -3,7 +3,7 @@ import "./Card.js";
 import Tools from "./Tools.js";
 import Editor, { setEditorTabsVisibility } from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview, setScaling, disableScaling } from "./Workspace.js";
-import { app_omnibox, cleared_cache_card, theme_button, preview_base_card, replace_text_card, json_formatter_card, uri_encoder_card, uuid_generator_card, settings_card, app_menubar, workspace_tabs, create_editor_button, scaler, card_backdrop, preview_base_input, generator_output, default_orientation_setting, syntax_highlighting_setting, automatic_refresh_setting, scrollbar_styles } from "./dom.js";
+import { app_omnibox, cleared_cache_card, theme_button, preview_base_card, replace_text_card, json_formatter_card, uri_encoder_card, uuid_generator_card, settings_card, app_menubar, workspace_tabs, create_editor_button, scaler, card_backdrop, preview_base_input, generator_output, default_orientation_setting, syntax_highlighting_setting, automatic_refresh_setting, scrollbar_styles, applyEditingBehavior } from "./dom.js";
 
 import type { Orientation } from "./Workspace.js";
 
@@ -46,7 +46,7 @@ for (const option of app_omnibox.querySelectorAll<HTMLButtonElement | HTMLAnchor
 
 const queryParameters = new URLSearchParams(window.location.search);
 
-await (async () => {
+(async () => {
   if (STE.environment.fileProtocol) return;
   if (window.location.href.includes("index.html")){
     history.pushState(null,"",window.location.href.replace(/index.html/,""));
@@ -498,69 +498,6 @@ if (queryParameters.get("settings")){
   removeQueryParameters(["settings"]);
 }
 
-export interface GetElementStyleOptions {
-  element: Element;
-  property: string;
-  pseudo?: string;
-}
-
-/**
- * Gets a style property value for a given element.
-*/
-export function getElementStyle({ element, property, pseudo }: GetElementStyleOptions){
-  return getComputedStyle(element,pseudo).getPropertyValue(property);
-}
-
-/**
- * Applies the app's behavior defaults, like Drag and Drop handling, to `<input>` and `<num-text>` elements.
-*/
-export function applyEditingBehavior(element: HTMLInputElement | NumTextElement){
-  (element as HTMLElement).addEventListener("dragover",event => {
-    event.stopPropagation();
-    if (event.dataTransfer === null) return;
-    event.dataTransfer.dropEffect = "copy";
-  });
-
-  (element as HTMLElement).addEventListener("drop",event => {
-    if (event.dataTransfer === null) return;
-    if ([...event.dataTransfer.items][0].kind === "file") return;
-    event.stopPropagation();
-    for (const menu of document.querySelectorAll<MenuDropElement>("menu-drop[data-open]")){
-      menu.close();
-    }
-  });
-
-  if (element instanceof HTMLInputElement){
-    element.spellcheck = false;
-    element.autocomplete = "off";
-    element.autocapitalize = "none";
-    element.setAttribute("autocorrect","off");
-  }
-
-  if (element instanceof NumTextElement){
-    element.colorScheme.set("dark");
-    element.themes.remove("vanilla-appearance");
-    const scrollbarStyles = document.createElement("style");
-    scrollbarStyles.textContent = scrollbar_styles.textContent;
-    element.shadowRoot.insertBefore(scrollbarStyles,element.container);
-  }
-}
-
-export type SetTitleOptions =
-  | { content: string; }
-  | { reset: true; }
-
-/**
- * Sets the title of the window.
-*/
-export function setTitle(options: SetTitleOptions){
-  if ("content" in options){
-    document.title = `Smart Text Editor - ${options.content}`;
-  } else {
-    document.title = "Smart Text Editor";
-  }
-}
-
 /**
  * Removes query parameters from the app's URL.
 */
@@ -580,36 +517,4 @@ function changeQueryParameters(parameters: URLSearchParams){
   if (query) query = "?" + query;
   const address = window.location.pathname + query;
   history.pushState(null,"",address);
-}
-
-/**
- * Shows the PWA Install Prompt, if the `BeforeInstallPrompt` event was fired when the app first started.
-*/
-export async function showInstallPrompt(){
-  if (STE.installPrompt === null) return;
-  STE.installPrompt.prompt();
-  const result = await STE.installPrompt.userChoice;
-  if (result.outcome !== "accepted") return;
-  document.documentElement.classList.remove("install-prompt-available");
-  theme_button.childNodes[0].textContent = "Customize Theme";
-}
-
-/**
- * Clears the Service Worker cache, if the user confirms doing so.
-*/
-export function clearSiteCaches(){
-  const hasConfirmed = confirm("Are you sure you would like to clear all app caches?\nSmart Text Editor will no longer work offline until an Internet connection is available.");
-  if (hasConfirmed){
-    navigator.serviceWorker.controller?.postMessage({ action: "clear-site-caches" });
-  }
-}
-
-window.showInstallPrompt = showInstallPrompt;
-window.clearSiteCaches = clearSiteCaches;
-
-declare global {
-  interface Window {
-    showInstallPrompt: typeof showInstallPrompt;
-    clearSiteCaches: typeof clearSiteCaches;
-  }
 }
