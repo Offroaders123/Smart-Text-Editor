@@ -3,7 +3,9 @@
 
 var self = /** @type { ServiceWorkerGlobalScope } */ (/** @type { unknown } */ (globalThis));
 
-const CACHE_VERSION = "Smart Text Editor v4.23.0";
+const NAME = "Smart Text Editor";
+const VERSION = "v4.24.0";
+const CACHE_NAME = /** @type { const } */ (`${NAME} ${VERSION}`);
 
 const IS_MACOS_DEVICE = (/(macOS|Mac)/i.test(navigator.userAgentData?.platform ?? navigator.platform) && navigator.standalone === undefined);
 
@@ -67,7 +69,7 @@ self.addEventListener("message",async event => {
       const keys = await caches.keys();
 
       await Promise.all(keys.map(async key => {
-        if (key.startsWith("Smart Text Editor ")){
+        if (key.startsWith(NAME)){
           await caches.delete(key);
         }
       }));
@@ -80,12 +82,14 @@ self.addEventListener("message",async event => {
 
 /**
  * Clears out old versions of the app from Cache Storage.
+ * 
+ * @returns { Promise<void> }
 */
 async function removeOutdatedVersions(){
   const keys = await caches.keys();
 
   await Promise.all(keys.map(async key => {
-    const isOutdatedVersion = key.startsWith("Smart Text Editor ") && key !== CACHE_VERSION;
+    const isOutdatedVersion = key.startsWith(NAME) && key !== CACHE_NAME;
 
     if (isOutdatedVersion){
       await caches.delete(key);
@@ -102,6 +106,7 @@ async function removeOutdatedVersions(){
  * If it hasn't been cached yet, it will fetch the network for a response, cache a clone, then return the response.
  * 
  * @param { Request } request
+ * @returns { Promise<Response> }
 */
 async function matchRequest(request){
   let response = await caches.match(request);
@@ -118,9 +123,10 @@ async function matchRequest(request){
  * 
  * @param { Request } request
  * @param { Response } response
+ * @return { Promise<void> }
 */
 async function cacheRequest(request,response){
-  const cache = await caches.open(CACHE_VERSION);
+  const cache = await caches.open(CACHE_NAME);
   await cache.put(request,response.clone());
 }
 

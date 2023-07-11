@@ -3,9 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc; vite build --base ./ --target esnext",
-    "dev": "vite --host --port 5500 --base ./",
-    "preview": "vite preview --host --port 5500 --base ./"
+    "build": "tsc; vite build",
+    "dev": "vite",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@stedit/menu-drop": "^1.0.1",
