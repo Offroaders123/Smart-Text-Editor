@@ -1,7 +1,6 @@
 import STE from "./STE.js";
 import Editor from "./Editor.js";
 import { workspace, view_menu, scaler, preview, preview_menu, workspace_tabs, header, getElementStyle } from "./dom.js";
-import { read, stringify } from "nbtify";
 
 import type { EditorOptions } from "./Editor.js";
 
@@ -149,7 +148,7 @@ export async function openFiles(): Promise<void> {
 
     const results: PromiseSettledResult<EditorOptions>[] = await Promise.allSettled([...input.files].map(async file => {
       const { name } = file;
-      const value = (name.match(/.(nbt|dat)$/)) ? await file.arrayBuffer().then(read).then(({ data }) => stringify(data,{ space: 2 })) : await file.text();
+      const value = await file.text();
       return { name, value };
     }));
 

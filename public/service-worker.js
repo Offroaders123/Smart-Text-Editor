@@ -4,7 +4,7 @@
 var self = /** @type { ServiceWorkerGlobalScope } */ (/** @type { unknown } */ (globalThis));
 
 const NAME = "Smart Text Editor";
-const VERSION = "v4.27.1";
+const VERSION = "v4.27.2";
 const CACHE_NAME = /** @type { const } */ (`${NAME} ${VERSION}`);
 
 const IS_MACOS_DEVICE = (/(macOS|Mac)/i.test(navigator.userAgentData?.platform ?? navigator.platform) && navigator.standalone === undefined);

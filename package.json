@@ -9,8 +9,7 @@
   },
   "dependencies": {
     "@stedit/menu-drop": "^1.0.1",
-    "@stedit/num-text": "^1.0.1",
-    "nbtify": "^1.60.2"
+    "@stedit/num-text": "^1.0.1"
   },
   "devDependencies": {
     "@types/prismjs": "^1.26.0",
