@@ -173,12 +173,10 @@ export class Editor extends NumTextElement {
         return editorRename.blur();
       }
 
-      Object.assign(editorRename,{
-        type: "text",
-        placeholder: this.#name,
-        tabIndex: -1,
-        value: this.#name
-      });
+      editorRename.type = "text";
+      editorRename.placeholder = this.#name;
+      editorRename.tabIndex = -1;
+      editorRename.value = this.#name;
       editorRename.setAttribute("data-editor-rename","");
       editorRename.style.setProperty("--editor-name-width",`${this.editorName.offsetWidth}px`);
 

@@ -3,6 +3,8 @@ import Editor from "./Editor.js";
 import { workspace, view_menu, scaler, preview, preview_menu, workspace_tabs, header, getElementStyle } from "./dom.js";
 import { read, stringify } from "nbtify";
 
+import type { EditorOptions } from "./Editor.js";
+
 declare global {
   interface Window {
     setView: typeof setView;
@@ -34,7 +36,7 @@ export interface SetViewOptions {
 /**
  * Sets the View state of the app. If a View change is already in progress, and the force option is not set to `true`, the call will be skipped.
 */
-export function setView(type: View, { force = false }: SetViewOptions = {}){
+export function setView(type: View, { force = false }: SetViewOptions = {}): void {
   if ((STE.orientationChange && !force) || STE.scalingChange) return;
   const changeIdentifier = Math.random().toString();
   document.body.setAttribute("data-view-change",changeIdentifier);
@@ -58,7 +60,7 @@ export type Orientation = "horizontal" | "vertical";
  * 
  * @param orientation If an Orientation type is not provided, the current state will be toggled to the other option.
 */
-export function setOrientation(orientation?: Orientation){
+export function setOrientation(orientation?: Orientation): void {
   if (STE.orientationChange || STE.scalingChange) return;
   document.body.setAttribute("data-orientation-change","");
   const param = (orientation), transitionDuration = ((STE.view != "split") ? 0 : parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`));
@@ -78,7 +80,7 @@ export function setOrientation(orientation?: Orientation){
     window.setTimeout(() => document.body.removeAttribute("data-orientation-change"),transitionDuration);
   },transitionDuration);
 
-  function setTransitionDurations(state: "on" | "off"){
+  function setTransitionDurations(state: "on" | "off"): void {
     if (state == "on"){
       workspace.style.removeProperty("transition-duration");
       scaler.style.removeProperty("transition-duration");
@@ -99,7 +101,7 @@ export type SetPreviewSourceOptions =
 /**
  * Sets the source for the Preview to a given Editor.
 */
-export function setPreviewSource(options: SetPreviewSourceOptions){
+export function setPreviewSource(options: SetPreviewSourceOptions): void {
   if ("activeEditor" in options || STE.previewEditor === options.identifier){
     STE.previewEditor = "active-editor";
     preview_menu.select("active-editor");
@@ -113,7 +115,7 @@ export function setPreviewSource(options: SetPreviewSourceOptions){
 /**
  * Creates a new Smart Text Editor window.
 */
-export function createWindow(){
+export function createWindow(): void {
   const features = (STE.appearance.standalone || STE.appearance.fullscreen) ? "popup" : "",
     win = window.open(window.location.href,"_blank",features);
 
@@ -132,12 +134,11 @@ export function createWindow(){
  * 
  * If the File System Access API is supported in the user's browser, it will use that. If not, it will fall back to using an `<input type="file">` element.
 */
-export async function openFiles(){
+export async function openFiles(): Promise<void> {
   if (!STE.support.fileSystem){
-    const input = Object.assign(document.createElement("input"),{
-      type: "file",
-      multiple: true
-    });
+    const input = document.createElement("input");
+    input.type = "file";
+    input.multiple = true;
 
     await new Promise(resolve => {
       input.addEventListener("change",resolve,{ once: true });
@@ -146,15 +147,15 @@ export async function openFiles(){
 
     if (input.files === null) return;
 
-    const results = await Promise.allSettled([...input.files].map(async file => {
+    const results: PromiseSettledResult<EditorOptions>[] = await Promise.allSettled([...input.files].map(async file => {
       const { name } = file;
       const value = (name.match(/.(nbt|dat)$/)) ? await file.arrayBuffer().then(read).then(({ data }) => stringify(data,{ space: 2 })) : await file.text();
       return { name, value };
     }));
 
-    const files = results
-      .filter(/** @returns { result is PromiseFulfilledResult<{ name: string; value: string; }> } */
-        (result): result is PromiseFulfilledResult<{ name: string; value: string; }> => result.status === "fulfilled")
+    const files: EditorOptions[] = results
+      .filter(
+        (result): result is PromiseFulfilledResult<EditorOptions> => result.status === "fulfilled")
       .map(result => result.value);
 
     for (const file of files){
@@ -179,7 +180,7 @@ export async function openFiles(){
  * 
  * If the File System Access API is not supported, or if a custom file extension is provided for the current file, a Save As dialog will be shown using an `<a download href="blob:">` element.
 */
-export async function saveFile(extension?: string){
+export async function saveFile(extension?: string): Promise<void> {
   if (extension || !STE.support.fileSystem){
     if (!extension) extension = STE.query().getName("extension") ?? "";
     const anchor = document.createElement("a"), link = window.URL.createObjectURL(new Blob([STE.query().textarea?.value ?? ""]));
@@ -216,7 +217,7 @@ export async function saveFile(extension?: string){
 /**
  * Creates a new Display window for the active Editor.
 */
-export function createDisplay(){
+export function createDisplay(): void {
   const width = window.screen.availWidth * 2/3,
     height = window.screen.availHeight * 2/3,
     left = window.screen.availWidth / 2 + window.screen.availLeft - width / 2,
@@ -246,7 +247,7 @@ export interface RefreshPreviewOptions {
 /**
  * Refreshes the Preview with the latest source from the source Editor.
 */
-export function refreshPreview({ force = false }: RefreshPreviewOptions = {}){
+export function refreshPreview({ force = false }: RefreshPreviewOptions = {}): void {
   if (STE.view == "code") return;
   const editor = (STE.previewEditor == "active-editor") ? STE.query() : STE.query(STE.previewEditor);
   if (!editor.tab || !editor.textarea) return;
@@ -267,7 +268,7 @@ export function refreshPreview({ force = false }: RefreshPreviewOptions = {}){
 /**
  * Sets the Split mode scaling when called from the Scaler's moving event listeners.
 */
-export function setScaling(event: MouseEvent | TouchEvent){
+export function setScaling(event: MouseEvent | TouchEvent): void {
   const { safeAreaInsets } = STE.appearance;
   let scalingOffset = 0;
   const scalingRange = {
@@ -289,7 +290,7 @@ export function setScaling(event: MouseEvent | TouchEvent){
 /**
  * Removes the Split mode scale handling when the user finishes moving the Scaler.
 */
-export function disableScaling(event: MouseEvent | TouchEvent){
+export function disableScaling(event: MouseEvent | TouchEvent): void {
   const touchEvent = (STE.environment.touchDevice && event instanceof TouchEvent);
   document.removeEventListener((!touchEvent) ? "mousemove" : "touchmove",setScaling);
   document.removeEventListener((!touchEvent) ? "mouseup" : "touchend",disableScaling);
@@ -299,7 +300,7 @@ export function disableScaling(event: MouseEvent | TouchEvent){
 /**
  * Resets the Split mode scaling offsets, making the Workspace responsive again.
 */
-function removeScaling(){
+function removeScaling(): void {
   if (!document.body.hasAttribute("data-scaling-active")) return;
   document.body.removeAttribute("data-scaling-active");
   workspace.style.removeProperty("--scaling-offset");

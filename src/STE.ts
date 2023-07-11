@@ -76,7 +76,7 @@ export class STE {
      * Gets the inset values for the screen Safe Area.
     */
     get safeAreaInsets(): SafeAreaInsets {
-      function getSafeAreaInset(section: string){
+      function getSafeAreaInset(section: string): number {
         return parseInt(getComputedStyle(document.documentElement).getPropertyValue(`--safe-area-inset-${section}`),10);
       }
       return {
