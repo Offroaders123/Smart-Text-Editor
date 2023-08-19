@@ -1,7 +1,6 @@
 import STE from "./STE.js";
 import Editor from "./Editor.js";
 import { setView } from "./Workspace.js";
-import { replacer_find, replacer_replace, formatter_input, encoder_type, encoder_input } from "./dom.js";
 
 export type TemplateType = "html" | "pack-manifest-bedrock";
 

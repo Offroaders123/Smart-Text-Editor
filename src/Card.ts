@@ -1,6 +1,6 @@
 import STE from "./STE.js";
 import Editor from "./Editor.js";
-import { card_backdrop, workspace_tabs, workspace_editors, getElementStyle } from "./dom.js";
+import { getElementStyle } from "./dom.js";
 
 /**
  * The base component for the Alert, Dialog, and Widget card types.

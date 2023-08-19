@@ -3,7 +3,7 @@ import "./Card.js";
 import Tools from "./Tools.js";
 import Editor from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview, setScaling, disableScaling } from "./Workspace.js";
-import { app_omnibox, cleared_cache_card, theme_button, preview_base_card, replace_text_card, json_formatter_card, uri_encoder_card, uuid_generator_card, settings_card, app_menubar, workspace_tabs, create_editor_button, scaler, card_backdrop, preview_base_input, generator_output, default_orientation_setting, syntax_highlighting_setting, automatic_refresh_setting, scrollbar_styles, applyEditingBehavior } from "./dom.js";
+import { applyEditingBehavior } from "./dom.js";
 
 import type { Orientation } from "./Workspace.js";
 

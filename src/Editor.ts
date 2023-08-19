@@ -1,6 +1,6 @@
 import STE from "./STE.js";
 import { setPreviewSource, refreshPreview } from "./Workspace.js";
-import { workspace_tabs, create_editor_button, workspace_editors, preview_menu, preview, getElementStyle, applyEditingBehavior, setTitle } from "./dom.js";
+import { getElementStyle, applyEditingBehavior, setTitle } from "./dom.js";
 
 export interface EditorOptions {
   name?: string;

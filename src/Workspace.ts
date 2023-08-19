@@ -1,6 +1,6 @@
 import STE from "./STE.js";
 import Editor from "./Editor.js";
-import { workspace, view_menu, scaler, preview, preview_menu, workspace_tabs, header, getElementStyle } from "./dom.js";
+import { getElementStyle } from "./dom.js";
 
 import type { EditorOptions } from "./Editor.js";
 

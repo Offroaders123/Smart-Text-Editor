@@ -1,5 +1,3 @@
-import { workspace_tabs, workspace_editors, default_orientation_setting, syntax_highlighting_setting, automatic_refresh_setting, preview_base_input, reset_settings_card } from "./dom.js";
-
 import type Card from "./Card.js";
 import type { View } from "./Workspace.js";
 import type { Orientation } from "./Workspace.js";
