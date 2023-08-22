@@ -2,13 +2,15 @@ import STE from "./STE.js";
 import Editor from "./Editor.js";
 import { getElementStyle } from "./dom.js";
 
+export type CardType = "alert" | "widget" | "dialog";
+
 /**
  * The base component for the Alert, Dialog, and Widget card types.
 */
 export class Card extends HTMLElement {
   declare defined;
 
-  declare type: string | null;
+  declare type: CardType;
   declare header: HTMLDivElement;
   declare back: HTMLButtonElement;
   declare heading: HTMLDivElement;
@@ -23,7 +25,7 @@ export class Card extends HTMLElement {
     if (this.defined || !this.isConnected) return;
     this.defined = true;
     this.addEventListener("keydown",event => {
-      if (this.getAttribute("data-type") != "dialog" || event.key != "Tab") return;
+      if (this.getAttribute("type") != "dialog" || event.key != "Tab") return;
       const navigable = Card.#getNavigableElements({ container: this, scope: true });
       if (!event.shiftKey){
         if (document.activeElement != navigable[navigable.length - 1]) return;
@@ -34,7 +36,7 @@ export class Card extends HTMLElement {
         navigable[navigable.length - 1].focus();
       }
     });
-    this.type = this.getAttribute("data-type");
+    this.type = this.getAttribute("type") as CardType;
     this.header = this.querySelector<HTMLDivElement>(".header")!;
     this.back = document.createElement("button");
     this.back.classList.add("card-back");
@@ -70,9 +72,9 @@ export class Card extends HTMLElement {
   }
 
   open(previous?: Card): void {
-    if (this.matches(".active") && !this.hasAttribute("data-alert-timeout")) return this.close();
+    if (this.matches("[active]") && !this.hasAttribute("data-alert-timeout")) return this.close();
     if (this.type != "alert"){
-      document.querySelectorAll<Card>(`.card.active`).forEach(card => {
+      document.querySelectorAll<Card>(`ste-card[active]`).forEach(card => {
         if (card.type != "dialog" && card.type != this.type) return;
         card.close();
         if (!card.matches(".minimize")) return;
@@ -80,7 +82,7 @@ export class Card extends HTMLElement {
         window.setTimeout(() => card.minimize(),transitionDuration);
       });
     }
-    this.classList.add("active");
+    this.setAttribute("active","");
     if (this.type == "widget" && card_backdrop.matches(".active")) card_backdrop.classList.remove("active");
     if (this.type == "alert"){
       const timeoutIdentifier = Math.random().toString();
@@ -145,7 +147,7 @@ export class Card extends HTMLElement {
   }
 
   close(): void {
-    this.classList.remove("active");
+    this.removeAttribute("active");
     if (this.matches(".minimize")){
       const transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
       window.setTimeout(() => this.minimize(),transitionDuration);
