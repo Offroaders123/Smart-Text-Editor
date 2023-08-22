@@ -4,26 +4,27 @@ import { getElementStyle } from "./dom.js";
 
 export type CardType = "alert" | "widget" | "dialog";
 
+export interface CardControls extends HTMLDivElement {
+  readonly minimize: HTMLButtonElement;
+  readonly close: HTMLButtonElement;
+}
+
 /**
  * The base component for the Alert, Dialog, and Widget card types.
 */
 export class Card extends HTMLElement {
-  declare defined;
-
-  declare type: CardType;
-  declare header: HTMLDivElement;
-  declare back: HTMLButtonElement;
-  declare heading: HTMLDivElement;
-  declare controls: HTMLDivElement & { minimize: HTMLButtonElement; close: HTMLButtonElement; };
+  readonly type: CardType = this.getAttribute("type") as CardType;
+  readonly header: HTMLDivElement = this.querySelector<HTMLDivElement>(".header")!;
+  readonly back: HTMLButtonElement = document.createElement("button");
+  readonly heading: HTMLDivElement = this.header.querySelector<HTMLDivElement>(".heading")!;
+  readonly controls: CardControls = Object.assign(document.createElement("div"),{
+    minimize: document.createElement("button"),
+    close: document.createElement("button")
+  });
 
   constructor() {
     super();
-    this.defined = false;
-  }
 
-  connectedCallback(): void {
-    if (this.defined || !this.isConnected) return;
-    this.defined = true;
     this.addEventListener("keydown",event => {
       if (this.getAttribute("type") != "dialog" || event.key != "Tab") return;
       const navigable = Card.#getNavigableElements({ container: this, scope: true });
@@ -36,35 +37,37 @@ export class Card extends HTMLElement {
         navigable[navigable.length - 1].focus();
       }
     });
-    this.type = this.getAttribute("type") as CardType;
-    this.header = this.querySelector<HTMLDivElement>(".header")!;
-    this.back = document.createElement("button");
+
     this.back.classList.add("card-back");
     this.back.innerHTML = `<svg><use href="#back_icon"/></svg>`;
     this.back.addEventListener("click",() => document.querySelector<Card>(`#${this.header?.getAttribute("data-card-parent")}`)!.open(this));
-    this.heading = this.header.querySelector<HTMLDivElement>(".heading")!;
-    this.controls = document.createElement("div") as typeof this.controls;
+
     this.controls.classList.add("card-controls");
-    this.controls.minimize = document.createElement("button");
+
     this.controls.minimize.classList.add("control");
     this.controls.minimize.setAttribute("data-control","minimize");
     this.controls.minimize.innerHTML = `<svg><use href="#minimize_icon"/></svg>`;
+
     this.controls.minimize.addEventListener("keydown",event => {
       if (event.key != "Enter") return;
       event.preventDefault();
       if (event.repeat) return;
       this.controls?.minimize.click();
     });
+
     this.controls.minimize.addEventListener("click",() => this.minimize());
-    this.controls.close = document.createElement("button");
+
     this.controls.close.classList.add("control");
     this.controls.close.setAttribute("data-control","close");
     this.controls.close.innerHTML = `<svg><use href="#close_icon"/></svg>`;
+
     this.controls.close.addEventListener("click",() => this.close());
+
     this.header.insertBefore(this.back,this.heading);
     this.controls.appendChild(this.controls.minimize);
     this.controls.appendChild(this.controls.close);
     this.header.appendChild(this.controls);
+
     if (STE.environment.macOSDevice){
       this.controls.insertBefore(this.controls.close,this.controls.minimize);
       this.header.insertBefore(this.controls,this.header.firstChild);
