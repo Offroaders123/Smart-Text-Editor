@@ -25,7 +25,7 @@ export function applyEditingBehavior(element: HTMLInputElement | NumTextElement)
 
   (element as HTMLElement).addEventListener("drop",event => {
     if (event.dataTransfer === null) return;
-    if ([...event.dataTransfer.items][0].kind === "file") return;
+    if ([...event.dataTransfer.items][0]?.kind === "file") return;
     event.stopPropagation();
     for (const menu of document.querySelectorAll<MenuDropElement>("menu-drop[data-open]")){
       menu.close();
@@ -72,7 +72,7 @@ export async function showInstallPrompt(): Promise<void> {
   const result = await STE.installPrompt.userChoice;
   if (result.outcome !== "accepted") return;
   document.documentElement.classList.remove("install-prompt-available");
-  theme_button.childNodes[0].textContent = "Customize Theme";
+  theme_button.childNodes[0]!.textContent = "Customize Theme";
 }
 
 /**

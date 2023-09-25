@@ -24,7 +24,7 @@ export class Tools {
     },
 
     clear(): void {
-      [replacer_find.value,replacer_replace.value] = "";
+      [replacer_find.value,replacer_replace.value] = ["",""];
     }
   }
 

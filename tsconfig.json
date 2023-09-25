@@ -2,10 +2,9 @@
   "compilerOptions": {
     "allowJs": true,
     "checkJs": true,
-    "module": "ESNext",
-    "moduleResolution": "NodeNext",
-    "isolatedModules": true,
+    "module": "NodeNext",
     "target": "ESNext",
+    "isolatedModules": true,
     "types": [
       "@stedit/menu-drop",
       "@stedit/num-text",
@@ -14,7 +13,12 @@
     "noEmit": true,
     "skipLibCheck": true,
     "strict": true,
-    "noImplicitOverride": true
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
+    "allowUnreachableCode": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
   },
   "exclude": [
     "./dist"

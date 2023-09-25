@@ -31,10 +31,10 @@ export class Card extends HTMLElement {
       if (!event.shiftKey){
         if (document.activeElement != navigable[navigable.length - 1]) return;
         event.preventDefault();
-        navigable[0].focus();
+        navigable[0]?.focus();
       } else if (document.activeElement == navigable[0]){
         event.preventDefault();
-        navigable[navigable.length - 1].focus();
+        navigable[navigable.length - 1]?.focus();
       }
     });
 
@@ -81,7 +81,7 @@ export class Card extends HTMLElement {
         if (card.type != "dialog" && card.type != this.type) return;
         card.close();
         if (!card.matches(".minimize")) return;
-        const transitionDuration = parseInt(`${Number(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
+        const transitionDuration = parseInt(`${Number(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
         window.setTimeout(() => card.minimize(),transitionDuration);
       });
     }
@@ -103,7 +103,7 @@ export class Card extends HTMLElement {
         STE.dialogPrevious = document.activeElement as Card;
       }
       document.querySelectorAll<MenuDropElement>("menu-drop[data-open]").forEach(menu => menu.close());
-      const transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 500}`);
+      const transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 500}`);
       window.setTimeout(() => {
         if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
         if (previous) this.querySelector<HTMLElement>(`[data-card-previous="${previous.id}"]`)!.focus();
@@ -120,7 +120,7 @@ export class Card extends HTMLElement {
 
     this.setAttribute("data-minimize-change",changeIdentifier);
     workspace_tabs.setAttribute("data-minimize-change",changeIdentifier);
-    const transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
+    const transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
     if (!this.matches(".minimize")){
       this.classList.add("minimize");
       if (this.controls === undefined) return;
@@ -152,7 +152,7 @@ export class Card extends HTMLElement {
   close(): void {
     this.removeAttribute("active");
     if (this.matches(".minimize")){
-      const transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
+      const transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
       window.setTimeout(() => this.minimize(),transitionDuration);
     }
     if (this.type == "dialog"){
@@ -183,7 +183,7 @@ export class Card extends HTMLElement {
     if (!STE.activeDialog || event.key != "Tab" || document.activeElement != document.body) return;
     const navigable = Card.#getNavigableElements({ container: STE.activeDialog, scope: true });
     event.preventDefault();
-    navigable[((!event.shiftKey) ? 0 : navigable.length - 1)].focus();
+    navigable[((!event.shiftKey) ? 0 : navigable.length - 1)]?.focus();
   }
 }
 

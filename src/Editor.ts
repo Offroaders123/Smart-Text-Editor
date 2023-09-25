@@ -27,7 +27,7 @@ export class Editor extends NumTextElement {
   */
   static open(identifier: string, options: EditorOpenOptions = {}): void {
     const editor = this.#editors[identifier];
-    editor.open(options);
+    editor?.open(options);
   }
 
   /**
@@ -35,7 +35,7 @@ export class Editor extends NumTextElement {
   */
   static async close(identifier: string): Promise<void> {
     const editor = this.#editors[identifier];
-    await editor.close();
+    await editor?.close();
   }
 
   /**
@@ -45,6 +45,9 @@ export class Editor extends NumTextElement {
   */
   static rename(identifier: string, rename?: string): void {
     const editor = this.#editors[identifier];
+    if (editor === undefined){
+      throw new Error(`Failed to rename editor '${identifier}', it may not exist`);
+    }
     const currentName = editor.#name;
 
     if (!rename){
@@ -62,12 +65,12 @@ export class Editor extends NumTextElement {
    * 
    * If the active Editor is the first one in the Workspace, it will wrap around to give the last Editor in the Workspace.
   */
-  static getPrevious(identifier: string, wrap: boolean = true): string | null {
+  static getPrevious(identifier: string, _wrap: boolean = true): string | null {
     const { tab } = STE.query(identifier);
     if (tab === null) return tab;
     const editorTabs = [...workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")];
     const previousTab = editorTabs[(editorTabs.indexOf(tab) || editorTabs.length) - 1];
-    const previousEditor = previousTab.getAttribute("data-editor-identifier");
+    const previousEditor = previousTab?.getAttribute("data-editor-identifier") ?? null;
     return previousEditor;
   }
 
@@ -76,12 +79,12 @@ export class Editor extends NumTextElement {
    * 
    * If the active Editor is the last one in the Workspace, it will wrap around to give the first Editor in the Workspace.
   */
-  static getNext(identifier: string, wrap: boolean = true): string | null {
+  static getNext(identifier: string, _wrap: boolean = true): string | null {
     const { tab } = STE.query(identifier);
     if (tab === null) return tab;
     const editorTabs = [...workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")];
     const nextTab = editorTabs[(editorTabs.indexOf(tab) !== editorTabs.length - 1) ? editorTabs.indexOf(tab) + 1 : 0];
-    const nextEditor = nextTab.getAttribute("data-editor-identifier");
+    const nextEditor = nextTab?.getAttribute("data-editor-identifier") ?? null;
     return nextEditor;
   }
 
@@ -136,7 +139,7 @@ export class Editor extends NumTextElement {
     const changeIdentifier = Math.random().toString();
 
     document.body.setAttribute("data-editor-change",changeIdentifier);
-    const transitionDuration = parseInt(`${Number(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
+    const transitionDuration = parseInt(`${Number(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
 
     this.tab.classList.add("tab");
     this.tab.setAttribute("data-editor-identifier",this.identifier);
@@ -364,7 +367,7 @@ export class Editor extends NumTextElement {
       }
     }
 
-    const transitionDuration = (document.body.hasAttribute("data-editor-change")) ? parseInt(`${Number(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`) : 0;
+    const transitionDuration = (document.body.hasAttribute("data-editor-change")) ? parseInt(`${Number(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`) : 0;
 
     if (this.tab === editorTabs[0] && editorTabs.length === 1){
       STE.activeEditor = null;
@@ -381,11 +384,11 @@ export class Editor extends NumTextElement {
       Editor.open(identifier);
     }
     if (this.tab === editorTabs[editorTabs.length - 1] && this.tab !== editorTabs[0] && this.tab.classList.contains("active")){
-      const identifier = editorTabs[editorTabs.length - 2].getAttribute("data-editor-identifier")!;
+      const identifier = editorTabs[editorTabs.length - 2]!.getAttribute("data-editor-identifier")!;
       Editor.open(identifier);
     }
     if (this.tab !== editorTabs[0] && this.tab.classList.contains("active")){
-      const identifier = editorTabs[editorTabs.indexOf(this.tab) + 1].getAttribute("data-editor-identifier")!;
+      const identifier = editorTabs[editorTabs.indexOf(this.tab) + 1]!.getAttribute("data-editor-identifier")!;
       Editor.open(identifier);
     }
 

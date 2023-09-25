@@ -90,7 +90,7 @@ window.addEventListener("beforeinstallprompt",event => {
   event.preventDefault();
   STE.installPrompt = event;
   document.documentElement.classList.add("install-prompt-available");
-  theme_button.childNodes[0].textContent = "Theme";
+  theme_button.childNodes[0]!.textContent = "Theme";
 });
 
 window.addEventListener("beforeunload",event => {

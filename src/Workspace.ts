@@ -39,7 +39,7 @@ export function setView(type: View, { force = false }: SetViewOptions = {}): voi
   if ((STE.orientationChange && !force) || STE.scalingChange) return;
   const changeIdentifier = Math.random().toString();
   document.body.setAttribute("data-view-change",changeIdentifier);
-  const transitionDuration = parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`);
+  const transitionDuration = parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
   document.body.classList.remove(STE.view);
   document.body.setAttribute("data-view",type);
   document.body.classList.add(STE.view);
@@ -62,7 +62,7 @@ export type Orientation = "horizontal" | "vertical";
 export function setOrientation(orientation?: Orientation): void {
   if (STE.orientationChange || STE.scalingChange) return;
   document.body.setAttribute("data-orientation-change","");
-  const param = (orientation), transitionDuration = ((STE.view != "split") ? 0 : parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0].replace(/s/g,"")) * 1000}`));
+  const param = (orientation), transitionDuration = ((STE.view != "split") ? 0 : parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`));
   if (!param && STE.view == "split") setView("code",{ force: true });
   if (!param && STE.orientation == "horizontal") orientation = "vertical";
   if (!param && STE.orientation == "vertical") orientation = "horizontal";
@@ -197,8 +197,8 @@ export async function saveFile(extension?: string): Promise<void> {
       });
       if (!handle) return;
       STE.fileHandles[identifier] = handle;
-    } else handle = STE.fileHandles[identifier];
-    const stream = await STE.fileHandles[identifier].createWritable().catch(error => {
+    } else handle = STE.fileHandles[identifier]!;
+    const stream = await STE.fileHandles[identifier]?.createWritable().catch(error => {
       alert(`"${STE.query().getName()}" could not be saved.`);
       if (error.toString().toLowerCase().includes("not allowed")) return;
     });
@@ -276,8 +276,8 @@ export function setScaling(event: MouseEvent | TouchEvent): void {
   };
   const touchEvent = (STE.environment.touchDevice && event instanceof TouchEvent);
 
-  if (STE.orientation == "horizontal") scalingOffset = (!touchEvent) ? (event as MouseEvent).pageX : (event as TouchEvent).touches[0].pageX;
-  if (STE.orientation == "vertical") scalingOffset = (!touchEvent) ? (event as MouseEvent).pageY - header.offsetHeight : (event as TouchEvent).touches[0].pageY - header.offsetHeight;
+  if (STE.orientation == "horizontal") scalingOffset = (!touchEvent) ? (event as MouseEvent).pageX : (event as TouchEvent).touches[0]!.pageX;
+  if (STE.orientation == "vertical") scalingOffset = (!touchEvent) ? (event as MouseEvent).pageY - header.offsetHeight : (event as TouchEvent).touches[0]!.pageY - header.offsetHeight;
   if (scalingOffset < scalingRange.minimum) scalingOffset = scalingRange.minimum;
   if (scalingOffset > scalingRange.maximum) scalingOffset = scalingRange.maximum;
   document.body.setAttribute("data-scaling-active","");
