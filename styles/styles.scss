@@ -14,18 +14,14 @@
   --titlebar-area-inset-width-left: env(titlebar-area-x,0px);
   --titlebar-area-inset-width-right: calc(100vw - env(titlebar-area-width,100vw) - var(--titlebar-area-inset-width-left));
   --titlebar-area-inset-height: env(titlebar-area-height,0px);
-}
 
-@media not (display-mode: window-controls-overlay) {
-  :root {
+  @media not (display-mode: window-controls-overlay) {
+    --titlebar-area-inset-top: 0px;
     --titlebar-area-inset-width-left: 0px;
     --titlebar-area-inset-width-right: 0px;
-    --titlebar-area-inset-top: 0px;
     --titlebar-area-inset-height: 0px;
   }
-}
 
-:root {
   --font-family-interface: -apple-system, BlinkMacSystemFont, "Rubik", sans-serif;
   --font-family-code: ui-monospace, "Noto Sans Mono", "Cousine", monospace;
   --line-height-code: 1.4;
@@ -39,10 +35,10 @@
   --scrollbar-width: 16px;
   --scrollbar-height: 16px;
   --scrollbar-border-width: 4px;
-}
 
-:root:-moz-window-inactive {
-  --selection-background: var(--selection-background-inactive);
+  &:-moz-window-inactive {
+    --selection-background: var(--selection-background-inactive);
+  }
 }
 
 html {
@@ -67,29 +63,31 @@ body {
   user-select: none;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-}
 
-body::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: #1e1e1e;
-  z-index: 4;
-  transition: opacity 250ms;
-}
+  &::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #1e1e1e;
+    z-index: 4;
+    transition: opacity 250ms;
 
-:root:not(.startup-fade) body::after {
-  opacity: 0;
-  pointer-events: none;
-}
+    :root:not(.startup-fade) & {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
 
-body.split.horizontal[data-scaling-change] {
-  cursor: col-resize;
-}
+  &.split {
+    &.horizontal[data-scaling-change] {
+      cursor: col-resize;
+    }
 
-body.split.vertical[data-scaling-change] {
-  cursor: row-resize;
+    &.vertical[data-scaling-change] {
+      cursor: row-resize;
+    }
+  }
 }
 
 header {
@@ -103,161 +101,157 @@ header {
   font-size: 13px;
   background: #1e1e1e;
   border-bottom: 1px solid #000000;
-}
 
-header::before, header::after {
-  content: "";
-  height: var(--header-height);
-  flex-shrink: 0;
-  -webkit-app-region: no-drag;
-}
-
-header::before {
-  width: calc(var(--safe-area-inset-left) + var(--titlebar-area-inset-width-left));
-}
-
-header::after {
-  width: calc(var(--safe-area-inset-right) + var(--titlebar-area-inset-width-right));
-}
-
-body[data-scaling-change] header {
-  pointer-events: none;
-}
-
-header .app-region {
-  margin: var(--app-region-margin);
-  margin-bottom: 0;
-  --app-region-margin: 4px;
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: calc(100% - var(--app-region-margin) * 2);
-  height: calc(100% - var(--app-region-margin));
-  z-index: -1;
-  -webkit-app-region: drag;
-}
-
-@media (display-mode: window-controls-overlay) {
-  :root header .app-region {
-    --app-region-margin: calc(var(--titlebar-area-inset-height) * 0.12);
+  &::before, &::after {
+    content: "";
+    height: var(--header-height);
+    flex-shrink: 0;
+    -webkit-app-region: no-drag;
   }
-}
 
-header .app-icon {
-  flex-shrink: 0;
-  display: flex;
-}
-
-@media (display-mode: window-controls-overlay) {
-  :root.macOS-device header .app-icon {
-    display: none;
+  &::before {
+    width: calc(var(--safe-area-inset-left) + var(--titlebar-area-inset-width-left));
   }
-}
 
-header .app-icon img {
-  width: 16px;
-  height: 16px;
-  /* aspect-ratio: 1 / 1; */
-}
-
-header .app-menubar {
-  min-width: 0;
-  align-self: stretch;
-  display: flex;
-  z-index: 3;
-  -webkit-app-region: no-drag;
-}
-
-header .app-menubar menu-drop {
-  min-width: 0;
-}
-
-header .app-menubar menu-drop::part(opener) {
-  min-width: unset;
-  padding: 0 8px;
-  background: none;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-header .app-menubar menu-drop::part(opener):where(:hover,:focus-visible),
-header .app-menubar menu-drop[data-open]::part(opener) {
-  color: #ffffff;
-  background: #ffffff24;
-}
-
-header .app-omnibox {
-  margin-left: auto;
-  height: var(--header-height);
-  align-self: flex-start;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--header-gap);
-  color: #ffffff;
-}
-
-@media (display-mode: window-controls-overlay) {
-  :root:not(.startup-fade) header .app-omnibox {
-    height: var(--titlebar-area-inset-height);
-    gap: calc(var(--header-gap) / var(--device-pixel-ratio));
-    z-index: 5;
+  &::after {
+    width: calc(var(--safe-area-inset-right) + var(--titlebar-area-inset-width-right));
   }
-  :root:not(.macOS-device) header .app-omnibox {
-    margin-right: calc(var(--header-gap) * -1);
+
+  body[data-scaling-change] & {
+    pointer-events: none;
   }
-  :root.macOS-device header .app-omnibox {
-    margin-right: -4px;
+
+  & .app-region {
+    margin: var(--app-region-margin);
+    margin-bottom: 0;
+    --app-region-margin: 4px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: calc(100% - var(--app-region-margin) * 2);
+    height: calc(100% - var(--app-region-margin));
+    z-index: -1;
+    -webkit-app-region: drag;
+
+    @media (display-mode: window-controls-overlay) {
+      --app-region-margin: calc(var(--titlebar-area-inset-height) * 0.12);
+    }
   }
-}
 
-header .app-omnibox button {
-  background: none;
-  border: none;
-  outline: none;
-}
+  & .app-icon {
+    flex-shrink: 0;
+    display: flex;
 
-header .app-omnibox a {
-  cursor: default;
-}
+    @media (display-mode: window-controls-overlay) {
+      :root.macOS-device & {
+        display: none;
+      }
+    }
 
-header .app-omnibox .option {
-  padding: 5px;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  border-radius: 12px;
-  outline: none;
-  transition: background-color 250ms linear;
-  -webkit-app-region: no-drag;
-}
-
-@media (display-mode: window-controls-overlay) {
-  :root header .app-omnibox .option {
-    padding: calc(5px / var(--device-pixel-ratio));
+    & img {
+      width: 16px;
+      height: 16px;
+      /* aspect-ratio: 1 / 1; */
+    }
   }
-}
 
-header .app-omnibox .option:hover {
-  background-color: #ffffff14;
-}
+  & .app-menubar {
+    min-width: 0;
+    align-self: stretch;
+    display: flex;
+    z-index: 3;
+    -webkit-app-region: no-drag;
 
-header .app-omnibox .option:where(:active,:focus-visible) {
-  background-color: #ffffff22;
-}
+    & menu-drop {
+      min-width: 0;
 
-header .app-omnibox .option svg {
-  width: 14px;
-  height: 14px;
-  /* aspect-ratio: 1 / 1; */
-  flex-shrink: 0;
-  fill: currentColor;
-}
+      &::part(opener) {
+        min-width: unset;
+        padding: 0 8px;
+        background: none;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
 
-@media (display-mode: window-controls-overlay) {
-  :root header .app-omnibox .option svg {
-    width: calc(14px / var(--device-pixel-ratio));
-    height: calc(14px / var(--device-pixel-ratio));
+      &::part(opener):where(:hover,:focus-visible),
+      &[data-open]::part(opener) {
+        color: #ffffff;
+        background: #ffffff24;
+      }
+    }
+  }
+
+  & .app-omnibox {
+    margin-left: auto;
+    height: var(--header-height);
+    align-self: flex-start;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--header-gap);
+    color: #ffffff;
+
+    @media (display-mode: window-controls-overlay) {
+      :root:not(.startup-fade) & {
+        height: var(--titlebar-area-inset-height);
+        gap: calc(var(--header-gap) / var(--device-pixel-ratio));
+        z-index: 5;
+      }
+
+      :root:not(.macOS-device) & {
+        margin-right: calc(var(--header-gap) * -1);
+      }
+
+      :root.macOS-device & {
+        margin-right: -4px;
+      }
+    }
+
+    & button {
+      background: none;
+      border: none;
+      outline: none;
+    }
+
+    & a {
+      cursor: default;
+    }
+
+    & .option {
+      padding: 5px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      border-radius: 12px;
+      outline: none;
+      transition: background-color 250ms linear;
+      -webkit-app-region: no-drag;
+
+      @media (display-mode: window-controls-overlay) {
+        padding: calc(5px / var(--device-pixel-ratio));
+      }
+
+      &:hover {
+        background-color: #ffffff14;
+      }
+
+      &:where(:active,:focus-visible) {
+        background-color: #ffffff22;
+      }
+
+      & svg {
+        width: 14px;
+        height: 14px;
+        /* aspect-ratio: 1 / 1; */
+        flex-shrink: 0;
+        fill: currentColor;
+
+        @media (display-mode: window-controls-overlay) {
+          width: calc(14px / var(--device-pixel-ratio));
+          height: calc(14px / var(--device-pixel-ratio));
+        }
+      }
+    }
   }
 }
 
