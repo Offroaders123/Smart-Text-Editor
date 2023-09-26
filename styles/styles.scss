@@ -959,7 +959,7 @@ menu-drop::part(icon) {
 }
 
 menu-drop::part(icon invert) {
-  filter: invert() hue-rotate(180deg);
+  filter: invert(1) hue-rotate(180deg);
 }
 
 menu-drop::part(icon rounded) {
