@@ -52,10 +52,9 @@ const queryParameters = new URLSearchParams(window.location.search);
   }
 
   if (!("serviceWorker" in navigator) || !STE.appearance.parentWindow) return;
-  if (import.meta.env.DEV) return console.log("skipped loading the service worker, use Vite Preview to use the SW with TS");
+  if (import.meta.env.DEV) return;
 
-  await navigator.serviceWorker.register("service-worker.js")
-  console.log("loaded the SW!");
+  await navigator.serviceWorker.register("service-worker.js");
   if (navigator.serviceWorker.controller === null) return;
 
   if (navigator.serviceWorker.controller.state === "activated"){
