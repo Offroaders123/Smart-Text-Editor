@@ -1,16 +1,15 @@
 /// <reference no-default-lib="true"/>
 /// <reference types="better-typescript/worker.d.ts"/>
 
-var self = /** @type { ServiceWorkerGlobalScope } */ (/** @type { unknown } */ (globalThis));
+declare var self: ServiceWorkerGlobalScope;
 
 const NAME = "Smart Text Editor";
 const VERSION = "v4.27.5";
-const CACHE_NAME = /** @type { const } */ (`${NAME} ${VERSION}`);
+const CACHE_NAME = `${NAME} ${VERSION}`;
 
-const IS_MACOS_DEVICE = (/(macOS|Mac)/i.test(navigator.userAgentData?.platform ?? navigator.platform) && navigator.standalone === undefined);
+const IS_MACOS_DEVICE: boolean = (/(macOS|Mac)/i.test(navigator.userAgentData?.platform ?? navigator.platform) && navigator.standalone === undefined);
 
-/** @type { File[] } */
-const SHARE_FILES = [];
+const SHARE_FILES: File[] = [];
 
 self.addEventListener("activate",event => {
   event.waitUntil(removeOutdatedVersions());
@@ -22,7 +21,7 @@ self.addEventListener("fetch",async event => {
       const formData = await event.request.formData();
       const files = formData.getAll("file");
       for (const file of files){
-        SHARE_FILES.push(/** @type { File } */ (file));
+        SHARE_FILES.push(file as File);
       }
       event.respondWith(Response.redirect("./?share-target=true",303));
     })());
@@ -37,7 +36,7 @@ self.addEventListener("fetch",async event => {
       const fetched = await fetch("./manifest.webmanifest");
       const manifest = await fetched.json();
 
-      manifest.icons = manifest.icons.filter(/** @param { { platform: string; purpose: string; } } icon */ icon => {
+      manifest.icons = manifest.icons.filter((icon: { platform: string; purpose: string; }) => {
         switch (true){
           case !IS_MACOS_DEVICE && icon.platform !== "macOS":
           case IS_MACOS_DEVICE && icon.platform === "macOS" || icon.purpose === "maskable": {
@@ -82,10 +81,8 @@ self.addEventListener("message",async event => {
 
 /**
  * Clears out old versions of the app from Cache Storage.
- * 
- * @returns { Promise<void> }
 */
-async function removeOutdatedVersions(){
+async function removeOutdatedVersions(): Promise<void> {
   const keys = await caches.keys();
 
   await Promise.all(keys.map(async key => {
@@ -104,11 +101,8 @@ async function removeOutdatedVersions(){
  * Matches a network request with it's cached counterpart from Cache Storage.
  * 
  * If it hasn't been cached yet, it will fetch the network for a response, cache a clone, then return the response.
- * 
- * @param { Request } request
- * @returns { Promise<Response> }
 */
-async function matchRequest(request){
+async function matchRequest(request: Request): Promise<Response> {
   let response = await caches.match(request);
   if (response !== undefined) return response;
 
@@ -120,21 +114,13 @@ async function matchRequest(request){
 
 /**
  * Adds a network request and response to Cache Storage.
- * 
- * @param { Request } request
- * @param { Response } response
- * @return { Promise<void> }
 */
-async function cacheRequest(request,response){
+async function cacheRequest(request: Request, response: Response): Promise<void> {
   const cache = await caches.open(CACHE_NAME);
   await cache.put(request,response.clone());
 }
 
-/**
- * @param { any } message
- * @param { StructuredSerializeOptions } options
-*/
-async function messageClients(message,options = {}){
+async function messageClients(message: any, options: StructuredSerializeOptions = {}): Promise<void> {
   const clients = await self.clients.matchAll();
 
   for (const client of clients){

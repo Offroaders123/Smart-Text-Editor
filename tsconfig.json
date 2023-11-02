@@ -1,14 +1,13 @@
 {
   "compilerOptions": {
-    "allowJs": true,
-    "checkJs": true,
     "module": "NodeNext",
     "target": "ESNext",
     "isolatedModules": true,
     "types": [
       "@stedit/menu-drop",
       "@stedit/num-text",
-      "new-javascript"
+      "new-javascript",
+      "vite/client"
     ],
     "noEmit": true,
     "skipLibCheck": true,
@@ -19,8 +18,5 @@
     "allowUnreachableCode": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true
-  },
-  "exclude": [
-    "./dist"
-  ]
+  }
 }
