@@ -2,6 +2,9 @@ import type { Card } from "./Card.js";
 
 declare global {
   interface Navigator {
+    /**
+     * Exclusive to iOS, iPadOS, and macOS devices.
+    */
     readonly standalone: boolean;
   }
 

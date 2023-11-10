@@ -43,7 +43,7 @@ export class STE {
     },
 
     /**
-     * Checks whether the app is running in standalone mode on iOS and iPadOS devices.
+     * Checks whether the app is running in standalone mode on an iOS, iPadOS, or macOS device.
     */
     get appleHomeScreen(): boolean {
       return (/(macOS|Mac|iPhone|iPad|iPod)/i.test(navigator.userAgentData?.platform ?? navigator.platform) && navigator.standalone === true);
@@ -119,7 +119,7 @@ export class STE {
      * Checks if the app is running on a macOS device.
     */
     get macOSDevice(): boolean {
-      return (/(macOS|Mac)/i.test(navigator.userAgentData?.platform ?? navigator.platform) && navigator.standalone == undefined);
+      return (/(macOS|Mac)/i.test(navigator.userAgentData?.platform ?? navigator.platform) && navigator.maxTouchPoints < 1);
     },
 
     /**

@@ -7,7 +7,7 @@ const NAME = "Smart Text Editor";
 const VERSION = "v4.27.5";
 const CACHE_NAME = `${NAME} ${VERSION}`;
 
-const IS_MACOS_DEVICE: boolean = (/(macOS|Mac)/i.test(navigator.userAgentData?.platform ?? navigator.platform) && navigator.standalone === undefined);
+const IS_MACOS_DEVICE: boolean = (/(macOS|Mac)/i.test(navigator.userAgentData?.platform ?? navigator.platform) && navigator.maxTouchPoints < 1);
 
 const SHARE_FILES: File[] = [];
 
