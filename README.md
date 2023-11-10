@@ -1,7 +1,7 @@
 <table>
   <tr>
     <td>
-      <img width="64" height="64" src="https://stedit.app/resources/icon.svg" alt="Smart Text Editor">
+      <img width="64" height="64" src="./public/img/icon.svg" alt="Smart Text Editor">
     </td>
     <td>
       <h1>Smart Text Editor</h1>
