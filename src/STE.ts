@@ -381,14 +381,6 @@ export class STE {
   static installPrompt: BeforeInstallPromptEvent | null = null;
 }
 
-declare global {
-  interface Window {
-    STE: typeof STE;
-  }
-}
-
-window.STE = STE;
-
 export default STE;
 
 // if (STE.appearance.parentWindow) document.documentElement.classList.add("startup-fade");

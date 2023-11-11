@@ -3,6 +3,7 @@
     "module": "NodeNext",
     "target": "ESNext",
     "isolatedModules": true,
+    "jsx": "react-jsx",
     "types": [
       "@stedit/menu-drop",
       "@stedit/num-text",

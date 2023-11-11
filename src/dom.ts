@@ -84,13 +84,3 @@ export function clearSiteCaches(): void {
     navigator.serviceWorker.controller?.postMessage({ action: "clear-site-caches" });
   }
 }
-
-window.showInstallPrompt = showInstallPrompt;
-window.clearSiteCaches = clearSiteCaches;
-
-declare global {
-  interface Window {
-    showInstallPrompt: typeof showInstallPrompt;
-    clearSiteCaches: typeof clearSiteCaches;
-  }
-}
