@@ -5,8 +5,6 @@ import Editor from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview, setScaling, disableScaling } from "./Workspace.js";
 import { applyEditingBehavior } from "./dom.js";
 
-import type { Orientation } from "./Workspace.js";
-
 for (const image of document.querySelectorAll("img")){
   image.draggable = false;
 }
@@ -404,8 +402,7 @@ preview_base_input.setValue = value => {
 
 preview_base_input.reset = () => {
   preview_base_input.setValue("");
-  if (!STE.settings.has("preview-base")) return;
-  STE.settings.remove("preview-base");
+  STE.settings.previewBase = null;
   refreshPreview({ force: true });
 };
 
@@ -421,10 +418,10 @@ preview_base_input.addEventListener("change",event => {
   const valid = event.target.matches(":valid");
 
   if (empty || !valid){
-    STE.settings.remove("preview-base");
+    STE.settings.previewBase = null;
   }
   if (!empty && valid){
-    STE.settings.set("preview-base",event.target.value);
+    STE.settings.previewBase = event.target.value;
   }
   if (empty || valid){
     refreshPreview({ force: true });
@@ -444,23 +441,23 @@ window.requestAnimationFrame(() => {
 });
 
 if (STE.appearance.parentWindow){
-  if (STE.settings.get("default-orientation")){
-    const value = STE.settings.get("default-orientation") as Orientation;
+  if (STE.settings.defaultOrientation !== null){
+    const value = STE.settings.defaultOrientation;
     window.requestAnimationFrame(() => {
       default_orientation_setting.select(value);
     });
     setOrientation(value);
   }
-  if (STE.settings.get("syntax-highlighting") != undefined){
-    const state: boolean = JSON.parse(STE.settings.get("syntax-highlighting")!);
+  if (STE.settings.syntaxHighlighting !== null){
+    const state: boolean = STE.settings.syntaxHighlighting;
     STE.appearance.setSyntaxHighlighting(state);
     syntax_highlighting_setting.checked = state;
   }
-  if (STE.settings.get("automatic-refresh") != undefined){
-    automatic_refresh_setting.checked = Boolean(STE.settings.get("automatic-refresh")!);
+  if (STE.settings.automaticRefresh !== null){
+    automatic_refresh_setting.checked = STE.settings.automaticRefresh;
   }
-  if (STE.settings.get("preview-base")){
-    preview_base_input.setValue(STE.settings.get("preview-base")!);
+  if (STE.settings.previewBase){
+    preview_base_input.setValue(STE.settings.previewBase);
   }
   // window.setTimeout(() => {
   //   document.documentElement.classList.remove("startup-fade");

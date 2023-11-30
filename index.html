@@ -274,8 +274,8 @@
             <menu-drop id="default_orientation_setting" data-select>
               <button>Horizontal</button>
               <ul>
-                <li data-value="horizontal" onclick="STE.settings.set('default-orientation','horizontal');" data-selected>Horizontal</li>
-                <li data-value="vertical" onclick="STE.settings.set('default-orientation','vertical');">Vertical</li>
+                <li data-value="horizontal" onclick="STE.settings.defaultOrientation = 'horizontal';" data-selected>Horizontal</li>
+                <li data-value="vertical" onclick="STE.settings.defaultOrientation = 'vertical';">Vertical</li>
               </ul>
             </menu-drop>
           </div>
@@ -284,7 +284,7 @@
             <label for="syntax_highlighting_setting"><svg class="check"><use href="#check_icon"/></svg>Syntax Highlighting (Beta)</label>
           </div>
           <div class="checkbox">
-            <input id="automatic_refresh_setting" type="checkbox" oninput="STE.settings.set('automatic-refresh',this.checked);" checked>
+            <input id="automatic_refresh_setting" type="checkbox" oninput="STE.settings.automaticRefresh = this.checked;" checked>
             <label for="automatic_refresh_setting"><svg class="check"><use href="#check_icon"/></svg>Automatically Refresh Preview</label>
           </div>
         </div>

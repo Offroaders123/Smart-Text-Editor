@@ -222,7 +222,7 @@ export function createDisplay(): void {
     left = window.screen.availWidth / 2 + window.screen.availLeft - width / 2,
     top = window.screen.availHeight / 2 + window.screen.availTop - height / 2,
     features = (STE.appearance.standalone || STE.appearance.fullscreen) ? "popup" : "",
-    baseURL = STE.settings.get("preview-base") || null;
+    baseURL = STE.settings.previewBase;
   let source = STE.query().textarea?.value ?? "";
   if (baseURL) source = `<!DOCTYPE html>\n<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
   const link = window.URL.createObjectURL(new Blob([source],{ type: "text/html" })),
@@ -250,9 +250,9 @@ export function refreshPreview({ force = false }: RefreshPreviewOptions = {}): v
   if (STE.view == "code") return;
   const editor = (STE.previewEditor == "active-editor") ? STE.query() : STE.query(STE.previewEditor);
   if (!editor.tab || !editor.textarea) return;
-  const change = (editor.tab.hasAttribute("data-editor-refresh") && STE.settings.get("automatic-refresh") != "false");
+  const change = (editor.tab.hasAttribute("data-editor-refresh") && STE.settings.automaticRefresh !== false);
   if (!change && !force) return;
-  const baseURL = STE.settings.get("preview-base") || null;
+  const baseURL = STE.settings.previewBase;
   let source = editor.textarea.value;
   if (baseURL) source = `<!DOCTYPE html>\n<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
   preview.addEventListener("load",() => {

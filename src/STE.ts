@@ -94,7 +94,7 @@ export class STE {
         if (!(editor.syntaxLanguage in Prism.languages)) continue;
         (state) ? editor.syntaxHighlight.enable() : editor.syntaxHighlight.disable();
       }
-      STE.settings.set("syntax-highlighting",String(state));
+      STE.settings.syntaxHighlighting = state;
     }
   }
 
@@ -135,13 +135,6 @@ export class STE {
    * A namespace of properties that query the support of features in the app's current environment.
   */
   static support = {
-    /**
-     * Queries if Local Storage can be used on the current URL Protocol.
-    */
-    get localStorage(): boolean {
-      return ((window.location.protocol != "blob:") ? window.localStorage : null) !== null;
-    },
-
     /**
      * Queries if the File System Access API is supported.
     */
@@ -293,45 +286,56 @@ export class STE {
    * A namespace of functions to work with the app's settings.
   */
   static settings = {
-    /**
-     * A session-mirror of the app settings present in Local Storage.
-    */
-    entries: (JSON.parse(window.localStorage.getItem("settings") ?? "null") || {}) as { [setting: string]: string | undefined; },
-
-    /**
-     * Sets the given key and value to the app settings.
-    */
-    set(key: string, value: string): string | null {
-      if (!STE.support.localStorage) return null;
-      STE.settings.entries[key] = value;
-      window.localStorage.setItem("settings",JSON.stringify(STE.settings.entries,null,"  "));
-      return value;
+    get defaultOrientation(): Orientation | null {
+      return localStorage.getItem("defaultOrientation") as Orientation | null;
     },
 
-    /**
-     * Removes the given key from the app settings.
-    */
-    remove(key: string): true | null {
-      if (!STE.support.localStorage) return null;
-      delete STE.settings.entries[key];
-      window.localStorage.setItem("settings",JSON.stringify(STE.settings.entries,null,"  "));
-      return true;
+    set defaultOrientation(value) {
+      if (value === null){
+        localStorage.removeItem("defaultOrientation");
+        return;
+      }
+      localStorage.setItem("defaultOrientation",value);
     },
 
-    /**
-     * Queries if a given key is present in the app settings.
-    */
-    has(key: string): boolean {
-      return (key in STE.settings.entries);
+    get syntaxHighlighting(): boolean | null {
+      const value = localStorage.getItem("syntaxHighlighting");
+      if (value === null) return value;
+      return JSON.parse(value) === true;
     },
 
-    /**
-     * Gets the value of a given key from the app settings.
-    */
-    get(key: string): string | null | undefined {
-      if (!STE.support.localStorage) return null;
-      if (!STE.settings.has(key)) return null;
-      return STE.settings.entries[key];
+    set syntaxHighlighting(value) {
+      if (value === null){
+        localStorage.removeItem("syntaxHighlighting");
+        return;
+      }
+      localStorage.setItem("syntaxHighlighting",`${value}`);
+    },
+
+    get automaticRefresh(): boolean | null {
+      const value = localStorage.getItem("automaticRefresh");
+      if (value === null) return value;
+      return JSON.parse(value) === true;
+    },
+
+    set automaticRefresh(value) {
+      if (value === null){
+        localStorage.removeItem("automaticRefresh");
+        return;
+      }
+      localStorage.setItem("automaticRefresh",`${value}`);
+    },
+
+    get previewBase(): string | null {
+      return localStorage.getItem("previewBase");
+    },
+
+    set previewBase(value) {
+      if (value === null){
+        localStorage.removeItem("previewBase");
+        return;
+      }
+      localStorage.setItem("previewBase",value);
     },
 
     /**
@@ -340,17 +344,23 @@ export class STE {
      * @param options Accepts an option to show the user a prompt to confirm that the settings should be reset.
     */
     reset({ confirm: showPrompt = false }: ResetSettingsOptions = {}): boolean {
-      if (!STE.support.localStorage) return false;
       if (showPrompt){
         if (!confirm("Are you sure you would like to reset all settings?")) return false;
       }
+
+      this.defaultOrientation = null;
       default_orientation_setting.select("horizontal");
       STE.appearance.setSyntaxHighlighting(false);
+
+      this.syntaxHighlighting = null;
       syntax_highlighting_setting.checked = false;
+
+      this.automaticRefresh = null;
       automatic_refresh_setting.checked = true;
+
+      this.previewBase = null;
       preview_base_input.reset();
-      STE.settings.entries = {};
-      window.localStorage.removeItem("settings");
+
       if (showPrompt) reset_settings_card.open();
       return true;
     }

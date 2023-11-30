@@ -302,7 +302,7 @@ export class Editor extends NumTextElement {
     }
 
     this.syntaxLanguage = STE.query(this.identifier).getName("extension")!;
-    if ((STE.settings.get("syntax-highlighting") == "true") && (this.syntaxLanguage in Prism.languages)){
+    if ((STE.settings.syntaxHighlighting === true) && (this.syntaxLanguage in Prism.languages)){
       this.syntaxHighlight.enable();
     }
 
@@ -341,7 +341,7 @@ export class Editor extends NumTextElement {
     }
 
     if (STE.previewEditor === "active-editor"){
-      refreshPreview({ force: (STE.settings.get("automatic-refresh") != "false") });
+      refreshPreview({ force: (STE.settings.automaticRefresh === true) });
     }
   }
 
@@ -447,7 +447,7 @@ export class Editor extends NumTextElement {
     if (isLoadedLanguage){
       this.syntaxLanguage = syntaxLanguage;
     }
-    if (STE.settings.get("syntax-highlighting") == "true" && isLoadedLanguage){
+    if (STE.settings.syntaxHighlighting === true && isLoadedLanguage){
       this.syntaxHighlight.enable();
     } else {
       this.syntaxHighlight.disable();
