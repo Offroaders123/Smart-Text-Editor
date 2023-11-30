@@ -452,7 +452,7 @@ if (STE.appearance.parentWindow){
     setOrientation(value);
   }
   if (STE.settings.get("syntax-highlighting") != undefined){
-    const state = Boolean(STE.settings.get("syntax-highlighting")!);
+    const state: boolean = JSON.parse(STE.settings.get("syntax-highlighting")!);
     STE.appearance.setSyntaxHighlighting(state);
     syntax_highlighting_setting.checked = state;
   }

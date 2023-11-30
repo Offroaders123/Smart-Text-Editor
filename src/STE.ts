@@ -1,4 +1,5 @@
 import type Card from "./Card.js";
+import type Editor from "./Editor.js";
 import type { View } from "./Workspace.js";
 import type { Orientation } from "./Workspace.js";
 
@@ -89,10 +90,10 @@ export class STE {
      * Enables or disables syntax highlighting for all Num Text elements.
     */
     setSyntaxHighlighting(state: boolean): void {
-      state = (state != undefined) ? state : (STE.settings.get("syntax-highlighting") != undefined);
-      document.querySelectorAll("num-text").forEach(editor => {
-        if (editor.syntaxLanguage in Prism.languages) (state) ? editor.syntaxHighlight.enable() : editor.syntaxHighlight.disable();
-      });
+      for (const editor of document.querySelectorAll<Editor | NumTextElement>("ste-editor, num-text")){
+        if (!(editor.syntaxLanguage in Prism.languages)) continue;
+        (state) ? editor.syntaxHighlight.enable() : editor.syntaxHighlight.disable();
+      }
       STE.settings.set("syntax-highlighting",String(state));
     }
   }
