@@ -1,3 +1,4 @@
+import * as JSX from "dino-tsx/jsx/src/jsx-runtime.js";
 import STE from "./STE.js";
 import Editor from "./Editor.js";
 import { getElementStyle } from "./dom.js";

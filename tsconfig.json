@@ -3,6 +3,9 @@
     "module": "NodeNext",
     "target": "ESNext",
     "isolatedModules": true,
+    "jsx": "react",
+    "jsxFactory": "JSX.jsx",
+    "jsxFragmentFactory": "JSX.Fragment",
     "types": [
       "@stedit/menu-drop",
       "@stedit/num-text",
