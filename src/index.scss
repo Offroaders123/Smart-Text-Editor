@@ -1208,11 +1208,6 @@ ste-card .header .card-back {
   outline: none;
 }
 
-:root.macOS-device ste-card .header .card-back {
-  padding: 4px;
-  border-radius: 4px;
-}
-
 ste-card .header:not([data-card-parent]) .card-back {
   display: none;
 }
@@ -1276,89 +1271,42 @@ ste-card[type="alert"] .header .card-controls {
   display: none;
 }
 
-:root.macOS-device ste-card .header .card-controls {
-  margin: 7px;
-  padding: 4px;
-  gap: 8px;
-  transition: margin var(--card-transition-duration);
-}
-
-:root.macOS-device ste-card .header:not([data-card-parent]) .card-controls {
-  margin-right: auto;
-}
-
-:root.macOS-device ste-card.minimize .header .card-controls {
-  margin: 1px;
-  margin-right: auto;
-}
-
 ste-card .header .card-controls .control {
   padding: var(--control-padding,0px);
   display: flex;
   background: var(--control-background);
   border: none;
   outline: none;
-}
-
-:root:not(.macOS-device) ste-card .header .card-controls .control {
   --control-padding: 10px;
   --control-background: none;
 }
 
-:root:not(.macOS-device) ste-card .header .card-controls .control:where(:hover,:active,:focus-visible) {
+ste-card .header .card-controls .control:where(:hover,:active,:focus-visible) {
   color: #ffffff;
   --control-background: #ffffff24;
 }
 
-:root:not(.macOS-device) ste-card .header .card-controls .control[data-control="close"]:where(:hover,:active,:focus-visible) {
+ste-card .header .card-controls .control[data-control="close"]:where(:hover,:active,:focus-visible) {
   --control-background: #cc2a24;
-}
-
-:root.macOS-device ste-card .header .card-controls .control {
-  --control-padding: 3px;
-  border-radius: 50%;
-}
-
-:root.macOS-device ste-card .header .card-controls .control[data-control="minimize"] {
-  --control-background: #fcbb40;
-}
-
-:root.macOS-device ste-card .header .card-controls .control[data-control="minimize"]:hover:active {
-  --control-background: #fee867;
-}
-
-:root.macOS-device ste-card .header .card-controls .control[data-control="close"] {
-  --control-background: #fc605c;
-}
-
-:root.macOS-device ste-card .header .card-controls .control[data-control="close"]:hover:active {
-  --control-background: #fd8e87;
 }
 
 ste-card:not([type="widget"]) .header .card-controls .control[data-control="minimize"] {
   display: none;
 }
 
-:root:not(.macOS-device) ste-card[type="widget"].minimize .header .card-controls .control {
+ste-card[type="widget"].minimize .header .card-controls .control {
   --control-padding: 6px;
 }
 
-:root:not(.macOS-device) ste-card[type="widget"].minimize .header .card-controls .control[data-control="minimize"] {
+ste-card[type="widget"].minimize .header .card-controls .control[data-control="minimize"] {
   border-radius: calc(var(--card-border-radius) - var(--card-border-width));
 }
 
 ste-card[type="widget"].minimize .header .card-controls .control[data-control="close"] {
-  visibility: hidden;
-  opacity: 0;
-}
-
-:root:not(.macOS-device) ste-card[type="widget"].minimize .header .card-controls .control[data-control="close"] {
   margin-left: var(--card-header-padding-right);
   margin-right: calc(var(--card-minimize-width) * -1);
-}
-
-:root.macOS-device ste-card[type="widget"].minimize .header .card-controls .control[data-control="close"] {
-  margin-left: calc(var(--card-minimize-width) * -1 - 8px);
+  visibility: hidden;
+  opacity: 0;
 }
 
 ste-card[type="widget"][data-minimize-change] .header .card-controls .control {
@@ -1375,33 +1323,15 @@ ste-card[type="widget"][data-minimize-change] .header .card-controls .control[da
 }
 
 ste-card .header .card-controls .control svg {
-  fill: currentColor;
-}
-
-:root:not(.macOS-device) ste-card .header .card-controls .control svg {
   width: 12px;
   height: 12px;
   /* aspect-ratio: 1 / 1; */
+  fill: currentColor;
 }
 
-:root:not(.macOS-device) ste-card .header .card-controls .control[data-control="close"]:hover svg {
+ste-card .header .card-controls .control[data-control="close"]:hover svg {
   color: #ffffff;
 }
-
-:root.macOS-device ste-card .header .card-controls .control svg {
-  width: 6px;
-  height: 6px;
-  /* aspect-ratio: 1 / 1; */
-  color: transparent;
-  mix-blend-mode: luminosity;
-}
-
-
-/* Temp Focus Visible (:where() wrapper for Safari support. It was cancelling out the whole selector before because :focus-visible was making it invalid.) */
-:root.macOS-device ste-card .header .card-controls:where(:hover,:active) .control svg, :root.macOS-device ste-card .header .card-controls:focus-within .control:where(:focus-visible) svg {
-  color: #202020bf;
-}
-
 
 ste-card[type="widget"].minimize .header .card-controls .control[data-control="minimize"] svg {
   transform: rotateY(180deg);

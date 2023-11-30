@@ -67,11 +67,6 @@ export class Card extends HTMLElement {
     this.controls.appendChild(this.controls.minimize);
     this.controls.appendChild(this.controls.close);
     this.header.appendChild(this.controls);
-
-    if (STE.environment.macOSDevice){
-      this.controls.insertBefore(this.controls.close,this.controls.minimize);
-      this.header.insertBefore(this.controls,this.header.firstChild);
-    }
   }
 
   open(previous?: Card): void {
