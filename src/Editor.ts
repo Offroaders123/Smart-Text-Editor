@@ -93,7 +93,7 @@ export class Editor extends NumTextElement {
    * 
    * If the given identifier is already fully in view, no scrolling will happen.
   */
-  static setTabsVisibility(identifier: string | null = STE.activeEditor): void {
+  static setTabsVisibility(identifier: string | null = STE.activeEditor?.identifier ?? null): void {
     if (!STE.activeEditor) return;
     const { tab } = STE.query(identifier);
     if (tab === null) return;
@@ -122,6 +122,7 @@ export class Editor extends NumTextElement {
 
   readonly previewOption: MenuDropOption = document.createElement("li");
 
+  declare handle: FileSystemFileHandle | null;
   declare readonly isOpen;
   declare readonly autoCreated;
   declare readonly autoReplace;
@@ -268,7 +269,7 @@ export class Editor extends NumTextElement {
         focusedOverride = true;
       }
       if (autoReplace){
-        Editor.close(STE.activeEditor);
+        Editor.close(STE.activeEditor.identifier);
       } else {
         STE.query().tab?.removeAttribute("data-editor-auto-created");
       }
@@ -295,7 +296,7 @@ export class Editor extends NumTextElement {
 
     applyEditingBehavior(this);
     Editor.#editors[this.identifier] = this;
-    if (handle !== undefined) STE.fileHandles[this.identifier] = handle;
+    this.handle = handle ?? null;
 
     if (open || STE.activeEditor === null){
       this.open({ autoCreated, focusedOverride });
@@ -331,7 +332,7 @@ export class Editor extends NumTextElement {
       this.tab.setAttribute("data-editor-auto-created","");
     }
     this.classList.add("active");
-    STE.activeEditor = this.identifier;
+    STE.activeEditor = this;
 
     Editor.setTabsVisibility();
     setTitle({ content: this.#name });
@@ -408,10 +409,6 @@ export class Editor extends NumTextElement {
 
     delete Editor.#editors[this.identifier];
 
-    if (STE.fileHandles[this.identifier]){
-      delete STE.fileHandles[this.identifier];
-    }
-
     if (transitionDuration !== 0){
       await new Promise(resolve => setTimeout(resolve,transitionDuration));
     }
@@ -464,7 +461,7 @@ export class Editor extends NumTextElement {
       setTitle({ content: rename });
     }
 
-    if ((STE.previewEditor === "active-editor" && STE.activeEditor === this.identifier) || STE.previewEditor === this.identifier){
+    if ((STE.previewEditor === "active-editor" && STE.activeEditor === this) || STE.previewEditor === this.identifier){
       refreshPreview({ force: true });
     }
   }

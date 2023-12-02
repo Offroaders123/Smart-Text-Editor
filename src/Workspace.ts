@@ -191,14 +191,14 @@ export async function saveFile(extension?: string): Promise<void> {
     const identifier = STE.activeEditor;
     let handle: void | FileSystemFileHandle;
     if (identifier === null) throw new Error("No editors are open, couldn't save anything!");
-    if (!STE.fileHandles[identifier]){
-      handle = await window.showSaveFilePicker({ suggestedName: STE.query().getName()!, startIn: (STE.fileHandles[identifier]) ? STE.fileHandles[identifier] : "desktop" }).catch(error => {
+    if (!identifier.handle){
+      handle = await window.showSaveFilePicker({ suggestedName: STE.query().getName()!, startIn: (identifier.handle) ? identifier.handle : "desktop" }).catch(error => {
         if (error.message.toLowerCase().includes("abort")) return;
       });
       if (!handle) return;
-      STE.fileHandles[identifier] = handle;
-    } else handle = STE.fileHandles[identifier]!;
-    const stream = await STE.fileHandles[identifier]?.createWritable().catch(error => {
+      identifier.handle = handle;
+    } else handle = identifier.handle!;
+    const stream = await identifier.handle?.createWritable().catch(error => {
       alert(`"${STE.query().getName()}" could not be saved.`);
       if (error.toString().toLowerCase().includes("not allowed")) return;
     });
@@ -206,7 +206,7 @@ export async function saveFile(extension?: string): Promise<void> {
     await stream.write(STE.query().textarea?.value ?? "");
     await stream.close();
     const currentName = STE.query().getName(), file = await handle.getFile(), rename = file.name;
-    if (currentName != rename) Editor.rename(identifier,rename);
+    if (currentName != rename) Editor.rename(identifier.identifier,rename);
   }
   if (STE.query().tab?.hasAttribute("data-editor-auto-created")) STE.query().tab?.removeAttribute("data-editor-auto-created");
   if (STE.query().tab?.hasAttribute("data-editor-unsaved")) STE.query().tab?.removeAttribute("data-editor-unsaved");

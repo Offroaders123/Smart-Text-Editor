@@ -149,14 +149,14 @@ document.body.addEventListener("keydown",event => {
     if (event.repeat) return;
     /* Future feature: If an editor tab is focused, close that editor instead of only the active editor */
     if (STE.activeEditor !== null){
-      Editor.close(STE.activeEditor);
+      Editor.close(STE.activeEditor.identifier);
     }
   }
   if (((controlShift || (event.ctrlKey && shift && !command && STE.environment.appleDevice)) && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("[") || pressed("{")))){
     event.preventDefault();
     if (event.repeat) return;
     if (STE.activeEditor === null) return;
-    const previous = Editor.getPrevious(STE.activeEditor);
+    const previous = Editor.getPrevious(STE.activeEditor.identifier);
     if (previous === null) return;
     Editor.open(previous);
   }
@@ -164,7 +164,7 @@ document.body.addEventListener("keydown",event => {
     event.preventDefault();
     if (event.repeat) return;
     if (STE.activeEditor === null) return;
-    const next = Editor.getNext(STE.activeEditor);
+    const next = Editor.getNext(STE.activeEditor.identifier);
     if (next === null) return;
     Editor.open(next);
   }
@@ -182,7 +182,7 @@ document.body.addEventListener("keydown",event => {
     event.preventDefault();
     if (event.repeat) return;
     if (STE.activeEditor !== null){
-      Editor.rename(STE.activeEditor);
+      Editor.rename(STE.activeEditor.identifier);
     }
   }
   if ((control || command) && !shift && pressed("s")){

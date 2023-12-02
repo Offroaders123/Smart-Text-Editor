@@ -177,7 +177,7 @@ export class STE {
    * @param identifier Defaults to the currently opened Editor.
    * @deprecated Need to move this functionality to individual Editor components instead.
   */
-  static query(identifier: string | null = STE.activeEditor): EditorQuery {
+  static query(identifier: string | null = STE.activeEditor?.identifier ?? null): EditorQuery {
     const tab = workspace_tabs.querySelector<HTMLButtonElement>(`.tab[data-editor-identifier="${identifier}"]`);
     const container = workspace_editors.querySelector<NumTextElement>(`.editor[data-editor-identifier="${identifier}"]`);
     const textarea = (container) ? container.editor : null;
@@ -259,9 +259,9 @@ export class STE {
   static preapprovedExtensions = ["txt","html","css","js","php","json","webmanifest","bbmodel","xml","yaml","yml","dist","config","ini","md","markdown","mcmeta","lang","properties","uidx","material","h","fragment","vertex","fxh","hlsl","ihlsl","svg"] as const;
 
   /**
-   * The identifier of the currently opened Editor.
+   * A reference to the currently opened Editor.
   */
-  static activeEditor: string | null = null;
+  static activeEditor: Editor | null = null;
 
   /**
    * The identifier of the Editor to be used within the Preview.
@@ -269,11 +269,6 @@ export class STE {
    * The value can also be `"active-editor"`. If it is set to that, then references to `STE.previewEditor` will be pointed to `STE.activeEditor`.
   */
   static previewEditor: string = "active-editor";
-
-  /**
-   * An object that pairs an Editor identifier with it's `FileSystemFileHandle`, if it was opened from the file system directly.
-  */
-  static fileHandles: { [identifier: string]: FileSystemFileHandle; } = {};
 
   /**
    * An array of all windows opened during the current session.
