@@ -148,25 +148,21 @@ document.body.addEventListener("keydown",event => {
     event.preventDefault();
     if (event.repeat) return;
     /* Future feature: If an editor tab is focused, close that editor instead of only the active editor */
-    if (STE.activeEditor !== null){
-      Editor.close(STE.activeEditor.identifier);
-    }
+    STE.activeEditor?.close();
   }
   if (((controlShift || (event.ctrlKey && shift && !command && STE.environment.appleDevice)) && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("[") || pressed("{")))){
     event.preventDefault();
     if (event.repeat) return;
     if (STE.activeEditor === null) return;
     const previous = Editor.getPrevious(STE.activeEditor.identifier);
-    if (previous === null) return;
-    Editor.open(previous);
+    previous?.open();
   }
   if (((control || (event.ctrlKey && !command && STE.environment.appleDevice)) && !shift && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("]") || pressed("}")))){
     event.preventDefault();
     if (event.repeat) return;
     if (STE.activeEditor === null) return;
     const next = Editor.getNext(STE.activeEditor.identifier);
-    if (next === null) return;
-    Editor.open(next);
+    next?.open();
   }
   if (((controlShift || shiftCommand) && pressed("n")) || ((controlShift || shiftCommand) && pressed("c"))){
     event.preventDefault();
@@ -346,10 +342,10 @@ workspace_tabs.addEventListener("keydown",event => {
   event.preventDefault();
 
   if (event.key === "ArrowLeft"){
-    STE.query(previousEditor).tab?.focus();
+    previousEditor?.tab.focus();
   }
   if (event.key === "ArrowRight"){
-    STE.query(nextEditor).tab?.focus();
+    nextEditor?.tab.focus();
   }
 });
 
@@ -478,7 +474,7 @@ if (STE.support.fileHandling && STE.support.fileSystem){
       new Editor({ name, value, handle });
     }
     if (!STE.environment.touchDevice){
-      STE.query().container?.focus({ preventScroll: true });
+      STE.activeEditor?.focus({ preventScroll: true });
     }
   });
 }

@@ -156,7 +156,7 @@ export class Card extends HTMLElement {
       STE.activeDialog = null;
       if (STE.dialogPrevious){
         const hidden = (getElementStyle({ element: STE.dialogPrevious, property: "visibility" }) == "hidden");
-        (!workspace_editors.contains(STE.dialogPrevious) && !hidden) ? STE.dialogPrevious.focus({ preventScroll: true }) : STE.query().container?.focus({ preventScroll: true });
+        (!workspace_editors.contains(STE.dialogPrevious) && !hidden) ? STE.dialogPrevious.focus({ preventScroll: true }) : STE.activeEditor?.focus({ preventScroll: true });
         STE.dialogPrevious = null;
       }
     }

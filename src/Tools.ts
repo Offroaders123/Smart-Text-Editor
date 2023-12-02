@@ -13,7 +13,7 @@ export class Tools {
   */
   static replaceText = {
     replace(): void {
-      const { container: editor } = STE.query();
+      const editor = STE.activeEditor;
       if (!editor) return;
       const replaced = editor.value.split(replacer_find.value).join(replacer_replace.value);
       if (replaced != editor.value) editor.value = replaced;

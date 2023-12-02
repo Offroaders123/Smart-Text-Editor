@@ -23,6 +23,13 @@ export class Editor extends NumTextElement {
   static #editors: { [identifier: string]: Editor; } = {};
 
   /**
+   * Queries an Editor by it's identifier.
+  */
+  static query(identifier: string): Editor | null {
+    return workspace_editors.querySelector<Editor>(`ste-editor[data-editor-identifier="${identifier}"]`);
+  }
+
+  /**
    * Opens an Editor from a given identifier.
   */
   static open(identifier: string, options: EditorOpenOptions = {}): void {
@@ -59,33 +66,38 @@ export class Editor extends NumTextElement {
     editor.name = rename;
   }
 
-  /* Future feature: Add support to disable the wrapping behavior */
   /**
    * Gets the previous Editor to the left of the currently opened Editor.
    * 
    * If the active Editor is the first one in the Workspace, it will wrap around to give the last Editor in the Workspace.
+   * 
+   * @param wrap Future feature: Add support to toggle the wrapping behavior.
   */
-  static getPrevious(identifier: string, _wrap: boolean = true): string | null {
-    const { tab } = STE.query(identifier);
-    if (tab === null) return tab;
-    const editorTabs = [...workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")];
+  static getPrevious(identifier: string, _wrap: boolean = true): Editor | null {
+    const editor = this.query(identifier);
+    if (editor === null) return null;
+    const { tab } = editor;
+    const editorTabs: HTMLButtonElement[] = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
     const previousTab = editorTabs[(editorTabs.indexOf(tab) || editorTabs.length) - 1];
     const previousEditor = previousTab?.getAttribute("data-editor-identifier") ?? null;
-    return previousEditor;
+    return previousEditor ? this.query(previousEditor) : null;
   }
 
   /**
    * Gets the next Editor to the right of the currently opened Editor.
    * 
    * If the active Editor is the last one in the Workspace, it will wrap around to give the first Editor in the Workspace.
+   * 
+   * @param wrap Future feature: Add support to toggle the wrapping behavior.
   */
-  static getNext(identifier: string, _wrap: boolean = true): string | null {
-    const { tab } = STE.query(identifier);
-    if (tab === null) return tab;
-    const editorTabs = [...workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")];
+  static getNext(identifier: string, _wrap: boolean = true): Editor | null {
+    const editor = this.query(identifier);
+    if (editor === null) return null;
+    const { tab } = editor;
+    const editorTabs: HTMLButtonElement[] = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
     const nextTab = editorTabs[(editorTabs.indexOf(tab) !== editorTabs.length - 1) ? editorTabs.indexOf(tab) + 1 : 0];
     const nextEditor = nextTab?.getAttribute("data-editor-identifier") ?? null;
-    return nextEditor;
+    return nextEditor ? this.query(nextEditor) : null;
   }
 
   /**
@@ -93,12 +105,13 @@ export class Editor extends NumTextElement {
    * 
    * If the given identifier is already fully in view, no scrolling will happen.
   */
-  static setTabsVisibility(identifier: string | null = STE.activeEditor?.identifier ?? null): void {
-    if (!STE.activeEditor) return;
-    const { tab } = STE.query(identifier);
-    if (tab === null) return;
-    const obstructedLeft = (tab.offsetLeft <= workspace_tabs.scrollLeft);
-    const obstructedRight = ((tab.offsetLeft + tab.clientWidth) >= (workspace_tabs.scrollLeft + workspace_tabs.clientWidth));
+  static setTabsVisibility(identifier: string | undefined = STE.activeEditor?.identifier): void {
+    if (!identifier) return;
+    const editor = this.query(identifier);
+    if (editor === null) return;
+    const { tab } = editor;
+    const obstructedLeft: boolean = (tab.offsetLeft <= workspace_tabs.scrollLeft);
+    const obstructedRight: boolean = ((tab.offsetLeft + tab.clientWidth) >= (workspace_tabs.scrollLeft + workspace_tabs.clientWidth));
     let spacingOffset = 0;
     if ((workspace_tabs.clientWidth < tab.clientWidth) && !obstructedLeft) return;
     if (obstructedLeft){
@@ -151,7 +164,7 @@ export class Editor extends NumTextElement {
       if (event.button !== 0 || document.activeElement.matches("[data-editor-rename]")) return;
 
       event.preventDefault();
-      if (this.tab !== STE.query().tab){
+      if (this.tab !== STE.activeEditor?.tab){
         this.open();
       }
     });
@@ -161,7 +174,7 @@ export class Editor extends NumTextElement {
       // Add a check to this to only apply this key handling if the Editor isn't currently being renamed in the Editor tab.
       if (event.key === " " || event.key === "Enter"){
         event.preventDefault();
-        if (this.tab !== STE.query().tab){
+        if (this.tab !== STE.activeEditor?.tab){
           this.open();
         }
       }
@@ -227,7 +240,7 @@ export class Editor extends NumTextElement {
       if (event.dataTransfer !== null){
         event.dataTransfer.dropEffect = "copy";
       }
-      if (this.tab !== STE.query().tab){
+      if (this.tab !== STE.activeEditor?.tab){
         this.open();
       }
     });
@@ -264,14 +277,14 @@ export class Editor extends NumTextElement {
       setPreviewSource({ identifier });
     });
 
-    if (STE.activeEditor !== null && STE.query().tab?.hasAttribute("data-editor-auto-created")){
-      if (document.activeElement === STE.query().container){
+    if (STE.activeEditor !== null && STE.activeEditor.tab?.hasAttribute("data-editor-auto-created")){
+      if (document.activeElement === STE.activeEditor){
         focusedOverride = true;
       }
       if (autoReplace){
         Editor.close(STE.activeEditor.identifier);
       } else {
-        STE.query().tab?.removeAttribute("data-editor-auto-created");
+        STE.activeEditor.tab?.removeAttribute("data-editor-auto-created");
       }
     }
 
@@ -302,7 +315,7 @@ export class Editor extends NumTextElement {
       this.open({ autoCreated, focusedOverride });
     }
 
-    this.syntaxLanguage = STE.query(this.identifier).getName("extension")!;
+    this.syntaxLanguage = this.getName("extension")!;
     if ((STE.settings.syntaxHighlighting === true) && (this.syntaxLanguage in Prism.languages)){
       this.syntaxHighlight.enable();
     }
@@ -318,14 +331,10 @@ export class Editor extends NumTextElement {
    * Opens the editor in the workspace.
   */
   open({ autoCreated = false, focusedOverride = false }: EditorOpenOptions = {}): void {
-    const focused = (document.activeElement === STE.query().container) || focusedOverride;
+    const focused = (document.activeElement === STE.activeEditor) || focusedOverride;
 
-    if (STE.query().tab){
-      STE.query().tab?.classList.remove("active");
-    }
-    if (STE.query().container){
-      STE.query().container?.classList.remove("active");
-    }
+    STE.activeEditor?.tab.classList.remove("active");
+    STE.activeEditor?.classList.remove("active");
 
     this.tab.classList.add("active");
     if (autoCreated){
@@ -393,8 +402,8 @@ export class Editor extends NumTextElement {
       Editor.open(identifier);
     }
 
-    if (focused && STE.query().textarea !== null){
-      STE.query().container?.focus({ preventScroll: true });
+    if (focused && STE.activeEditor?.editor !== undefined){
+      STE.activeEditor?.focus({ preventScroll: true });
     }
 
     this.tab.setAttribute("data-editor-change","");
@@ -425,9 +434,8 @@ export class Editor extends NumTextElement {
   }
 
   set name(rename) {
-    const { getName } = STE.query(this.identifier);
-    const base = getName("base");
-    const extension = getName("extension");
+    const base = this.getName("base");
+    const extension = this.getName("extension");
 
     if (!rename.includes(".")){
       rename = `${rename}.${extension}`;
@@ -438,7 +446,7 @@ export class Editor extends NumTextElement {
     this.editorName.innerText = rename;
     this.previewOption.innerText = rename;
 
-    const syntaxLanguage = STE.query(this.identifier).getName("extension")!;
+    const syntaxLanguage = this.getName("extension")!;
     const isLoadedLanguage = syntaxLanguage in Prism.languages;
 
     if (isLoadedLanguage){
@@ -457,13 +465,35 @@ export class Editor extends NumTextElement {
       this.tab.removeAttribute("data-editor-auto-created");
     }
 
-    if (this.tab === STE.query().tab){
+    if (this.tab === STE.activeEditor?.tab){
       setTitle({ content: rename });
     }
 
     if ((STE.previewEditor === "active-editor" && STE.activeEditor === this) || STE.previewEditor === this.identifier){
       refreshPreview({ force: true });
     }
+  }
+
+  /**
+   * Get the file name of the Editor.
+   * 
+   * @param section The `"base"` flag provides the name before the extension, and the `"extension"` flag provides only the extension. If omitted, the full file name is returned.
+  */
+  getName(section?: "base" | "extension"): string | null {
+    if ((document.querySelectorAll(`[data-editor-identifier="${this.identifier}"]:not([data-editor-change])`).length === 0) && (this !== STE.activeEditor)) return null;
+    let name: string | string[] = workspace_tabs.querySelector<HTMLSpanElement>(`.tab[data-editor-identifier="${this.identifier}"] [data-editor-name]`)!.innerText;
+    if (!section || (!name.includes(".") && section === "base")) return name;
+    if (section === "base"){
+      name = name.split(".");
+      name.pop();
+      return name.join(".");
+    }
+    if (section === "extension"){
+      if (!name.includes(".")) return "";
+      return name.split(".").pop()!;
+    }
+    // I don't think this is used, I had to add this to streamline the type to remove 'undefined'
+    return name;
   }
 }
 

@@ -172,42 +172,6 @@ export class STE {
   }
 
   /**
-   * Selects an Editor by it's identifier.
-   * 
-   * @param identifier Defaults to the currently opened Editor.
-   * @deprecated Need to move this functionality to individual Editor components instead.
-  */
-  static query(identifier: string | null = STE.activeEditor?.identifier ?? null): EditorQuery {
-    const tab = workspace_tabs.querySelector<HTMLButtonElement>(`.tab[data-editor-identifier="${identifier}"]`);
-    const container = workspace_editors.querySelector<NumTextElement>(`.editor[data-editor-identifier="${identifier}"]`);
-    const textarea = (container) ? container.editor : null;
-
-    /**
-     * Get the file name of the selected Editor.
-     * 
-     * @param section The `"base"` flag provides the name before the extension, and the `"extension"` flag provides only the extension. If omitted, the full file name is returned.
-    */
-    function getName(section?: "base" | "extension"): string | null {
-      if ((document.querySelectorAll(`[data-editor-identifier="${identifier}"]:not([data-editor-change])`).length === 0) && (identifier !== STE.activeEditor)) return null;
-      let name: string | string[] = workspace_tabs.querySelector<HTMLSpanElement>(`.tab[data-editor-identifier="${identifier}"] [data-editor-name]`)!.innerText;
-      if (!section || (!name.includes(".") && section === "base")) return name;
-      if (section === "base"){
-        name = name.split(".");
-        name.pop();
-        return name.join(".");
-      }
-      if (section === "extension"){
-        if (!name.includes(".")) return "";
-        return name.split(".").pop()!;
-      }
-      // I don't think this is used, I had to add this to streamline the type to remove 'undefined'
-      return name;
-    }
-
-    return { tab, container, textarea, getName };
-  }
-
-  /**
    * Gets the current View layout.
   */
   static get view(): View {

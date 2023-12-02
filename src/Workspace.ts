@@ -45,7 +45,7 @@ export function setView(type: View, { force = false }: SetViewOptions = {}): voi
   document.body.classList.add(STE.view);
   removeScaling();
   view_menu.select(STE.view);
-  if (type != "preview") window.setTimeout(Editor.setTabsVisibility,transitionDuration);
+  if (type != "preview") window.setTimeout(() => Editor.setTabsVisibility(),transitionDuration);
   window.setTimeout(() => {
     if (document.body.getAttribute("data-view-change") == changeIdentifier) document.body.removeAttribute("data-view-change");
   },transitionDuration);
@@ -181,10 +181,11 @@ export async function openFiles(): Promise<void> {
 */
 export async function saveFile(extension?: string): Promise<void> {
   if (extension || !STE.support.fileSystem){
-    if (!extension) extension = STE.query().getName("extension") ?? "";
-    const anchor = document.createElement("a"), link = window.URL.createObjectURL(new Blob([STE.query().textarea?.value ?? ""]));
+    if (!extension) extension = STE.activeEditor?.getName("extension") ?? "";
+    const anchor = document.createElement("a"), link = window.URL.createObjectURL(new Blob([STE.activeEditor?.editor.value ?? ""]));
     anchor.href = link;
-    anchor.download = `${STE.query().getName("base")}.${extension}`;
+    // @ts-expect-error
+    anchor.download = `${STE.activeEditor?.getName("base") satisfies string}.${extension}`;
     anchor.click();
     window.URL.revokeObjectURL(link);
   } else {
@@ -192,24 +193,37 @@ export async function saveFile(extension?: string): Promise<void> {
     let handle: void | FileSystemFileHandle;
     if (identifier === null) throw new Error("No editors are open, couldn't save anything!");
     if (!identifier.handle){
-      handle = await window.showSaveFilePicker({ suggestedName: STE.query().getName()!, startIn: (identifier.handle) ? identifier.handle : "desktop" }).catch(error => {
+      handle = await window.showSaveFilePicker({
+        // @ts-expect-error
+        suggestedName: STE.activeEditor?.getName(),
+        startIn: (identifier.handle) ? identifier.handle : "desktop"
+      }).catch(error => {
         if (error.message.toLowerCase().includes("abort")) return;
       });
       if (!handle) return;
       identifier.handle = handle;
     } else handle = identifier.handle!;
     const stream = await identifier.handle?.createWritable().catch(error => {
-      alert(`"${STE.query().getName()}" could not be saved.`);
+      // @ts-expect-error
+      alert(`"${STE.activeEditor?.getName() satisfies string}" could not be saved.`);
       if (error.toString().toLowerCase().includes("not allowed")) return;
     });
     if (!stream) return;
-    await stream.write(STE.query().textarea?.value ?? "");
+    // @ts-expect-error
+    await stream.write(STE.activeEditor?.editor.value satisfies string);
     await stream.close();
-    const currentName = STE.query().getName(), file = await handle.getFile(), rename = file.name;
+    // @ts-expect-error
+    const currentName: string = STE.activeEditor?.getName();
+    const file = await handle.getFile();
+    const rename = file.name;
     if (currentName != rename) Editor.rename(identifier.identifier,rename);
   }
-  if (STE.query().tab?.hasAttribute("data-editor-auto-created")) STE.query().tab?.removeAttribute("data-editor-auto-created");
-  if (STE.query().tab?.hasAttribute("data-editor-unsaved")) STE.query().tab?.removeAttribute("data-editor-unsaved");
+  if (STE.activeEditor?.tab.hasAttribute("data-editor-auto-created")){
+    STE.activeEditor?.tab.removeAttribute("data-editor-auto-created");
+  }
+  if (STE.activeEditor?.tab.hasAttribute("data-editor-unsaved")){
+    STE.activeEditor?.tab.removeAttribute("data-editor-unsaved");
+  }
   refreshPreview({ force: true });
 }
 
@@ -223,7 +237,8 @@ export function createDisplay(): void {
     top = window.screen.availHeight / 2 + window.screen.availTop - height / 2,
     features = (STE.appearance.standalone || STE.appearance.fullscreen) ? "popup" : "",
     baseURL = STE.settings.previewBase;
-  let source = STE.query().textarea?.value ?? "";
+  // @ts-expect-error
+  let source: string = STE.activeEditor?.editor.value;
   if (baseURL) source = `<!DOCTYPE html>\n<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
   const link = window.URL.createObjectURL(new Blob([source],{ type: "text/html" })),
     win = window.open(link,"_blank",features);
@@ -235,7 +250,8 @@ export function createDisplay(): void {
   STE.childWindows.push(win);
   window.setTimeout(() => {
     if (win === null) return;
-    if (!win.document.title) win.document.title = STE.query().getName()!;
+    // @ts-expect-error
+    if (!win.document.title) win.document.title = STE.activeEditor?.getName();
   },20);
 }
 
@@ -248,12 +264,12 @@ export interface RefreshPreviewOptions {
 */
 export function refreshPreview({ force = false }: RefreshPreviewOptions = {}): void {
   if (STE.view == "code") return;
-  const editor = (STE.previewEditor == "active-editor") ? STE.query() : STE.query(STE.previewEditor);
-  if (!editor.tab || !editor.textarea) return;
+  const editor: Editor | null = (STE.previewEditor == "active-editor") ? STE.activeEditor : Editor.query(STE.previewEditor);
+  if (editor === null) return;
   const change = (editor.tab.hasAttribute("data-editor-refresh") && STE.settings.automaticRefresh !== false);
   if (!change && !force) return;
   const baseURL = STE.settings.previewBase;
-  let source = editor.textarea.value;
+  let source = editor.editor.value;
   if (baseURL) source = `<!DOCTYPE html>\n<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
   preview.addEventListener("load",() => {
     preview.contentWindow?.document.open();
