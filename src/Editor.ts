@@ -446,6 +446,8 @@ export class Editor extends NumTextElement {
     this.editorName.innerText = rename;
     this.previewOption.innerText = rename;
 
+    this.#name = rename;
+
     const syntaxLanguage = this.getName("extension")!;
     const isLoadedLanguage = syntaxLanguage in Prism.languages;
 
@@ -479,21 +481,22 @@ export class Editor extends NumTextElement {
    * 
    * @param section The `"base"` flag provides the name before the extension, and the `"extension"` flag provides only the extension. If omitted, the full file name is returned.
   */
-  getName(section?: "base" | "extension"): string | null {
-    if ((document.querySelectorAll(`[data-editor-identifier="${this.identifier}"]:not([data-editor-change])`).length === 0) && (this !== STE.activeEditor)) return null;
-    let name: string | string[] = workspace_tabs.querySelector<HTMLSpanElement>(`.tab[data-editor-identifier="${this.identifier}"] [data-editor-name]`)!.innerText;
-    if (!section || (!name.includes(".") && section === "base")) return name;
-    if (section === "base"){
-      name = name.split(".");
-      name.pop();
-      return name.join(".");
+  getName(section: "base" | "extension"): string {
+    let rename: string | string[] = this.#name;
+    if (!rename.includes(".") && section === "base"){
+      return rename;
     }
-    if (section === "extension"){
-      if (!name.includes(".")) return "";
-      return name.split(".").pop()!;
+    switch (section){
+      case "base": {
+        rename = rename.split(".");
+        rename.pop();
+        return rename.join(".");
+      }
+      case "extension": {
+        if (!rename.includes(".")) return "";
+        return rename.split(".").pop()!;
+      }
     }
-    // I don't think this is used, I had to add this to streamline the type to remove 'undefined'
-    return name;
   }
 }
 
