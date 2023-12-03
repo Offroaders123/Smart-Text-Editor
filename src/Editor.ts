@@ -126,7 +126,43 @@ export class Editor extends NumTextElement {
 
   declare handle: FileSystemFileHandle | null;
   declare readonly isOpen;
-  declare readonly autoCreated;
+
+  get autoCreated(): boolean {
+    return this.tab.hasAttribute("data-editor-auto-created");
+  }
+
+  set autoCreated(value) {
+    if (value){
+      this.tab.setAttribute("data-editor-auto-created","");
+    } else {
+      this.tab.removeAttribute("data-editor-auto-created");
+    }
+  }
+
+  get refresh(): boolean {
+    return this.tab.hasAttribute("data-editor-refresh");
+  }
+
+  set refresh(value) {
+    if (value){
+      this.tab.setAttribute("data-editor-refresh","");
+    } else {
+      this.tab.removeAttribute("data-editor-refresh");
+    }
+  }
+
+  get unsaved(): boolean {
+    return this.tab.hasAttribute("data-editor-unsaved");
+  }
+
+  set unsaved(value) {
+    if (value){
+      this.tab.setAttribute("data-editor-unsaved","");
+    } else {
+      this.tab.removeAttribute("data-editor-unsaved");
+    }
+  }
+
   declare readonly autoReplace;
 
   constructor({ name = "Untitled.txt", value = "", handle, open = true, autoCreated = false, autoReplace = true }: EditorOptions = {}) {
@@ -146,7 +182,7 @@ export class Editor extends NumTextElement {
 
     this.tab.classList.add("tab");
     this.tab.setAttribute("data-editor-identifier",this.identifier);
-    if (value) this.tab.setAttribute("data-editor-refresh","");
+    if (value) this.refresh = true;
 
     this.tab.addEventListener("mousedown",event => {
       if (document.activeElement === null) return;
@@ -265,14 +301,14 @@ export class Editor extends NumTextElement {
       setPreviewSource(this);
     });
 
-    if (STE.activeEditor !== null && STE.activeEditor.tab?.hasAttribute("data-editor-auto-created")){
+    if (STE.activeEditor !== null && STE.activeEditor.autoCreated){
       if (document.activeElement === STE.activeEditor){
         focusedOverride = true;
       }
       if (autoReplace){
         STE.activeEditor.close();
       } else {
-        STE.activeEditor.tab?.removeAttribute("data-editor-auto-created");
+        STE.activeEditor.autoCreated = false;
       }
     }
 
@@ -281,14 +317,14 @@ export class Editor extends NumTextElement {
     workspace_editors.append(this);
 
     this.editor.addEventListener("input",() => {
-      if (this.tab.hasAttribute("data-editor-auto-created")){
-        this.tab.removeAttribute("data-editor-auto-created");
+      if (this.autoCreated){
+        this.autoCreated = false;
       }
-      if (!this.tab.hasAttribute("data-editor-refresh")){
-        this.tab.setAttribute("data-editor-refresh","");
+      if (!this.refresh){
+        this.refresh = true;
       }
-      if (!this.tab.hasAttribute("data-editor-unsaved")){
-        this.tab.setAttribute("data-editor-unsaved","");
+      if (!this.unsaved){
+        this.unsaved = true;
       }
       refreshPreview();
     });
@@ -326,7 +362,7 @@ export class Editor extends NumTextElement {
 
     this.tab.classList.add("active");
     if (autoCreated){
-      this.tab.setAttribute("data-editor-auto-created","");
+      this.autoCreated = true;
     }
     this.classList.add("active");
     STE.activeEditor = this;
@@ -347,13 +383,14 @@ export class Editor extends NumTextElement {
    * Closes the editor in the workspace.
   */
   async close(): Promise<void> {
-    if (this.tab.hasAttribute("data-editor-unsaved")){
-      if (!confirm(`Are you sure you would like to close "${this.#name}"?\nRecent changes have not yet been saved.`)) return;
+    if (this.unsaved){
+      const confirmation: boolean = confirm(`Are you sure you would like to close "${this.#name}"?\nRecent changes have not yet been saved.`);
+      if (!confirmation) return;
     }
 
-    const editorTabs = [...workspace_tabs.querySelectorAll(".tab:not([data-editor-change])")];
-    const changeIdentifier = Math.random().toString();
-    const focused = (document.activeElement === this);
+    const editorTabs = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
+    const changeIdentifier: string = Math.random().toString();
+    const focused: boolean = document.activeElement === this;
 
     if (editorTabs.length !== 1){
       document.body.setAttribute("data-editor-change",changeIdentifier);
@@ -467,8 +504,8 @@ export class Editor extends NumTextElement {
       this.syntaxLanguage = syntaxLanguage;
     }
 
-    if (this.tab.hasAttribute("data-editor-auto-created")){
-      this.tab.removeAttribute("data-editor-auto-created");
+    if (this.autoCreated){
+      this.autoCreated = false;
     }
 
     if (this.tab === STE.activeEditor?.tab){

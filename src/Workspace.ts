@@ -223,11 +223,11 @@ export async function saveFile(extension?: string): Promise<void> {
     const rename = file.name;
     if (currentName != rename) identifier.rename(rename);
   }
-  if (STE.activeEditor?.tab.hasAttribute("data-editor-auto-created")){
-    STE.activeEditor?.tab.removeAttribute("data-editor-auto-created");
+  if (STE.activeEditor?.autoCreated){
+    STE.activeEditor.autoCreated = false;
   }
-  if (STE.activeEditor?.tab.hasAttribute("data-editor-unsaved")){
-    STE.activeEditor?.tab.removeAttribute("data-editor-unsaved");
+  if (STE.activeEditor?.unsaved){
+    STE.activeEditor.unsaved = false;
   }
   await refreshPreview({ force: true });
 }
@@ -274,7 +274,7 @@ export async function refreshPreview({ force = false }: RefreshPreviewOptions = 
 
   const editor: Editor | null = STE.previewEditor ?? STE.activeEditor;
   if (editor === null) return;
-  const change: boolean = editor.tab.hasAttribute("data-editor-refresh") && !STE.settings.automaticRefresh;
+  const change: boolean = editor.refresh && !STE.settings.automaticRefresh;
   if (!change && !force) return;
 
   const baseURL: string | null = STE.settings.previewBase;
@@ -293,7 +293,7 @@ export async function refreshPreview({ force = false }: RefreshPreviewOptions = 
   preview.contentDocument?.write(source);
   preview.contentDocument?.close();
 
-  if (change) editor.tab.removeAttribute("data-editor-refresh");
+  if (change) editor.refresh = false;
 }
 
 /**
