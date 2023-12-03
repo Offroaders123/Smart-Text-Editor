@@ -315,7 +315,7 @@ export class Editor extends NumTextElement {
       this.open({ autoCreated, focusedOverride });
     }
 
-    this.syntaxLanguage = this.getName("extension")!;
+    this.syntaxLanguage = this.extension;
     if ((STE.settings.syntaxHighlighting === true) && (this.syntaxLanguage in Prism.languages)){
       this.syntaxHighlight.enable();
     }
@@ -434,13 +434,12 @@ export class Editor extends NumTextElement {
   }
 
   set name(rename) {
-    const base = this.getName("base");
-    const extension = this.getName("extension");
+    const { basename, extension } = this;
 
     if (!rename.includes(".")){
       rename = `${rename}.${extension}`;
-    } else if (rename.charAt(0) === "."){
-      rename = `${base}${rename}`;
+    } else if (rename.startsWith(".")){
+      rename = `${basename}${rename}`;
     }
 
     this.editorName.innerText = rename;
@@ -448,8 +447,8 @@ export class Editor extends NumTextElement {
 
     this.#name = rename;
 
-    const syntaxLanguage = this.getName("extension")!;
-    const isLoadedLanguage = syntaxLanguage in Prism.languages;
+    const syntaxLanguage: string = this.extension;
+    const isLoadedLanguage: boolean = syntaxLanguage in Prism.languages;
 
     if (isLoadedLanguage){
       this.syntaxLanguage = syntaxLanguage;
@@ -476,27 +475,18 @@ export class Editor extends NumTextElement {
     }
   }
 
-  /**
-   * Get the file name of the Editor.
-   * 
-   * @param section The `"base"` flag provides the name before the extension, and the `"extension"` flag provides only the extension. If omitted, the full file name is returned.
-  */
-  getName(section: "base" | "extension"): string {
-    let rename: string | string[] = this.#name;
-    if (!rename.includes(".") && section === "base"){
-      return rename;
-    }
-    switch (section){
-      case "base": {
-        rename = rename.split(".");
-        rename.pop();
-        return rename.join(".");
-      }
-      case "extension": {
-        if (!rename.includes(".")) return "";
-        return rename.split(".").pop()!;
-      }
-    }
+  get basename(): string {
+    const name = this.#name;
+    if (!name.includes(".")) return name;
+    const basename: string = name.split(".").slice(0,-1).join(".");
+    return basename;
+  }
+
+  get extension(): string {
+    const name = this.#name;
+    if (!name.includes(".")) return "";
+    const extension: string = name.split(".").pop()!;
+    return extension;
   }
 }
 

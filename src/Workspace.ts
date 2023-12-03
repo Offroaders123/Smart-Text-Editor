@@ -181,7 +181,7 @@ export async function openFiles(): Promise<void> {
 */
 export async function saveFile(extension?: string): Promise<void> {
   if (extension || !STE.support.fileSystem){
-    if (!extension) extension = STE.activeEditor?.getName("extension") ?? "";
+    if (!extension) extension = STE.activeEditor?.extension;
     const anchor = document.createElement("a"), link = window.URL.createObjectURL(new Blob([STE.activeEditor?.editor.value ?? ""]));
     anchor.href = link;
     // @ts-expect-error
