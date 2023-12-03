@@ -93,19 +93,16 @@ export function setOrientation(orientation?: Orientation): void {
   }
 }
 
-export type SetPreviewSourceOptions =
-  | { identifier: string; }
-  | { activeEditor: true; }
-
 /**
  * Sets the source for the Preview to a given Editor.
+ * 
+ * @see {@link STE.previewEditor}
 */
-export function setPreviewSource(options: SetPreviewSourceOptions): void {
-  if ("activeEditor" in options || STE.previewEditor === options.identifier){
-    STE.previewEditor = "active-editor";
+export function setPreviewSource(previewEditor: Editor | null): void {
+  STE.previewEditor = previewEditor;
+
+  if (previewEditor === null){
     preview_menu.select("active-editor");
-  } else {
-    STE.previewEditor = options.identifier;
   }
 
   refreshPreview({ force: true });
@@ -264,9 +261,9 @@ export interface RefreshPreviewOptions {
 */
 export function refreshPreview({ force = false }: RefreshPreviewOptions = {}): void {
   if (STE.view == "code") return;
-  const editor: Editor | null = (STE.previewEditor == "active-editor") ? STE.activeEditor : Editor.query(STE.previewEditor);
+  const editor: Editor | null = STE.previewEditor ?? STE.activeEditor;
   if (editor === null) return;
-  const change = (editor.tab.hasAttribute("data-editor-refresh") && STE.settings.automaticRefresh !== false);
+  const change: boolean = editor.tab.hasAttribute("data-editor-refresh") && !STE.settings.automaticRefresh;
   if (!change && !force) return;
   const baseURL = STE.settings.previewBase;
   let source = editor.editor.value;

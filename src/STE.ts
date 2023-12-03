@@ -230,9 +230,9 @@ export class STE {
   /**
    * The identifier of the Editor to be used within the Preview.
    * 
-   * The value can also be `"active-editor"`. If it is set to that, then references to `STE.previewEditor` will be pointed to `STE.activeEditor`.
+   * When set to `null`, internally the value of `STE.previewEditor` will be pointed to `STE.activeEditor` when used.
   */
-  static previewEditor: string = "active-editor";
+  static previewEditor: Editor | null = null;
 
   /**
    * An array of all windows opened during the current session.

@@ -262,8 +262,7 @@ export class Editor extends NumTextElement {
     this.previewOption.innerText = this.#name;
 
     this.previewOption.addEventListener("click",() => {
-      const { identifier } = this;
-      setPreviewSource({ identifier });
+      setPreviewSource(this);
     });
 
     if (STE.activeEditor !== null && STE.activeEditor.tab?.hasAttribute("data-editor-auto-created")){
@@ -339,8 +338,8 @@ export class Editor extends NumTextElement {
       this.focus({ preventScroll: true });
     }
 
-    if (STE.previewEditor === "active-editor"){
-      refreshPreview({ force: (STE.settings.automaticRefresh === true) });
+    if (STE.previewEditor === null){
+      refreshPreview({ force: STE.settings.automaticRefresh !== false });
     }
   }
 
@@ -374,8 +373,8 @@ export class Editor extends NumTextElement {
       preview.src = "about:blank";
     }
 
-    if (STE.previewEditor === this.identifier){
-      setPreviewSource({ activeEditor: true });
+    if (STE.previewEditor === this){
+      setPreviewSource(null);
     }
 
     if (this.tab === editorTabs[0] && editorTabs[1] && this.tab.classList.contains("active")){
@@ -476,7 +475,7 @@ export class Editor extends NumTextElement {
       setTitle({ content: rename });
     }
 
-    if ((STE.previewEditor === "active-editor" && STE.activeEditor === this) || STE.previewEditor === this.identifier){
+    if ((STE.previewEditor === null && STE.activeEditor === this) || STE.previewEditor === this){
       refreshPreview({ force: true });
     }
   }
