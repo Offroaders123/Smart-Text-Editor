@@ -764,7 +764,7 @@ a {
   text-decoration: none;
 }
 
-num-text {
+num-text, ste-editor {
   --padding: 8px;
   caret-color: var(--color);
   font-family: var(--font-family-code);
@@ -774,10 +774,10 @@ num-text {
   background: var(--background);
   --background: #2d2d2d;
   scrollbar-color: #808080 var(--background);
-}
 
-num-text::part(container) {
-  border-radius: inherit;
+  &::part(container) {
+    border-radius: inherit;
+  }
 }
 
 input:is([type="text"],[type="url"]) {
