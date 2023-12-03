@@ -177,9 +177,7 @@ document.body.addEventListener("keydown",event => {
   if ((controlShift || shiftCommand) && pressed("r")){
     event.preventDefault();
     if (event.repeat) return;
-    if (STE.activeEditor !== null){
-      Editor.rename(STE.activeEditor.identifier);
-    }
+    STE.activeEditor?.rename();
   }
   if ((control || command) && !shift && pressed("s")){
     event.preventDefault();

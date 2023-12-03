@@ -216,7 +216,7 @@ export async function saveFile(extension?: string): Promise<void> {
     const currentName: string = STE.activeEditor?.getName();
     const file = await handle.getFile();
     const rename = file.name;
-    if (currentName != rename) Editor.rename(identifier.identifier,rename);
+    if (currentName != rename) identifier.rename(rename);
   }
   if (STE.activeEditor?.tab.hasAttribute("data-editor-auto-created")){
     STE.activeEditor?.tab.removeAttribute("data-editor-auto-created");

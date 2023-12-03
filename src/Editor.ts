@@ -26,14 +26,14 @@ export class Editor extends NumTextElement {
    * Queries an Editor by it's identifier.
   */
   static query(identifier: string): Editor | null {
-    return workspace_editors.querySelector<Editor>(`ste-editor[data-editor-identifier="${identifier}"]`);
+    return this.#editors[identifier] ?? null;
   }
 
   /**
    * Opens an Editor from a given identifier.
   */
   static open(identifier: string, options: EditorOpenOptions = {}): void {
-    const editor = this.#editors[identifier];
+    const editor = this.query(identifier);
     editor?.open(options);
   }
 
@@ -41,29 +41,18 @@ export class Editor extends NumTextElement {
    * Closes an Editor from a given identifier.
   */
   static async close(identifier: string): Promise<void> {
-    const editor = this.#editors[identifier];
+    const editor = this.query(identifier);
     await editor?.close();
   }
 
   /**
    * Renames an Editor from a given identifier.
    * 
-   * @param rename If a new name isn't provided, the user is prompted to provide one.
+   * @param name If a new name isn't provided, the user is prompted to provide one.
   */
-  static rename(identifier: string, rename?: string): void {
-    const editor = this.#editors[identifier];
-    if (editor === undefined){
-      throw new Error(`Failed to rename editor '${identifier}', it may not exist`);
-    }
-    const currentName = editor.#name;
-
-    if (!rename){
-      const result = prompt(`Enter a new file name for "${currentName}".`,currentName);
-      if (result === null) return;
-      rename = result;
-    }
-
-    editor.name = rename;
+  static rename(identifier: string, name?: string): void {
+    const editor = this.query(identifier);
+    editor?.rename(name);
   }
 
   /**
@@ -282,7 +271,7 @@ export class Editor extends NumTextElement {
         focusedOverride = true;
       }
       if (autoReplace){
-        Editor.close(STE.activeEditor.identifier);
+        STE.activeEditor.close();
       } else {
         STE.activeEditor.tab?.removeAttribute("data-editor-auto-created");
       }
@@ -356,7 +345,7 @@ export class Editor extends NumTextElement {
   }
 
   /**
-   * Closes the editor in the workspace
+   * Closes the editor in the workspace.
   */
   async close(): Promise<void> {
     if (this.tab.hasAttribute("data-editor-unsaved")){
@@ -427,6 +416,23 @@ export class Editor extends NumTextElement {
     if (document.body.getAttribute("data-editor-change") === changeIdentifier){
       document.body.removeAttribute("data-editor-change");
     }
+  }
+
+  /**
+   * Renames the file of the editor.
+   * 
+   * @param name If a new name isn't provided, the user is prompted to provide one.
+  */
+  rename(name?: string): void {
+    const currentName = this.#name;
+
+    if (name === undefined){
+      const result = prompt(`Enter a new file name for "${currentName}".`,currentName);
+      if (result === null) return;
+      name = result;
+    }
+
+    this.name = name;
   }
 
   get name(): string {
