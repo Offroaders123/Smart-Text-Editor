@@ -98,14 +98,14 @@ export function setOrientation(orientation?: Orientation): void {
  * 
  * @see {@link STE.previewEditor}
 */
-export function setPreviewSource(previewEditor: Editor | null): void {
+export async function setPreviewSource(previewEditor: Editor | null): Promise<void> {
   STE.previewEditor = previewEditor;
 
   if (previewEditor === null){
     preview_menu.select("active-editor");
   }
 
-  refreshPreview({ force: true });
+  await refreshPreview({ force: true });
 }
 
 /**
@@ -179,10 +179,13 @@ export async function openFiles(): Promise<void> {
 export async function saveFile(extension?: string): Promise<void> {
   if (extension || !STE.support.fileSystem){
     if (!extension) extension = STE.activeEditor?.extension;
-    const anchor = document.createElement("a"), link = window.URL.createObjectURL(new Blob([STE.activeEditor?.editor.value ?? ""]));
+    const anchor = document.createElement("a");
+    const link = window.URL.createObjectURL(new Blob([STE.activeEditor?.editor.value ?? ""]));
     anchor.href = link;
-    // @ts-expect-error
-    anchor.download = `${STE.activeEditor?.getName("base") satisfies string}.${extension}`;
+    anchor.download = `${
+      // @ts-expect-error
+      STE.activeEditor?.basename satisfies string
+    }.${extension}`;
     anchor.click();
     window.URL.revokeObjectURL(link);
   } else {
@@ -191,8 +194,9 @@ export async function saveFile(extension?: string): Promise<void> {
     if (identifier === null) throw new Error("No editors are open, couldn't save anything!");
     if (!identifier.handle){
       handle = await window.showSaveFilePicker({
-        // @ts-expect-error
-        suggestedName: STE.activeEditor?.getName(),
+        suggestedName:
+          // @ts-expect-error
+          STE.activeEditor?.name satisfies string,
         startIn: (identifier.handle) ? identifier.handle : "desktop"
       }).catch(error => {
         if (error.message.toLowerCase().includes("abort")) return;
@@ -201,16 +205,20 @@ export async function saveFile(extension?: string): Promise<void> {
       identifier.handle = handle;
     } else handle = identifier.handle!;
     const stream = await identifier.handle?.createWritable().catch(error => {
-      // @ts-expect-error
-      alert(`"${STE.activeEditor?.getName() satisfies string}" could not be saved.`);
+      alert(`"${
+        // @ts-expect-error
+        STE.activeEditor?.name satisfies string
+      }" could not be saved.`);
       if (error.toString().toLowerCase().includes("not allowed")) return;
     });
     if (!stream) return;
-    // @ts-expect-error
-    await stream.write(STE.activeEditor?.editor.value satisfies string);
+    await stream.write(
+      // @ts-expect-error
+      STE.activeEditor?.editor.value satisfies string
+    );
     await stream.close();
     // @ts-expect-error
-    const currentName: string = STE.activeEditor?.getName();
+    const currentName: string = STE.activeEditor?.name;
     const file = await handle.getFile();
     const rename = file.name;
     if (currentName != rename) identifier.rename(rename);
@@ -221,7 +229,7 @@ export async function saveFile(extension?: string): Promise<void> {
   if (STE.activeEditor?.tab.hasAttribute("data-editor-unsaved")){
     STE.activeEditor?.tab.removeAttribute("data-editor-unsaved");
   }
-  refreshPreview({ force: true });
+  await refreshPreview({ force: true });
 }
 
 /**
@@ -247,8 +255,10 @@ export function createDisplay(): void {
   STE.childWindows.push(win);
   window.setTimeout(() => {
     if (win === null) return;
-    // @ts-expect-error
-    if (!win.document.title) win.document.title = STE.activeEditor?.getName();
+    if (!win.document.title){
+      // @ts-expect-error
+      win.document.title = STE.activeEditor?.name;
+    }
   },20);
 }
 
@@ -259,21 +269,30 @@ export interface RefreshPreviewOptions {
 /**
  * Refreshes the Preview with the latest source from the source Editor.
 */
-export function refreshPreview({ force = false }: RefreshPreviewOptions = {}): void {
-  if (STE.view == "code") return;
+export async function refreshPreview({ force = false }: RefreshPreviewOptions = {}): Promise<void> {
+  if (STE.view === "code") return;
+
   const editor: Editor | null = STE.previewEditor ?? STE.activeEditor;
   if (editor === null) return;
   const change: boolean = editor.tab.hasAttribute("data-editor-refresh") && !STE.settings.automaticRefresh;
   if (!change && !force) return;
-  const baseURL = STE.settings.previewBase;
-  let source = editor.editor.value;
-  if (baseURL) source = `<!DOCTYPE html>\n<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
-  preview.addEventListener("load",() => {
-    preview.contentWindow?.document.open();
-    preview.contentWindow?.document.write(source);
-    preview.contentWindow?.document.close();
-  },{ once: true });
-  preview.src = "about:blank";
+
+  const baseURL: string | null = STE.settings.previewBase;
+  let source: string = editor.editor.value;
+  if (baseURL !== null){
+    source = `<!DOCTYPE html>\n<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
+  }
+
+  await new Promise<void>((resolve,reject) => {
+    preview.addEventListener("load",() => resolve(),{ once: true });
+    preview.addEventListener("error",() => reject(),{ once: true });
+    preview.src = "about:blank";
+  });
+
+  preview.contentDocument?.open();
+  preview.contentDocument?.write(source);
+  preview.contentDocument?.close();
+
   if (change) editor.tab.removeAttribute("data-editor-refresh");
 }
 

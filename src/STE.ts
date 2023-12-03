@@ -10,13 +10,6 @@ export interface SafeAreaInsets {
   bottom: number;
 }
 
-export interface EditorQuery {
-  tab: HTMLButtonElement | null;
-  container: NumTextElement | null;
-  textarea: HTMLTextAreaElement | null;
-  getName(section?: "base" | "extension"): string | null;
-}
-
 interface ResetSettingsOptions {
   confirm?: boolean;
 }
