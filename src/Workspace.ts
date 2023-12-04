@@ -59,38 +59,44 @@ export type Orientation = "horizontal" | "vertical";
  * 
  * @param orientation If an Orientation type is not provided, the current state will be toggled to the other option.
 */
-export function setOrientation(orientation?: Orientation): void {
+export async function setOrientation(orientation?: Orientation): Promise<void> {
   if (STE.orientationChange || STE.scalingChange) return;
-  document.body.setAttribute("data-orientation-change","");
-  const param = (orientation), transitionDuration = ((STE.view != "split") ? 0 : parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`));
-  if (!param && STE.view == "split") setView("code",{ force: true });
-  if (!param && STE.orientation == "horizontal") orientation = "vertical";
-  if (!param && STE.orientation == "vertical") orientation = "horizontal";
-  window.setTimeout(() => {
-    setTransitionDurations("off");
-    document.body.classList.remove(STE.orientation);
-    document.body.setAttribute("data-orientation",orientation!);
-    document.body.classList.add(STE.orientation);
-    workspace.offsetHeight;
-    scaler.offsetHeight;
-    preview.offsetHeight;
-    setTransitionDurations("on");
-    if (!param) setView("split",{ force: true });
-    window.setTimeout(() => document.body.removeAttribute("data-orientation-change"),transitionDuration);
-  },transitionDuration);
 
-  function setTransitionDurations(state: "on" | "off"): void {
-    if (state == "on"){
-      workspace.style.removeProperty("transition-duration");
-      scaler.style.removeProperty("transition-duration");
-      preview.style.removeProperty("transition-duration");
-    }
-    if (state == "off"){
-      workspace.style.transitionDuration = "0s";
-      scaler.style.transitionDuration = "0s";
-      preview.style.transitionDuration = "0s";
-    }
+  document.body.setAttribute("data-orientation-change","");
+  const param: boolean = orientation !== undefined;
+  const transitionDuration: number = ((STE.view != "split") ? 0 : parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`));
+
+  if (!param && STE.view == "split"){
+    setView("code",{ force: true });
   }
+  if (!param && STE.orientation === "horizontal"){
+    orientation = "vertical";
+  }
+  if (!param && STE.orientation === "vertical"){
+    orientation = "horizontal";
+  }
+
+  await new Promise<void>(resolve => setTimeout(resolve,transitionDuration));
+
+  workspace.style.transitionDuration = "0s";
+  scaler.style.transitionDuration = "0s";
+  preview.style.transitionDuration = "0s";
+  document.body.classList.remove(STE.orientation);
+  document.body.setAttribute("data-orientation",orientation!);
+  document.body.classList.add(STE.orientation);
+  workspace.offsetHeight;
+  scaler.offsetHeight;
+  preview.offsetHeight;
+  workspace.style.removeProperty("transition-duration");
+  scaler.style.removeProperty("transition-duration");
+  preview.style.removeProperty("transition-duration");
+  if (!param){
+    setView("split",{ force: true });
+  }
+
+  await new Promise(resolve => setTimeout(resolve,transitionDuration));
+
+  document.body.removeAttribute("data-orientation-change");
 }
 
 /**
