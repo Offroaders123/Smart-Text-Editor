@@ -35,21 +35,29 @@ export interface SetViewOptions {
 /**
  * Sets the View state of the app. If a View change is already in progress, and the force option is not set to `true`, the call will be skipped.
 */
-export function setView(type: View, { force = false }: SetViewOptions = {}): void {
+export async function setView(type: View, { force = false }: SetViewOptions = {}): Promise<void> {
   if ((STE.orientationChange && !force) || STE.scalingChange) return;
-  const changeIdentifier = Math.random().toString();
+
+  const changeIdentifier: string = Math.random().toString();
   document.body.setAttribute("data-view-change",changeIdentifier);
-  const transitionDuration = parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
+
+  const transitionDuration: number = parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
   document.body.classList.remove(STE.view);
   document.body.setAttribute("data-view",type);
   document.body.classList.add(STE.view);
   removeScaling();
   view_menu.select(STE.view);
-  if (type != "preview") window.setTimeout(() => Editor.setTabsVisibility(),transitionDuration);
-  window.setTimeout(() => {
-    if (document.body.getAttribute("data-view-change") == changeIdentifier) document.body.removeAttribute("data-view-change");
-  },transitionDuration);
+
   refreshPreview();
+
+  await new Promise<void>(resolve => setTimeout(resolve,transitionDuration));
+
+  if (type !== "preview"){
+    Editor.setTabsVisibility();
+  }
+  if (document.body.getAttribute("data-view-change") === changeIdentifier){
+    document.body.removeAttribute("data-view-change");
+  }
 }
 
 export type Orientation = "horizontal" | "vertical";
