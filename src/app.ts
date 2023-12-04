@@ -334,10 +334,10 @@ workspace_tabs.addEventListener("keydown",event => {
   event.preventDefault();
 
   if (event.key === "ArrowLeft"){
-    Editor.getPrevious(identifier)?.tab.focus();
+    Editor.query(identifier)?.getPrevious()?.tab.focus();
   }
   if (event.key === "ArrowRight"){
-    Editor.getNext(identifier)?.tab.focus();
+    Editor.query(identifier)?.getNext()?.tab.focus();
   }
 });
 

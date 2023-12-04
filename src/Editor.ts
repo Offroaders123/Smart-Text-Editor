@@ -30,58 +30,6 @@ export class Editor extends NumTextElement {
   }
 
   /**
-   * Opens an Editor from a given identifier.
-  */
-  static open(identifier: string, options: EditorOpenOptions = {}): void {
-    const editor = this.query(identifier);
-    editor?.open(options);
-  }
-
-  /**
-   * Closes an Editor from a given identifier.
-  */
-  static async close(identifier: string): Promise<void> {
-    const editor = this.query(identifier);
-    await editor?.close();
-  }
-
-  /**
-   * Renames an Editor from a given identifier.
-   * 
-   * @param name If a new name isn't provided, the user is prompted to provide one.
-  */
-  static rename(identifier: string, name?: string): void {
-    const editor = this.query(identifier);
-    editor?.rename(name);
-  }
-
-  /**
-   * Gets the previous Editor to the left of the currently opened Editor.
-   * 
-   * If the active Editor is the first one in the Workspace, it will wrap around to give the last Editor in the Workspace.
-   * 
-   * @param wrap Future feature: Add support to toggle the wrapping behavior.
-  */
-  static getPrevious(identifier: string, _wrap: boolean = true): Editor | null {
-    const editor = this.query(identifier);
-    const previousEditor = editor?.getPrevious() ?? null;
-    return previousEditor;
-  }
-
-  /**
-   * Gets the next Editor to the right of the currently opened Editor.
-   * 
-   * If the active Editor is the last one in the Workspace, it will wrap around to give the first Editor in the Workspace.
-   * 
-   * @param wrap Future feature: Add support to toggle the wrapping behavior.
-  */
-  static getNext(identifier: string, _wrap: boolean = true): Editor | null {
-    const editor = this.query(identifier);
-    const nextEditor = editor?.getNext() ?? null;
-    return nextEditor;
-  }
-
-  /**
    * Updates the horizontal scroll position of the Workspace Tabs section to show a given Editor, by it's given identifier.
    * 
    * If the given identifier is already fully in view, no scrolling will happen.
@@ -408,15 +356,15 @@ export class Editor extends NumTextElement {
 
     if (this.tab === editorTabs[0] && editorTabs[1] && this.tab.classList.contains("active")){
       const identifier = editorTabs[1].getAttribute("data-editor-identifier")!;
-      Editor.open(identifier);
+      Editor.query(identifier)?.open();
     }
     if (this.tab === editorTabs[editorTabs.length - 1] && this.tab !== editorTabs[0] && this.tab.classList.contains("active")){
       const identifier = editorTabs[editorTabs.length - 2]!.getAttribute("data-editor-identifier")!;
-      Editor.open(identifier);
+      Editor.query(identifier)?.open();
     }
     if (this.tab !== editorTabs[0] && this.tab.classList.contains("active")){
       const identifier = editorTabs[editorTabs.indexOf(this.tab) + 1]!.getAttribute("data-editor-identifier")!;
-      Editor.open(identifier);
+      Editor.query(identifier)?.open();
     }
 
     if (focused && STE.activeEditor?.editor !== undefined){
