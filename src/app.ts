@@ -153,16 +153,12 @@ document.body.addEventListener("keydown",event => {
   if (((controlShift || (event.ctrlKey && shift && !command && STE.environment.appleDevice)) && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("[") || pressed("{")))){
     event.preventDefault();
     if (event.repeat) return;
-    if (STE.activeEditor === null) return;
-    const previous = Editor.getPrevious(STE.activeEditor.identifier);
-    previous?.open();
+    STE.activeEditor?.getPrevious()?.open();
   }
   if (((control || (event.ctrlKey && !command && STE.environment.appleDevice)) && !shift && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("]") || pressed("}")))){
     event.preventDefault();
     if (event.repeat) return;
-    if (STE.activeEditor === null) return;
-    const next = Editor.getNext(STE.activeEditor.identifier);
-    next?.open();
+    STE.activeEditor?.getNext()?.open();
   }
   if (((controlShift || shiftCommand) && pressed("n")) || ((controlShift || shiftCommand) && pressed("c"))){
     event.preventDefault();
@@ -335,15 +331,13 @@ workspace_tabs.addEventListener("keydown",event => {
   const identifier = document.activeElement.getAttribute("data-editor-identifier");
   if (identifier === null) return;
 
-  const previousEditor = Editor.getPrevious(identifier);
-  const nextEditor = Editor.getNext(identifier);
   event.preventDefault();
 
   if (event.key === "ArrowLeft"){
-    previousEditor?.tab.focus();
+    Editor.getPrevious(identifier)?.tab.focus();
   }
   if (event.key === "ArrowRight"){
-    nextEditor?.tab.focus();
+    Editor.getNext(identifier)?.tab.focus();
   }
 });
 
