@@ -32,11 +32,6 @@ for (const checkbox of document.querySelectorAll<HTMLDivElement>(".checkbox")){
   input.addEventListener("click",event => event.stopPropagation());
 }
 
-new ResizeObserver(() => {
-  if (!STE.appearance.windowControlsOverlay) return;
-  app_omnibox.style.setProperty("--device-pixel-ratio",window.devicePixelRatio.toFixed(2));
-}).observe(app_omnibox);
-
 for (const option of app_omnibox.querySelectorAll<HTMLButtonElement | HTMLAnchorElement>(".option")){
   option.tabIndex = -1;
   option.addEventListener("mousedown",event => event.preventDefault());

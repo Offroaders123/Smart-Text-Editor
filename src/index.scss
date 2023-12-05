@@ -193,8 +193,6 @@ header {
 
     @media (display-mode: window-controls-overlay) {
       :root:not(.startup-fade) & {
-        height: var(--titlebar-area-inset-height);
-        gap: calc(var(--header-gap) / var(--device-pixel-ratio));
         z-index: 5;
       }
 
@@ -227,10 +225,6 @@ header {
       transition: background-color 250ms linear;
       -webkit-app-region: no-drag;
 
-      @media (display-mode: window-controls-overlay) {
-        padding: calc(5px / var(--device-pixel-ratio));
-      }
-
       &:hover {
         background-color: #ffffff14;
       }
@@ -245,11 +239,6 @@ header {
         /* aspect-ratio: 1 / 1; */
         flex-shrink: 0;
         fill: currentColor;
-
-        @media (display-mode: window-controls-overlay) {
-          width: calc(14px / var(--device-pixel-ratio));
-          height: calc(14px / var(--device-pixel-ratio));
-        }
       }
     }
   }
