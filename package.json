@@ -16,6 +16,6 @@
     "better-typescript": "^0.1.6",
     "new-javascript": "^0.3.6",
     "typescript": "^5.2.2",
-    "vite": "^4.4.9"
+    "vite": "^4.4.12"
   }
 }
