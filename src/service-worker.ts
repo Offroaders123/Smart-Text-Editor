@@ -1,7 +1,9 @@
 /// <reference no-default-lib="true"/>
-/// <reference types="better-typescript/worker.d.ts"/>
+/// <reference lib="ESNext"/>
+/// <reference lib="WebWorker"/>
 
 declare var self: ServiceWorkerGlobalScope;
+declare const clients: Clients;
 
 const NAME = "Smart Text Editor";
 const VERSION = "v4.27.5";
