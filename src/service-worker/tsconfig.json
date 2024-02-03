@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "module": "None",
+    "lib": [
+      "ESNext",
+      "WebWorker"
+    ],
+    "types": [
+      "new-javascript/wicg/ua-client-hints",
+      "vite/client"
+    ]
+  },
+  "exclude": []
+}

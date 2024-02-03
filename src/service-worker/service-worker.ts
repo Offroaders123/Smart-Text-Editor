@@ -1,6 +1,3 @@
-/// <reference lib="ESNext"/>
-/// <reference lib="WebWorker"/>
-
 declare var self: ServiceWorkerGlobalScope;
 declare const clients: Clients;
 
@@ -128,3 +125,5 @@ async function messageClients(message: any, options: StructuredSerializeOptions 
     client.postMessage(message,options);
   }
 }
+
+export {};
