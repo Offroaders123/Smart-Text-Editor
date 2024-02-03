@@ -6,7 +6,11 @@
     "types": [
       "@stedit/menu-drop",
       "@stedit/num-text",
-      "new-javascript",
+      "new-javascript/wicg/file-system-access",
+      "new-javascript/wicg/manifest-incubations",
+      "new-javascript/wicg/ua-client-hints",
+      "new-javascript/wicg/web-app-launch",
+      "new-javascript/wicg/window-controls-overlay",
       "vite/client"
     ],
     "noEmit": true,
