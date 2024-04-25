@@ -1,3 +1,4 @@
+import Prism from "./prism.js";
 import STE from "./STE.js";
 import { setPreviewSource, refreshPreview } from "./Workspace.js";
 import { getElementStyle, applyEditingBehavior, setTitle } from "./dom.js";

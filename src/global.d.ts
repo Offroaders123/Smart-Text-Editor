@@ -13,8 +13,6 @@ declare global {
     readonly availTop: number;
   }
 
-  var Prism: typeof import("prismjs");
-
   var theme_color: HTMLMetaElement;
   var scrollbar_styles: HTMLStyleElement;
   var theme_styles: HTMLStyleElement;
