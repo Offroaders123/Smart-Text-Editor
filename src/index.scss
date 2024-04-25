@@ -90,6 +90,10 @@ body {
   }
 }
 
+#root {
+  display: contents;
+}
+
 header {
   padding-top: calc(var(--safe-area-inset-top) + var(--titlebar-area-inset-top));
   position: relative;
