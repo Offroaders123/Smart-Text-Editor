@@ -13,9 +13,9 @@
   },
   "devDependencies": {
     "@types/prismjs": "^1.26.3",
-    "new-javascript": "^0.4.2",
-    "sass": "^1.70.0",
-    "typescript": "^5.3.3",
-    "vite": "^5.0.12"
+    "new-javascript": "^0.4.3",
+    "sass": "^1.75.0",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.10"
   }
 }
