@@ -1,4 +1,4 @@
-import type { Card } from "./Card.js";
+import type { Card, CardType } from "./Card.js";
 
 declare global {
   interface Navigator {
@@ -94,6 +94,25 @@ declare global {
 
   var uuid_generator_card: Card;
   var generator_output: HTMLInputElement;
+}
+
+declare module "solid-js" {
+  export namespace JSX {
+    interface CardHTMLAttributes<T> extends HTMLAttributes<T> {
+      type: CardType;
+    }
+
+    interface NumTextHTMLAttributes<T> extends HTMLAttributes<T> {
+      placeholder?: string;
+      value?: string;
+    }
+
+    interface HTMLElementTags {
+      "menu-drop": HTMLAttributes<MenuDropElement>;
+      "num-text": NumTextHTMLAttributes<NumTextElement>;
+      "ste-card": CardHTMLAttributes<Card>;
+    }
+  }
 }
 
 export {};

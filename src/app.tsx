@@ -1,5 +1,6 @@
 import { render } from "solid-js/web";
 import { Header } from "./Header.js";
+import { Main } from "./Main.js";
 import STE from "./STE.js";
 import "./Card.js";
 import Tools from "./Tools.js";
@@ -9,7 +10,12 @@ import { applyEditingBehavior } from "./dom.js";
 
 const root: HTMLDivElement = document.querySelector("#root")!;
 
-render(() => <Header/>, root);
+render(() => (
+  <>
+    <Header/>
+    <Main/>
+  </>
+), root);
 
 for (const image of document.querySelectorAll("img")){
   image.draggable = false;

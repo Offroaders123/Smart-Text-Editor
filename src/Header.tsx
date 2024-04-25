@@ -107,11 +107,3 @@ export function Header() {
     </header>
   );
 }
-
-declare module "solid-js" {
-  export namespace JSX {
-    interface HTMLElementTags {
-      "menu-drop": HTMLAttributes<MenuDropElement>;
-    }
-  }
-}
