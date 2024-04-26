@@ -112,11 +112,80 @@ export function Header() {
           </ul>
         </menu-drop>
       </div>
-      <div id="app_omnibox" class="app-omnibox">
-        <button id="install_option" class="option" title="Install" onclick={() => showInstallPrompt()}><svg><use href="#install_icon"/></svg></button>
-        <button class="option" title="Refresh Preview" onclick={() => refreshPreview({ force: true })}><svg><use href="#refresh_icon"/></svg></button>
-        <a class="option" href="https://github.com/Offroaders123/Smart-Text-Editor" title="Smart Text Editor on GitHub"><svg><use href="#github_icon"/></svg></a>
-      </div>
+      <Omnibox/>
     </header>
+  );
+}
+
+function Omnibox() {
+  return (
+    <div id="app_omnibox" class="app-omnibox">
+      <OmniboxButton
+        id="install_option"
+        title="Install"
+        onclick={() => showInstallPrompt()}
+        icon="#install_icon"
+      />
+      <OmniboxButton
+        title="Refresh Preview"
+        onclick={() => refreshPreview({ force: true })}
+        icon="#refresh_icon"
+      />
+      <OmniboxAnchor
+        href="https://github.com/Offroaders123/Smart-Text-Editor"
+        title="Smart Text Editor on GitHub"
+        icon="#github_icon"
+      />
+    </div>
+  );
+}
+
+interface OmniboxButtonProps {
+  id?: string;
+  title: string;
+  onclick: () => void;
+  icon: string;
+}
+
+function OmniboxButton(props: OmniboxButtonProps) {
+  return (
+    <button
+      id={props.id}
+      class="option"
+      title={props.title}
+      onclick={props.onclick}
+    >
+      <OmniboxIcon href={props.icon}/>
+    </button>
+  );
+}
+
+interface OmniboxAnchorProps {
+  href: string;
+  title: string;
+  icon: string;
+}
+
+function OmniboxAnchor(props: OmniboxAnchorProps) {
+  return (
+    <a
+      class="option"
+      href={props.href}
+      title={props.title}
+    >
+      <OmniboxIcon href={props.icon}/>
+    </a>
+  );
+}
+
+interface OmniboxIconProps {
+  href: string;
+}
+
+function OmniboxIcon(props: OmniboxIconProps) {
+  return (
+    <svg>
+      <use href={props.href}/>
+    </svg>
   );
 }
