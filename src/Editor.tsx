@@ -511,12 +511,6 @@ declare global {
   interface HTMLElementTagNameMap {
     "ste-editor": Editor;
   }
-
-  interface Window {
-    Editor: typeof Editor;
-  }
 }
-
-window.Editor = Editor;
 
 export default Editor;

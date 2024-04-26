@@ -143,10 +143,4 @@ export class Tools {
   }
 }
 
-declare global {
-  var Tools: Tools;
-}
-
-globalThis.Tools = Tools;
-
 export default Tools;

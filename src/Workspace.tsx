@@ -4,28 +4,6 @@ import { getElementStyle } from "./dom.js";
 
 import type { EditorOptions } from "./Editor.js";
 
-declare global {
-  interface Window {
-    setView: typeof setView;
-    setOrientation: typeof setOrientation;
-    setPreviewSource: typeof setPreviewSource;
-    createWindow: typeof createWindow;
-    openFiles: typeof openFiles;
-    saveFile: typeof saveFile;
-    createDisplay: typeof createDisplay;
-    refreshPreview: typeof refreshPreview;
-  }
-}
-
-window.setView = setView;
-window.setOrientation = setOrientation;
-window.setPreviewSource = setPreviewSource;
-window.createWindow = createWindow;
-window.openFiles = openFiles;
-window.saveFile = saveFile;
-window.createDisplay = createDisplay;
-window.refreshPreview = refreshPreview;
-
 export type View = "code" | "split" | "preview";
 
 export interface SetViewOptions {
