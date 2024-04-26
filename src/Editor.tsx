@@ -276,7 +276,7 @@ export class Editor extends NumTextElement {
     Editor.#editors[this.identifier] = this;
     this.handle = handle ?? null;
 
-    if (open || STE.setActiveEditor(null)){
+    if (open || STE.activeEditor() === null){
       this.open({ autoCreated, focusedOverride });
     }
 
@@ -485,7 +485,7 @@ export class Editor extends NumTextElement {
       setTitle({ content: rename });
     }
 
-    if ((STE.previewEditor() === null && STE.setActiveEditor(this as Editor)) || STE.previewEditor() === this){
+    if ((STE.previewEditor() === null && STE.activeEditor() === this) || STE.previewEditor() === this){
       refreshPreview({ force: true });
     }
   }
