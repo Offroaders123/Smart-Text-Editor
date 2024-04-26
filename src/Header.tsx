@@ -3,13 +3,26 @@ import STE from "./STE.js";
 import Tools from "./Tools.js";
 import { createDisplay, createWindow, openFiles, refreshPreview, saveFile, setOrientation, setPreviewSource, setView } from "./Workspace.js";
 import { clearSiteCaches, showInstallPrompt } from "./dom.js";
+import Icon from "/img/icon.svg";
+import WebFormatter from "./img/web-formatter.svg";
+import Sharedrop from "./img/sharedrop.svg";
+import Diffchecker from "./img/diffchecker.svg";
+import Caniuse from "./img/caniuse.svg";
+import WebDev from "./img/webdev.svg";
+import RealFaviconGenerator from "./img/real-favicon-generator.svg";
+import Appscope from "./img/appscope.svg";
+import SVGMinify from "./img/svgminify.svg";
+import Cryptii from "./img/cryptii.svg";
+import Install from "./img/install.svg";
+import Template from "./img/template.svg";
+import Settings from "./img/settings.svg";
 
 export function Header() {
   return (
     <header id="header">
       <div class="app-region"></div>
       <div class="app-icon">
-        <img src="./img/icon.svg" alt=""/>
+        <img src={Icon} alt=""/>
       </div>
       <div id="app_menubar" class="app-menubar">
         <menu-drop id="file_menu">
@@ -76,15 +89,15 @@ export function Header() {
             </li>
             <li>Online Resources...
               <ul data-show-icons>
-                <li><a href="https://webformatter.com"><img src="./src/img/web-formatter.svg" alt=""/>Code Formatter</a></li>
-                <li><a href="https://www.sharedrop.io"><img part="invert" src="./src/img/sharedrop.svg" alt=""/>File Transferer</a></li>
-                <li><a href="https://www.diffchecker.com/"><img src="./src/img/diffchecker.svg" alt=""/>Difference Finder</a></li>
-                <li><a href="https://caniuse.com/"><img src="./src/img/caniuse.svg" alt=""/>Compatibility Checker</a></li>
-                <li><a href="https://web.dev/measure/"><img src="./src/img/webdev.svg" alt=""/>Performance Tester</a></li>
-                <li><a href="https://realfavicongenerator.net/"><img part="rounded" src="./src/img/real-favicon-generator.svg" alt=""/>Favicon Generator</a></li>
-                <li><a href="https://appsco.pe/developer/splash-screens/"><img part="invert" src="./src/img/appscope.svg" alt=""/>Splash Generator</a></li>
-                <li><a href="https://www.svgminify.com/"><img src="./src/img/svgminify.svg" alt=""/>SVG Simplifier</a></li>
-                <li><a href="https://cryptii.com/"><img src="./src/img/cryptii.svg" alt=""/>Text Encryptor</a></li>
+                <li><a href="https://webformatter.com"><img src={WebFormatter} alt=""/>Code Formatter</a></li>
+                <li><a href="https://www.sharedrop.io"><img part="invert" src={Sharedrop} alt=""/>File Transferer</a></li>
+                <li><a href="https://www.diffchecker.com/"><img src={Diffchecker} alt=""/>Difference Finder</a></li>
+                <li><a href="https://caniuse.com/"><img src={Caniuse} alt=""/>Compatibility Checker</a></li>
+                <li><a href="https://web.dev/measure/"><img src={WebDev} alt=""/>Performance Tester</a></li>
+                <li><a href="https://realfavicongenerator.net/"><img part="rounded" src={RealFaviconGenerator} alt=""/>Favicon Generator</a></li>
+                <li><a href="https://appsco.pe/developer/splash-screens/"><img part="invert" src={Appscope} alt=""/>Splash Generator</a></li>
+                <li><a href="https://www.svgminify.com/"><img src={SVGMinify} alt=""/>SVG Simplifier</a></li>
+                <li><a href="https://cryptii.com/"><img src={Cryptii} alt=""/>Text Encryptor</a></li>
               </ul>
             </li>
           </ul>
@@ -92,10 +105,10 @@ export function Header() {
         <menu-drop id="settings_menu" data-alternate>
           <button onclick={() => settings_card.open()}>Settings</button>
           <ul data-show-icons>
-            <li part="install-option" onclick={() => showInstallPrompt()}><img src="./src/img/install.svg" alt=""/>Install</li>
-            <li onclick={() => theme_card.open()}><img src="./src/img/template.svg" alt=""/>Theme Settings</li>
-            <li part="clear-site-caches-option" onclick={() => clearSiteCaches()}><img src="./src/img/settings.svg" alt=""/>Clear Cache</li>
-            <li onclick={() => STE.settings.reset({ confirm: true })}><img src="./src/img/settings.svg" alt=""/>Reset Settings</li>
+            <li part="install-option" onclick={() => showInstallPrompt()}><img src={Install} alt=""/>Install</li>
+            <li onclick={() => theme_card.open()}><img src={Template} alt=""/>Theme Settings</li>
+            <li part="clear-site-caches-option" onclick={() => clearSiteCaches()}><img src={Settings} alt=""/>Clear Cache</li>
+            <li onclick={() => STE.settings.reset({ confirm: true })}><img src={Settings} alt=""/>Reset Settings</li>
           </ul>
         </menu-drop>
       </div>

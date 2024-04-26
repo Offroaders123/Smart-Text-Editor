@@ -1,6 +1,8 @@
 import STE from "./STE.jsx";
 import Tools from "./Tools.jsx";
 import { clearSiteCaches, showInstallPrompt } from "./dom.jsx";
+import Settings from "./img/settings.svg";
+import Template from "./img/template.svg";
 
 export function Main() {
   return (
@@ -86,7 +88,7 @@ export function Main() {
       </ste-card>
       <ste-card id="reset_settings_card" type="alert">
         <div class="header">
-          <img class="icon" src="./src/img/settings.svg" alt=""/>
+          <img class="icon" src={Settings} alt=""/>
           <span class="heading">Reset Settings</span>
         </div>
         <div class="main">
@@ -97,7 +99,7 @@ export function Main() {
       </ste-card>
       <ste-card id="cleared_cache_card" type="alert">
         <div class="header">
-          <img class="icon" src="./src/img/template.svg" alt=""/>
+          <img class="icon" src={Template} alt=""/>
           <span class="heading">Cleared Cache</span>
         </div>
         <div class="main">
