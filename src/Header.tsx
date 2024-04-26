@@ -1,6 +1,6 @@
 import Editor from "./Editor.js";
 import { activeEditor, settings } from "./STE.js";
-import Tools from "./Tools.js";
+import { insertTemplate } from "./Tools.js";
 import { createDisplay, createWindow, openFiles, refreshPreview, saveFile, setOrientation, setPreviewSource, setView } from "./Workspace.js";
 import { clearSiteCaches, showInstallPrompt } from "./dom.js";
 import Icon from "/img/icon.svg";
@@ -83,8 +83,8 @@ export function Header() {
             <li onclick={() => uuid_generator_card.open()} data-shortcuts='{ "default": "Ctrl+Shift+O", "macOS": "Shift+Cmd+O" }'>UUID Generator</li>
             <li>Insert Templates...
               <ul>
-                <li onclick={() => Tools.insertTemplate('html')} data-shortcuts='{ "default": "Ctrl+Shift+H", "macOS": "Shift+Cmd+H" }'>HTML</li>
-                <li onclick={() => Tools.insertTemplate('pack-manifest-bedrock')}>Pack Manifest - Bedrock</li>
+                <li onclick={() => insertTemplate('html')} data-shortcuts='{ "default": "Ctrl+Shift+H", "macOS": "Shift+Cmd+H" }'>HTML</li>
+                <li onclick={() => insertTemplate('pack-manifest-bedrock')}>Pack Manifest - Bedrock</li>
               </ul>
             </li>
             <li>Online Resources...

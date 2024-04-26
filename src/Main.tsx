@@ -1,5 +1,5 @@
 import { settings, appearance } from "./STE.jsx";
-import Tools from "./Tools.jsx";
+import { replaceText, jsonFormatter, uriEncoder, uuidGenerator } from "./Tools.jsx";
 import { clearSiteCaches, showInstallPrompt } from "./dom.jsx";
 import Settings from "./img/settings.svg";
 import Template from "./img/template.svg";
@@ -120,9 +120,9 @@ export function Main() {
             </div>
           </div>
           <div class="options">
-            <button onclick={() => Tools.replaceText.replace()}>Replace</button>
-            <button onclick={() => Tools.replaceText.flip()}>Flip</button>
-            <button onclick={() => Tools.replaceText.clear()}>Clear</button>
+            <button onclick={() => replaceText.replace()}>Replace</button>
+            <button onclick={() => replaceText.flip()}>Flip</button>
+            <button onclick={() => replaceText.clear()}>Clear</button>
           </div>
         </div>
       </ste-card>
@@ -163,9 +163,9 @@ export function Main() {
             </div>
           </div>
           <div class="options">
-            <button onclick={() => Tools.jsonFormatter.format()}>Format</button>
-            <button onclick={() => Tools.jsonFormatter.collapse()}>Collapse</button>
-            <button onclick={() => Tools.jsonFormatter.clear()}>Clear</button>
+            <button onclick={() => jsonFormatter.format()}>Format</button>
+            <button onclick={() => jsonFormatter.collapse()}>Collapse</button>
+            <button onclick={() => jsonFormatter.clear()}>Clear</button>
           </div>
         </div>
       </ste-card>
@@ -180,9 +180,9 @@ export function Main() {
             </div>
           </div>
           <div class="options">
-            <button onclick={() => Tools.uriEncoder.encode()}>Encode</button>
-            <button onclick={() => Tools.uriEncoder.decode()}>Decode</button>
-            <button onclick={() => Tools.uriEncoder.clear()}>Clear</button>
+            <button onclick={() => uriEncoder.encode()}>Encode</button>
+            <button onclick={() => uriEncoder.decode()}>Decode</button>
+            <button onclick={() => uriEncoder.clear()}>Clear</button>
           </div>
           <div class="options">
             <div class="checkbox">
@@ -203,7 +203,7 @@ export function Main() {
             </div>
           </div>
           <div class="options">
-            <button onclick={() => generator_output.value = Tools.uuidGenerator.generate()}>Generate</button>
+            <button onclick={() => generator_output.value = uuidGenerator.generate()}>Generate</button>
           </div>
         </div>
       </ste-card>

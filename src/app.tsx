@@ -3,7 +3,7 @@ import { Header } from "./Header.js";
 import { Main } from "./Main.js";
 import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings } from "./STE.js";
 import "./Card.js";
-import Tools from "./Tools.js";
+import { insertTemplate } from "./Tools.js";
 import Editor from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview, setScaling, disableScaling } from "./Workspace.js";
 import { applyEditingBehavior } from "./dom.js";
@@ -250,7 +250,7 @@ document.body.addEventListener("keydown",event => {
   if ((controlShift || shiftCommand) && pressed("h")){
     event.preventDefault();
     if (event.repeat) return;
-    Tools.insertTemplate("html");
+    insertTemplate("html");
   }
   if ((controlShift || shiftCommand) && pressed("m")){
     event.preventDefault();
@@ -479,7 +479,7 @@ if (support.fileHandling && support.fileSystem){
 }
 
 if (queryParameters.get("template")){
-  Tools.insertTemplate("html");
+  insertTemplate("html");
   removeQueryParameters(["template"]);
 }
 
