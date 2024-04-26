@@ -1,4 +1,4 @@
-import * as STE from "./STE.js";
+import { installPrompt } from "./STE.js";
 
 export interface GetElementStyleOptions {
   element: Element;
@@ -67,9 +67,9 @@ export function setTitle(options: SetTitleOptions): void {
  * Shows the PWA Install Prompt, if the `BeforeInstallPrompt` event was fired when the app first started.
 */
 export async function showInstallPrompt(): Promise<void> {
-  if (STE.installPrompt() === null) return;
-  STE.installPrompt()!.prompt();
-  const result = await STE.installPrompt()!.userChoice;
+  if (installPrompt() === null) return;
+  installPrompt()!.prompt();
+  const result = await installPrompt()!.userChoice;
   if (result.outcome !== "accepted") return;
   document.documentElement.classList.remove("install-prompt-available");
   theme_button.childNodes[0]!.textContent = "Customize Theme";

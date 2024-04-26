@@ -1,7 +1,7 @@
 import { render } from "solid-js/web";
 import { Header } from "./Header.js";
 import { Main } from "./Main.js";
-import * as STE from "./STE.js";
+import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings } from "./STE.js";
 import "./Card.js";
 import Tools from "./Tools.js";
 import Editor from "./Editor.js";
@@ -56,7 +56,7 @@ const queryParameters = new URLSearchParams(window.location.search);
     history.pushState(null,"",window.location.href.replace(/index.html/,""));
   }
 
-  if (!("serviceWorker" in navigator) || !STE.appearance.parentWindow) return;
+  if (!("serviceWorker" in navigator) || !appearance.parentWindow) return;
   if (import.meta.env.DEV) return;
 
   await navigator.serviceWorker.register("service-worker.js");
@@ -95,42 +95,42 @@ const queryParameters = new URLSearchParams(window.location.search);
 
 window.addEventListener("beforeinstallprompt",event => {
   event.preventDefault();
-  STE.setInstallPrompt(event);
+  setInstallPrompt(event);
   document.documentElement.classList.add("install-prompt-available");
   theme_button.childNodes[0]!.textContent = "Theme";
 });
 
 window.addEventListener("beforeunload",event => {
-  if (STE.unsavedWork()) return;
+  if (unsavedWork()) return;
   event.preventDefault();
   event.returnValue = "";
 });
 
 window.addEventListener("unload",() => {
-  for (const childWindow of STE.childWindows){
+  for (const childWindow of childWindows){
     childWindow.close();
   }
 });
 
 window.addEventListener("resize",() => {
-  if (STE.view() !== "preview"){
+  if (view() !== "preview"){
     Editor.setTabsVisibility();
   }
-  if (STE.view() === "split" && document.body.hasAttribute("data-scaling-active")){
+  if (view() === "split" && document.body.hasAttribute("data-scaling-active")){
     setView("split");
   }
 });
 
 window.addEventListener("blur",() => {
-  if (!STE.appearance.parentWindow) return;
+  if (!appearance.parentWindow) return;
   for (const menu of document.querySelectorAll<MenuDropElement>("menu-drop[data-open]")){
     menu.close();
   }
 });
 
 document.body.addEventListener("keydown",event => {
-  const control = (event.ctrlKey && !STE.environment.appleDevice);
-  const command = (event.metaKey && STE.environment.appleDevice);
+  const control = (event.ctrlKey && !environment.appleDevice);
+  const command = (event.metaKey && environment.appleDevice);
   const shift = (event.shiftKey || ((event.key.toUpperCase() === event.key) && (event.key + event.key === String(Number(event.key) * 2))));
   const controlShift = (control && shift);
   const shiftCommand = (shift && command);
@@ -143,7 +143,7 @@ document.body.addEventListener("keydown",event => {
   if (pressed("Escape")){
     event.preventDefault();
     if (event.repeat) return;
-    if (STE.activeDialog() && !document.activeElement?.matches("menu-drop[data-open]")) STE.activeDialog()!.close();
+    if (activeDialog() && !document.activeElement?.matches("menu-drop[data-open]")) activeDialog()!.close();
   }
   if (((control || command) && !shift && pressed("n")) || ((controlShift || shiftCommand) && pressed("x"))){
     event.preventDefault();
@@ -155,17 +155,17 @@ document.body.addEventListener("keydown",event => {
     event.preventDefault();
     if (event.repeat) return;
     /* Future feature: If an editor tab is focused, close that editor instead of only the active editor */
-    STE.activeEditor()?.close();
+    activeEditor()?.close();
   }
-  if (((controlShift || (event.ctrlKey && shift && !command && STE.environment.appleDevice)) && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("[") || pressed("{")))){
+  if (((controlShift || (event.ctrlKey && shift && !command && environment.appleDevice)) && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("[") || pressed("{")))){
     event.preventDefault();
     if (event.repeat) return;
-    STE.activeEditor()?.getPrevious()?.open();
+    activeEditor()?.getPrevious()?.open();
   }
-  if (((control || (event.ctrlKey && !command && STE.environment.appleDevice)) && !shift && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("]") || pressed("}")))){
+  if (((control || (event.ctrlKey && !command && environment.appleDevice)) && !shift && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("]") || pressed("}")))){
     event.preventDefault();
     if (event.repeat) return;
-    STE.activeEditor()?.getNext()?.open();
+    activeEditor()?.getNext()?.open();
   }
   if (((controlShift || shiftCommand) && pressed("n")) || ((controlShift || shiftCommand) && pressed("c"))){
     event.preventDefault();
@@ -180,7 +180,7 @@ document.body.addEventListener("keydown",event => {
   if ((controlShift || shiftCommand) && pressed("r")){
     event.preventDefault();
     if (event.repeat) return;
-    STE.activeEditor()?.rename();
+    activeEditor()?.rename();
   }
   if ((control || command) && !shift && pressed("s")){
     event.preventDefault();
@@ -254,9 +254,9 @@ document.body.addEventListener("keydown",event => {
   }
   if ((controlShift || shiftCommand) && pressed("m")){
     event.preventDefault();
-    if (event.repeat || !STE.activeWidget()) return;
-    if (STE.activeWidget()){
-      STE.activeWidget()!.minimize();
+    if (event.repeat || !activeWidget()) return;
+    if (activeWidget()){
+      activeWidget()!.minimize();
     }
   }
   if ((control || command) && (pressed(",") || pressed("<"))){
@@ -292,7 +292,7 @@ document.body.addEventListener("drop",event => {
   [...event.dataTransfer.items].forEach(async (item,index) => {
     switch (item.kind){
       case "file": {
-        if (!STE.support.fileSystem || !("getAsFileSystemHandle")){
+        if (!support.fileSystem || !("getAsFileSystemHandle")){
           const file = item.getAsFile();
           if (file === null) break;
           const { name } = file;
@@ -365,7 +365,7 @@ create_editor_button.addEventListener("click",() => {
 
 scaler.addEventListener("mousedown",event => {
   if (event.button !== 0) return;
-  if (STE.view() !== "split") return;
+  if (view() !== "split") return;
   event.preventDefault();
   document.body.setAttribute("data-scaling-change","");
   document.addEventListener("mousemove",setScaling);
@@ -373,15 +373,15 @@ scaler.addEventListener("mousedown",event => {
 });
 
 scaler.addEventListener("touchstart",event => {
-  if (STE.view() !== "split" || event.touches.length !== 1) return;
+  if (view() !== "split" || event.touches.length !== 1) return;
   document.body.setAttribute("data-scaling-change","");
   document.addEventListener("touchmove",setScaling,{ passive: true });
   document.addEventListener("touchend",disableScaling,{ passive: true });
 },{ passive: true });
 
 card_backdrop.addEventListener("click",() => {
-  if (STE.activeDialog() === null) return;
-  STE.activeDialog()!.close();
+  if (activeDialog() === null) return;
+  activeDialog()!.close();
 });
 
 preview_base_input.placeholder = document.baseURI;
@@ -397,7 +397,7 @@ preview_base_input.setValue = value => {
 
 preview_base_input.reset = () => {
   preview_base_input.setValue("");
-  STE.settings.previewBase = null;
+  settings.previewBase = null;
   refreshPreview({ force: true });
 };
 
@@ -413,10 +413,10 @@ preview_base_input.addEventListener("change",event => {
   const valid = event.target.matches(":valid");
 
   if (empty || !valid){
-    STE.settings.previewBase = null;
+    settings.previewBase = null;
   }
   if (!empty && valid){
-    STE.settings.previewBase = event.target.value;
+    settings.previewBase = event.target.value;
   }
   if (empty || valid){
     refreshPreview({ force: true });
@@ -435,24 +435,24 @@ window.requestAnimationFrame(() => {
   new Editor({ autoCreated: true });
 });
 
-if (STE.appearance.parentWindow){
-  if (STE.settings.defaultOrientation !== null){
-    const value = STE.settings.defaultOrientation;
+if (appearance.parentWindow){
+  if (settings.defaultOrientation !== null){
+    const value = settings.defaultOrientation;
     window.requestAnimationFrame(() => {
       default_orientation_setting.select(value);
     });
     setOrientation(value);
   }
-  if (STE.settings.syntaxHighlighting !== null){
-    const state: boolean = STE.settings.syntaxHighlighting;
-    STE.appearance.setSyntaxHighlighting(state);
+  if (settings.syntaxHighlighting !== null){
+    const state: boolean = settings.syntaxHighlighting;
+    appearance.setSyntaxHighlighting(state);
     syntax_highlighting_setting.checked = state;
   }
-  if (STE.settings.automaticRefresh !== null){
-    automatic_refresh_setting.checked = STE.settings.automaticRefresh;
+  if (settings.automaticRefresh !== null){
+    automatic_refresh_setting.checked = settings.automaticRefresh;
   }
-  if (STE.settings.previewBase){
-    preview_base_input.setValue(STE.settings.previewBase);
+  if (settings.previewBase){
+    preview_base_input.setValue(settings.previewBase);
   }
   // window.setTimeout(() => {
   //   document.documentElement.classList.remove("startup-fade");
@@ -464,7 +464,7 @@ if (STE.appearance.parentWindow){
     });
 }
 
-if (STE.support.fileHandling && STE.support.fileSystem){
+if (support.fileHandling && support.fileSystem){
   window.launchQueue.setConsumer(async ({ files: handles }) => {
     for (const handle of handles){
       const file = await handle.getFile();
@@ -472,8 +472,8 @@ if (STE.support.fileHandling && STE.support.fileSystem){
       const value = await file.text();
       new Editor({ name, value, handle });
     }
-    if (!STE.environment.touchDevice){
-      STE.activeEditor()?.focus({ preventScroll: true });
+    if (!environment.touchDevice){
+      activeEditor()?.focus({ preventScroll: true });
     }
   });
 }

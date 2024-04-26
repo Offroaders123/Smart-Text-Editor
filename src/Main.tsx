@@ -1,4 +1,4 @@
-import * as STE from "./STE.jsx";
+import { settings, appearance } from "./STE.jsx";
 import Tools from "./Tools.jsx";
 import { clearSiteCaches, showInstallPrompt } from "./dom.jsx";
 import Settings from "./img/settings.svg";
@@ -28,17 +28,17 @@ export function Main() {
                 <menu-drop id="default_orientation_setting" data-select>
                   <button>Horizontal</button>
                   <ul>
-                    <li data-value="horizontal" onclick={() => STE.settings.defaultOrientation = 'horizontal'} data-selected>Horizontal</li>
-                    <li data-value="vertical" onclick={() => STE.settings.defaultOrientation = 'vertical'}>Vertical</li>
+                    <li data-value="horizontal" onclick={() => settings.defaultOrientation = 'horizontal'} data-selected>Horizontal</li>
+                    <li data-value="vertical" onclick={() => settings.defaultOrientation = 'vertical'}>Vertical</li>
                   </ul>
                 </menu-drop>
               </div>
               <div class="checkbox">
-                <input id="syntax_highlighting_setting" type="checkbox" oninput={event => STE.appearance.setSyntaxHighlighting(event.currentTarget.checked)}/>
+                <input id="syntax_highlighting_setting" type="checkbox" oninput={event => appearance.setSyntaxHighlighting(event.currentTarget.checked)}/>
                 <label for="syntax_highlighting_setting"><svg class="check"><use href="#check_icon"/></svg>Syntax Highlighting (Beta)</label>
               </div>
               <div class="checkbox">
-                <input id="automatic_refresh_setting" type="checkbox" oninput={event => STE.settings.automaticRefresh = event.currentTarget.checked} checked/>
+                <input id="automatic_refresh_setting" type="checkbox" oninput={event => settings.automaticRefresh = event.currentTarget.checked} checked/>
                 <label for="automatic_refresh_setting"><svg class="check"><use href="#check_icon"/></svg>Automatically Refresh Preview</label>
               </div>
             </div>
@@ -49,7 +49,7 @@ export function Main() {
           </div>
           <div class="options">
             <button id="clear_site_caches_button" class="warning" onclick={() => clearSiteCaches()}>Clear Cache</button>
-            <button class="warning" onclick={() => STE.settings.reset({ confirm: true })}>Reset Settings</button>
+            <button class="warning" onclick={() => settings.reset({ confirm: true })}>Reset Settings</button>
           </div>
         </div>
       </ste-card>
