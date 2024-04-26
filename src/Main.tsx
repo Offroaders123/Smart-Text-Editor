@@ -1,4 +1,4 @@
-import STE from "./STE.jsx";
+import * as STE from "./STE.jsx";
 import Tools from "./Tools.jsx";
 import { clearSiteCaches, showInstallPrompt } from "./dom.jsx";
 import Settings from "./img/settings.svg";

@@ -1,4 +1,4 @@
-import STE from "./STE.js";
+import * as STE from "./STE.js";
 import Editor from "./Editor.js";
 import { getElementStyle } from "./dom.js";
 
@@ -36,17 +36,17 @@ export interface SetViewOptions {
  * Sets the View state of the app. If a View change is already in progress, and the force option is not set to `true`, the call will be skipped.
 */
 export async function setView(type: View, { force = false }: SetViewOptions = {}): Promise<void> {
-  if ((STE.orientationChange && !force) || STE.scalingChange) return;
+  if ((STE.orientationChange() && !force) || STE.scalingChange()) return;
 
   const changeIdentifier: string = Math.random().toString();
   document.body.setAttribute("data-view-change",changeIdentifier);
 
   const transitionDuration: number = parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
-  document.body.classList.remove(STE.view);
+  document.body.classList.remove(STE.view());
   document.body.setAttribute("data-view",type);
-  document.body.classList.add(STE.view);
+  document.body.classList.add(STE.view());
   removeScaling();
-  view_menu.select(STE.view);
+  view_menu.select(STE.view());
 
   refreshPreview();
 
@@ -68,19 +68,19 @@ export type Orientation = "horizontal" | "vertical";
  * @param orientation If an Orientation type is not provided, the current state will be toggled to the other option.
 */
 export async function setOrientation(orientation?: Orientation): Promise<void> {
-  if (STE.orientationChange || STE.scalingChange) return;
+  if (STE.orientationChange() || STE.scalingChange()) return;
 
   document.body.setAttribute("data-orientation-change","");
   const param: boolean = orientation !== undefined;
-  const transitionDuration: number = ((STE.view != "split") ? 0 : parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`));
+  const transitionDuration: number = ((STE.view() != "split") ? 0 : parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`));
 
-  if (!param && STE.view == "split"){
+  if (!param && STE.view() == "split"){
     setView("code",{ force: true });
   }
-  if (!param && STE.orientation === "horizontal"){
+  if (!param && STE.orientation() === "horizontal"){
     orientation = "vertical";
   }
-  if (!param && STE.orientation === "vertical"){
+  if (!param && STE.orientation() === "vertical"){
     orientation = "horizontal";
   }
 
@@ -89,9 +89,9 @@ export async function setOrientation(orientation?: Orientation): Promise<void> {
   workspace.style.transitionDuration = "0s";
   scaler.style.transitionDuration = "0s";
   preview.style.transitionDuration = "0s";
-  document.body.classList.remove(STE.orientation);
+  document.body.classList.remove(STE.orientation());
   document.body.setAttribute("data-orientation",orientation!);
-  document.body.classList.add(STE.orientation);
+  document.body.classList.add(STE.orientation());
   workspace.offsetHeight;
   scaler.offsetHeight;
   preview.offsetHeight;
@@ -113,7 +113,7 @@ export async function setOrientation(orientation?: Orientation): Promise<void> {
  * @see {@link STE.previewEditor}
 */
 export async function setPreviewSource(previewEditor: Editor | null): Promise<void> {
-  STE.previewEditor = previewEditor;
+  STE.setPreviewEditor(previewEditor);
 
   if (previewEditor === null){
     preview_menu.select("active-editor");
@@ -192,25 +192,25 @@ export async function openFiles(): Promise<void> {
 */
 export async function saveFile(extension?: string): Promise<void> {
   if (extension || !STE.support.fileSystem){
-    if (!extension) extension = STE.activeEditor?.extension;
+    if (!extension) extension = STE.activeEditor()?.extension;
     const anchor = document.createElement("a");
-    const link = window.URL.createObjectURL(new Blob([STE.activeEditor?.editor.value ?? ""]));
+    const link = window.URL.createObjectURL(new Blob([STE.activeEditor()?.editor.value ?? ""]));
     anchor.href = link;
     anchor.download = `${
       // @ts-expect-error
-      STE.activeEditor?.basename satisfies string
+      STE.activeEditor()?.basename satisfies string
     }.${extension}`;
     anchor.click();
     window.URL.revokeObjectURL(link);
   } else {
-    const identifier = STE.activeEditor;
+    const identifier = STE.activeEditor();
     let handle: void | FileSystemFileHandle;
     if (identifier === null) throw new Error("No editors are open, couldn't save anything!");
     if (!identifier.handle){
       handle = await window.showSaveFilePicker({
         suggestedName:
           // @ts-expect-error
-          STE.activeEditor?.name satisfies string,
+          STE.activeEditor()?.name satisfies string,
         startIn: (identifier.handle) ? identifier.handle : "desktop"
       }).catch(error => {
         if (error.message.toLowerCase().includes("abort")) return;
@@ -221,27 +221,27 @@ export async function saveFile(extension?: string): Promise<void> {
     const stream = await identifier.handle?.createWritable().catch(error => {
       alert(`"${
         // @ts-expect-error
-        STE.activeEditor?.name satisfies string
+        STE.activeEditor()?.name satisfies string
       }" could not be saved.`);
       if (error.toString().toLowerCase().includes("not allowed")) return;
     });
     if (!stream) return;
     await stream.write(
       // @ts-expect-error
-      STE.activeEditor?.editor.value satisfies string
+      STE.activeEditor()?.editor.value satisfies string
     );
     await stream.close();
     // @ts-expect-error
-    const currentName: string = STE.activeEditor?.name;
+    const currentName: string = STE.activeEditor()?.name;
     const file = await handle.getFile();
     const rename = file.name;
     if (currentName != rename) identifier.rename(rename);
   }
-  if (STE.activeEditor?.autoCreated){
-    STE.activeEditor.autoCreated = false;
+  if (STE.activeEditor()?.autoCreated){
+    STE.activeEditor()!.autoCreated = false;
   }
-  if (STE.activeEditor?.unsaved){
-    STE.activeEditor.unsaved = false;
+  if (STE.activeEditor()?.unsaved){
+    STE.activeEditor()!.unsaved = false;
   }
   await refreshPreview({ force: true });
 }
@@ -257,7 +257,7 @@ export function createDisplay(): void {
     features = (STE.appearance.standalone || STE.appearance.fullscreen) ? "popup" : "",
     baseURL = STE.settings.previewBase;
   // @ts-expect-error
-  let source: string = STE.activeEditor?.editor.value;
+  let source: string = STE.activeEditor()?.editor.value;
   if (baseURL) source = `<!DOCTYPE html>\n<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
   const link = window.URL.createObjectURL(new Blob([source],{ type: "text/html" })),
     win = window.open(link,"_blank",features);
@@ -271,7 +271,7 @@ export function createDisplay(): void {
     if (win === null) return;
     if (!win.document.title){
       // @ts-expect-error
-      win.document.title = STE.activeEditor?.name;
+      win.document.title = STE.activeEditor()?.name;
     }
   },20);
 }
@@ -284,9 +284,9 @@ export interface RefreshPreviewOptions {
  * Refreshes the Preview with the latest source from the source Editor.
 */
 export async function refreshPreview({ force = false }: RefreshPreviewOptions = {}): Promise<void> {
-  if (STE.view === "code") return;
+  if (STE.view() === "code") return;
 
-  const editor: Editor | null = STE.previewEditor ?? STE.activeEditor;
+  const editor: Editor | null = STE.previewEditor() ?? STE.activeEditor();
   if (editor === null) return;
   const change: boolean = editor.refresh && !STE.settings.automaticRefresh;
   if (!change && !force) return;
@@ -317,13 +317,13 @@ export function setScaling(event: MouseEvent | TouchEvent): void {
   const { safeAreaInsets } = STE.appearance;
   let scalingOffset = 0;
   const scalingRange = {
-    minimum: ((STE.orientation == "vertical") ? workspace_tabs.offsetHeight : safeAreaInsets.left) + 80,
-    maximum: ((STE.orientation == "horizontal") ? window.innerWidth - safeAreaInsets.right : (STE.orientation == "vertical") ? (window.innerHeight - header.offsetHeight - safeAreaInsets.bottom) : 0) - 80
+    minimum: ((STE.orientation() == "vertical") ? workspace_tabs.offsetHeight : safeAreaInsets.left) + 80,
+    maximum: ((STE.orientation() == "horizontal") ? window.innerWidth - safeAreaInsets.right : (STE.orientation() == "vertical") ? (window.innerHeight - header.offsetHeight - safeAreaInsets.bottom) : 0) - 80
   };
   const touchEvent = (STE.environment.touchDevice && event instanceof TouchEvent);
 
-  if (STE.orientation == "horizontal") scalingOffset = (!touchEvent) ? (event as MouseEvent).pageX : (event as TouchEvent).touches[0]!.pageX;
-  if (STE.orientation == "vertical") scalingOffset = (!touchEvent) ? (event as MouseEvent).pageY - header.offsetHeight : (event as TouchEvent).touches[0]!.pageY - header.offsetHeight;
+  if (STE.orientation() == "horizontal") scalingOffset = (!touchEvent) ? (event as MouseEvent).pageX : (event as TouchEvent).touches[0]!.pageX;
+  if (STE.orientation() == "vertical") scalingOffset = (!touchEvent) ? (event as MouseEvent).pageY - header.offsetHeight : (event as TouchEvent).touches[0]!.pageY - header.offsetHeight;
   if (scalingOffset < scalingRange.minimum) scalingOffset = scalingRange.minimum;
   if (scalingOffset > scalingRange.maximum) scalingOffset = scalingRange.maximum;
   document.body.setAttribute("data-scaling-active","");

@@ -1,5 +1,5 @@
 import Prism from "./prism.js";
-import STE from "./STE.js";
+import * as STE from "./STE.js";
 import { setPreviewSource, refreshPreview } from "./Workspace.js";
 import { getElementStyle, applyEditingBehavior, setTitle } from "./dom.js";
 
@@ -35,7 +35,7 @@ export class Editor extends NumTextElement {
    * 
    * If the given identifier is already fully in view, no scrolling will happen.
   */
-  static setTabsVisibility(identifier: string | undefined = STE.activeEditor?.identifier): void {
+  static setTabsVisibility(identifier: string | undefined = STE.activeEditor()?.identifier): void {
     if (!identifier) return;
     const editor = this.query(identifier);
     if (editor === null) return;
@@ -130,7 +130,7 @@ export class Editor extends NumTextElement {
       if (event.button !== 0 || document.activeElement.matches("[data-editor-rename]")) return;
 
       event.preventDefault();
-      if (this.tab !== STE.activeEditor?.tab){
+      if (this.tab !== STE.activeEditor()?.tab){
         this.open();
       }
     });
@@ -140,7 +140,7 @@ export class Editor extends NumTextElement {
       // Add a check to this to only apply this key handling if the Editor isn't currently being renamed in the Editor tab.
       if (event.key === " " || event.key === "Enter"){
         event.preventDefault();
-        if (this.tab !== STE.activeEditor?.tab){
+        if (this.tab !== STE.activeEditor()?.tab){
           this.open();
         }
       }
@@ -206,7 +206,7 @@ export class Editor extends NumTextElement {
       if (event.dataTransfer !== null){
         event.dataTransfer.dropEffect = "copy";
       }
-      if (this.tab !== STE.activeEditor?.tab){
+      if (this.tab !== STE.activeEditor()?.tab){
         this.open();
       }
     });
@@ -242,14 +242,14 @@ export class Editor extends NumTextElement {
       setPreviewSource(this);
     });
 
-    if (STE.activeEditor !== null && STE.activeEditor.autoCreated){
-      if (document.activeElement === STE.activeEditor){
+    if (STE.activeEditor() !== null && STE.activeEditor()!.autoCreated){
+      if (document.activeElement === STE.activeEditor()!){
         focusedOverride = true;
       }
       if (autoReplace){
-        STE.activeEditor.close();
+        STE.activeEditor()!.close();
       } else {
-        STE.activeEditor.autoCreated = false;
+        STE.activeEditor()!.autoCreated = false;
       }
     }
 
@@ -276,7 +276,7 @@ export class Editor extends NumTextElement {
     Editor.#editors[this.identifier] = this;
     this.handle = handle ?? null;
 
-    if (open || STE.activeEditor === null){
+    if (open || STE.setActiveEditor(null)){
       this.open({ autoCreated, focusedOverride });
     }
 
@@ -295,27 +295,27 @@ export class Editor extends NumTextElement {
   /**
    * Opens the editor in the workspace.
   */
-  open({ autoCreated = false, focusedOverride = false }: EditorOpenOptions = {}): void {
-    const focused = (document.activeElement === STE.activeEditor) || focusedOverride;
+  open(this: Editor, { autoCreated = false, focusedOverride = false }: EditorOpenOptions = {}): void {
+    const focused = (document.activeElement === STE.activeEditor()) || focusedOverride;
 
-    STE.activeEditor?.tab.classList.remove("active");
-    STE.activeEditor?.classList.remove("active");
+    STE.activeEditor()?.tab.classList.remove("active");
+    STE.activeEditor()?.classList.remove("active");
 
     this.tab.classList.add("active");
     if (autoCreated){
       this.autoCreated = true;
     }
     this.classList.add("active");
-    STE.activeEditor = this;
+    STE.setActiveEditor(this);
 
     Editor.setTabsVisibility();
     setTitle({ content: this.#name });
 
-    if ((((document.activeElement === document.body && STE.activeDialog !== null) || autoCreated) && !STE.environment.touchDevice && STE.appearance.parentWindow) || focused){
+    if ((((document.activeElement === document.body && STE.activeDialog() !== null) || autoCreated) && !STE.environment.touchDevice && STE.appearance.parentWindow) || focused){
       this.focus({ preventScroll: true });
     }
 
-    if (STE.previewEditor === null){
+    if (STE.previewEditor() === null){
       refreshPreview({ force: STE.settings.automaticRefresh !== false });
     }
   }
@@ -346,12 +346,12 @@ export class Editor extends NumTextElement {
     const transitionDuration = (document.body.hasAttribute("data-editor-change")) ? parseInt(`${Number(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`) : 0;
 
     if (this.tab === editorTabs[0] && editorTabs.length === 1){
-      STE.activeEditor = null;
+      STE.setActiveEditor(null);
       setTitle({ reset: true });
       preview.src = "about:blank";
     }
 
-    if (STE.previewEditor === this){
+    if (STE.previewEditor() === this){
       setPreviewSource(null);
     }
 
@@ -368,8 +368,8 @@ export class Editor extends NumTextElement {
       Editor.query(identifier)?.open();
     }
 
-    if (focused && STE.activeEditor?.editor !== undefined){
-      STE.activeEditor?.focus({ preventScroll: true });
+    if (focused && STE.activeEditor()?.editor !== undefined){
+      STE.activeEditor()?.focus({ preventScroll: true });
     }
 
     this.tab.setAttribute("data-editor-change","");
@@ -481,11 +481,11 @@ export class Editor extends NumTextElement {
       this.autoCreated = false;
     }
 
-    if (this.tab === STE.activeEditor?.tab){
+    if (this.tab === STE.activeEditor()?.tab){
       setTitle({ content: rename });
     }
 
-    if ((STE.previewEditor === null && STE.activeEditor === this) || STE.previewEditor === this){
+    if ((STE.previewEditor() === null && STE.setActiveEditor(this as Editor)) || STE.previewEditor() === this){
       refreshPreview({ force: true });
     }
   }

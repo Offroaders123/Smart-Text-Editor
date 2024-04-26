@@ -1,4 +1,4 @@
-import STE from "./STE.js";
+import * as STE from "./STE.js";
 import Editor from "./Editor.js";
 import { getElementStyle } from "./dom.js";
 
@@ -69,7 +69,7 @@ export class Card extends HTMLElement {
     this.header.appendChild(this.controls);
   }
 
-  open(previous?: Card): void {
+  open(this: Card, previous?: Card): void {
     if (this.matches("[active]") && !this.hasAttribute("data-alert-timeout")) return this.close();
     if (this.type != "alert"){
       document.querySelectorAll<Card>(`ste-card[active]`).forEach(card => {
@@ -94,8 +94,8 @@ export class Card extends HTMLElement {
     if (this.type == "dialog"){
       document.body.addEventListener("keydown",Card.#catchCardNavigation);
       card_backdrop.classList.add("active");
-      if (!STE.activeDialog && !STE.dialogPrevious){
-        STE.dialogPrevious = document.activeElement as Card;
+      if (!STE.activeDialog() && !STE.dialogPrevious()){
+        STE.setDialogPrevious(document.activeElement as Card);
       }
       document.querySelectorAll<MenuDropElement>("menu-drop[data-open]").forEach(menu => menu.close());
       const transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 500}`);
@@ -103,9 +103,9 @@ export class Card extends HTMLElement {
         if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
         if (previous) this.querySelector<HTMLElement>(`[data-card-previous="${previous.id}"]`)!.focus();
       },transitionDuration);
-      STE.activeDialog = this;
+      STE.setActiveDialog(this);
     }
-    if (this.type == "widget") STE.activeWidget = this;
+    if (this.type == "widget") STE.setActiveWidget(this);
   }
 
   minimize(): void {
@@ -153,14 +153,14 @@ export class Card extends HTMLElement {
     if (this.type == "dialog"){
       document.body.removeEventListener("keydown",Card.#catchCardNavigation);
       card_backdrop.classList.remove("active");
-      STE.activeDialog = null;
-      if (STE.dialogPrevious){
-        const hidden = (getElementStyle({ element: STE.dialogPrevious, property: "visibility" }) == "hidden");
-        (!workspace_editors.contains(STE.dialogPrevious) && !hidden) ? STE.dialogPrevious.focus({ preventScroll: true }) : STE.activeEditor?.focus({ preventScroll: true });
-        STE.dialogPrevious = null;
+      STE.setActiveDialog(null);
+      if (STE.dialogPrevious()){
+        const hidden = (getElementStyle({ element: STE.dialogPrevious()!, property: "visibility" }) == "hidden");
+        (!workspace_editors.contains(STE.dialogPrevious()!) && !hidden) ? STE.dialogPrevious()!.focus({ preventScroll: true }) : STE.activeEditor()?.focus({ preventScroll: true });
+        STE.setDialogPrevious(null);
       }
     }
-    if (this.type == "widget") STE.activeWidget = null;
+    if (this.type == "widget") STE.setActiveWidget(null);
   }
 
   /**
@@ -175,8 +175,8 @@ export class Card extends HTMLElement {
   }
 
   static #catchCardNavigation(event: KeyboardEvent): void {
-    if (!STE.activeDialog || event.key != "Tab" || document.activeElement != document.body) return;
-    const navigable = Card.#getNavigableElements({ container: STE.activeDialog, scope: true });
+    if (!STE.activeDialog() || event.key != "Tab" || document.activeElement != document.body) return;
+    const navigable = Card.#getNavigableElements({ container: STE.activeDialog()!, scope: true });
     event.preventDefault();
     navigable[((!event.shiftKey) ? 0 : navigable.length - 1)]?.focus();
   }

@@ -1,5 +1,5 @@
 import Editor from "./Editor.js";
-import STE from "./STE.js";
+import * as STE from "./STE.js";
 import Tools from "./Tools.js";
 import { createDisplay, createWindow, openFiles, refreshPreview, saveFile, setOrientation, setPreviewSource, setView } from "./Workspace.js";
 import { clearSiteCaches, showInstallPrompt } from "./dom.js";
@@ -31,7 +31,7 @@ export function Header() {
             <li onclick={() => new Editor({ autoReplace: false })} data-shortcuts='{ "default": "Ctrl+Shift+X", "macOS": "Shift+Cmd+X" }'>New Editor</li>
             <li part="create-window-option" onclick={() => createWindow()} data-shortcuts='{ "default": "Ctrl+Shift+C", "macOS": "Shift+Cmd+C" }'>New Window</li>
             <li onclick={() => openFiles()} data-shortcuts='{ "default": "Ctrl+O", "macOS": "Cmd+O" }'>Open</li>
-            <li onclick={() => STE.activeEditor?.rename()} data-shortcuts='{ "default": "Ctrl+Shift+R", "macOS": "Shift+Cmd+R" }'>Rename</li>
+            <li onclick={() => STE.activeEditor()?.rename()} data-shortcuts='{ "default": "Ctrl+Shift+R", "macOS": "Shift+Cmd+R" }'>Rename</li>
             <li onclick={() => saveFile()} data-shortcuts='{ "default": "Ctrl+S", "macOS": "Cmd+S" }'>Save</li>
             <li>Save As...
               <ul>

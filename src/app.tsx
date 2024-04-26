@@ -1,7 +1,7 @@
 import { render } from "solid-js/web";
 import { Header } from "./Header.js";
 import { Main } from "./Main.js";
-import STE from "./STE.js";
+import * as STE from "./STE.js";
 import "./Card.js";
 import Tools from "./Tools.js";
 import Editor from "./Editor.js";
@@ -95,13 +95,13 @@ const queryParameters = new URLSearchParams(window.location.search);
 
 window.addEventListener("beforeinstallprompt",event => {
   event.preventDefault();
-  STE.installPrompt = event;
+  STE.setInstallPrompt(event);
   document.documentElement.classList.add("install-prompt-available");
   theme_button.childNodes[0]!.textContent = "Theme";
 });
 
 window.addEventListener("beforeunload",event => {
-  if (STE.unsavedWork) return;
+  if (STE.unsavedWork()) return;
   event.preventDefault();
   event.returnValue = "";
 });
@@ -113,10 +113,10 @@ window.addEventListener("unload",() => {
 });
 
 window.addEventListener("resize",() => {
-  if (STE.view !== "preview"){
+  if (STE.view() !== "preview"){
     Editor.setTabsVisibility();
   }
-  if (STE.view === "split" && document.body.hasAttribute("data-scaling-active")){
+  if (STE.view() === "split" && document.body.hasAttribute("data-scaling-active")){
     setView("split");
   }
 });
@@ -143,7 +143,7 @@ document.body.addEventListener("keydown",event => {
   if (pressed("Escape")){
     event.preventDefault();
     if (event.repeat) return;
-    if (STE.activeDialog && !document.activeElement?.matches("menu-drop[data-open]")) STE.activeDialog.close();
+    if (STE.activeDialog() && !document.activeElement?.matches("menu-drop[data-open]")) STE.activeDialog()!.close();
   }
   if (((control || command) && !shift && pressed("n")) || ((controlShift || shiftCommand) && pressed("x"))){
     event.preventDefault();
@@ -155,17 +155,17 @@ document.body.addEventListener("keydown",event => {
     event.preventDefault();
     if (event.repeat) return;
     /* Future feature: If an editor tab is focused, close that editor instead of only the active editor */
-    STE.activeEditor?.close();
+    STE.activeEditor()?.close();
   }
   if (((controlShift || (event.ctrlKey && shift && !command && STE.environment.appleDevice)) && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("[") || pressed("{")))){
     event.preventDefault();
     if (event.repeat) return;
-    STE.activeEditor?.getPrevious()?.open();
+    STE.activeEditor()?.getPrevious()?.open();
   }
   if (((control || (event.ctrlKey && !command && STE.environment.appleDevice)) && !shift && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("]") || pressed("}")))){
     event.preventDefault();
     if (event.repeat) return;
-    STE.activeEditor?.getNext()?.open();
+    STE.activeEditor()?.getNext()?.open();
   }
   if (((controlShift || shiftCommand) && pressed("n")) || ((controlShift || shiftCommand) && pressed("c"))){
     event.preventDefault();
@@ -180,7 +180,7 @@ document.body.addEventListener("keydown",event => {
   if ((controlShift || shiftCommand) && pressed("r")){
     event.preventDefault();
     if (event.repeat) return;
-    STE.activeEditor?.rename();
+    STE.activeEditor()?.rename();
   }
   if ((control || command) && !shift && pressed("s")){
     event.preventDefault();
@@ -254,9 +254,9 @@ document.body.addEventListener("keydown",event => {
   }
   if ((controlShift || shiftCommand) && pressed("m")){
     event.preventDefault();
-    if (event.repeat || !STE.activeWidget) return;
-    if (STE.activeWidget){
-      STE.activeWidget.minimize();
+    if (event.repeat || !STE.activeWidget()) return;
+    if (STE.activeWidget()){
+      STE.activeWidget()!.minimize();
     }
   }
   if ((control || command) && (pressed(",") || pressed("<"))){
@@ -365,7 +365,7 @@ create_editor_button.addEventListener("click",() => {
 
 scaler.addEventListener("mousedown",event => {
   if (event.button !== 0) return;
-  if (STE.view !== "split") return;
+  if (STE.view() !== "split") return;
   event.preventDefault();
   document.body.setAttribute("data-scaling-change","");
   document.addEventListener("mousemove",setScaling);
@@ -373,15 +373,15 @@ scaler.addEventListener("mousedown",event => {
 });
 
 scaler.addEventListener("touchstart",event => {
-  if (STE.view !== "split" || event.touches.length !== 1) return;
+  if (STE.view() !== "split" || event.touches.length !== 1) return;
   document.body.setAttribute("data-scaling-change","");
   document.addEventListener("touchmove",setScaling,{ passive: true });
   document.addEventListener("touchend",disableScaling,{ passive: true });
 },{ passive: true });
 
 card_backdrop.addEventListener("click",() => {
-  if (STE.activeDialog === null) return;
-  STE.activeDialog.close();
+  if (STE.activeDialog() === null) return;
+  STE.activeDialog()!.close();
 });
 
 preview_base_input.placeholder = document.baseURI;
@@ -473,7 +473,7 @@ if (STE.support.fileHandling && STE.support.fileSystem){
       new Editor({ name, value, handle });
     }
     if (!STE.environment.touchDevice){
-      STE.activeEditor?.focus({ preventScroll: true });
+      STE.activeEditor()?.focus({ preventScroll: true });
     }
   });
 }

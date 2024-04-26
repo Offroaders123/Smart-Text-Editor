@@ -1,4 +1,4 @@
-import STE from "./STE.js";
+import * as STE from "./STE.js";
 import Editor from "./Editor.js";
 import { setView } from "./Workspace.js";
 
@@ -13,7 +13,7 @@ export class Tools {
   */
   static replaceText = {
     replace(): void {
-      const editor = STE.activeEditor;
+      const editor = STE.activeEditor();
       if (!editor) return;
       const replaced = editor.value.split(replacer_find.value).join(replacer_replace.value);
       if (replaced != editor.value) editor.value = replaced;
@@ -137,7 +137,7 @@ export class Tools {
     if (value === undefined) return;
 
     new Editor({ name, value });
-    if (STE.view === "preview"){
+    if (STE.view() === "preview"){
       setView("split");
     }
   }
