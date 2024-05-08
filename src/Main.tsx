@@ -1,3 +1,4 @@
+import Checkbox from "./Checkbox.js";
 import DecorativeImage from "./DecorativeImage.js";
 import { settings, appearance } from "./STE.js";
 import { replaceText, jsonFormatter, uriEncoder, uuidGenerator } from "./Tools.js";
@@ -34,14 +35,17 @@ export function Main() {
                   </ul>
                 </menu-drop>
               </div>
-              <div class="checkbox">
-                <input id="syntax_highlighting_setting" type="checkbox" oninput={event => appearance.setSyntaxHighlighting(event.currentTarget.checked)}/>
-                <label for="syntax_highlighting_setting"><svg class="check"><use href="#check_icon"/></svg>Syntax Highlighting (Beta)</label>
-              </div>
-              <div class="checkbox">
-                <input id="automatic_refresh_setting" type="checkbox" oninput={event => settings.automaticRefresh = event.currentTarget.checked} checked/>
-                <label for="automatic_refresh_setting"><svg class="check"><use href="#check_icon"/></svg>Automatically Refresh Preview</label>
-              </div>
+              <Checkbox
+                id="syntax_highlighting_setting"
+                oninput={event => appearance.setSyntaxHighlighting(event.currentTarget.checked)}>
+                Syntax Highlighting (Beta)
+              </Checkbox>
+              <Checkbox
+                id="automatic_refresh_setting"
+                oninput={event => settings.automaticRefresh = event.currentTarget.checked}
+                checked>
+                Automatically Refresh Preview
+              </Checkbox>
             </div>
           </div>
           <div class="options">
@@ -186,10 +190,7 @@ export function Main() {
             <button onclick={() => uriEncoder.clear()}>Clear</button>
           </div>
           <div class="options">
-            <div class="checkbox">
-              <input id="encoder_type" type="checkbox"/>
-              <label for="encoder_type"><svg class="check"><use href="#check_icon"/></svg>Enable URI Component</label>
-            </div>
+            <Checkbox id="encoder_type">Enable URI Component</Checkbox>
           </div>
         </div>
       </ste-card>

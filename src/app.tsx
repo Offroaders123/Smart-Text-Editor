@@ -16,21 +16,6 @@ render(() => (
   </>
 ), root);
 
-for (const checkbox of document.querySelectorAll<HTMLDivElement>(".checkbox")){
-  const input = checkbox.querySelector<HTMLInputElement>("input[type='checkbox']")!;
-
-  checkbox.addEventListener("click",() => input.click());
-  checkbox.addEventListener("keydown",event => {
-    if (!event.repeat && event.key == "Enter") input.click();
-  });
-  checkbox.addEventListener("keyup",event => {
-    if (event.key == " ") input.click();
-  });
-  checkbox.tabIndex = 0;
-
-  input.addEventListener("click",event => event.stopPropagation());
-}
-
 for (const option of app_omnibox.querySelectorAll<HTMLButtonElement | HTMLAnchorElement>(".option")){
   option.tabIndex = -1;
   option.addEventListener("mousedown",event => event.preventDefault());
