@@ -1,7 +1,7 @@
 import DecorativeImage from "./DecorativeImage.js";
 import { settings, appearance } from "./STE.js";
 import { replaceText, jsonFormatter, uriEncoder, uuidGenerator } from "./Tools.js";
-import { clearSiteCaches, showInstallPrompt } from "./dom.js";
+import { applyEditingBehavior, clearSiteCaches, showInstallPrompt } from "./dom.js";
 import Settings from "./img/settings.svg";
 import Template from "./img/template.svg";
 
@@ -64,7 +64,7 @@ export function Main() {
               <span style="line-height: 1.6;">Custom workspace theme settings<br/>will be featured in a later update.</span>
             </div>
             {/* <div class="item list expand">
-              <num-text id="theme_setting" placeholder="CSS to modify..."></num-text>
+              <num-text ref={ref => applyEditingBehavior(ref)} id="theme_setting" placeholder="CSS to modify..."></num-text>
             </div> */}
           </div>
           {/* <div class="options">
@@ -79,7 +79,7 @@ export function Main() {
         <div class="main">
           <div class="content">
             <div class="item list expand">
-              <input id="preview_base_input" type="url"/>
+              <input ref={ref => applyEditingBehavior(ref)} id="preview_base_input" type="url"/>
             </div>
           </div>
           <div class="options">
@@ -116,8 +116,8 @@ export function Main() {
         <div class="main">
           <div class="content">
             <div class="item list expand">
-              <num-text id="replacer_find" placeholder="Text to find..."></num-text>
-              <num-text id="replacer_replace" placeholder="Replace with..."></num-text>
+              <num-text ref={ref => applyEditingBehavior(ref)} id="replacer_find" placeholder="Text to find..."></num-text>
+              <num-text ref={ref => applyEditingBehavior(ref)} id="replacer_replace" placeholder="Replace with..."></num-text>
             </div>
           </div>
           <div class="options">
@@ -135,7 +135,7 @@ export function Main() {
           <div class="content">
             <div class="item list">
               <div id="picker_preview"></div>
-              <input id="picker_input" type="text" value="#ee8800" maxlength="7" placeholder="#rrggbb"/>
+              <input ref={ref => applyEditingBehavior(ref)} id="picker_input" type="text" value="#ee8800" maxlength="7" placeholder="#rrggbb"/>
             </div>
             <div class="item list">
               <label for="red_channel">Red</label>
@@ -160,7 +160,7 @@ export function Main() {
         <div class="main">
           <div class="content">
             <div class="item expand">
-              <num-text id="formatter_input" class="expand" syntax-language="json" placeholder="JSON data to format..."></num-text>
+              <num-text ref={ref => applyEditingBehavior(ref)} id="formatter_input" class="expand" syntax-language="json" placeholder="JSON data to format..."></num-text>
             </div>
           </div>
           <div class="options">
@@ -177,7 +177,7 @@ export function Main() {
         <div class="main">
           <div class="content">
             <div class="item expand">
-              <num-text id="encoder_input" class="expand" placeholder="Text to encode..."></num-text>
+              <num-text ref={ref => applyEditingBehavior(ref)} id="encoder_input" class="expand" placeholder="Text to encode..."></num-text>
             </div>
           </div>
           <div class="options">
@@ -200,7 +200,7 @@ export function Main() {
         <div class="main">
           <div class="content">
             <div class="item expand">
-              <input id="generator_output" type="text" placeholder="Result..." readonly/>
+              <input ref={ref => applyEditingBehavior(ref)} id="generator_output" type="text" placeholder="Result..." readonly/>
             </div>
           </div>
           <div class="options">

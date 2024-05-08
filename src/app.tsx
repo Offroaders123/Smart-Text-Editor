@@ -6,7 +6,6 @@ import "./Card.js";
 import { insertTemplate } from "./Tools.js";
 import Editor from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview, setScaling, disableScaling } from "./Workspace.js";
-import { applyEditingBehavior } from "./dom.js";
 
 const root: HTMLDivElement = document.querySelector("#root")!;
 
@@ -16,14 +15,6 @@ render(() => (
     <Main/>
   </>
 ), root);
-
-for (const numText of document.querySelectorAll("num-text")){
-  applyEditingBehavior(numText);
-}
-
-for (const input of document.querySelectorAll<HTMLInputElement>("input:is([type='text'],[type='url'])")){
-  applyEditingBehavior(input);
-}
 
 for (const checkbox of document.querySelectorAll<HTMLDivElement>(".checkbox")){
   const input = checkbox.querySelector<HTMLInputElement>("input[type='checkbox']")!;
