@@ -1,3 +1,4 @@
+import DecorativeImage from "./DecorativeImage.js";
 import Editor from "./Editor.js";
 import { activeEditor, settings } from "./STE.js";
 import { insertTemplate } from "./Tools.js";
@@ -22,7 +23,7 @@ export function Header() {
     <header id="header">
       <div class="app-region"></div>
       <div class="app-icon">
-        <img src={Icon} alt=""/>
+        <DecorativeImage src={Icon} alt=""/>
       </div>
       <div id="app_menubar" class="app-menubar">
         <menu-drop id="file_menu">
@@ -89,15 +90,15 @@ export function Header() {
             </li>
             <li>Online Resources...
               <ul data-show-icons>
-                <li><a href="https://webformatter.com"><img src={WebFormatter} alt=""/>Code Formatter</a></li>
-                <li><a href="https://www.sharedrop.io"><img part="invert" src={Sharedrop} alt=""/>File Transferer</a></li>
-                <li><a href="https://www.diffchecker.com/"><img src={Diffchecker} alt=""/>Difference Finder</a></li>
-                <li><a href="https://caniuse.com/"><img src={Caniuse} alt=""/>Compatibility Checker</a></li>
-                <li><a href="https://web.dev/measure/"><img src={WebDev} alt=""/>Performance Tester</a></li>
-                <li><a href="https://realfavicongenerator.net/"><img part="rounded" src={RealFaviconGenerator} alt=""/>Favicon Generator</a></li>
-                <li><a href="https://appsco.pe/developer/splash-screens/"><img part="invert" src={Appscope} alt=""/>Splash Generator</a></li>
-                <li><a href="https://www.svgminify.com/"><img src={SVGMinify} alt=""/>SVG Simplifier</a></li>
-                <li><a href="https://cryptii.com/"><img src={Cryptii} alt=""/>Text Encryptor</a></li>
+                <li><a href="https://webformatter.com"><DecorativeImage src={WebFormatter} alt=""/>Code Formatter</a></li>
+                <li><a href="https://www.sharedrop.io"><DecorativeImage part="invert" src={Sharedrop} alt=""/>File Transferer</a></li>
+                <li><a href="https://www.diffchecker.com/"><DecorativeImage src={Diffchecker} alt=""/>Difference Finder</a></li>
+                <li><a href="https://caniuse.com/"><DecorativeImage src={Caniuse} alt=""/>Compatibility Checker</a></li>
+                <li><a href="https://web.dev/measure/"><DecorativeImage src={WebDev} alt=""/>Performance Tester</a></li>
+                <li><a href="https://realfavicongenerator.net/"><DecorativeImage part="rounded" src={RealFaviconGenerator} alt=""/>Favicon Generator</a></li>
+                <li><a href="https://appsco.pe/developer/splash-screens/"><DecorativeImage part="invert" src={Appscope} alt=""/>Splash Generator</a></li>
+                <li><a href="https://www.svgminify.com/"><DecorativeImage src={SVGMinify} alt=""/>SVG Simplifier</a></li>
+                <li><a href="https://cryptii.com/"><DecorativeImage src={Cryptii} alt=""/>Text Encryptor</a></li>
               </ul>
             </li>
           </ul>
@@ -105,10 +106,10 @@ export function Header() {
         <menu-drop id="settings_menu" data-alternate>
           <button onclick={() => settings_card.open()}>Settings</button>
           <ul data-show-icons>
-            <li part="install-option" onclick={() => showInstallPrompt()}><img src={Install} alt=""/>Install</li>
-            <li onclick={() => theme_card.open()}><img src={Template} alt=""/>Theme Settings</li>
-            <li part="clear-site-caches-option" onclick={() => clearSiteCaches()}><img src={Settings} alt=""/>Clear Cache</li>
-            <li onclick={() => settings.reset({ confirm: true })}><img src={Settings} alt=""/>Reset Settings</li>
+            <li part="install-option" onclick={() => showInstallPrompt()}><DecorativeImage src={Install} alt=""/>Install</li>
+            <li onclick={() => theme_card.open()}><DecorativeImage src={Template} alt=""/>Theme Settings</li>
+            <li part="clear-site-caches-option" onclick={() => clearSiteCaches()}><DecorativeImage src={Settings} alt=""/>Clear Cache</li>
+            <li onclick={() => settings.reset({ confirm: true })}><DecorativeImage src={Settings} alt=""/>Reset Settings</li>
           </ul>
         </menu-drop>
       </div>

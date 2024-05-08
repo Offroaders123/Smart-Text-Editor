@@ -1,6 +1,7 @@
-import { settings, appearance } from "./STE.jsx";
-import { replaceText, jsonFormatter, uriEncoder, uuidGenerator } from "./Tools.jsx";
-import { clearSiteCaches, showInstallPrompt } from "./dom.jsx";
+import DecorativeImage from "./DecorativeImage.js";
+import { settings, appearance } from "./STE.js";
+import { replaceText, jsonFormatter, uriEncoder, uuidGenerator } from "./Tools.js";
+import { clearSiteCaches, showInstallPrompt } from "./dom.js";
 import Settings from "./img/settings.svg";
 import Template from "./img/template.svg";
 
@@ -88,7 +89,7 @@ export function Main() {
       </ste-card>
       <ste-card id="reset_settings_card" type="alert">
         <div class="header">
-          <img class="icon" src={Settings} alt=""/>
+          <DecorativeImage class="icon" src={Settings} alt=""/>
           <span class="heading">Reset Settings</span>
         </div>
         <div class="main">
@@ -99,7 +100,7 @@ export function Main() {
       </ste-card>
       <ste-card id="cleared_cache_card" type="alert">
         <div class="header">
-          <img class="icon" src={Template} alt=""/>
+          <DecorativeImage class="icon" src={Template} alt=""/>
           <span class="heading">Cleared Cache</span>
         </div>
         <div class="main">
