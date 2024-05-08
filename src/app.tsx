@@ -16,11 +16,6 @@ render(() => (
   </>
 ), root);
 
-for (const option of app_omnibox.querySelectorAll<HTMLButtonElement | HTMLAnchorElement>(".option")){
-  option.tabIndex = -1;
-  option.addEventListener("mousedown",event => event.preventDefault());
-}
-
 const queryParameters = new URLSearchParams(window.location.search);
 
 (async () => {

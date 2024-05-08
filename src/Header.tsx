@@ -17,6 +17,7 @@ import Cryptii from "./img/cryptii.svg";
 import Install from "./img/install.svg";
 import Template from "./img/template.svg";
 import Settings from "./img/settings.svg";
+import { JSX } from "solid-js";
 
 export function Header() {
   return (
@@ -144,7 +145,7 @@ function Omnibox() {
 interface OmniboxButtonProps {
   id?: string;
   title: string;
-  onclick: () => void;
+  onclick: JSX.CustomEventHandlersLowerCase<HTMLButtonElement>["onclick"];
   icon: string;
 }
 
@@ -154,7 +155,9 @@ function OmniboxButton(props: OmniboxButtonProps) {
       id={props.id}
       class="option"
       title={props.title}
+      tabindex={-1}
       onclick={props.onclick}
+      onmousedown={event => event.preventDefault()}
     >
       <OmniboxIcon href={props.icon}/>
     </button>
@@ -173,6 +176,8 @@ function OmniboxAnchor(props: OmniboxAnchorProps) {
       class="option"
       href={props.href}
       title={props.title}
+      tabindex={-1}
+      onmousedown={event => event.preventDefault()}
     >
       <OmniboxIcon href={props.icon}/>
     </a>
