@@ -30,11 +30,30 @@ export function Alert(props: AlertProps) {
 
 export interface DialogProps {
   id: string;
+  cardParent?: string;
+  headingText: string;
+  mainContent: JSX.Element[];
+  options?: JSX.Element[];
 }
 
 export function Dialog(props: DialogProps) {
   return (
-    <></>
+    <ste-card id={props.id} type="dialog">
+      <div class="header" data-card-parent={props.cardParent}>
+        <button class="card-back">
+          <svg>
+            <use href="#back_icon"/>
+          </svg>
+        </button>
+        <span class="heading">{props.headingText}</span>
+      </div>
+      <div class="main">
+        <div class="content">
+          {props.mainContent}
+        </div>
+        {props.options?.map(row => <div class="options">{row}</div>)}
+      </div>
+    </ste-card>
   );
 }
 
@@ -76,7 +95,7 @@ export type { Card };
 class Card extends HTMLElement {
   readonly type: CardType = this.getAttribute("type") as CardType;
   readonly header: HTMLDivElement = this.querySelector<HTMLDivElement>(".header")!;
-  readonly back: HTMLButtonElement = document.createElement("button");
+  readonly back: HTMLButtonElement | null = this.querySelector<HTMLButtonElement>(".card-back");
   readonly heading: HTMLDivElement = this.header.querySelector<HTMLDivElement>(".heading")!;
   readonly controls: CardControls = Object.assign(document.createElement("div"),{
     minimize: document.createElement("button"),
@@ -99,9 +118,7 @@ class Card extends HTMLElement {
       }
     });
 
-    this.back.classList.add("card-back");
-    this.back.innerHTML = `<svg><use href="#back_icon"/></svg>`;
-    this.back.addEventListener("click",() => document.querySelector<Card>(`#${this.header?.getAttribute("data-card-parent")}`)!.open(this));
+    this.back?.addEventListener("click",() => document.querySelector<Card>(`#${this.header?.getAttribute("data-card-parent")}`)!.open(this));
 
     this.controls.classList.add("card-controls");
 
@@ -124,7 +141,6 @@ class Card extends HTMLElement {
 
     this.controls.close.addEventListener("click",() => this.close());
 
-    if (this.type === "dialog") this.header.insertBefore(this.back,this.heading);
     this.controls.appendChild(this.controls.minimize);
     this.controls.appendChild(this.controls.close);
     this.header.appendChild(this.controls);

@@ -1,4 +1,4 @@
-import { Alert, Widget } from "./Card.js";
+import { Alert, Dialog, Widget } from "./Card.js";
 import Checkbox from "./Checkbox.js";
 import { settings, appearance } from "./STE.js";
 import { replaceText, jsonFormatter, uriEncoder, uuidGenerator } from "./Tools.js";
@@ -18,79 +18,120 @@ export function Main() {
       <div id="scaler" class="scaler"></div>
       <iframe id="preview" class="preview" src="about:blank"></iframe>
       <div id="card_backdrop" class="card-backdrop"></div>
-      <ste-card id="settings_card" type="dialog">
-        <div class="header">
-          <span class="heading">Settings</span>
-        </div>
-        <div class="main">
-          <div class="content">
-            <div class="item list start">
-              <div class="select">
-                <label>Default Orientation:</label>
-                <menu-drop id="default_orientation_setting" data-select>
-                  <button>Horizontal</button>
-                  <ul>
-                    <li data-value="horizontal" onclick={() => settings.defaultOrientation = 'horizontal'} data-selected>Horizontal</li>
-                    <li data-value="vertical" onclick={() => settings.defaultOrientation = 'vertical'}>Vertical</li>
-                  </ul>
-                </menu-drop>
-              </div>
-              <Checkbox
-                id="syntax_highlighting_setting"
-                oninput={event => appearance.setSyntaxHighlighting(event.currentTarget.checked)}>
-                Syntax Highlighting (Beta)
-              </Checkbox>
-              <Checkbox
-                id="automatic_refresh_setting"
-                oninput={event => settings.automaticRefresh = event.currentTarget.checked}
-                checked>
-                Automatically Refresh Preview
-              </Checkbox>
+      <Dialog
+        id="settings_card"
+        headingText="Settings"
+        mainContent={[
+          <div class="item list start">
+            <div class="select">
+              <label>Default Orientation:</label>
+              <menu-drop id="default_orientation_setting" data-select>
+                <button>Horizontal</button>
+                <ul>
+                  <li
+                    data-value="horizontal"
+                    onclick={() => settings.defaultOrientation = 'horizontal'}
+                    data-selected>
+                    Horizontal
+                  </li>
+                  <li
+                    data-value="vertical"
+                    onclick={() => settings.defaultOrientation = 'vertical'}>
+                    Vertical
+                  </li>
+                </ul>
+              </menu-drop>
             </div>
+            <Checkbox
+              id="syntax_highlighting_setting"
+              oninput={event => appearance.setSyntaxHighlighting(event.currentTarget.checked)}>
+              Syntax Highlighting (Beta)
+            </Checkbox>
+            <Checkbox
+              id="automatic_refresh_setting"
+              oninput={event => settings.automaticRefresh = event.currentTarget.checked}
+              checked>
+              Automatically Refresh Preview
+            </Checkbox>
           </div>
-          <div class="options">
-            <button id="install_button" onclick={() => showInstallPrompt()}><svg><use href="#install_icon"/></svg>Install</button>
-            <button id="theme_button" onclick={() => theme_card.open()} data-card-previous="theme_card">Customize Theme<svg><use href="#arrow_icon"/></svg></button>
+        ]}
+        options={[
+          <>
+            <button
+              id="install_button"
+              onclick={() => showInstallPrompt()}>
+              <svg>
+                <use href="#install_icon"/>
+              </svg>
+              Install
+            </button>
+            <button
+              id="theme_button"
+              onclick={() => theme_card.open()}
+              data-card-previous="theme_card">
+              Customize Theme
+              <svg>
+                <use href="#arrow_icon"/>
+              </svg>
+            </button>
+          </>,
+          <>
+            <button
+              id="clear_site_caches_button"
+              class="warning"
+              onclick={() => clearSiteCaches()}>
+              Clear Cache
+            </button>
+            <button
+              class="warning"
+              onclick={() => settings.reset({ confirm: true })}>
+              Reset Settings
+            </button>
+          </>
+        ]}
+      />
+      <Dialog
+        id="theme_card"
+        cardParent="settings_card"
+        headingText="Theme"
+        mainContent={[
+          <div class="item list">
+            <span style="line-height: 1.6;">Custom workspace theme settings<br/>will be featured in a later update.</span>
+          </div>,
+          // <div class="item list expand">
+          //   <num-text
+          //     ref={ref => applyEditingBehavior(ref)}
+          //     id="theme_setting"
+          //     placeholder="CSS to modify..."
+          //   />
+          // </div>
+        ]}
+        // options={[
+        //   <button
+        //     onclick={() => resetTheme()}>
+        //     Reset Theme
+        //   </button>
+        // ]}
+      />
+      <Dialog
+        id="preview_base_card"
+        headingText="Base URL"
+        mainContent={[
+          <div class="item list expand">
+            <input
+              ref={ref => applyEditingBehavior(ref)}
+              id="preview_base_input"
+              type="url"
+            />
           </div>
-          <div class="options">
-            <button id="clear_site_caches_button" class="warning" onclick={() => clearSiteCaches()}>Clear Cache</button>
-            <button class="warning" onclick={() => settings.reset({ confirm: true })}>Reset Settings</button>
-          </div>
-        </div>
-      </ste-card>
-      <ste-card id="theme_card" type="dialog">
-        <div class="header" data-card-parent="settings_card">
-          <span class="heading">Theme</span>
-        </div>
-        <div class="main">
-          <div class="content">
-            <div class="item list">
-              <span style="line-height: 1.6;">Custom workspace theme settings<br/>will be featured in a later update.</span>
-            </div>
-            {/* <div class="item list expand">
-              <num-text ref={ref => applyEditingBehavior(ref)} id="theme_setting" placeholder="CSS to modify..."></num-text>
-            </div> */}
-          </div>
-          {/* <div class="options">
-            <button onclick={() => resetTheme()}>Reset Theme</button>
-          </div> */}
-        </div>
-      </ste-card>
-      <ste-card id="preview_base_card" type="dialog">
-        <div class="header">
-          <span class="heading">Base URL</span>
-        </div>
-        <div class="main">
-          <div class="content">
-            <div class="item list expand">
-              <input ref={ref => applyEditingBehavior(ref)} id="preview_base_input" type="url"/>
-            </div>
-          </div>
-          <div class="options">
-            <button onclick={() => preview_base_input.reset()}>Reset</button>
-          </div>
-        </div>
-      </ste-card>
+        ]}
+        options={[
+          <button
+            onclick={() => preview_base_input.reset()}>
+            Reset
+          </button>
+        ]}
+      />
       <Alert
         id="reset_settings_card"
         headingText="Reset Settings"
