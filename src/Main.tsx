@@ -1,6 +1,5 @@
-import { Widget } from "./Card.js";
+import { Alert, Widget } from "./Card.js";
 import Checkbox from "./Checkbox.js";
-import DecorativeImage from "./DecorativeImage.js";
 import { settings, appearance } from "./STE.js";
 import { replaceText, jsonFormatter, uriEncoder, uuidGenerator } from "./Tools.js";
 import { applyEditingBehavior, clearSiteCaches, showInstallPrompt } from "./dom.js";
@@ -92,28 +91,22 @@ export function Main() {
           </div>
         </div>
       </ste-card>
-      <ste-card id="reset_settings_card" type="alert">
-        <div class="header">
-          <DecorativeImage class="icon" src={Settings} alt=""/>
-          <span class="heading">Reset Settings</span>
-        </div>
-        <div class="main">
-          <div class="content">
-            <div class="item">Your settings have been reset!</div>
-          </div>
-        </div>
-      </ste-card>
-      <ste-card id="cleared_cache_card" type="alert">
-        <div class="header">
-          <DecorativeImage class="icon" src={Template} alt=""/>
-          <span class="heading">Cleared Cache</span>
-        </div>
-        <div class="main">
-          <div class="content">
-            <div class="item">Successfully cleared offline cache!</div>
-          </div>
-        </div>
-      </ste-card>
+      <Alert
+        id="reset_settings_card"
+        headingText="Reset Settings"
+        headingIcon={Settings}
+        mainContent={[
+          <div class="item">Your settings have been reset!</div>
+        ]}
+      />
+      <Alert
+        id="cleared_cache_card"
+        headingText="Cleared Cache"
+        headingIcon={Template}
+        mainContent={[
+          <div class="item">Successfully cleared offline cache!</div>
+        ]}
+      />
       <Widget
         id="replace_text_card"
         headingText="Replace Text"

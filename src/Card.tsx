@@ -1,15 +1,30 @@
 import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor } from "./STE.js";
+import DecorativeImage from "./DecorativeImage.js";
 import Editor from "./Editor.js";
 import { getElementStyle } from "./dom.js";
-import { JSX } from "solid-js";
+
+import type { JSX } from "solid-js";
 
 export interface AlertProps {
   id: string;
+  headingText: string;
+  headingIcon: string;
+  mainContent: JSX.Element[];
 }
 
 export function Alert(props: AlertProps) {
   return (
-    <></>
+    <ste-card id={props.id} type="alert">
+      <div class="header">
+        <DecorativeImage class="icon" src={props.headingIcon} alt=""/>
+        <span class="heading">{props.headingText}</span>
+      </div>
+      <div class="main">
+        <div class="content">
+          {props.mainContent}
+        </div>
+      </div>
+    </ste-card>
   );
 }
 
