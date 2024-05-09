@@ -6,7 +6,7 @@ import ReplaceTextCard from "./ReplaceTextCard.js";
 import ResetSettingsCard from "./ResetSettingsCard.js";
 import SettingsCard from "./SettingsCard.js";
 import ThemeCard from "./ThemeCard.js";
-import URIEncoderCard from "./URIEncoderCard.jsx";
+import URIEncoderCard from "./URIEncoderCard.js";
 import UUIDGeneratorCard from "./UUIDGeneratorCard.js";
 
 export function Main() {

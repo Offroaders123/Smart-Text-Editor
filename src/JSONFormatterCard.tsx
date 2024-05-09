@@ -1,8 +1,40 @@
 import { Widget } from "./Card.js";
-import { jsonFormatter } from "./Tools.js";
 import { applyEditingBehavior } from "./dom.js";
 
 export default function JSONFormatterCard() {
+  function format(spacing: string | number = "  "): void {
+    try {
+      const formatted = JSON.stringify(JSON.parse(formatter_input.value),null,spacing);
+      if (formatted != formatter_input.value) formatter_input.value = formatted;
+    } catch (error: any){
+      /* ~~Make~~ Made matching for "position" optional, as Safari doesn't give JSON parsing error data, it only says that an error occurred. */
+      try {
+        const message = error.toString().match(/^(.+?)position /)[0];
+        const errorIndex = error.toString().match(/position (\d+)/)[1];
+
+        let errorLine: number;
+        const errorLineIndex: number = (() => {
+          const lineIndexes = indexi("\n",formatter_input.value);
+          errorLine = formatter_input.value.substring(0,errorIndex).split("\n").length - 1;
+          return lineIndexes[errorLine - 1] || 1;
+        })();
+        const errorPosition = errorIndex - errorLineIndex + 1;
+
+        alert(`Could not parse JSON, a syntax error occurred.\n${message}line ${errorLine + 1} position ${errorPosition}`);
+      } catch {
+        alert("Could not parse JSON, a syntax error occurred.");
+      }
+    }
+  }
+
+  function collapse(): void {
+    format("");
+  }
+
+  function clear(): void {
+    formatter_input.value = "";
+  }
+
   return (
     <Widget
       id="json_formatter_card"
@@ -20,11 +52,18 @@ export default function JSONFormatterCard() {
       ]}
       options={[
         <>
-          <button onclick={() => jsonFormatter.format()}>Format</button>
-          <button onclick={() => jsonFormatter.collapse()}>Collapse</button>
-          <button onclick={() => jsonFormatter.clear()}>Clear</button>
+          <button onclick={() => format()}>Format</button>
+          <button onclick={() => collapse()}>Collapse</button>
+          <button onclick={() => clear()}>Clear</button>
         </>
       ]}
     />
   );
+}
+
+function indexi(char: string, str: string): number[] {
+  const list: number[] = [];
+  let i = -1;
+  while ((i = str.indexOf(char,i + 1)) >= 0) list.push(i + 1);
+  return list;
 }
