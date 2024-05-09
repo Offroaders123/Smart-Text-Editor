@@ -1,6 +1,6 @@
 import Prism from "./prism.js";
 
-import type Card from "./Card.js";
+import type { Card } from "./Card.js";
 import type Editor from "./Editor.js";
 import type { View } from "./Workspace.js";
 import type { Orientation } from "./Workspace.js";

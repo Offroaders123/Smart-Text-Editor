@@ -1,6 +1,50 @@
 import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor } from "./STE.js";
 import Editor from "./Editor.js";
 import { getElementStyle } from "./dom.js";
+import { JSX } from "solid-js";
+
+export interface AlertProps {
+  id: string;
+}
+
+export function Alert(props: AlertProps) {
+  return (
+    <></>
+  );
+}
+
+export interface DialogProps {
+  id: string;
+}
+
+export function Dialog(props: DialogProps) {
+  return (
+    <></>
+  );
+}
+
+export interface WidgetProps {
+  id: string;
+  headingText: string;
+  mainContent: JSX.Element[];
+  options: JSX.Element[];
+}
+
+export function Widget(props: WidgetProps) {
+  return (
+    <ste-card id={props.id} type="widget">
+      <div class="header">
+        <span class="heading">{props.headingText}</span>
+      </div>
+      <div class="main">
+        <div class="content">
+          {props.mainContent}
+        </div>
+        {props.options.map(row => <div class="options">{row}</div>)}
+      </div>
+    </ste-card>
+  );
+}
 
 export type CardType = "alert" | "widget" | "dialog";
 
@@ -9,10 +53,12 @@ export interface CardControls extends HTMLDivElement {
   readonly close: HTMLButtonElement;
 }
 
+export type { Card };
+
 /**
  * The base component for the Alert, Dialog, and Widget card types.
 */
-export class Card extends HTMLElement {
+class Card extends HTMLElement {
   readonly type: CardType = this.getAttribute("type") as CardType;
   readonly header: HTMLDivElement = this.querySelector<HTMLDivElement>(".header")!;
   readonly back: HTMLButtonElement = document.createElement("button");
@@ -63,7 +109,7 @@ export class Card extends HTMLElement {
 
     this.controls.close.addEventListener("click",() => this.close());
 
-    this.header.insertBefore(this.back,this.heading);
+    if (this.type === "dialog") this.header.insertBefore(this.back,this.heading);
     this.controls.appendChild(this.controls.minimize);
     this.controls.appendChild(this.controls.close);
     this.header.appendChild(this.controls);
@@ -194,5 +240,3 @@ declare global {
     "ste-card": Card;
   }
 }
-
-export default Card;

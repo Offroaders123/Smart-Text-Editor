@@ -1,3 +1,4 @@
+import { Widget } from "./Card.js";
 import Checkbox from "./Checkbox.js";
 import DecorativeImage from "./DecorativeImage.js";
 import { settings, appearance } from "./STE.js";
@@ -113,102 +114,125 @@ export function Main() {
           </div>
         </div>
       </ste-card>
-      <ste-card id="replace_text_card" type="widget">
-        <div class="header">
-          <span class="heading">Replace Text</span>
-        </div>
-        <div class="main">
-          <div class="content">
-            <div class="item list expand">
-              <num-text ref={ref => applyEditingBehavior(ref)} id="replacer_find" placeholder="Text to find..."></num-text>
-              <num-text ref={ref => applyEditingBehavior(ref)} id="replacer_replace" placeholder="Replace with..."></num-text>
-            </div>
+      <Widget
+        id="replace_text_card"
+        headingText="Replace Text"
+        mainContent={[
+          <div class="item list expand">
+            <num-text
+              ref={ref => applyEditingBehavior(ref)}
+              id="replacer_find"
+              placeholder="Text to find..."
+            />
+            <num-text
+              ref={ref => applyEditingBehavior(ref)}
+              id="replacer_replace"
+              placeholder="Replace with..."
+            />
           </div>
-          <div class="options">
+        ]}
+        options={[
+          <>
             <button onclick={() => replaceText.replace()}>Replace</button>
             <button onclick={() => replaceText.flip()}>Flip</button>
             <button onclick={() => replaceText.clear()}>Clear</button>
+          </>
+        ]}
+      />
+      <Widget
+        id="color_picker_card"
+        headingText="Color Picker"
+        mainContent={[
+          <div class="item list">
+            <div id="picker_preview"></div>
+            <input
+              ref={ref => applyEditingBehavior(ref)}
+              id="picker_input"
+              type="text"
+              value="#ee8800"
+              maxlength="7"
+              placeholder="#rrggbb"
+            />
+          </div>,
+          <div class="item list">
+            <label for="red_channel">Red</label>
+            <input id="red_channel" type="range"/>
+            <label for="green_channel">Green</label>
+            <input id="green_channel" type="range"/>
+            <label for="blue_channel">Blue</label>
+            <input id="blue_channel" type="range"/>
           </div>
-        </div>
-      </ste-card>
-      <ste-card id="color_picker_card" type="widget">
-        <div class="header">
-          <span class="heading">Color Picker</span>
-        </div>
-        <div class="main">
-          <div class="content">
-            <div class="item list">
-              <div id="picker_preview"></div>
-              <input ref={ref => applyEditingBehavior(ref)} id="picker_input" type="text" value="#ee8800" maxlength="7" placeholder="#rrggbb"/>
-            </div>
-            <div class="item list">
-              <label for="red_channel">Red</label>
-              <input id="red_channel" type="range"/>
-              <label for="green_channel">Green</label>
-              <input id="green_channel" type="range"/>
-              <label for="blue_channel">Blue</label>
-              <input id="blue_channel" type="range"/>
-            </div>
-          </div>
-          <div class="options">
+        ]}
+        options={[
+          <>
             <button onclick={() => /* copyPicker() */ {}}>Copy</button>
             <button onclick={() => /* insertPicker() */ {}}>Insert</button>
             <button onclick={() => /* deletePicker() */ {}}>Delete</button>
+          </>
+        ]}
+      />
+      <Widget
+        id="json_formatter_card"
+        headingText="JSON Formatter"
+        mainContent={[
+          <div class="item expand">
+            <num-text
+              ref={ref => applyEditingBehavior(ref)}
+              id="formatter_input"
+              class="expand"
+              syntax-language="json"
+              placeholder="JSON data to format..."
+            />
           </div>
-        </div>
-      </ste-card>
-      <ste-card id="json_formatter_card" type="widget">
-        <div class="header">
-          <span class="heading">JSON Formatter</span>
-        </div>
-        <div class="main">
-          <div class="content">
-            <div class="item expand">
-              <num-text ref={ref => applyEditingBehavior(ref)} id="formatter_input" class="expand" syntax-language="json" placeholder="JSON data to format..."></num-text>
-            </div>
-          </div>
-          <div class="options">
+        ]}
+        options={[
+          <>
             <button onclick={() => jsonFormatter.format()}>Format</button>
             <button onclick={() => jsonFormatter.collapse()}>Collapse</button>
             <button onclick={() => jsonFormatter.clear()}>Clear</button>
+          </>
+        ]}
+      />
+      <Widget
+        id="uri_encoder_card"
+        headingText="URI Encoder"
+        mainContent={[
+          <div class="item expand">
+            <num-text
+              ref={ref => applyEditingBehavior(ref)}
+              id="encoder_input"
+              class="expand"
+              placeholder="Text to encode..."
+            />
           </div>
-        </div>
-      </ste-card>
-      <ste-card id="uri_encoder_card" type="widget">
-        <div class="header">
-          <span class="heading">URI Encoder</span>
-        </div>
-        <div class="main">
-          <div class="content">
-            <div class="item expand">
-              <num-text ref={ref => applyEditingBehavior(ref)} id="encoder_input" class="expand" placeholder="Text to encode..."></num-text>
-            </div>
-          </div>
-          <div class="options">
+        ]}
+        options={[
+          <>
             <button onclick={() => uriEncoder.encode()}>Encode</button>
             <button onclick={() => uriEncoder.decode()}>Decode</button>
             <button onclick={() => uriEncoder.clear()}>Clear</button>
+          </>,
+          <Checkbox id="encoder_type">Enable URI Component</Checkbox>
+        ]}
+      />
+      <Widget
+        id="uuid_generator_card"
+        headingText="UUID Generator"
+        mainContent={[
+          <div class="item expand">
+            <input
+              ref={ref => applyEditingBehavior(ref)}
+              id="generator_output"
+              type="text"
+              placeholder="Result..."
+              readonly
+            />
           </div>
-          <div class="options">
-            <Checkbox id="encoder_type">Enable URI Component</Checkbox>
-          </div>
-        </div>
-      </ste-card>
-      <ste-card id="uuid_generator_card" type="widget">
-        <div class="header">
-          <span class="heading">UUID Generator</span>
-        </div>
-        <div class="main">
-          <div class="content">
-            <div class="item expand">
-              <input ref={ref => applyEditingBehavior(ref)} id="generator_output" type="text" placeholder="Result..." readonly/>
-            </div>
-          </div>
-          <div class="options">
-            <button onclick={() => generator_output.value = uuidGenerator.generate()}>Generate</button>
-          </div>
-        </div>
-      </ste-card>
+        ]}
+        options={[
+          <button onclick={() => generator_output.value = uuidGenerator.generate()}>Generate</button>
+        ]}
+      />
     </main>
   );
 }
