@@ -1089,7 +1089,7 @@ menu-drop::part(divider) {
   transition-timing-function: ease-out;
 }
 
-ste-card {
+.ste-card {
   --card-header-padding-right: max(var(--safe-area-inset-right),8px);
   display: flex;
   flex-direction: column;
@@ -1106,23 +1106,23 @@ ste-card {
   transition-property: visibility, opacity, transform;
 }
 
-ste-card:not([active]) {
+.ste-card:not(.active) {
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
 }
 
-ste-card[active] {
+.ste-card.active {
   visibility: visible;
   opacity: 1;
   z-index: calc(var(--card-z-index) + 1);
 }
 
-ste-card:not([type="dialog"]) {
+.ste-card:not([data-type="dialog"]) {
   margin: var(--margin) max(var(--safe-area-inset-right),var(--margin)) max(var(--safe-area-inset-bottom),var(--margin)) max(var(--safe-area-inset-left),var(--margin));
 }
 
-ste-card[type="alert"] {
+.ste-card[data-type="alert"] {
   --margin: 16px;
   position: absolute;
   right: 0;
@@ -1132,11 +1132,11 @@ ste-card[type="alert"] {
   --card-z-index: 5;
 }
 
-ste-card[type="alert"]:not([active]) {
+.ste-card[data-type="alert"]:not(.active) {
   transform: translateX(calc(100% + var(--margin) * 2));
 }
 
-ste-card[type="widget"] {
+.ste-card[data-type="widget"] {
   --margin: 8px;
   position: absolute;
   right: 0;
@@ -1145,15 +1145,15 @@ ste-card[type="widget"] {
   transform-origin: center top;
 }
 
-ste-card[type="widget"]:not([active]) {
+.ste-card[data-type="widget"]:not(.active) {
   transform: scaleY(0.25);
 }
 
-ste-card[type="widget"][data-minimize-change] {
+.ste-card[data-type="widget"].minimize-change {
   transition-property: margin-right, margin-top, border-top-right-radius, border-bottom-right-radius, box-shadow, visibility, opacity, transform;
 }
 
-ste-card[type="widget"].minimize {
+.ste-card[data-type="widget"].minimize {
   margin-right: calc(var(--card-border-width) * -1);
   margin-top: 3px;
   --card-border-radius: 10px;
@@ -1162,17 +1162,17 @@ ste-card[type="widget"].minimize {
   box-shadow: 0 4px 7px #00000050;
 }
 
-ste-card[type="dialog"] {
+.ste-card[data-type="dialog"] {
   position: absolute;
   --card-border-radius: 14px;
   --card-z-index: 3;
 }
 
-ste-card[type="dialog"]:not([active]) {
+.ste-card[data-type="dialog"]:not(.active) {
   transform: scale(0.5);
 }
 
-ste-card .header {
+.ste-card .header {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1181,18 +1181,18 @@ ste-card .header {
   --card-header-border-width: 1px;
 }
 
-ste-card[type="widget"][data-minimize-change] .header {
+.ste-card[data-type="widget"].minimize-change .header {
   background-clip: content-box;
   transition: var(--card-transition-duration);
   transition-property: margin-bottom, border-color;
 }
 
-ste-card[type="widget"].minimize .header {
+.ste-card[data-type="widget"].minimize .header {
   margin-bottom: calc(var(--card-header-border-width) * -1);
   border-color: transparent;
 }
 
-ste-card .header .card-back {
+.ste-card .header .card-back {
   margin-right: auto;
   padding: 10px;
   display: flex;
@@ -1201,23 +1201,23 @@ ste-card .header .card-back {
   outline: none;
 }
 
-ste-card .header:not([data-card-parent]) .card-back {
+.ste-card .header:not([data-card-parent]) .card-back {
   display: none;
 }
 
-ste-card .header .card-back:where(:hover,:active,:focus-visible) {
+.ste-card .header .card-back:where(:hover,:active,:focus-visible) {
   color: #ffffff;
   background: #ffffff24;
 }
 
-ste-card .header .card-back svg {
+.ste-card .header .card-back svg {
   width: 12px;
   height: 12px;
   /* aspect-ratio: 1 / 1; */
   fill: currentColor;
 }
 
-ste-card .header .icon {
+.ste-card .header .icon {
   margin: 8px;
   margin-left: 12px;
   margin-right: 0;
@@ -1226,45 +1226,45 @@ ste-card .header .icon {
   /* aspect-ratio: 1 / 1; */
 }
 
-ste-card .header .heading {
+.ste-card .header .heading {
   white-space: pre;
   z-index: -1;
 }
 
-ste-card:not([type="alert"]) .header .heading {
+.ste-card:not([data-type="alert"]) .header .heading {
   position: absolute;
 }
 
-ste-card[type="alert"] .header .heading {
+.ste-card[data-type="alert"] .header .heading {
   margin: 0 auto;
 }
 
-ste-card[type="widget"][data-minimize-change] .header .heading {
+.ste-card[data-type="widget"].minimize-change .header .heading {
   transform-origin: calc(50% - calc(var(--card-minimize-width) + var(--card-header-padding-right)) * 0.5) center;
   transition: var(--card-transition-duration);
   transition-property: visibility, opacity, transform;
 }
 
-ste-card[type="widget"].minimize .header .heading {
+.ste-card[data-type="widget"].minimize .header .heading {
   visibility: hidden;
   opacity: 0;
   transform: scale(0);
 }
 
-ste-card[type="dialog"] .header .heading {
+.ste-card[data-type="dialog"] .header .heading {
   font-size: 16px;
 }
 
-ste-card .header .card-controls {
+.ste-card .header .card-controls {
   margin-left: auto;
   display: flex;
 }
 
-ste-card[type="alert"] .header .card-controls {
+.ste-card[data-type="alert"] .header .card-controls {
   display: none;
 }
 
-ste-card .header .card-controls .control {
+.ste-card .header .card-controls .control {
   padding: var(--control-padding,0px);
   display: flex;
   background: var(--control-background);
@@ -1274,92 +1274,92 @@ ste-card .header .card-controls .control {
   --control-background: none;
 }
 
-ste-card .header .card-controls .control:where(:hover,:active,:focus-visible) {
+.ste-card .header .card-controls .control:where(:hover,:active,:focus-visible) {
   color: #ffffff;
   --control-background: #ffffff24;
 }
 
-ste-card .header .card-controls .control[data-control="close"]:where(:hover,:active,:focus-visible) {
+.ste-card .header .card-controls .control[data-control="close"]:where(:hover,:active,:focus-visible) {
   --control-background: #cc2a24;
 }
 
-ste-card:not([type="widget"]) .header .card-controls .control[data-control="minimize"] {
+.ste-card:not([data-type="widget"]) .header .card-controls .control[data-control="minimize"] {
   display: none;
 }
 
-ste-card[type="widget"].minimize .header .card-controls .control {
+.ste-card[data-type="widget"].minimize .header .card-controls .control {
   --control-padding: 6px;
 }
 
-ste-card[type="widget"].minimize .header .card-controls .control[data-control="minimize"] {
+.ste-card[data-type="widget"].minimize .header .card-controls .control[data-control="minimize"] {
   border-radius: calc(var(--card-border-radius) - var(--card-border-width));
 }
 
-ste-card[type="widget"].minimize .header .card-controls .control[data-control="close"] {
+.ste-card[data-type="widget"].minimize .header .card-controls .control[data-control="close"] {
   margin-left: var(--card-header-padding-right);
   margin-right: calc(var(--card-minimize-width) * -1);
   visibility: hidden;
   opacity: 0;
 }
 
-ste-card[type="widget"][data-minimize-change] .header .card-controls .control {
+.ste-card[data-type="widget"].minimize-change .header .card-controls .control {
   transition: var(--card-transition-duration);
   transition-property: padding;
 }
 
-ste-card[type="widget"][data-minimize-change] .header .card-controls .control[data-control="minimize"] {
+.ste-card[data-type="widget"].minimize-change .header .card-controls .control[data-control="minimize"] {
   transition-property: padding, border-radius;
 }
 
-ste-card[type="widget"][data-minimize-change] .header .card-controls .control[data-control="close"] {
+.ste-card[data-type="widget"].minimize-change .header .card-controls .control[data-control="close"] {
   transition-property: margin-left, margin-right, padding, visibility, opacity;
 }
 
-ste-card .header .card-controls .control svg {
+.ste-card .header .card-controls .control svg {
   width: 12px;
   height: 12px;
   /* aspect-ratio: 1 / 1; */
   fill: currentColor;
 }
 
-ste-card .header .card-controls .control[data-control="close"]:hover svg {
+.ste-card .header .card-controls .control[data-control="close"]:hover svg {
   color: #ffffff;
 }
 
-ste-card[type="widget"].minimize .header .card-controls .control[data-control="minimize"] svg {
+.ste-card[data-type="widget"].minimize .header .card-controls .control[data-control="minimize"] svg {
   transform: rotateY(180deg);
 }
 
-ste-card[type="widget"][data-minimize-change] .header .card-controls .control[data-control="close"] svg {
+.ste-card[data-type="widget"].minimize-change .header .card-controls .control[data-control="close"] svg {
   transition: transform var(--card-transition-duration);
 }
 
-ste-card[type="widget"].minimize .header .card-controls .control[data-control="close"] svg {
+.ste-card[data-type="widget"].minimize .header .card-controls .control[data-control="close"] svg {
   transform: scale(0);
 }
 
-ste-card .main {
+.ste-card .main {
   display: flex;
   flex-direction: column;
 }
 
-ste-card:not([type="widget"]) .main {
+.ste-card:not([data-type="widget"]) .main {
   padding: 16px;
   gap: 16px;
 }
 
-ste-card[type="widget"] .main {
+.ste-card[data-type="widget"] .main {
   padding: 14px;
   gap: 14px;
   transform-origin: calc(100% - calc(var(--card-minimize-width) + var(--card-header-padding-right)) * 0.5) top;
 }
 
-ste-card[type="widget"][data-minimize-change] .main {
+.ste-card[data-type="widget"].minimize-change .main {
   transition: var(--card-transition-duration);
   transition-property: margin-left, margin-bottom, visibility, opacity, transform;
 }
 
-ste-card[type="widget"].minimize .main {
+.ste-card[data-type="widget"].minimize .main {
   margin-left: calc(calc(var(--card-main-width) - var(--card-header-padding-right)) * -1 + var(--card-minimize-width));
   margin-bottom: calc(var(--card-main-height) * -1);
   visibility: hidden;
@@ -1367,44 +1367,44 @@ ste-card[type="widget"].minimize .main {
   transform: scale(0);
 }
 
-ste-card .main .content {
+.ste-card .main .content {
   display: flex;
   justify-content: space-around;
 }
 
-ste-card .main .content .item {
+.ste-card .main .content .item {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-ste-card:not([type="widget"]) .main .content .item {
+.ste-card:not([data-type="widget"]) .main .content .item {
   gap: 16px;
 }
 
-ste-card[type="widget"] .main .content .item {
+.ste-card[data-type="widget"] .main .content .item {
   gap: 14px;
 }
 
-ste-card .main .content .item.start {
+.ste-card .main .content .item.start {
   align-items: flex-start;
 }
 
-ste-card .options {
+.ste-card .options {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-ste-card:not([type="widget"]) .options {
+.ste-card:not([data-type="widget"]) .options {
   gap: 16px;
 }
 
-ste-card[type="widget"] .options {
+.ste-card[data-type="widget"] .options {
   gap: 14px;
 }
 
-ste-card .main button {
+.ste-card .main button {
   padding: 2px 8px;
   min-width: 74px;
   display: flex;
@@ -1420,44 +1420,44 @@ ste-card .main button {
   transition-property: color, background-color, border-color, border-radius;
 }
 
-ste-card .main button:where(:hover,:active,:focus-visible) {
+.ste-card .main button:where(:hover,:active,:focus-visible) {
   color: #ffffff;
   background: #4f4f4f;
 }
 
-ste-card .main button:focus-visible {
+.ste-card .main button:focus-visible {
   border-color: #c0c0c0;
 }
 
-ste-card .main button.warning:where(:hover,:active,:focus-visible) {
+.ste-card .main button.warning:where(:hover,:active,:focus-visible) {
   background: #b12f25;
 }
 
-ste-card .options button > img {
+.ste-card .options button > img {
   width: 16px;
   height: 16px;
   /* aspect-ratio: 1 / 1; */
 }
 
-ste-card .options button > svg {
+.ste-card .options button > svg {
   width: 12px;
   height: 12px;
   /* aspect-ratio: 1 / 1; */
   fill: currentColor;
 }
 
-ste-card num-text {
+.ste-card num-text {
   width: 32ch;
   height: 12ch;
   --background: #2d2d2d;
   border-radius: 6px;
 }
 
-ste-card num-text.expand {
+.ste-card num-text.expand {
   height: 20ch;
 }
 
-ste-card num-text::part(container)::before {
+.ste-card num-text::part(container)::before {
   content: "";
   position: absolute;
   width: 100%;
@@ -1468,7 +1468,7 @@ ste-card num-text::part(container)::before {
   z-index: 2;
 }
 
-ste-card input:is([type="text"],[type="url"]) {
+.ste-card input:is([type="text"],[type="url"]) {
   border-radius: 6px;
   box-shadow: 0 2px 3px #00000090 inset;
 }

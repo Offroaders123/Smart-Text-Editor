@@ -1,198 +1,236 @@
-import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor } from "./STE.js";
+import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, activeWidget, activeAlert, setActiveAlert } from "./STE.js";
 import Editor from "./Editor.js";
 import { getElementStyle } from "./dom.js";
+import DecorativeImage from "./DecorativeImage.js";
+import { Show, createSignal } from "solid-js";
+
+import type { JSX } from "solid-js";
 
 export type CardType = "alert" | "widget" | "dialog";
 
-export interface CardControls extends HTMLDivElement {
-  readonly minimize: HTMLButtonElement;
-  readonly close: HTMLButtonElement;
+export interface CardComponentProps {
+  id: string;
+  type: CardType;
+  cardParent?: string;
+  headerIcon?: string;
+  headerText: string;
+  content: JSX.Element;
+  options?: JSX.Element[];
 }
 
 /**
  * The base component for the Alert, Dialog, and Widget card types.
 */
-export class Card extends HTMLElement {
-  readonly type: CardType = this.getAttribute("type") as CardType;
-  readonly header: HTMLDivElement = this.querySelector<HTMLDivElement>(".header")!;
-  readonly back: HTMLButtonElement = document.createElement("button");
-  readonly heading: HTMLDivElement = this.header.querySelector<HTMLDivElement>(".heading")!;
-  readonly controls: CardControls = Object.assign(document.createElement("div"),{
-    minimize: document.createElement("button"),
-    close: document.createElement("button")
-  });
+export default function Card(props: CardComponentProps) {
+  let thiss: HTMLDivElement;
+  let minimizeElem: HTMLButtonElement;
 
-  constructor() {
-    super();
+  const [minimized, setMinimized] = createSignal<boolean>(false);
+  const [minimizedChange, setMinimizedChange] = createSignal<string | null>(null);
+  const [active, setActive] = createSignal<boolean>(false);
+  // const active = createMemo<boolean>(() => {
+  //   switch (props.type) {
+  //     case "alert": return activeAlert() === props.id;
+  //     case "dialog": return activeDialog() === props.id;
+  //     case "widget": return activeWidget() === props.id;
+  //   }
+  // });
+  const [alertTimeout, setAlertTimeout] = createSignal<string | null>(null);
 
-    this.addEventListener("keydown",event => {
-      if (this.getAttribute("type") != "dialog" || event.key != "Tab") return;
-      const navigable = Card.#getNavigableElements({ container: this, scope: true });
-      if (!event.shiftKey){
-        if (document.activeElement != navigable[navigable.length - 1]) return;
-        event.preventDefault();
-        navigable[0]?.focus();
-      } else if (document.activeElement == navigable[0]){
-        event.preventDefault();
-        navigable[navigable.length - 1]?.focus();
-      }
-    });
+  return (
+    <div
+      id={props.id}
+      ref={thiss!}
+      classList={{ "ste-card": true, minimize: minimized(), "minimize-change": minimizedChange() !== null, active: active(), "alert-timeout": alertTimeout() !== null }}
+      data-type={props.type}
+      onkeydown={event => {
+        if (props.type !== "dialog" || event.key != "Tab") return;
+        const navigable = getNavigableElements({ container: event.currentTarget, scope: true });
+        if (!event.shiftKey){
+          if (document.activeElement != navigable[navigable.length - 1]) return;
+          event.preventDefault();
+          navigable[0]?.focus();
+        } else if (document.activeElement == navigable[0]){
+          event.preventDefault();
+          navigable[navigable.length - 1]?.focus();
+        }
+      }}
+    >
+      <div class="header" data-card-parent={props.cardParent}>
+        <button
+          class="card-back"
+          onclick={() => {
+            const card = document.querySelector<HTMLDivElement>(`#${props.cardParent}`)!;
+            const type: CardType = card.getAttribute("data-type")! as CardType;
 
-    this.back.classList.add("card-back");
-    this.back.innerHTML = `<svg><use href="#back_icon"/></svg>`;
-    this.back.addEventListener("click",() => document.querySelector<Card>(`#${this.header?.getAttribute("data-card-parent")}`)!.open(this));
+            switch (type) {
+              // Alert doesn't have a case here because it wouldn't make sense
+              // case "alert":
+              case "alert": return setActiveAlert(card.id as ReturnType<typeof setActiveAlert>);
+              case "dialog": return setActiveDialog(card.id as ReturnType<typeof setActiveDialog>);
+              case "widget": return setActiveWidget(card.id as ReturnType<typeof setActiveWidget>);
+            }
+          }}>
+          <svg>
+            <use href="#back_icon"/>
+          </svg>
+        </button>
+        <div class="card-controls">
+          <button
+            class="control"
+            ref={minimizeElem!}
+            data-control="minimize"
+            onkeydown={event => {
+              if (event.key !== "Enter") return;
+              event.preventDefault();
+              if (event.repeat) return;
+              event.currentTarget.click();
+            }}
+            onclick={() => minimize()}
+          >
+            <svg>
+              <use href="#minimize_icon"/>
+            </svg>
+          </button>
+          <button
+            class="control"
+            data-control="close"
+            onclick={() => close()}
+          >
+            <svg>
+              <use href="#close_icon"/>
+            </svg>
+          </button>
+        </div>
+        <Show when={typeof props.headerIcon === "string"}>
+          <DecorativeImage class="icon" src={props.headerIcon} alt=""/>
+        </Show>
+        <span class="heading">{props.headerText}</span>
+      </div>
+      <div class="main">
+        <div class="content">
+          {props.content}
+        </div>
+        {props.options?.map(row => <div class="options">{row}</div>)}
+      </div>
+    </div>
+  );
 
-    this.controls.classList.add("card-controls");
-
-    this.controls.minimize.classList.add("control");
-    this.controls.minimize.setAttribute("data-control","minimize");
-    this.controls.minimize.innerHTML = `<svg><use href="#minimize_icon"/></svg>`;
-
-    this.controls.minimize.addEventListener("keydown",event => {
-      if (event.key != "Enter") return;
-      event.preventDefault();
-      if (event.repeat) return;
-      this.controls?.minimize.click();
-    });
-
-    this.controls.minimize.addEventListener("click",() => this.minimize());
-
-    this.controls.close.classList.add("control");
-    this.controls.close.setAttribute("data-control","close");
-    this.controls.close.innerHTML = `<svg><use href="#close_icon"/></svg>`;
-
-    this.controls.close.addEventListener("click",() => this.close());
-
-    this.header.insertBefore(this.back,this.heading);
-    this.controls.appendChild(this.controls.minimize);
-    this.controls.appendChild(this.controls.close);
-    this.header.appendChild(this.controls);
-  }
-
-  open(this: Card, previous?: Card): void {
-    if (this.matches("[active]") && !this.hasAttribute("data-alert-timeout")) return this.close();
-    if (this.type != "alert"){
-      document.querySelectorAll<Card>(`ste-card[active]`).forEach(card => {
-        if (card.type != "dialog" && card.type != this.type) return;
+  function open(previous?: Card): void {
+    if (active() && alertTimeout() !== null) return close();
+    if (props.type != "alert"){
+      document.querySelectorAll<Card>(`.ste-card.active`).forEach(card => {
+        if (card.type != "dialog" && card.type != props.type) return;
         card.close();
         if (!card.matches(".minimize")) return;
         const transitionDuration = parseInt(`${Number(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
         window.setTimeout(() => card.minimize(),transitionDuration);
       });
     }
-    this.setAttribute("active","");
-    if (this.type == "widget" && card_backdrop.matches(".active")) card_backdrop.classList.remove("active");
-    if (this.type == "alert"){
+    setActive(true);
+    if (props.type == "widget" && card_backdrop.matches(".active")) card_backdrop.classList.remove("active");
+    if (props.type == "alert"){
       const timeoutIdentifier = Math.random().toString();
-      this.setAttribute("data-alert-timeout",timeoutIdentifier);
+      setAlertTimeout(timeoutIdentifier);
       window.setTimeout(() => {
-        if (this.getAttribute("data-alert-timeout") != timeoutIdentifier) return;
-        this.removeAttribute("data-alert-timeout");
+        if (alertTimeout() != timeoutIdentifier) return;
+        setAlertTimeout(null);
         this.close();
       },4000);
     }
-    if (this.type == "dialog"){
-      document.body.addEventListener("keydown",Card.#catchCardNavigation);
+    if (props.type == "dialog"){
+      document.body.addEventListener("keydown",catchCardNavigation);
       card_backdrop.classList.add("active");
       if (!activeDialog() && !dialogPrevious()){
-        setDialogPrevious(document.activeElement as Card);
+        setDialogPrevious(document.activeElement as HTMLElement);
       }
       document.querySelectorAll<MenuDropElement>("menu-drop[data-open]").forEach(menu => menu.close());
-      const transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 500}`);
+      const transitionDuration = parseInt(`${Number(getElementStyle({ element: thiss, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 500}`);
       window.setTimeout(() => {
         if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
-        if (previous) this.querySelector<HTMLElement>(`[data-card-previous="${previous.id}"]`)!.focus();
+        if (previous) thiss.querySelector<HTMLElement>(`[data-card-previous="${previous.id}"]`)!.focus();
       },transitionDuration);
-      setActiveDialog(this);
+      setActiveDialog(props.id as ReturnType<typeof setActiveDialog>);
     }
-    if (this.type == "widget") setActiveWidget(this);
+    if (props.type == "widget") setActiveWidget(props.id as ReturnType<typeof setActiveWidget>);
   }
 
-  minimize(): void {
-    const icon = this.controls.minimize.querySelector<SVGUseElement>("svg use")!;
-    const main = this.querySelector<HTMLDivElement>(".main")!;
+  function minimize(): void {
+    const icon = minimizeElem.querySelector<SVGUseElement>("svg use")!;
+    const main = thiss.querySelector<HTMLDivElement>(".main")!;
     const changeIdentifier = Math.random().toString();
 
-    this.setAttribute("data-minimize-change",changeIdentifier);
+    setMinimizedChange(changeIdentifier);
     workspace_tabs.setAttribute("data-minimize-change",changeIdentifier);
-    const transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
-    if (!this.matches(".minimize")){
-      this.classList.add("minimize");
-      if (this.controls === undefined) return;
-      this.style.setProperty("--card-minimize-width",`${this.controls.minimize.querySelector("svg")!.clientWidth + parseInt(getElementStyle({ element: this.controls.minimize, property: "--control-padding" }),10) * 2}px`);
-      this.style.setProperty("--card-main-width",`${main.clientWidth}px`);
-      this.style.setProperty("--card-main-height",`${main.clientHeight}px`);
+    const transitionDuration = parseInt(`${Number(getElementStyle({ element: thiss, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
+    if (!minimized()){
+      setMinimized(true);
+      thiss.style.setProperty("--card-minimize-width",`${minimizeElem.querySelector("svg")!.clientWidth + parseInt(getElementStyle({ element: minimizeElem, property: "--control-padding" }),10) * 2}px`);
+      thiss.style.setProperty("--card-main-width",`${main.clientWidth}px`);
+      thiss.style.setProperty("--card-main-height",`${main.clientHeight}px`);
       icon.setAttribute("href","#arrow_icon");
       window.setTimeout(() => {
-        workspace_tabs.style.setProperty("--minimize-tab-width",getElementStyle({ element: this, property: "width" }));
+        workspace_tabs.style.setProperty("--minimize-tab-width",getElementStyle({ element: thiss, property: "width" }));
         Editor.setTabsVisibility();
       },transitionDuration);
-      if (this.contains(document.activeElement) && document.activeElement != this.controls.minimize) this.controls.minimize.focus();
+      if (thiss.contains(document.activeElement) && document.activeElement != minimizeElem) minimizeElem.focus();
     } else {
-      this.classList.remove("minimize");
+      setMinimized(false);
       window.setTimeout(() => {
-        if (this.getAttribute("data-minimize-change") == changeIdentifier) this.style.removeProperty("--card-minimize-width");
+        if (minimizedChange() == changeIdentifier) thiss.style.removeProperty("--card-minimize-width");
       },transitionDuration);
-      this.style.removeProperty("--card-main-width");
-      this.style.removeProperty("--card-main-height");
+      thiss.style.removeProperty("--card-main-width");
+      thiss.style.removeProperty("--card-main-height");
       icon.setAttribute("href","#minimize_icon");
       workspace_tabs.style.removeProperty("--minimize-tab-width");
     }
     window.setTimeout(() => {
-      if (this.getAttribute("data-minimize-change") == changeIdentifier) this.removeAttribute("data-minimize-change");
+      if (minimizedChange() == changeIdentifier) setMinimizedChange(null);;
       if (workspace_tabs.getAttribute("data-minimize-change") == changeIdentifier) workspace_tabs.removeAttribute("data-minimize-change");
     },transitionDuration);
   }
 
-  close(): void {
-    this.removeAttribute("active");
-    if (this.matches(".minimize")){
-      const transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
-      window.setTimeout(() => this.minimize(),transitionDuration);
+  function close(): void {
+    setActive(false);
+    if (minimized()){
+      const transitionDuration = parseInt(`${Number(getElementStyle({ element: thiss, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
+      window.setTimeout(() => minimize(),transitionDuration);
     }
-    if (this.type == "dialog"){
-      document.body.removeEventListener("keydown",Card.#catchCardNavigation);
+    if (props.type == "dialog"){
+      document.body.removeEventListener("keydown",catchCardNavigation);
       card_backdrop.classList.remove("active");
       setActiveDialog(null);
       if (dialogPrevious()){
-        const hidden = (getElementStyle({ element: dialogPrevious()!, property: "visibility" }) == "hidden");
-        (!workspace_editors.contains(dialogPrevious()!) && !hidden) ? dialogPrevious()!.focus({ preventScroll: true }) : activeEditor()?.focus({ preventScroll: true });
+        const prev: HTMLElement = dialogPrevious()!;
+        const hidden = (getElementStyle({ element: prev, property: "visibility" }) == "hidden");
+        (!workspace_editors.contains(prev) && !hidden) ? prev.focus({ preventScroll: true }) : activeEditor()?.focus({ preventScroll: true });
         setDialogPrevious(null);
       }
     }
-    if (this.type == "widget") setActiveWidget(null);
+    if (props.type == "widget") setActiveWidget(null);
   }
+}
 
   /**
    * Gets all navigable elements within a given parent element.
    * 
    * @param options If the scope option is set to `true`, only direct children within the parent element will be selected.
   */
-  static #getNavigableElements({ container, scope = false }: GetNavigableElementsOptions): HTMLElement[] {
+  function getNavigableElements({ container, scope = false }: GetNavigableElementsOptions): HTMLElement[] {
     scope = (scope) ? "" : ":scope > ";
     const navigable: NodeListOf<HTMLElement> = container.querySelectorAll(`${scope}button:not([disabled]), ${scope}textarea:not([disabled]), ${scope}input:not([disabled]), ${scope}select:not([disabled]), ${scope}a[href]:not([disabled]), ${scope}[tabindex]:not([tabindex="-1"])`);
     return Array.from(navigable).filter(element => (getElementStyle({ element, property: "display" }) != "none"));
   }
 
-  static #catchCardNavigation(event: KeyboardEvent): void {
+  function catchCardNavigation(event: KeyboardEvent): void {
     if (!activeDialog() || event.key != "Tab" || document.activeElement != document.body) return;
-    const navigable = Card.#getNavigableElements({ container: activeDialog()!, scope: true });
+    const activeDialogg = document.querySelector<HTMLDivElement>(`#${activeDialog()!}`)!;
+    const navigable = getNavigableElements({ container: activeDialogg, scope: true });
     event.preventDefault();
     navigable[((!event.shiftKey) ? 0 : navigable.length - 1)]?.focus();
   }
-}
 
 export interface GetNavigableElementsOptions {
   container: HTMLElement;
   scope?: boolean | string;
 }
-
-window.customElements.define("ste-card",Card);
-
-declare global {
-  interface HTMLElementTagNameMap {
-    "ste-card": Card;
-  }
-}
-
-export default Card;

@@ -1,6 +1,6 @@
+import CardComponent from "./Card.js";
 import Checkbox from "./Checkbox.js";
-import DecorativeImage from "./DecorativeImage.js";
-import { settings, appearance } from "./STE.js";
+import { settings, appearance, setActiveDialog } from "./STE.js";
 import { replaceText, jsonFormatter, uriEncoder, uuidGenerator } from "./Tools.js";
 import { applyEditingBehavior, clearSiteCaches, showInstallPrompt } from "./dom.js";
 import Settings from "./img/settings.svg";
@@ -18,12 +18,12 @@ export function Main() {
       <div id="scaler" class="scaler"></div>
       <iframe id="preview" class="preview" src="about:blank"></iframe>
       <div id="card_backdrop" class="card-backdrop"></div>
-      <ste-card id="settings_card" type="dialog">
-        <div class="header">
-          <span class="heading">Settings</span>
-        </div>
-        <div class="main">
-          <div class="content">
+      <CardComponent
+        id="settings_card"
+        type="dialog"
+        headerText="Settings"
+        content={
+          <>
             <div class="item list start">
               <div class="select">
                 <label>Default Orientation:</label>
@@ -47,100 +47,98 @@ export function Main() {
                 Automatically Refresh Preview
               </Checkbox>
             </div>
-          </div>
-          <div class="options">
+            </>
+          }
+        options={[
+          <>
             <button id="install_button" onclick={() => showInstallPrompt()}><svg><use href="#install_icon"/></svg>Install</button>
-            <button id="theme_button" onclick={() => theme_card.open()} data-card-previous="theme_card">Customize Theme<svg><use href="#arrow_icon"/></svg></button>
-          </div>
-          <div class="options">
+            <button id="theme_button" onclick={() => setActiveDialog("theme_card")} data-card-previous="theme_card">Customize Theme<svg><use href="#arrow_icon"/></svg></button>
+          </>,
+          <>
             <button id="clear_site_caches_button" class="warning" onclick={() => clearSiteCaches()}>Clear Cache</button>
             <button class="warning" onclick={() => settings.reset({ confirm: true })}>Reset Settings</button>
-          </div>
-        </div>
-      </ste-card>
-      <ste-card id="theme_card" type="dialog">
-        <div class="header" data-card-parent="settings_card">
-          <span class="heading">Theme</span>
-        </div>
-        <div class="main">
-          <div class="content">
+          </>
+        ]}
+      />
+      <CardComponent
+        id="theme_card"
+        type="dialog"
+        cardParent="settings_card"
+        headerText="Theme"
+        content={[
             <div class="item list">
               <span style="line-height: 1.6;">Custom workspace theme settings<br/>will be featured in a later update.</span>
-            </div>
-            {/* <div class="item list expand">
-              <num-text ref={ref => applyEditingBehavior(ref)} id="theme_setting" placeholder="CSS to modify..."></num-text>
-            </div> */}
-          </div>
-          {/* <div class="options">
-            <button onclick={() => resetTheme()}>Reset Theme</button>
-          </div> */}
-        </div>
-      </ste-card>
-      <ste-card id="preview_base_card" type="dialog">
-        <div class="header">
-          <span class="heading">Base URL</span>
-        </div>
-        <div class="main">
-          <div class="content">
+            </div>,
+            // <div class="item list expand">
+            //   <num-text ref={ref => applyEditingBehavior(ref)} id="theme_setting" placeholder="CSS to modify..."></num-text>
+            // </div>
+        ]}
+        options={[
+          // <div class="options">
+          //   <button onclick={() => resetTheme()}>Reset Theme</button>
+          // </div>
+        ]}
+      />
+      <CardComponent
+        id="preview_base_card"
+        type="dialog"
+        headerText="Base URL"
+        content={[
             <div class="item list expand">
               <input ref={ref => applyEditingBehavior(ref)} id="preview_base_input" type="url"/>
             </div>
-          </div>
+        ]}
+        options={[
           <div class="options">
             <button onclick={() => preview_base_input.reset()}>Reset</button>
           </div>
-        </div>
-      </ste-card>
-      <ste-card id="reset_settings_card" type="alert">
-        <div class="header">
-          <DecorativeImage class="icon" src={Settings} alt=""/>
-          <span class="heading">Reset Settings</span>
-        </div>
-        <div class="main">
-          <div class="content">
+        ]}
+      />
+      <CardComponent
+        id="reset_settings_card"
+        type="alert"
+        headerIcon={Settings}
+        headerText="Reset Settings"
+        content={[
             <div class="item">Your settings have been reset!</div>
-          </div>
-        </div>
-      </ste-card>
-      <ste-card id="cleared_cache_card" type="alert">
-        <div class="header">
-          <DecorativeImage class="icon" src={Template} alt=""/>
-          <span class="heading">Cleared Cache</span>
-        </div>
-        <div class="main">
-          <div class="content">
-            <div class="item">Successfully cleared offline cache!</div>
-          </div>
-        </div>
-      </ste-card>
-      <ste-card id="replace_text_card" type="widget">
-        <div class="header">
-          <span class="heading">Replace Text</span>
-        </div>
-        <div class="main">
-          <div class="content">
+        ]}
+      />
+      <CardComponent
+        id="cleared_cache_card"
+        type="alert"
+        headerIcon={Template}
+        headerText="Cleared Cache"
+        content={[
+           <div class="item">Successfully cleared offline cache!</div>
+        ]}
+      />
+      <CardComponent
+        id="replace_text_card"
+        type="widget"
+        headerText="Replace Text"
+        content={[
             <div class="item list expand">
               <num-text ref={ref => applyEditingBehavior(ref)} id="replacer_find" placeholder="Text to find..."></num-text>
               <num-text ref={ref => applyEditingBehavior(ref)} id="replacer_replace" placeholder="Replace with..."></num-text>
             </div>
-          </div>
+        ]}
+        options={[
           <div class="options">
             <button onclick={() => replaceText.replace()}>Replace</button>
             <button onclick={() => replaceText.flip()}>Flip</button>
             <button onclick={() => replaceText.clear()}>Clear</button>
           </div>
-        </div>
-      </ste-card>
-      <ste-card id="color_picker_card" type="widget">
-        <div class="header">
-          <span class="heading">Color Picker</span>
-        </div>
-        <div class="main">
-          <div class="content">
+        ]}
+      />
+      <CardComponent
+        id="color_picker_card"
+        type="widget"
+        headerText="Color Picker"
+        content={[
             <div class="item list">
               <div id="picker_preview"></div>
               <input ref={ref => applyEditingBehavior(ref)} id="picker_input" type="text" value="#ee8800" maxlength="7" placeholder="#rrggbb"/>
-            </div>
+            </div>,
             <div class="item list">
               <label for="red_channel">Red</label>
               <input id="red_channel" type="range"/>
@@ -149,66 +147,67 @@ export function Main() {
               <label for="blue_channel">Blue</label>
               <input id="blue_channel" type="range"/>
             </div>
-          </div>
+        ]}
+        options={[
           <div class="options">
             <button onclick={() => /* copyPicker() */ {}}>Copy</button>
             <button onclick={() => /* insertPicker() */ {}}>Insert</button>
             <button onclick={() => /* deletePicker() */ {}}>Delete</button>
           </div>
-        </div>
-      </ste-card>
-      <ste-card id="json_formatter_card" type="widget">
-        <div class="header">
-          <span class="heading">JSON Formatter</span>
-        </div>
-        <div class="main">
-          <div class="content">
+        ]}
+      />
+      <CardComponent
+        id="json_formatter_card"
+        type="widget"
+        headerText="JSON Formatter"
+        content={[
             <div class="item expand">
               <num-text ref={ref => applyEditingBehavior(ref)} id="formatter_input" class="expand" syntax-language="json" placeholder="JSON data to format..."></num-text>
             </div>
-          </div>
+        ]}
+        options={[
           <div class="options">
             <button onclick={() => jsonFormatter.format()}>Format</button>
             <button onclick={() => jsonFormatter.collapse()}>Collapse</button>
             <button onclick={() => jsonFormatter.clear()}>Clear</button>
           </div>
-        </div>
-      </ste-card>
-      <ste-card id="uri_encoder_card" type="widget">
-        <div class="header">
-          <span class="heading">URI Encoder</span>
-        </div>
-        <div class="main">
-          <div class="content">
+        ]}
+      />
+      <CardComponent
+        id="uri_encoder_card"
+        type="widget"
+        headerText="URI Encoder"
+        content={[
             <div class="item expand">
               <num-text ref={ref => applyEditingBehavior(ref)} id="encoder_input" class="expand" placeholder="Text to encode..."></num-text>
             </div>
-          </div>
+        ]}
+        options={[
           <div class="options">
             <button onclick={() => uriEncoder.encode()}>Encode</button>
             <button onclick={() => uriEncoder.decode()}>Decode</button>
             <button onclick={() => uriEncoder.clear()}>Clear</button>
-          </div>
+          </div>,
           <div class="options">
             <Checkbox id="encoder_type">Enable URI Component</Checkbox>
           </div>
-        </div>
-      </ste-card>
-      <ste-card id="uuid_generator_card" type="widget">
-        <div class="header">
-          <span class="heading">UUID Generator</span>
-        </div>
-        <div class="main">
-          <div class="content">
+        ]}
+      />
+      <CardComponent
+        id="uuid_generator_card"
+        type="widget"
+        headerText="UUID Generator"
+        content={[
             <div class="item expand">
               <input ref={ref => applyEditingBehavior(ref)} id="generator_output" type="text" placeholder="Result..." readonly/>
             </div>
-          </div>
+        ]}
+        options={[
           <div class="options">
             <button onclick={() => generator_output.value = uuidGenerator.generate()}>Generate</button>
           </div>
-        </div>
-      </ste-card>
+        ]}
+      />
     </main>
   );
 }

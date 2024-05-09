@@ -1,6 +1,5 @@
 import Prism from "./prism.js";
 
-import type Card from "./Card.js";
 import type Editor from "./Editor.js";
 import type { View } from "./Workspace.js";
 import type { Orientation } from "./Workspace.js";
@@ -312,25 +311,27 @@ export const settings = {
     this.previewBase = null;
     preview_base_input.reset();
 
-    if (showPrompt) reset_settings_card.open();
+    if (showPrompt) setActiveAlert("reset_settings_card");
     return true;
   }
 }
 
+export const [activeAlert, setActiveAlert] = createSignal<"reset_settings_card" | "cleared_cache_card" | null>(null);
+
 /**
  * A reference to the currently opened Dialog.
 */
-export const [activeDialog, setActiveDialog] = createSignal<Card | null>(null);
+export const [activeDialog, setActiveDialog] = createSignal<"settings_card" | "theme_card" | "preview_base_card" | null>("theme_card");
 
 /**
  * A reference to the previously opened Dialog, if the active one has a back button.
 */
-export const [dialogPrevious, setDialogPrevious] = createSignal<Card | null>(null);
+export const [dialogPrevious, setDialogPrevious] = createSignal<HTMLElement | null>(null);
 
 /**
  * A reference to the currently opened Widget.
 */
-export const [activeWidget, setActiveWidget] = createSignal<Card | null>(null);
+export const [activeWidget, setActiveWidget] = createSignal<"replace_text_card" | "color_picker_card" | "json_formatter_card" | "uri_encoder_card" | "uuid_generator_card" | null>(null);
 
 /**
  * The color the Color Picker Widget is currently set to.

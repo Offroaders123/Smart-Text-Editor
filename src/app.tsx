@@ -1,7 +1,7 @@
 import { render } from "solid-js/web";
 import { Header } from "./Header.js";
 import { Main } from "./Main.js";
-import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings } from "./STE.js";
+import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, setActiveWidget, setActiveDialog, setActiveAlert } from "./STE.js";
 import "./Card.js";
 import { insertTemplate } from "./Tools.js";
 import Editor from "./Editor.js";
@@ -36,7 +36,7 @@ const queryParameters = new URLSearchParams(window.location.search);
   navigator.serviceWorker.addEventListener("message",async event => {
     switch (event.data.action){
       case "service-worker-activated": activateManifest(); break;
-      case "clear-site-caches-complete": cleared_cache_card.open(); break;
+      case "clear-site-caches-complete": setActiveAlert("cleared_cache_card"); break;
       case "share-target": {
         for (const file of event.data.files as File[]){
           const { name } = file;
@@ -110,7 +110,7 @@ document.body.addEventListener("keydown",event => {
   if (pressed("Escape")){
     event.preventDefault();
     if (event.repeat) return;
-    if (activeDialog() && !document.activeElement?.matches("menu-drop[data-open]")) activeDialog()!.close();
+    if (activeDialog() && !document.activeElement?.matches("menu-drop[data-open]")) setActiveDialog(null);
   }
   if (((control || command) && !shift && pressed("n")) || ((controlShift || shiftCommand) && pressed("x"))){
     event.preventDefault();
@@ -187,32 +187,32 @@ document.body.addEventListener("keydown",event => {
   if ((controlShift || shiftCommand) && pressed("B")){
     event.preventDefault();
     if (event.repeat) return;
-    preview_base_card.open();
+    setActiveDialog("preview_base_card");
   }
   if ((controlShift || shiftCommand) && pressed("f")){
     event.preventDefault();
     if (event.repeat) return;
-    replace_text_card.open();
+    setActiveWidget("replace_text_card");
   }/*
   if ((controlShift || shiftCommand) && pressed("k")){
     event.preventDefault();
     if (event.repeat) return;
-    color_picker_card.open();
+    setActiveWidget("color_picker_card");
   }*/
   if ((controlShift || shiftCommand) && pressed("g")){
     event.preventDefault();
     if (event.repeat) return;
-    json_formatter_card.open();
+    setActiveWidget("json_formatter_card");
   }
   if ((controlShift || shiftCommand) && pressed("y")){
     event.preventDefault();
     if (event.repeat) return;
-    uri_encoder_card.open();
+    setActiveWidget("uri_encoder_card");
   }
   if ((controlShift || shiftCommand) && pressed("o")){
     event.preventDefault();
     if (event.repeat) return;
-    uuid_generator_card.open();
+    setActiveWidget("uuid_generator_card");
   }
   if ((controlShift || shiftCommand) && pressed("h")){
     event.preventDefault();
@@ -229,7 +229,7 @@ document.body.addEventListener("keydown",event => {
   if ((control || command) && (pressed(",") || pressed("<"))){
     event.preventDefault();
     if (event.repeat) return;
-    settings_card.open();
+    setActiveDialog("settings_card");
   }
 },{ capture: true });
 
@@ -246,7 +246,7 @@ document.body.addEventListener("contextmenu",event => {
 document.body.addEventListener("dragover",event => {
   event.preventDefault();
   if (event.dataTransfer === null || !(event.target instanceof Element)) return;
-  event.dataTransfer.dropEffect = (event.target.matches("menu-drop, header, ste-card") || event.target.closest("menu-drop, header, ste-card")) ? "none" : "copy";
+  event.dataTransfer.dropEffect = (event.target.matches("menu-drop, header, .ste-card") || event.target.closest("menu-drop, header, .ste-card")) ? "none" : "copy";
 });
 
 document.body.addEventListener("drop",event => {
@@ -348,7 +348,7 @@ scaler.addEventListener("touchstart",event => {
 
 card_backdrop.addEventListener("click",() => {
   if (activeDialog() === null) return;
-  activeDialog()!.close();
+  setActiveDialog(null);
 });
 
 preview_base_input.placeholder = document.baseURI;
@@ -424,7 +424,7 @@ if (appearance.parentWindow){
   // window.setTimeout(() => {
   //   document.documentElement.classList.remove("startup-fade");
   // },50);
-  Promise.all(["menu-drop","num-text","ste-card"].map(tag => window.customElements.whenDefined(tag)))
+  Promise.all(["menu-drop","num-text"].map(tag => window.customElements.whenDefined(tag)))
     .then(async () => {
       // await new Promise(resolve => setTimeout(resolve,50));
       document.documentElement.classList.remove("startup-fade");
@@ -451,7 +451,7 @@ if (queryParameters.get("template")){
 }
 
 if (queryParameters.get("settings")){
-  settings_card.open();
+  setActiveDialog("settings_card");
   removeQueryParameters(["settings"]);
 }
 
