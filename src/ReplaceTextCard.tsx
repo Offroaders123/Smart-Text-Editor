@@ -1,21 +1,29 @@
+import { createSignal } from "solid-js";
 import { Widget } from "./Card.js";
 import { activeEditor } from "./STE.js";
 import { applyEditingBehavior } from "./dom.js";
 
 export default function ReplaceTextCard() {
+  const [findValue, setFindValue] = createSignal<string>("");
+  const [replaceValue, setReplaceValue] = createSignal<string>("");
+
   function replace(): void {
     const editor = activeEditor();
     if (!editor) return;
-    const replaced = editor.value.split(replacer_find.value).join(replacer_replace.value);
+    const replaced = editor.value.split(findValue()).join(replaceValue());
     if (replaced != editor.value) editor.value = replaced;
   }
 
   function flip(): void {
-    [replacer_find.value,replacer_replace.value] = [replacer_replace.value,replacer_find.value];
+    const find = findValue();
+    const replace = replaceValue();
+    setFindValue(replace);
+    setReplaceValue(find);
   }
 
   function clear(): void {
-    [replacer_find.value,replacer_replace.value] = ["",""];
+    setFindValue("");
+    setReplaceValue("");
   }
 
   return (
@@ -26,13 +34,15 @@ export default function ReplaceTextCard() {
         <div class="item list expand">
           <num-text
             ref={ref => applyEditingBehavior(ref)}
-            id="replacer_find"
             placeholder="Text to find..."
+            value={findValue()}
+            oninput={event => setFindValue(event.currentTarget.value)}
           />
           <num-text
             ref={ref => applyEditingBehavior(ref)}
-            id="replacer_replace"
             placeholder="Replace with..."
+            value={replaceValue()}
+            oninput={event => setReplaceValue(event.currentTarget.value)}
           />
         </div>
       ]}

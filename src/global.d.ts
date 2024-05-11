@@ -70,8 +70,6 @@ declare global {
   var cleared_cache_card: Card;
 
   var replace_text_card: Card;
-  var replacer_find: NumTextElement;
-  var replacer_replace: NumTextElement;
 
   var color_picker_card: Card;
   var picker_preview: HTMLDivElement;
