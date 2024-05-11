@@ -1,11 +1,14 @@
+import { createSignal } from "solid-js";
 import { Widget } from "./Card.js";
 import { applyEditingBehavior } from "./dom.js";
 
 export default function JSONFormatterCard() {
+  const [value, setValue] = createSignal<string>("");
+
   function format(spacing: string | number = "  "): void {
     try {
-      const formatted = JSON.stringify(JSON.parse(formatter_input.value),null,spacing);
-      if (formatted != formatter_input.value) formatter_input.value = formatted;
+      const formatted = JSON.stringify(JSON.parse(value()),null,spacing);
+      if (formatted != value()) setValue(formatted);
     } catch (error: any){
       /* ~~Make~~ Made matching for "position" optional, as Safari doesn't give JSON parsing error data, it only says that an error occurred. */
       try {
@@ -14,8 +17,8 @@ export default function JSONFormatterCard() {
 
         let errorLine: number;
         const errorLineIndex: number = (() => {
-          const lineIndexes = indexi("\n",formatter_input.value);
-          errorLine = formatter_input.value.substring(0,errorIndex).split("\n").length - 1;
+          const lineIndexes = indexi("\n",value());
+          errorLine = value().substring(0,errorIndex).split("\n").length - 1;
           return lineIndexes[errorLine - 1] || 1;
         })();
         const errorPosition = errorIndex - errorLineIndex + 1;
@@ -32,7 +35,7 @@ export default function JSONFormatterCard() {
   }
 
   function clear(): void {
-    formatter_input.value = "";
+    setValue("");
   }
 
   return (
@@ -42,11 +45,14 @@ export default function JSONFormatterCard() {
       mainContent={[
         <div class="item expand">
           <num-text
-            ref={ref => applyEditingBehavior(ref)}
-            id="formatter_input"
+            ref={ref => {
+              applyEditingBehavior(ref);
+              ref.editor.onchange = () => setValue(ref.value);
+            }}
             class="expand"
             syntax-language="json"
             placeholder="JSON data to format..."
+            value={value()}
           />
         </div>
       ]}

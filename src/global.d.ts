@@ -79,7 +79,6 @@ declare global {
   var blue_channel: HTMLInputElement;
 
   var json_formatter_card: Card;
-  var formatter_input: NumTextElement;
 
   var uri_encoder_card: Card;
   var encoder_input: NumTextElement;
