@@ -1526,7 +1526,7 @@ ste-card input:is([type="text"],[type="url"]) {
   width: calc(var(--input-count,0) * 1ch);
 }
 
-#generator_output {
+#uuid_generator_card input[type="text"] {
   width: 220px;
   cursor: grab;
 }

@@ -1,7 +1,10 @@
+import { createSignal } from "solid-js";
 import { Widget } from "./Card.js";
 import { applyEditingBehavior } from "./dom.js";
 
 export default function UUIDGeneratorCard() {
+  const [value, setValue] = createSignal<string>("");
+
   return (
     <Widget
       id="uuid_generator_card"
@@ -10,30 +13,24 @@ export default function UUIDGeneratorCard() {
         <div class="item expand">
           <input
             ref={ref => applyEditingBehavior(ref)}
-            id="generator_output"
             type="text"
             placeholder="Result..."
             readonly
+            value={value()}
+            onclick={event => event.currentTarget.select()}
+            onkeydown={event => event.currentTarget.click()}
           />
         </div>
       ]}
       options={[
         <button
-          onclick={() => generator_output.value = generate()}>
+          onclick={() => setValue(generate())}>
           Generate
         </button>
       ]}
     />
   );
 }
-
-generator_output.addEventListener("click",() => {
-  generator_output.select();
-});
-
-generator_output.addEventListener("keydown",() => {
-  generator_output.click();
-});
 
 export const generate: () => string = (() => {
   const lut: string[] = [];

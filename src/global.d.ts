@@ -93,7 +93,6 @@ declare global {
   var encoder_type: HTMLInputElement;
 
   var uuid_generator_card: Card;
-  var generator_output: HTMLInputElement;
 }
 
 declare module "solid-js" {
