@@ -27,6 +27,14 @@ export default function UUIDGeneratorCard() {
   );
 }
 
+generator_output.addEventListener("click",() => {
+  generator_output.select();
+});
+
+generator_output.addEventListener("keydown",() => {
+  generator_output.click();
+});
+
 export const generate: () => string = (() => {
   const lut: string[] = [];
   for (let i = 0; i < 256; i++) lut[i] = ((i < 16) ? "0" : "") + i.toString(16);

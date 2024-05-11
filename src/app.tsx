@@ -351,53 +351,6 @@ card_backdrop.addEventListener("click",() => {
   activeDialog()!.close();
 });
 
-preview_base_input.placeholder = document.baseURI;
-
-preview_base_input.setWidth = () => {
-  preview_base_input.style.setProperty("--input-count",preview_base_input.value.length.toString());
-};
-
-preview_base_input.setValue = value => {
-  preview_base_input.value = value;
-  preview_base_input.setWidth();
-};
-
-preview_base_input.reset = () => {
-  preview_base_input.setValue("");
-  settings.previewBase = null;
-  refreshPreview({ force: true });
-};
-
-preview_base_input.style.setProperty("--placeholder-count",preview_base_input.placeholder.length.toString());
-
-preview_base_input.addEventListener("input",() => {
-  preview_base_input.setWidth();
-});
-
-preview_base_input.addEventListener("change",event => {
-  if (!(event.target instanceof HTMLInputElement)) return;
-  const empty = event.target.matches(":placeholder-shown");
-  const valid = event.target.matches(":valid");
-
-  if (empty || !valid){
-    settings.previewBase = null;
-  }
-  if (!empty && valid){
-    settings.previewBase = event.target.value;
-  }
-  if (empty || valid){
-    refreshPreview({ force: true });
-  }
-});
-
-generator_output.addEventListener("click",() => {
-  generator_output.select();
-});
-
-generator_output.addEventListener("keydown",() => {
-  generator_output.click();
-});
-
 window.requestAnimationFrame(() => {
   new Editor({ autoCreated: true });
 });
