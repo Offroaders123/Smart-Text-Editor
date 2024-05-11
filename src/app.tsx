@@ -1,7 +1,7 @@
 import { render } from "solid-js/web";
 import { Header } from "./Header.js";
 import { Main } from "./Main.js";
-import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings } from "./STE.js";
+import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, previewBase, setPreviewBase } from "./STE.js";
 import "./Card.js";
 import { insertTemplate } from "./Tools.js";
 import Editor from "./Editor.js";
@@ -12,7 +12,10 @@ const root: HTMLDivElement = document.querySelector("#root")!;
 render(() => (
   <>
     <Header/>
-    <Main/>
+    <Main
+      previewBase={previewBase}
+      setPreviewBase={setPreviewBase}
+    />
   </>
 ), root);
 
@@ -370,9 +373,6 @@ if (appearance.parentWindow){
   }
   if (settings.automaticRefresh !== null){
     automatic_refresh_setting.checked = settings.automaticRefresh;
-  }
-  if (settings.previewBase){
-    preview_base_input.setValue(settings.previewBase);
   }
   // window.setTimeout(() => {
   //   document.documentElement.classList.remove("startup-fade");

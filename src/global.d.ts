@@ -65,11 +65,6 @@ declare global {
   var theme_setting: NumTextElement;
 
   var preview_base_card: Card;
-  var preview_base_input: HTMLInputElement & {
-    setWidth(): void;
-    setValue(value: string): void;
-    reset(): void;
-  };
 
   var reset_settings_card: Card;
   var cleared_cache_card: Card;

@@ -1519,7 +1519,7 @@ ste-card input:is([type="text"],[type="url"]) {
   display: none;
 }
 
-#preview_base_input {
+#preview_base_card input[type="url"] {
   box-sizing: content-box;
   min-width: calc(var(--placeholder-count,0) * 1ch);
   max-width: min(40ch,75vw);

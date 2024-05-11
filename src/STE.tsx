@@ -310,7 +310,7 @@ export const settings = {
     automatic_refresh_setting.checked = true;
 
     this.previewBase = null;
-    preview_base_input.reset();
+    setPreviewBase(null);
 
     if (showPrompt) reset_settings_card.open();
     return true;
@@ -331,6 +331,8 @@ export const [dialogPrevious, setDialogPrevious] = createSignal<Card | null>(nul
  * A reference to the currently opened Widget.
 */
 export const [activeWidget, setActiveWidget] = createSignal<Card | null>(null);
+
+export const [previewBase, setPreviewBase] = createSignal<string | null>(settings.previewBase);
 
 /**
  * The color the Color Picker Widget is currently set to.

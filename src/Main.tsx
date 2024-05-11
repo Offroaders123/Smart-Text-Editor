@@ -9,7 +9,14 @@ import ThemeCard from "./ThemeCard.js";
 import URIEncoderCard from "./URIEncoderCard.js";
 import UUIDGeneratorCard from "./UUIDGeneratorCard.js";
 
-export function Main() {
+import type { Accessor, Setter } from "solid-js";
+
+export interface MainProps {
+  previewBase: Accessor<string | null>;
+  setPreviewBase: Setter<string | null>;
+}
+
+export function Main(props: MainProps) {
   return (
     <main id="main">
       <div id="workspace" class="workspace">
@@ -23,7 +30,10 @@ export function Main() {
       <div id="card_backdrop" class="card-backdrop"></div>
       <SettingsCard/>
       <ThemeCard/>
-      <PreviewBaseCard/>
+      <PreviewBaseCard
+        value={props.previewBase}
+        setValue={props.setPreviewBase}
+      />
       <ResetSettingsCard/>
       <ClearedCacheCard/>
       <ReplaceTextCard/>
