@@ -4,6 +4,24 @@ import { getElementStyle } from "./dom.js";
 
 import type { EditorOptions } from "./Editor.js";
 
+export default function Workspace() {
+  return (
+    <div id="workspace" class="workspace">
+      <div id="workspace_tabs" class="workspace-tabs">
+        <button
+          id="create_editor_button"
+          class="create-editor-button"
+          title="New Editor">
+          <svg>
+            <use href="#close_icon"/>
+          </svg>
+        </button>
+      </div>
+      <div id="workspace_editors" class="workspace-editors"></div>
+    </div>
+  );
+}
+
 export type View = "code" | "split" | "preview";
 
 export interface SetViewOptions {
