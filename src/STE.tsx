@@ -344,6 +344,8 @@ export const [pickerColor, setPickerColor] = createSignal<string | null>(null);
 */
 export const [installPrompt, setInstallPrompt] = createSignal<BeforeInstallPromptEvent | null>(null);
 
+export const [cardBackdropShown, setCardBackdropShown] = createSignal<boolean>(false);
+
 // if (appearance.parentWindow) document.documentElement.classList.add("startup-fade");
 if (appearance.appleHomeScreen) document.documentElement.classList.add("apple-home-screen");
 if (environment.touchDevice) document.documentElement.classList.add("touch-device");

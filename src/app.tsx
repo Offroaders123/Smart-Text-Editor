@@ -349,11 +349,6 @@ scaler.addEventListener("touchstart",event => {
   document.addEventListener("touchend",disableScaling,{ passive: true });
 },{ passive: true });
 
-card_backdrop.addEventListener("click",() => {
-  if (activeDialog() === null) return;
-  activeDialog()!.close();
-});
-
 window.requestAnimationFrame(() => {
   new Editor({ autoCreated: true });
 });

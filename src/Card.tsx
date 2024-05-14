@@ -1,4 +1,4 @@
-import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor } from "./STE.js";
+import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown } from "./STE.js";
 import DecorativeImage from "./DecorativeImage.js";
 import Editor from "./Editor.js";
 import { getElementStyle } from "./dom.js";
@@ -158,7 +158,7 @@ class Card extends HTMLElement {
       });
     }
     this.setAttribute("active","");
-    if (this.type == "widget" && card_backdrop.matches(".active")) card_backdrop.classList.remove("active");
+    if (this.type == "widget" && cardBackdropShown()) setCardBackdropShown(false);
     if (this.type == "alert"){
       const timeoutIdentifier = Math.random().toString();
       this.setAttribute("data-alert-timeout",timeoutIdentifier);
@@ -170,7 +170,7 @@ class Card extends HTMLElement {
     }
     if (this.type == "dialog"){
       document.body.addEventListener("keydown",Card.#catchCardNavigation);
-      card_backdrop.classList.add("active");
+      setCardBackdropShown(true);
       if (!activeDialog() && !dialogPrevious()){
         setDialogPrevious(document.activeElement as Card);
       }
@@ -229,7 +229,7 @@ class Card extends HTMLElement {
     }
     if (this.type == "dialog"){
       document.body.removeEventListener("keydown",Card.#catchCardNavigation);
-      card_backdrop.classList.remove("active");
+      setCardBackdropShown(false);
       setActiveDialog(null);
       if (dialogPrevious()){
         const hidden = (getElementStyle({ element: dialogPrevious()!, property: "visibility" }) == "hidden");

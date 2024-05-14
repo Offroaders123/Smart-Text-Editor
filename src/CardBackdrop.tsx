@@ -1,8 +1,13 @@
+import { activeDialog, cardBackdropShown } from "./STE.js";
+
 export default function CardBackdrop() {
   return (
     <div
-      id="card_backdrop"
-      class="card-backdrop"
+      classList={{ "card-backdrop": true, active: cardBackdropShown() }}
+      onclick={() => {
+        if (activeDialog() === null) return;
+        activeDialog()!.close();
+      }}
     />
   );
 }

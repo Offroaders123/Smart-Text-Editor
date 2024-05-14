@@ -51,8 +51,6 @@ declare global {
   var scaler: HTMLDivElement;
   var preview: HTMLIFrameElement;
 
-  var card_backdrop: HTMLDivElement;
-
   var settings_card: Card;
   var default_orientation_setting: MenuDropElement;
   var syntax_highlighting_setting: HTMLInputElement;
