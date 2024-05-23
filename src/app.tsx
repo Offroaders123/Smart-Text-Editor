@@ -1,7 +1,7 @@
 import { render } from "solid-js/web";
 import { Header } from "./Header.js";
 import { Main } from "./Main.js";
-import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, previewBase, setPreviewBase, setPreview, setScaler, setWorkspace, setWorkspaceEditors, setWorkspaceTabs, workspaceTabs, setCreateEditorButton, createEditorButton } from "./STE.js";
+import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, previewBase, setPreviewBase, setPreview, setScaler, setWorkspace, setWorkspaceEditors, setWorkspaceTabs, setCreateEditorButton, createEditorButton } from "./STE.js";
 import "./Card.js";
 import { insertTemplate } from "./Tools.js";
 import Editor from "./Editor.js";
@@ -306,23 +306,6 @@ for (const menu of app_menubar.querySelectorAll("menu-drop")){
     menu.open();
   });
 }
-
-workspaceTabs()!.addEventListener("keydown",event => {
-  if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-  if (!workspaceTabs()!.contains(document.activeElement) || !(document.activeElement instanceof HTMLElement)) return;
-
-  const identifier = document.activeElement.getAttribute("data-editor-identifier");
-  if (identifier === null) return;
-
-  event.preventDefault();
-
-  if (event.key === "ArrowLeft"){
-    Editor.query(identifier)?.getPrevious()?.tab.focus();
-  }
-  if (event.key === "ArrowRight"){
-    Editor.query(identifier)?.getNext()?.tab.focus();
-  }
-});
 
 createEditorButton()!.addEventListener("keydown",event => {
   if (event.key !== "Enter") return;

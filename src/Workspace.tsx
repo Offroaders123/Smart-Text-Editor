@@ -17,7 +17,23 @@ export default function Workspace(props: WorkspaceProps) {
     <div ref={props.setWorkspace} class="workspace">
       <div
         ref={props.setWorkspaceTabs}
-        class="workspace-tabs">
+        class="workspace-tabs"
+        onkeydown={event => {
+          if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+          if (!workspaceTabs()!.contains(document.activeElement) || !(document.activeElement instanceof HTMLElement)) return;
+        
+          const identifier = document.activeElement.getAttribute("data-editor-identifier");
+          if (identifier === null) return;
+        
+          event.preventDefault();
+        
+          if (event.key === "ArrowLeft"){
+            Editor.query(identifier)?.getPrevious()?.tab.focus();
+          }
+          if (event.key === "ArrowRight"){
+            Editor.query(identifier)?.getNext()?.tab.focus();
+          }
+        }}>
         <button
           ref={props.setCreateEditorButton}
           class="create-editor-button"
