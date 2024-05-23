@@ -324,18 +324,18 @@ workspaceTabs()!.addEventListener("keydown",event => {
   }
 });
 
-createEditorButton().addEventListener("keydown",event => {
+createEditorButton()!.addEventListener("keydown",event => {
   if (event.key !== "Enter") return;
   if (event.repeat){
     event.preventDefault();
   }
 });
 
-createEditorButton().addEventListener("mousedown",event => {
+createEditorButton()!.addEventListener("mousedown",event => {
   event.preventDefault();
 });
 
-createEditorButton().addEventListener("click",() => {
+createEditorButton()!.addEventListener("click",() => {
   new Editor({ autoReplace: false });
 });
 

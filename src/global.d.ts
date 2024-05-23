@@ -42,7 +42,7 @@ declare global {
   var app_omnibox: HTMLDivElement;
   var install_option: HTMLButtonElement;
 
-  var main: HTMLElement;
+  // var main: HTMLElement;
 
   // var workspace: HTMLDivElement;
   // var workspace_tabs: HTMLDivElement;

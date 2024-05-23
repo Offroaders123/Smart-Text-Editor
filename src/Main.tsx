@@ -28,7 +28,7 @@ export interface MainProps {
 
 export function Main(props: MainProps) {
   return (
-    <main id="main">
+    <main>
       <Workspace
         setWorkspace={props.setWorkspace}
         setWorkspaceTabs={props.setWorkspaceTabs}

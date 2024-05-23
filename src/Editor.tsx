@@ -110,7 +110,7 @@ export class Editor extends NumTextElement {
   constructor({ name = "Untitled.txt", value = "", handle, open = true, autoCreated = false, autoReplace = true }: EditorOptions = {}) {
     super();
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
-    const create_editor_button: HTMLButtonElement = createEditorButton();
+    const create_editor_button: HTMLButtonElement = createEditorButton()!;
     const workspace_editors: HTMLDivElement = workspaceEditors()!;
 
     this.#name = (!name.includes(".")) ? `${name}.txt` : name;
