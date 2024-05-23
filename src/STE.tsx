@@ -346,6 +346,8 @@ export const [installPrompt, setInstallPrompt] = createSignal<BeforeInstallPromp
 
 export const [cardBackdropShown, setCardBackdropShown] = createSignal<boolean>(false);
 
+export const [preview, setPreview] = createSignal<HTMLIFrameElement | null>(null);
+
 // if (appearance.parentWindow) document.documentElement.classList.add("startup-fade");
 if (appearance.appleHomeScreen) document.documentElement.classList.add("apple-home-screen");
 if (environment.touchDevice) document.documentElement.classList.add("touch-device");

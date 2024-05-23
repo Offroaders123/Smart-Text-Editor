@@ -1,7 +1,13 @@
-export default function Preview() {
+import type { Setter } from "solid-js";
+
+export interface PreviewProps {
+  setPreview: Setter<HTMLIFrameElement | null>;
+}
+
+export default function Preview(props: PreviewProps) {
   return (
     <iframe
-      id="preview"
+      ref={props.setPreview}
       class="preview"
       src="about:blank"
     />

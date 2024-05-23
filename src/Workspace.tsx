@@ -1,4 +1,4 @@
-import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, environment } from "./STE.js";
+import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, environment, preview as getPreview } from "./STE.js";
 import Editor from "./Editor.js";
 import { getElementStyle } from "./dom.js";
 
@@ -65,6 +65,7 @@ export type Orientation = "horizontal" | "vertical";
 */
 export async function setOrientation(orientationValue?: Orientation): Promise<void> {
   if (orientationChange() || scalingChange()) return;
+  const preview: HTMLIFrameElement = getPreview();
 
   document.body.setAttribute("data-orientation-change","");
   const param: boolean = orientationValue !== undefined;
@@ -286,7 +287,8 @@ export async function refreshPreview({ force = false }: RefreshPreviewOptions = 
   if (editor === null) return;
   const change: boolean = editor.refresh && !settings.automaticRefresh;
   if (!change && !force) return;
-
+  
+  const preview: HTMLIFrameElement = getPreview();
   const baseURL: string | null = settings.previewBase;
   let source: string = editor.editor.value;
   if (baseURL !== null){
@@ -310,6 +312,7 @@ export async function refreshPreview({ force = false }: RefreshPreviewOptions = 
  * Sets the Split mode scaling when called from the Scaler's moving event listeners.
 */
 export function setScaling(event: MouseEvent | TouchEvent): void {
+  const preview: HTMLIFrameElement = getPreview();
   const { safeAreaInsets } = appearance;
   let scalingOffset = 0;
   const scalingRange = {
@@ -343,6 +346,7 @@ export function disableScaling(event: MouseEvent | TouchEvent): void {
 */
 function removeScaling(): void {
   if (!document.body.hasAttribute("data-scaling-active")) return;
+  const preview: HTMLIFrameElement = getPreview();
   document.body.removeAttribute("data-scaling-active");
   workspace.style.removeProperty("--scaling-offset");
   scaler.style.removeProperty("--scaling-offset");

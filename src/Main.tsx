@@ -16,6 +16,7 @@ import Workspace from "./Workspace.js";
 import type { Accessor, Setter } from "solid-js";
 
 export interface MainProps {
+  setPreview: Setter<HTMLIFrameElement | null>;
   previewBase: Accessor<string | null>;
   setPreviewBase: Setter<string | null>;
 }
@@ -25,7 +26,9 @@ export function Main(props: MainProps) {
     <main id="main">
       <Workspace/>
       <Scaler/>
-      <Preview/>
+      <Preview
+        setPreview={props.setPreview}
+      />
       <CardBackdrop/>
       <SettingsCard/>
       <ThemeCard/>

@@ -49,7 +49,7 @@ declare global {
   var create_editor_button: HTMLButtonElement;
   var workspace_editors: HTMLDivElement;
   var scaler: HTMLDivElement;
-  var preview: HTMLIFrameElement;
+  // var preview: HTMLIFrameElement;
 
   var settings_card: Card;
   var default_orientation_setting: MenuDropElement;

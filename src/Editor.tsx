@@ -1,5 +1,5 @@
 import Prism from "./prism.js";
-import { activeEditor, settings, setActiveEditor, activeDialog, environment, appearance, previewEditor } from "./STE.js";
+import { activeEditor, settings, setActiveEditor, activeDialog, environment, appearance, previewEditor, preview as getPreview } from "./STE.js";
 import { setPreviewSource, refreshPreview } from "./Workspace.js";
 import { getElementStyle, applyEditingBehavior, setTitle } from "./dom.js";
 
@@ -329,6 +329,7 @@ export class Editor extends NumTextElement {
       if (!confirmation) return;
     }
 
+    const preview: HTMLIFrameElement = getPreview();
     const editorTabs = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
     const changeIdentifier: string = Math.random().toString();
     const focused: boolean = document.activeElement === this;
