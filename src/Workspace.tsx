@@ -37,7 +37,19 @@ export default function Workspace(props: WorkspaceProps) {
         <button
           ref={props.setCreateEditorButton}
           class="create-editor-button"
-          title="New Editor">
+          title="New Editor"
+          onkeydown={event => {
+            if (event.key !== "Enter") return;
+            if (event.repeat){
+              event.preventDefault();
+            }
+          }}
+          onmousedown={event => {
+            event.preventDefault();
+          }}
+          onclick={() => {
+            new Editor({ autoReplace: false });
+          }}>
           <svg>
             <use href="#close_icon"/>
           </svg>

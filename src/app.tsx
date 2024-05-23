@@ -1,7 +1,7 @@
 import { render } from "solid-js/web";
 import { Header } from "./Header.js";
 import { Main } from "./Main.js";
-import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, previewBase, setPreviewBase, setPreview, setScaler, setWorkspace, setWorkspaceEditors, setWorkspaceTabs, setCreateEditorButton, createEditorButton } from "./STE.js";
+import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, previewBase, setPreviewBase, setPreview, setScaler, setWorkspace, setWorkspaceEditors, setWorkspaceTabs, setCreateEditorButton } from "./STE.js";
 import "./Card.js";
 import { insertTemplate } from "./Tools.js";
 import Editor from "./Editor.js";
@@ -306,21 +306,6 @@ for (const menu of app_menubar.querySelectorAll("menu-drop")){
     menu.open();
   });
 }
-
-createEditorButton()!.addEventListener("keydown",event => {
-  if (event.key !== "Enter") return;
-  if (event.repeat){
-    event.preventDefault();
-  }
-});
-
-createEditorButton()!.addEventListener("mousedown",event => {
-  event.preventDefault();
-});
-
-createEditorButton()!.addEventListener("click",() => {
-  new Editor({ autoReplace: false });
-});
 
 window.requestAnimationFrame(() => {
   new Editor({ autoCreated: true });
