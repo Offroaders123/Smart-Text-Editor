@@ -1,12 +1,17 @@
-import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, environment, preview as getPreview, scaler as getScaler } from "./STE.js";
+import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, environment, preview as getPreview, scaler as getScaler, workspace as getWorkspace } from "./STE.js";
 import Editor from "./Editor.js";
 import { getElementStyle } from "./dom.js";
 
+import type { Setter } from "solid-js";
 import type { EditorOptions } from "./Editor.js";
 
-export default function Workspace() {
+export interface WorkspaceProps {
+  setWorkspace: Setter<HTMLDivElement | null>;
+}
+
+export default function Workspace(props: WorkspaceProps) {
   return (
-    <div id="workspace" class="workspace">
+    <div ref={props.setWorkspace} class="workspace">
       <div id="workspace_tabs" class="workspace-tabs">
         <button
           id="create_editor_button"
@@ -34,6 +39,7 @@ export interface SetViewOptions {
 export async function setView(type: View, { force = false }: SetViewOptions = {}): Promise<void> {
   if ((orientationChange() && !force) || scalingChange()) return;
 
+  const workspace: HTMLDivElement = getWorkspace();
   const changeIdentifier: string = Math.random().toString();
   document.body.setAttribute("data-view-change",changeIdentifier);
 
@@ -65,7 +71,8 @@ export type Orientation = "horizontal" | "vertical";
 */
 export async function setOrientation(orientationValue?: Orientation): Promise<void> {
   if (orientationChange() || scalingChange()) return;
-  const scaler: HTMLDivElement = getScaler();
+  const workspace: HTMLDivElement = getWorkspace();
+  const scaler: HTMLDivElement = getScaler()!;
   const preview: HTMLIFrameElement = getPreview()!;
 
   document.body.setAttribute("data-orientation-change","");
@@ -313,7 +320,8 @@ export async function refreshPreview({ force = false }: RefreshPreviewOptions = 
  * Sets the Split mode scaling when called from the Scaler's moving event listeners.
 */
 export function setScaling(event: MouseEvent | TouchEvent): void {
-  const scaler: HTMLDivElement = getScaler();
+  const workspace: HTMLDivElement = getWorkspace();
+  const scaler: HTMLDivElement = getScaler()!;
   const preview: HTMLIFrameElement = getPreview()!;
   const { safeAreaInsets } = appearance;
   let scalingOffset = 0;
@@ -348,7 +356,8 @@ export function disableScaling(event: MouseEvent | TouchEvent): void {
 */
 function removeScaling(): void {
   if (!document.body.hasAttribute("data-scaling-active")) return;
-  const scaler: HTMLDivElement = getScaler();
+  const workspace: HTMLDivElement = getWorkspace();
+  const scaler: HTMLDivElement = getScaler()!;
   const preview: HTMLIFrameElement = getPreview()!;
   document.body.removeAttribute("data-scaling-active");
   workspace.style.removeProperty("--scaling-offset");

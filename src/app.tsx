@@ -1,7 +1,7 @@
 import { render } from "solid-js/web";
 import { Header } from "./Header.js";
 import { Main } from "./Main.js";
-import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, previewBase, setPreviewBase, setPreview, setScaler, scaler } from "./STE.js";
+import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, previewBase, setPreviewBase, setPreview, setScaler, scaler, setWorkspace } from "./STE.js";
 import "./Card.js";
 import { insertTemplate } from "./Tools.js";
 import Editor from "./Editor.js";
@@ -13,6 +13,7 @@ render(() => (
   <>
     <Header/>
     <Main
+      setWorkspace={setWorkspace}
       setScaler={setScaler}
       setPreview={setPreview}
       previewBase={previewBase}
@@ -335,7 +336,7 @@ create_editor_button.addEventListener("click",() => {
   new Editor({ autoReplace: false });
 });
 
-scaler().addEventListener("mousedown",event => {
+scaler()!.addEventListener("mousedown",event => {
   if (event.button !== 0) return;
   if (view() !== "split") return;
   event.preventDefault();
@@ -344,7 +345,7 @@ scaler().addEventListener("mousedown",event => {
   document.addEventListener("mouseup",disableScaling);
 });
 
-scaler().addEventListener("touchstart",event => {
+scaler()!.addEventListener("touchstart",event => {
   if (view() !== "split" || event.touches.length !== 1) return;
   document.body.setAttribute("data-scaling-change","");
   document.addEventListener("touchmove",setScaling,{ passive: true });
