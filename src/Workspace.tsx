@@ -8,6 +8,7 @@ import type { EditorOptions } from "./Editor.js";
 export interface WorkspaceProps {
   setWorkspace: Setter<HTMLDivElement | null>;
   setWorkspaceTabs: Setter<HTMLDivElement | null>;
+  setCreateEditorButton: Setter<HTMLButtonElement | null>;
   setWorkspaceEditors: Setter<HTMLDivElement | null>;
 }
 
@@ -18,7 +19,7 @@ export default function Workspace(props: WorkspaceProps) {
         ref={props.setWorkspaceTabs}
         class="workspace-tabs">
         <button
-          id="create_editor_button"
+          ref={props.setCreateEditorButton}
           class="create-editor-button"
           title="New Editor">
           <svg>
@@ -328,7 +329,7 @@ export async function refreshPreview({ force = false }: RefreshPreviewOptions = 
 */
 export function setScaling(event: MouseEvent | TouchEvent): void {
   const workspace: HTMLDivElement = getWorkspace()!;
-  const workspace_tabs: HTMLDivElement = workspaceTabs();
+  const workspace_tabs: HTMLDivElement = workspaceTabs()!;
   const scaler: HTMLDivElement = getScaler()!;
   const preview: HTMLIFrameElement = getPreview()!;
   const { safeAreaInsets } = appearance;

@@ -1,7 +1,7 @@
 import { render } from "solid-js/web";
 import { Header } from "./Header.js";
 import { Main } from "./Main.js";
-import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, previewBase, setPreviewBase, setPreview, setScaler, scaler, setWorkspace, setWorkspaceEditors, setWorkspaceTabs, workspaceTabs } from "./STE.js";
+import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, previewBase, setPreviewBase, setPreview, setScaler, scaler, setWorkspace, setWorkspaceEditors, setWorkspaceTabs, workspaceTabs, setCreateEditorButton, createEditorButton } from "./STE.js";
 import "./Card.js";
 import { insertTemplate } from "./Tools.js";
 import Editor from "./Editor.js";
@@ -15,6 +15,7 @@ render(() => (
     <Main
       setWorkspace={setWorkspace}
       setWorkspaceTabs={setWorkspaceTabs}
+      setCreateEditorButton={setCreateEditorButton}
       setWorkspaceEditors={setWorkspaceEditors}
       setScaler={setScaler}
       setPreview={setPreview}
@@ -306,9 +307,9 @@ for (const menu of app_menubar.querySelectorAll("menu-drop")){
   });
 }
 
-workspaceTabs().addEventListener("keydown",event => {
+workspaceTabs()!.addEventListener("keydown",event => {
   if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-  if (!workspaceTabs().contains(document.activeElement) || !(document.activeElement instanceof HTMLElement)) return;
+  if (!workspaceTabs()!.contains(document.activeElement) || !(document.activeElement instanceof HTMLElement)) return;
 
   const identifier = document.activeElement.getAttribute("data-editor-identifier");
   if (identifier === null) return;
@@ -323,18 +324,18 @@ workspaceTabs().addEventListener("keydown",event => {
   }
 });
 
-create_editor_button.addEventListener("keydown",event => {
+createEditorButton().addEventListener("keydown",event => {
   if (event.key !== "Enter") return;
   if (event.repeat){
     event.preventDefault();
   }
 });
 
-create_editor_button.addEventListener("mousedown",event => {
+createEditorButton().addEventListener("mousedown",event => {
   event.preventDefault();
 });
 
-create_editor_button.addEventListener("click",() => {
+createEditorButton().addEventListener("click",() => {
   new Editor({ autoReplace: false });
 });
 

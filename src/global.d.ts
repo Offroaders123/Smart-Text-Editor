@@ -46,7 +46,7 @@ declare global {
 
   // var workspace: HTMLDivElement;
   // var workspace_tabs: HTMLDivElement;
-  var create_editor_button: HTMLButtonElement;
+  // var create_editor_button: HTMLButtonElement;
   // var workspace_editors: HTMLDivElement;
   // var scaler: HTMLDivElement;
   // var preview: HTMLIFrameElement;

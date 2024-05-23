@@ -186,7 +186,7 @@ class Card extends HTMLElement {
   }
 
   minimize(): void {
-    const workspace_tabs: HTMLDivElement = workspaceTabs();
+    const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const icon = this.controls.minimize.querySelector<SVGUseElement>("svg use")!;
     const main = this.querySelector<HTMLDivElement>(".main")!;
     const changeIdentifier = Math.random().toString();
