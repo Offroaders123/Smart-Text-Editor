@@ -346,6 +346,8 @@ export const [installPrompt, setInstallPrompt] = createSignal<BeforeInstallPromp
 
 export const [cardBackdropShown, setCardBackdropShown] = createSignal<boolean>(false);
 
+export const [scaler, setScaler] = createSignal<HTMLDivElement | null>(null);
+
 export const [preview, setPreview] = createSignal<HTMLIFrameElement | null>(null);
 
 // if (appearance.parentWindow) document.documentElement.classList.add("startup-fade");

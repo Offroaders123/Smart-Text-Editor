@@ -16,6 +16,7 @@ import Workspace from "./Workspace.js";
 import type { Accessor, Setter } from "solid-js";
 
 export interface MainProps {
+  setScaler: Setter<HTMLDivElement | null>;
   setPreview: Setter<HTMLIFrameElement | null>;
   previewBase: Accessor<string | null>;
   setPreviewBase: Setter<string | null>;
@@ -25,7 +26,9 @@ export function Main(props: MainProps) {
   return (
     <main id="main">
       <Workspace/>
-      <Scaler/>
+      <Scaler
+        setScaler={props.setScaler}
+      />
       <Preview
         setPreview={props.setPreview}
       />

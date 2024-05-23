@@ -329,7 +329,7 @@ export class Editor extends NumTextElement {
       if (!confirmation) return;
     }
 
-    const preview: HTMLIFrameElement = getPreview();
+    const preview: HTMLIFrameElement = getPreview()!;
     const editorTabs = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
     const changeIdentifier: string = Math.random().toString();
     const focused: boolean = document.activeElement === this;

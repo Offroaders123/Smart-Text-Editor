@@ -1,7 +1,13 @@
-export default function Scaler() {
+import type { Setter } from "solid-js";
+
+export interface ScalerProps {
+  setScaler: Setter<HTMLDivElement | null>;
+}
+
+export default function Scaler(props: ScalerProps) {
   return (
     <div
-      id="scaler"
+      ref={props.setScaler}
       class="scaler"
     />
   );
