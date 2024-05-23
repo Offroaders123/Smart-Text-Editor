@@ -202,6 +202,7 @@ export function scalingChange(): boolean {
  * Checks if any Editors haven't been saved since their last edits.
 */
 export function unsavedWork(): boolean {
+  const workspace_tabs: HTMLDivElement = workspaceTabs();
   return (!appearance.parentWindow || (workspace_tabs.querySelectorAll(".tab:not([data-editor-change])[data-editor-unsaved]").length == 0));
 }
 
@@ -347,6 +348,8 @@ export const [installPrompt, setInstallPrompt] = createSignal<BeforeInstallPromp
 export const [cardBackdropShown, setCardBackdropShown] = createSignal<boolean>(false);
 
 export const [workspace, setWorkspace] = createSignal<HTMLDivElement | null>(null);
+
+export const [workspaceTabs, setWorkspaceTabs] = createSignal<HTMLDivElement | null>(null);
 
 export const [workspaceEditors, setWorkspaceEditors] = createSignal<HTMLDivElement | null>(null);
 

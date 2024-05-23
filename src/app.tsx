@@ -1,7 +1,7 @@
 import { render } from "solid-js/web";
 import { Header } from "./Header.js";
 import { Main } from "./Main.js";
-import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, previewBase, setPreviewBase, setPreview, setScaler, scaler, setWorkspace, setWorkspaceEditors } from "./STE.js";
+import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, previewBase, setPreviewBase, setPreview, setScaler, scaler, setWorkspace, setWorkspaceEditors, setWorkspaceTabs, workspaceTabs } from "./STE.js";
 import "./Card.js";
 import { insertTemplate } from "./Tools.js";
 import Editor from "./Editor.js";
@@ -14,6 +14,7 @@ render(() => (
     <Header/>
     <Main
       setWorkspace={setWorkspace}
+      setWorkspaceTabs={setWorkspaceTabs}
       setWorkspaceEditors={setWorkspaceEditors}
       setScaler={setScaler}
       setPreview={setPreview}
@@ -305,9 +306,9 @@ for (const menu of app_menubar.querySelectorAll("menu-drop")){
   });
 }
 
-workspace_tabs.addEventListener("keydown",event => {
+workspaceTabs().addEventListener("keydown",event => {
   if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-  if (!workspace_tabs.contains(document.activeElement) || !(document.activeElement instanceof HTMLElement)) return;
+  if (!workspaceTabs().contains(document.activeElement) || !(document.activeElement instanceof HTMLElement)) return;
 
   const identifier = document.activeElement.getAttribute("data-editor-identifier");
   if (identifier === null) return;

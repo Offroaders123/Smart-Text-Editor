@@ -1,4 +1,4 @@
-import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors } from "./STE.js";
+import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs } from "./STE.js";
 import DecorativeImage from "./DecorativeImage.js";
 import Editor from "./Editor.js";
 import { getElementStyle } from "./dom.js";
@@ -186,6 +186,7 @@ class Card extends HTMLElement {
   }
 
   minimize(): void {
+    const workspace_tabs: HTMLDivElement = workspaceTabs();
     const icon = this.controls.minimize.querySelector<SVGUseElement>("svg use")!;
     const main = this.querySelector<HTMLDivElement>(".main")!;
     const changeIdentifier = Math.random().toString();
@@ -228,7 +229,7 @@ class Card extends HTMLElement {
       window.setTimeout(() => this.minimize(),transitionDuration);
     }
     if (this.type == "dialog"){
-      const workspace_editors: HTMLDivElement = workspaceEditors();
+      const workspace_editors: HTMLDivElement = workspaceEditors()!;
       document.body.removeEventListener("keydown",Card.#catchCardNavigation);
       setCardBackdropShown(false);
       setActiveDialog(null);

@@ -1,4 +1,4 @@
-import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, environment, preview as getPreview, scaler as getScaler, workspace as getWorkspace } from "./STE.js";
+import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, environment, preview as getPreview, scaler as getScaler, workspace as getWorkspace, workspaceTabs } from "./STE.js";
 import Editor from "./Editor.js";
 import { getElementStyle } from "./dom.js";
 
@@ -7,13 +7,16 @@ import type { EditorOptions } from "./Editor.js";
 
 export interface WorkspaceProps {
   setWorkspace: Setter<HTMLDivElement | null>;
+  setWorkspaceTabs: Setter<HTMLDivElement | null>;
   setWorkspaceEditors: Setter<HTMLDivElement | null>;
 }
 
 export default function Workspace(props: WorkspaceProps) {
   return (
     <div ref={props.setWorkspace} class="workspace">
-      <div id="workspace_tabs" class="workspace-tabs">
+      <div
+        ref={props.setWorkspaceTabs}
+        class="workspace-tabs">
         <button
           id="create_editor_button"
           class="create-editor-button"
@@ -325,6 +328,7 @@ export async function refreshPreview({ force = false }: RefreshPreviewOptions = 
 */
 export function setScaling(event: MouseEvent | TouchEvent): void {
   const workspace: HTMLDivElement = getWorkspace()!;
+  const workspace_tabs: HTMLDivElement = workspaceTabs();
   const scaler: HTMLDivElement = getScaler()!;
   const preview: HTMLIFrameElement = getPreview()!;
   const { safeAreaInsets } = appearance;

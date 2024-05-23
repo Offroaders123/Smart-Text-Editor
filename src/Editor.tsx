@@ -1,5 +1,5 @@
 import Prism from "./prism.js";
-import { activeEditor, settings, setActiveEditor, activeDialog, environment, appearance, previewEditor, preview as getPreview, workspaceEditors } from "./STE.js";
+import { activeEditor, settings, setActiveEditor, activeDialog, environment, appearance, previewEditor, preview as getPreview, workspaceEditors, workspaceTabs } from "./STE.js";
 import { setPreviewSource, refreshPreview } from "./Workspace.js";
 import { getElementStyle, applyEditingBehavior, setTitle } from "./dom.js";
 
@@ -39,6 +39,7 @@ export class Editor extends NumTextElement {
     if (!identifier) return;
     const editor = this.query(identifier);
     if (editor === null) return;
+    const workspace_tabs: HTMLDivElement = workspaceTabs();
     const { tab } = editor;
     const obstructedLeft: boolean = (tab.offsetLeft <= workspace_tabs.scrollLeft);
     const obstructedRight: boolean = ((tab.offsetLeft + tab.clientWidth) >= (workspace_tabs.scrollLeft + workspace_tabs.clientWidth));
@@ -108,7 +109,8 @@ export class Editor extends NumTextElement {
 
   constructor({ name = "Untitled.txt", value = "", handle, open = true, autoCreated = false, autoReplace = true }: EditorOptions = {}) {
     super();
-    const workspace_editors: HTMLDivElement = workspaceEditors();
+    const workspace_tabs: HTMLDivElement = workspaceTabs();
+    const workspace_editors: HTMLDivElement = workspaceEditors()!;
 
     this.#name = (!name.includes(".")) ? `${name}.txt` : name;
     this.editor.value = value;
@@ -330,7 +332,8 @@ export class Editor extends NumTextElement {
       if (!confirmation) return;
     }
 
-    const workspace_editors: HTMLDivElement = workspaceEditors();
+    const workspace_tabs: HTMLDivElement = workspaceTabs();
+    const workspace_editors: HTMLDivElement = workspaceEditors()!;
     const preview: HTMLIFrameElement = getPreview()!;
     const editorTabs = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
     const changeIdentifier: string = Math.random().toString();
@@ -423,6 +426,7 @@ export class Editor extends NumTextElement {
    * @param wrap Future feature: Add support to toggle the wrapping behavior.
   */
   getPrevious(_wrap: boolean = true): Editor | null {
+    const workspace_tabs: HTMLDivElement = workspaceTabs();
     const { tab } = this;
     const editorTabs: HTMLButtonElement[] = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
     const previousTab: HTMLButtonElement | null = editorTabs[(editorTabs.indexOf(tab) || editorTabs.length) - 1] ?? null;
@@ -439,6 +443,7 @@ export class Editor extends NumTextElement {
    * @param wrap Future feature: Add support to toggle the wrapping behavior.
   */
   getNext(_wrap: boolean = true): Editor | null {
+    const workspace_tabs: HTMLDivElement = workspaceTabs();
     const { tab } = this;
     const editorTabs: HTMLButtonElement[] = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
     const nextTab: HTMLButtonElement | null = editorTabs[(editorTabs.indexOf(tab) !== editorTabs.length - 1) ? editorTabs.indexOf(tab) + 1 : 0] ?? null;
