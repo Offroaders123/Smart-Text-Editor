@@ -121,7 +121,7 @@ export function Header() {
 
 function Omnibox() {
   return (
-    <div id="app_omnibox" class="app-omnibox">
+    <div class="app-omnibox">
       <OmniboxButton
         id="install_option"
         title="Install"

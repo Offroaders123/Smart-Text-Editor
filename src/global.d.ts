@@ -39,7 +39,7 @@ declare global {
   var tools_menu: MenuDropElement;
   var settings_menu: MenuDropElement;
 
-  var app_omnibox: HTMLDivElement;
+  // var app_omnibox: HTMLDivElement;
   var install_option: HTMLButtonElement;
 
   // var main: HTMLElement;
