@@ -1,11 +1,11 @@
 import { render } from "solid-js/web";
 import { Header } from "./Header.js";
 import { Main } from "./Main.js";
-import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, previewBase, setPreviewBase, setPreview, setScaler, scaler, setWorkspace, setWorkspaceEditors, setWorkspaceTabs, workspaceTabs, setCreateEditorButton, createEditorButton } from "./STE.js";
+import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, previewBase, setPreviewBase, setPreview, setScaler, setWorkspace, setWorkspaceEditors, setWorkspaceTabs, workspaceTabs, setCreateEditorButton, createEditorButton } from "./STE.js";
 import "./Card.js";
 import { insertTemplate } from "./Tools.js";
 import Editor from "./Editor.js";
-import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview, setScaling, disableScaling } from "./Workspace.js";
+import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview } from "./Workspace.js";
 
 const root: HTMLDivElement = document.querySelector("#root")!;
 
@@ -338,22 +338,6 @@ createEditorButton()!.addEventListener("mousedown",event => {
 createEditorButton()!.addEventListener("click",() => {
   new Editor({ autoReplace: false });
 });
-
-scaler()!.addEventListener("mousedown",event => {
-  if (event.button !== 0) return;
-  if (view() !== "split") return;
-  event.preventDefault();
-  document.body.setAttribute("data-scaling-change","");
-  document.addEventListener("mousemove",setScaling);
-  document.addEventListener("mouseup",disableScaling);
-});
-
-scaler()!.addEventListener("touchstart",event => {
-  if (view() !== "split" || event.touches.length !== 1) return;
-  document.body.setAttribute("data-scaling-change","");
-  document.addEventListener("touchmove",setScaling,{ passive: true });
-  document.addEventListener("touchend",disableScaling,{ passive: true });
-},{ passive: true });
 
 window.requestAnimationFrame(() => {
   new Editor({ autoCreated: true });
