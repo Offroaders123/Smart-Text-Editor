@@ -1,4 +1,4 @@
-import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown } from "./STE.js";
+import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors } from "./STE.js";
 import DecorativeImage from "./DecorativeImage.js";
 import Editor from "./Editor.js";
 import { getElementStyle } from "./dom.js";
@@ -228,6 +228,7 @@ class Card extends HTMLElement {
       window.setTimeout(() => this.minimize(),transitionDuration);
     }
     if (this.type == "dialog"){
+      const workspace_editors: HTMLDivElement = workspaceEditors();
       document.body.removeEventListener("keydown",Card.#catchCardNavigation);
       setCardBackdropShown(false);
       setActiveDialog(null);

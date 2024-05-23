@@ -7,6 +7,7 @@ import type { EditorOptions } from "./Editor.js";
 
 export interface WorkspaceProps {
   setWorkspace: Setter<HTMLDivElement | null>;
+  setWorkspaceEditors: Setter<HTMLDivElement | null>;
 }
 
 export default function Workspace(props: WorkspaceProps) {
@@ -22,7 +23,10 @@ export default function Workspace(props: WorkspaceProps) {
           </svg>
         </button>
       </div>
-      <div id="workspace_editors" class="workspace-editors"></div>
+      <div
+        ref={props.setWorkspaceEditors}
+        class="workspace-editors"
+      />
     </div>
   );
 }
@@ -39,7 +43,7 @@ export interface SetViewOptions {
 export async function setView(type: View, { force = false }: SetViewOptions = {}): Promise<void> {
   if ((orientationChange() && !force) || scalingChange()) return;
 
-  const workspace: HTMLDivElement = getWorkspace();
+  const workspace: HTMLDivElement = getWorkspace()!;
   const changeIdentifier: string = Math.random().toString();
   document.body.setAttribute("data-view-change",changeIdentifier);
 
@@ -71,7 +75,7 @@ export type Orientation = "horizontal" | "vertical";
 */
 export async function setOrientation(orientationValue?: Orientation): Promise<void> {
   if (orientationChange() || scalingChange()) return;
-  const workspace: HTMLDivElement = getWorkspace();
+  const workspace: HTMLDivElement = getWorkspace()!;
   const scaler: HTMLDivElement = getScaler()!;
   const preview: HTMLIFrameElement = getPreview()!;
 
@@ -320,7 +324,7 @@ export async function refreshPreview({ force = false }: RefreshPreviewOptions = 
  * Sets the Split mode scaling when called from the Scaler's moving event listeners.
 */
 export function setScaling(event: MouseEvent | TouchEvent): void {
-  const workspace: HTMLDivElement = getWorkspace();
+  const workspace: HTMLDivElement = getWorkspace()!;
   const scaler: HTMLDivElement = getScaler()!;
   const preview: HTMLIFrameElement = getPreview()!;
   const { safeAreaInsets } = appearance;
@@ -356,7 +360,7 @@ export function disableScaling(event: MouseEvent | TouchEvent): void {
 */
 function removeScaling(): void {
   if (!document.body.hasAttribute("data-scaling-active")) return;
-  const workspace: HTMLDivElement = getWorkspace();
+  const workspace: HTMLDivElement = getWorkspace()!;
   const scaler: HTMLDivElement = getScaler()!;
   const preview: HTMLIFrameElement = getPreview()!;
   document.body.removeAttribute("data-scaling-active");

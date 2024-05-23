@@ -348,6 +348,8 @@ export const [cardBackdropShown, setCardBackdropShown] = createSignal<boolean>(f
 
 export const [workspace, setWorkspace] = createSignal<HTMLDivElement | null>(null);
 
+export const [workspaceEditors, setWorkspaceEditors] = createSignal<HTMLDivElement | null>(null);
+
 export const [scaler, setScaler] = createSignal<HTMLDivElement | null>(null);
 
 export const [preview, setPreview] = createSignal<HTMLIFrameElement | null>(null);

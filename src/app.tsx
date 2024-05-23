@@ -1,7 +1,7 @@
 import { render } from "solid-js/web";
 import { Header } from "./Header.js";
 import { Main } from "./Main.js";
-import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, previewBase, setPreviewBase, setPreview, setScaler, scaler, setWorkspace } from "./STE.js";
+import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, previewBase, setPreviewBase, setPreview, setScaler, scaler, setWorkspace, setWorkspaceEditors } from "./STE.js";
 import "./Card.js";
 import { insertTemplate } from "./Tools.js";
 import Editor from "./Editor.js";
@@ -14,6 +14,7 @@ render(() => (
     <Header/>
     <Main
       setWorkspace={setWorkspace}
+      setWorkspaceEditors={setWorkspaceEditors}
       setScaler={setScaler}
       setPreview={setPreview}
       previewBase={previewBase}
