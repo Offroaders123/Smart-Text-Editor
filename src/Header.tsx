@@ -3,6 +3,7 @@ import Menubar from "./Menubar.js";
 import { refreshPreview } from "./Workspace.js";
 import { showInstallPrompt } from "./dom.js";
 import Icon from "/img/icon.svg";
+import "./Header.scss";
 
 import type { JSX } from "solid-js";
 

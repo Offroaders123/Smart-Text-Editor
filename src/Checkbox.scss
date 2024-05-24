@@ -1,0 +1,75 @@
+.checkbox {
+  margin: calc(var(--checkbox-padding) * -1);
+  padding: calc(var(--checkbox-padding) - var(--checkbox-border-width));
+  --checkbox-padding: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: var(--checkbox-border-width) solid transparent;
+  --checkbox-border-width: 1px;
+  --checkbox-check-border-width: 2px;
+  border-radius: calc(var(--checkbox-padding) + var(--checkbox-border-width) + var(--checkbox-check-border-width));
+  outline: none;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transition: var(--transition-fast);
+  transition-property: color, border-color, opacity;
+}
+
+.checkbox:where(:hover,:active,:focus-visible) {
+  color: #ffffff;
+}
+
+.checkbox:active {
+  opacity: 0.85;
+}
+
+.checkbox:focus-visible {
+  border-color: #c0c0c0;
+}
+
+.checkbox input[type="checkbox"] {
+  display: none;
+}
+
+.checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  --check-padding: 2px;
+  --check-size: 12px;
+  pointer-events: none;
+}
+
+.checkbox label::before {
+  content: "";
+  padding: var(--check-padding);
+  width: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));
+  height: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));
+  /* aspect-ratio: 1 / 1; */
+  background: #ffffff0c;
+  border: var(--checkbox-check-border-width) solid currentColor;
+  border-radius: calc(var(--check-padding) + calc(var(--checkbox-check-border-width) * 2));
+  transition: background-color var(--transition-fast);
+}
+
+.checkbox:where(:hover,:active,:focus-visible) label::before {
+  background: #ffffff1c;
+}
+
+.checkbox label .check {
+  padding: calc(var(--check-padding) + var(--checkbox-check-border-width));
+  position: absolute;
+  width: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));
+  height: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));
+  /* aspect-ratio: 1 / 1; */
+  fill: currentColor;
+  transform: rotate(-45deg) scale(0);
+  transform-origin: 45% 65%;
+  transition: transform 125ms ease-in;
+}
+
+.checkbox input[type="checkbox"]:checked + label .check {
+  transform: rotate(0deg) scale(1);
+  transition-timing-function: ease-out;
+}

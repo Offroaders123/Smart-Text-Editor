@@ -1,4 +1,5 @@
 import { activeDialog, cardBackdropShown } from "./STE.js";
+import "./CardBackdrop.scss";
 
 export default function CardBackdrop() {
   return (

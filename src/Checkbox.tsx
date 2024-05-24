@@ -1,3 +1,5 @@
+import "./Checkbox.scss";
+
 import type { JSX, FlowProps } from "solid-js";
 
 export interface CheckboxProps {

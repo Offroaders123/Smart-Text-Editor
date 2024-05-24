@@ -2,6 +2,7 @@ import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setAc
 import DecorativeImage from "./DecorativeImage.js";
 import Editor from "./Editor.js";
 import { getElementStyle } from "./dom.js";
+import "./Card.scss";
 
 import type { JSX } from "solid-js";
 

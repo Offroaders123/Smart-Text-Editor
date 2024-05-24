@@ -12,6 +12,7 @@ import ThemeCard from "./ThemeCard.js";
 import URIEncoderCard from "./URIEncoderCard.js";
 import UUIDGeneratorCard from "./UUIDGeneratorCard.js";
 import Workspace from "./Workspace.js";
+import "./Main.scss";
 
 import type { Accessor, Setter } from "solid-js";
 

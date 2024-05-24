@@ -1,0 +1,22 @@
+.card-backdrop {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: #1e1e1e60;
+  z-index: 3;
+  transition: calc(var(--main-transition-duration) * 0.5);
+  transition-property: visibility, opacity;
+}
+
+.card-backdrop:not(.active) {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.card-backdrop.active {
+  visibility: visible;
+  opacity: 1;
+}

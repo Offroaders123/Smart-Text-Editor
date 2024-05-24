@@ -1,0 +1,153 @@
+header {
+  padding-top: calc(var(--safe-area-inset-top) + var(--titlebar-area-inset-top));
+  position: relative;
+  --header-height: max(var(--titlebar-area-inset-height),34px);
+  display: flex;
+  align-items: center;
+  --header-gap: 8px;
+  gap: var(--header-gap);
+  font-size: 13px;
+  background: #1e1e1e;
+  border-bottom: 1px solid #000000;
+
+  &::before, &::after {
+    content: "";
+    height: var(--header-height);
+    flex-shrink: 0;
+    -webkit-app-region: no-drag;
+  }
+
+  &::before {
+    width: calc(var(--safe-area-inset-left) + var(--titlebar-area-inset-width-left));
+  }
+
+  &::after {
+    width: calc(var(--safe-area-inset-right) + var(--titlebar-area-inset-width-right));
+  }
+
+  body[data-scaling-change] & {
+    pointer-events: none;
+  }
+
+  & .app-region {
+    margin: var(--app-region-margin);
+    margin-bottom: 0;
+    --app-region-margin: 4px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: calc(100% - var(--app-region-margin) * 2);
+    height: calc(100% - var(--app-region-margin));
+    z-index: -1;
+    -webkit-app-region: drag;
+
+    @media (display-mode: window-controls-overlay) {
+      --app-region-margin: calc(var(--titlebar-area-inset-height) * 0.12);
+    }
+  }
+
+  & .app-icon {
+    flex-shrink: 0;
+    display: flex;
+
+    @media (display-mode: window-controls-overlay) {
+      :root.macOS-device & {
+        display: none;
+      }
+    }
+
+    & img {
+      width: 16px;
+      height: 16px;
+      /* aspect-ratio: 1 / 1; */
+    }
+  }
+
+  & .app-menubar {
+    min-width: 0;
+    align-self: stretch;
+    display: flex;
+    z-index: 3;
+    -webkit-app-region: no-drag;
+
+    & menu-drop {
+      min-width: 0;
+
+      &::part(opener) {
+        min-width: unset;
+        padding: 0 8px;
+        background: none;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      &::part(opener):where(:hover,:focus-visible),
+      &[data-open]::part(opener) {
+        color: #ffffff;
+        background: #ffffff24;
+      }
+    }
+  }
+
+  & .app-omnibox {
+    margin-left: auto;
+    height: var(--header-height);
+    align-self: flex-start;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--header-gap);
+    color: #ffffff;
+
+    @media (display-mode: window-controls-overlay) {
+      :root:not(.startup-fade) & {
+        z-index: 5;
+      }
+
+      :root:not(.macOS-device) & {
+        margin-right: calc(var(--header-gap) * -1);
+      }
+
+      :root.macOS-device & {
+        margin-right: -4px;
+      }
+    }
+
+    & button {
+      background: none;
+      border: none;
+      outline: none;
+    }
+
+    & a {
+      cursor: default;
+    }
+
+    & .option {
+      padding: 5px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      border-radius: 12px;
+      outline: none;
+      transition: background-color 250ms linear;
+      -webkit-app-region: no-drag;
+
+      &:hover {
+        background-color: #ffffff14;
+      }
+
+      &:where(:active,:focus-visible) {
+        background-color: #ffffff22;
+      }
+
+      & svg {
+        width: 14px;
+        height: 14px;
+        /* aspect-ratio: 1 / 1; */
+        flex-shrink: 0;
+        fill: currentColor;
+      }
+    }
+  }
+}
