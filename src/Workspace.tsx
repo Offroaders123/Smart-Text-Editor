@@ -1,5 +1,7 @@
-import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, workspaceTabs } from "./STE.js";
+import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace } from "./STE.js";
 import Editor from "./Editor.js";
+import WorkspaceTabs from "./WorkspaceTabs.js";
+import WorkspaceEditors from "./WorkspaceEditors.js";
 import { getElementStyle } from "./dom.js";
 
 import type { Setter } from "solid-js";
@@ -14,50 +16,15 @@ export interface WorkspaceProps {
 
 export default function Workspace(props: WorkspaceProps) {
   return (
-    <div ref={props.setWorkspace} class="workspace">
-      <div
-        ref={props.setWorkspaceTabs}
-        class="workspace-tabs"
-        onkeydown={event => {
-          if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-          if (!workspaceTabs()!.contains(document.activeElement) || !(document.activeElement instanceof HTMLElement)) return;
-        
-          const identifier = document.activeElement.getAttribute("data-editor-identifier");
-          if (identifier === null) return;
-        
-          event.preventDefault();
-        
-          if (event.key === "ArrowLeft"){
-            Editor.query(identifier)?.getPrevious()?.tab.focus();
-          }
-          if (event.key === "ArrowRight"){
-            Editor.query(identifier)?.getNext()?.tab.focus();
-          }
-        }}>
-        <button
-          ref={props.setCreateEditorButton}
-          class="create-editor-button"
-          title="New Editor"
-          onkeydown={event => {
-            if (event.key !== "Enter") return;
-            if (event.repeat){
-              event.preventDefault();
-            }
-          }}
-          onmousedown={event => {
-            event.preventDefault();
-          }}
-          onclick={() => {
-            new Editor({ autoReplace: false });
-          }}>
-          <svg>
-            <use href="#close_icon"/>
-          </svg>
-        </button>
-      </div>
-      <div
-        ref={props.setWorkspaceEditors}
-        class="workspace-editors"
+    <div
+      ref={props.setWorkspace}
+      class="workspace">
+      <WorkspaceTabs
+        setWorkspaceTabs={props.setWorkspaceTabs}
+        setCreateEditorButton={props.setCreateEditorButton}
+      />
+      <WorkspaceEditors
+        setWorkspaceEditors={props.setWorkspaceEditors}
       />
     </div>
   );
