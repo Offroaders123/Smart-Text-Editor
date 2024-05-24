@@ -1,3 +1,5 @@
+import "./WorkspaceEditors.scss";
+
 import type { Setter } from "solid-js";
 
 export interface WorkspaceEditorsProps {

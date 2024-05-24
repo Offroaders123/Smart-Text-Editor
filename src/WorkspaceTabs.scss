@@ -1,0 +1,172 @@
+main .workspace .workspace-tabs {
+  --workspace-tabs-padding: 6px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 -1px 0 var(--workspace-accent) inset, 0 -1px 0 var(--workspace-background) inset;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  transition: calc(var(--main-transition-duration) * 0.5);
+  transition-property: none;
+}
+
+main .workspace .workspace-tabs::before, main .workspace .workspace-tabs::after {
+  content: "";
+  height: 100%;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-tabs::before,
+body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-tabs::after {
+  transition: width var(--main-transition-duration);
+}
+
+main .workspace .workspace-tabs::before {
+  width: calc(var(--safe-area-inset-left) + var(--workspace-tabs-padding));
+}
+
+main .workspace .workspace-tabs::after {
+  margin-left: auto;
+  width: calc(var(--safe-area-inset-right) + var(--workspace-tabs-padding) + var(--minimize-tab-width,0px));
+}
+
+main .workspace .workspace-tabs[data-minimize-change]::after {
+  transition: width calc(var(--main-transition-duration) * 0.55);
+}
+
+body.split.horizontal main .workspace .workspace-tabs::after {
+  width: var(--workspace-tabs-padding);
+}
+
+body.preview.horizontal main .workspace .workspace-tabs::after {
+  width: var(--workspace-tabs-padding);
+}
+
+main .workspace .workspace-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+main .workspace .workspace-tabs .tab {
+  margin-right: -1px;
+  margin-top: 3px;
+  padding: calc(6px - var(--tab-border-width));
+  padding-left: calc(10px - var(--tab-border-width));
+  padding-bottom: calc(8px - var(--tab-border-width));
+  position: relative;
+  min-width: 80px;
+  flex-shrink: 0;
+  gap: 6px;
+  justify-content: space-between;
+  color: #aaaaaa;
+  font-size: 12px;
+  background: none;
+  outline: none;
+}
+
+main .workspace .workspace-tabs .tab:not([data-editor-change]):not(.active) + .tab:not([data-editor-change]):not(.active)::before,
+main .workspace .workspace-tabs > .tab:not([data-editor-change]):not(.active) + :nth-last-child(2):not([data-editor-change]):not(.active)::before,
+main .workspace .workspace-tabs > .tab + :nth-last-child(2):not([data-editor-change]):not(.active)::after {
+  content: "";
+  position: absolute;
+  right: 100%;
+  width: 1px;
+  height: 14px;
+  background: currentColor;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 1;
+}
+
+main .workspace .workspace-tabs > .tab + :nth-last-child(2):not([data-editor-change]):not(.active)::after {
+  left: 100%;
+  right: unset;
+}
+
+main .workspace .workspace-tabs .tab:focus-visible {
+  border-bottom-color: #ffffff80;
+}
+
+main .workspace .workspace-tabs .tab.active {
+  color: #eaeaea;
+  background: var(--workspace-background);
+  border-left-color: var(--workspace-accent);
+  border-top-color: var(--workspace-accent);
+  border-right-color: var(--workspace-accent);
+}
+
+body[data-editor-change] main .workspace .workspace-tabs .tab[data-editor-change] {
+  margin-right: var(--tab-margin-right);
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0);
+  transform-origin: left center;
+  transition: inherit;
+  transition-property: margin-right, opacity, transform;
+}
+
+main .workspace .workspace-tabs .tab[data-editor-unsaved] {
+  font-style: italic;
+}
+
+main .workspace .workspace-tabs .tab [data-editor-rename] {
+  margin: calc(calc(var(--editor-rename-padding-y) + var(--editor-rename-border-width)) * -1) calc(calc(var(--editor-rename-padding-x) + var(--editor-rename-border-width)) * -1);
+  padding: var(--editor-rename-padding-y) var(--editor-rename-padding-x);
+  --editor-rename-padding-x: 4px;
+  --editor-rename-padding-y: 3px;
+  min-width: calc(var(--editor-name-width) + calc(var(--editor-rename-padding-x) + var(--editor-rename-border-width)) * 2);
+  width: calc(var(--editor-rename-width,0px) + calc(var(--editor-rename-border-width) * 2));
+  color: inherit;
+  font: inherit;
+  background: none;
+  border: var(--editor-rename-border-width) solid #ffffff80;
+  --editor-rename-border-width: 1px;
+  border-radius: 4px;
+}
+
+main .workspace .workspace-tabs .tab [data-editor-name] {
+  pointer-events: none;
+}
+
+main .workspace .workspace-tabs .tab [data-editor-rename] ~ [data-editor-name] {
+  display: none;
+}
+
+main .workspace .workspace-tabs .tab[data-editor-unsaved] [data-editor-name]::after {
+  content: "*";
+  margin-left: 0.5ch;
+  font-size: 13px;
+  font-style: normal;
+  line-height: 12px;
+}
+
+main .workspace .workspace-tabs .create-editor-button {
+  margin-left: calc(var(--workspace-tabs-padding) + 1px);
+  margin-bottom: 1px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  color: #aaaaaa;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  outline: none;
+}
+
+main .workspace .workspace-tabs .create-editor-button:only-child {
+  display: none;
+}
+
+main .workspace .workspace-tabs .create-editor-button:where(:hover,:active,:focus-visible) {
+  color: #ffffff;
+  background-color: #ffffff24;
+}
+
+main .workspace .workspace-tabs .create-editor-button svg {
+  width: 8px;
+  height: 8px;
+  /* aspect-ratio: 1 / 1; */
+  fill: currentColor;
+  transform: rotate(45deg);
+}

@@ -3,6 +3,7 @@ import Editor from "./Editor.js";
 import WorkspaceTabs from "./WorkspaceTabs.js";
 import WorkspaceEditors from "./WorkspaceEditors.js";
 import { getElementStyle } from "./dom.js";
+import "./Workspace.scss";
 
 import type { Setter } from "solid-js";
 import type { EditorOptions } from "./Editor.js";

@@ -1,0 +1,53 @@
+main .workspace {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace {
+  transition: var(--main-transition-duration);
+  transition-property: width, height, opacity;
+}
+
+body.code main .workspace {
+  width: 100%;
+  height: 100%;
+}
+
+body.split.horizontal main .workspace {
+  width: calc(50% - calc(var(--scaler-size) * 0.5));
+  height: 100%;
+}
+
+body.split.vertical main .workspace {
+  width: 100%;
+  height: calc(50% - calc(var(--scaler-size) * 0.5) - calc(var(--safe-area-inset-bottom) * 0.5));
+}
+
+body.split.horizontal[data-scaling-active] main .workspace {
+  width: calc(var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
+}
+
+body.split.vertical[data-scaling-active] main .workspace {
+  height: calc(var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
+}
+
+body.preview main .workspace {
+  opacity: 0;
+}
+
+body.preview.horizontal main .workspace {
+  width: 0%;
+  height: 100%;
+}
+
+body.preview.vertical main .workspace {
+  width: 100%;
+  height: 0%;
+}
+
+body[data-scaling-change] main .workspace {
+  pointer-events: none;
+}

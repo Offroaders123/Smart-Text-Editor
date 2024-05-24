@@ -1,0 +1,50 @@
+main .workspace .editor {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: var(--workspace-background);
+  border: solid transparent;
+  border-width: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
+  visibility: hidden;
+  --scrollbar-width: 18px;
+  --scrollbar-height: 18px;
+  --scrollbar-border-width: 5px;
+}
+
+body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .editor {
+  transition: var(--main-transition-duration);
+  transition-property: border-width, border-color;
+}
+
+body.split.horizontal main .workspace .editor {
+  border-right-width: 0;
+}
+
+body.preview.horizontal main .workspace .editor {
+  border-right-width: 0;
+}
+
+@media (orientation: portrait) and (max-aspect-ratio: 5 / 8) {
+  body.split.horizontal main .workspace .editor {
+    border-bottom-color: var(--preview-border-color);
+  }
+  body.preview.horizontal main .workspace .editor {
+    border-bottom-color: var(--preview-border-color);
+  }
+}
+
+body.split.vertical main .workspace .editor {
+  border-bottom-width: 0;
+}
+
+body.preview.vertical main .workspace .editor {
+  border-bottom-width: 0;
+}
+
+main .workspace .editor:not(.active) {
+  z-index: -1;
+}
+
+main .workspace .editor.active {
+  visibility: visible;
+}

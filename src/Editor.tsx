@@ -2,6 +2,7 @@ import Prism from "./prism.js";
 import { activeEditor, settings, setActiveEditor, activeDialog, environment, appearance, previewEditor, preview as getPreview, workspaceEditors, workspaceTabs, createEditorButton } from "./STE.js";
 import { setPreviewSource, refreshPreview } from "./Workspace.js";
 import { getElementStyle, applyEditingBehavior, setTitle } from "./dom.js";
+import "./Editor.scss";
 
 export interface EditorOptions {
   name?: string;

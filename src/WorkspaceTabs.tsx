@@ -1,5 +1,6 @@
 import Editor from "./Editor.js";
 import { workspaceTabs } from "./STE.js";
+import "./WorkspaceTabs.scss";
 
 import type { Setter } from "solid-js";
 

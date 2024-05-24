@@ -1,0 +1,61 @@
+main .workspace .workspace-editors {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 0 solid transparent;
+}
+
+:root:not(.startup-fade) main .workspace .workspace-editors:empty {
+  border-width: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
+}
+
+:root:not(.startup-fade) body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-editors:empty {
+  transition: var(--main-transition-duration);
+  transition-property: border-width, border-color;
+}
+
+:root:not(.startup-fade) main .workspace .workspace-editors:empty::before {
+  content: "No Editors Open";
+  padding: 8px;
+  text-align: center;
+}
+
+:root:not(.startup-fade) body[data-view-change] main .workspace .workspace-editors:empty::before {
+  white-space: nowrap;
+}
+
+:root:not(.startup-fade) body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .workspace-editors:empty::before {
+  transition: transform var(--main-transition-duration);
+}
+
+:root:not(.startup-fade) body.preview main .workspace .workspace-editors:empty::before {
+  transform: scale(0);
+}
+
+:root:not(.startup-fade) body.split.horizontal main .workspace .workspace-editors:empty {
+  border-right-width: 0;
+}
+
+:root:not(.startup-fade) body.preview.horizontal main .workspace .workspace-editors:empty {
+  border-right-width: 0;
+}
+
+@media (orientation: portrait) and (max-aspect-ratio: 5 / 8) {
+  :root:not(.startup-fade) body.split.horizontal main .workspace .workspace-editors:empty {
+    border-bottom-color: var(--preview-border-color);
+  }
+  :root:not(.startup-fade) body.preview.horizontal main .workspace .workspace-editors:empty {
+    border-bottom-color: var(--preview-border-color);
+  }
+}
+
+:root:not(.startup-fade) body.split.vertical main .workspace .workspace-editors:empty {
+  border-bottom-width: 0;
+}
+
+:root:not(.startup-fade) body.preview.vertical main .workspace .workspace-editors:empty {
+  border-bottom-width: 0;
+}

@@ -1,0 +1,81 @@
+main .scaler {
+  position: absolute;
+  background: #424242;
+  border: 0 solid transparent;
+  box-shadow: 0 0 2px 1px #00000028;
+  touch-action: none;
+  z-index: 1;
+  transition: background-color var(--transition-fast);
+}
+
+body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .scaler {
+  transition: var(--main-transition-duration);
+  transition-property: left, top, width, height, border-width, border-color, opacity;
+}
+
+main .scaler:hover, body[data-scaling-change] main .scaler {
+  background: #4f4f4f;
+}
+
+body.code main .scaler {
+  --scaler-size: 0px;
+  opacity: 0;
+}
+
+body.preview main .scaler {
+  --scaler-size: 0px;
+  opacity: 0;
+}
+
+body.horizontal main .scaler {
+  top: 0;
+  width: var(--scaler-size);
+  height: 100%;
+  cursor: col-resize;
+}
+
+@media (orientation: portrait) and (max-aspect-ratio: 5 / 8) {
+  body.horizontal main .scaler {
+    border-bottom-width: var(--safe-area-inset-bottom);
+    border-bottom-color: var(--preview-border-color);
+  }
+}
+
+body.vertical main .scaler {
+  left: 0;
+  width: 100%;
+  height: var(--scaler-size);
+  cursor: row-resize;
+}
+
+body.code.horizontal main .scaler {
+  left: 100%;
+}
+
+body.code.vertical main .scaler {
+  top: 100%;
+}
+
+body.split.horizontal main .scaler {
+  left: calc(50% - calc(var(--scaler-size) * 0.5));
+}
+
+body.split.vertical main .scaler {
+  top: calc(50% - calc(var(--scaler-size) * 0.5) - calc(var(--safe-area-inset-bottom) * 0.5));
+}
+
+body.split.horizontal[data-scaling-active] main .scaler {
+  left: calc(var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
+}
+
+body.split.vertical[data-scaling-active] main .scaler {
+  top: calc(var(--scaling-offset) - calc(var(--scaler-size) * 0.5));
+}
+
+body.preview.horizontal main .scaler {
+  left: calc(var(--scaler-size) * -1);
+}
+
+body.preview.vertical main .scaler {
+  top: calc(var(--scaler-size) * -1);
+}
