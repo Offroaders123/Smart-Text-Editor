@@ -1,4 +1,4 @@
-import { render } from "solid-js/web";
+import { createEffect } from "solid-js";
 import { Header } from "./Header.js";
 import { Main } from "./Main.js";
 import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, previewBase, setPreviewBase, setPreview, setScaler, setWorkspace, setWorkspaceEditors, setWorkspaceTabs, setCreateEditorButton } from "./STE.js";
@@ -7,24 +7,8 @@ import { insertTemplate } from "./Tools.js";
 import Editor from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview } from "./Workspace.js";
 
-const root: HTMLDivElement = document.querySelector("#root")!;
-
-render(() => (
-  <>
-    <Header/>
-    <Main
-      setWorkspace={setWorkspace}
-      setWorkspaceTabs={setWorkspaceTabs}
-      setCreateEditorButton={setCreateEditorButton}
-      setWorkspaceEditors={setWorkspaceEditors}
-      setScaler={setScaler}
-      setPreview={setPreview}
-      previewBase={previewBase}
-      setPreviewBase={setPreviewBase}
-    />
-  </>
-), root);
-
+export default function App() {
+  createEffect(() => {
 const queryParameters = new URLSearchParams(window.location.search);
 
 (async () => {
@@ -380,4 +364,22 @@ function changeQueryParameters(parameters: URLSearchParams): void {
   if (query) query = "?" + query;
   const address = window.location.pathname + query;
   history.pushState(null,"",address);
+}
+  });
+
+  return (
+    <>
+      <Header/>
+      <Main
+        setWorkspace={setWorkspace}
+        setWorkspaceTabs={setWorkspaceTabs}
+        setCreateEditorButton={setCreateEditorButton}
+        setWorkspaceEditors={setWorkspaceEditors}
+        setScaler={setScaler}
+        setPreview={setPreview}
+        previewBase={previewBase}
+        setPreviewBase={setPreviewBase}
+      />
+    </>
+  );
 }
