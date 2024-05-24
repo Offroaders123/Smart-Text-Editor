@@ -49,10 +49,10 @@ function setScaling(event: MouseEvent | TouchEvent): void {
     minimum: ((orientation() == "vertical") ? workspace_tabs.offsetHeight : safeAreaInsets.left) + 80,
     maximum: ((orientation() == "horizontal") ? window.innerWidth - safeAreaInsets.right : (orientation() == "vertical") ? (window.innerHeight - header.offsetHeight - safeAreaInsets.bottom) : 0) - 80
   };
-  const touchEvent = (environment.touchDevice && event instanceof TouchEvent);
+  const touchEvent = ((event: MouseEvent | TouchEvent): event is TouchEvent => environment.touchDevice && event instanceof TouchEvent);
 
-  if (orientation() == "horizontal") scalingOffset = (!touchEvent) ? (event as MouseEvent).pageX : (event as TouchEvent).touches[0]!.pageX;
-  if (orientation() == "vertical") scalingOffset = (!touchEvent) ? (event as MouseEvent).pageY - header.offsetHeight : (event as TouchEvent).touches[0]!.pageY - header.offsetHeight;
+  if (orientation() == "horizontal") scalingOffset = (!touchEvent(event)) ? event.pageX : event.touches[0]!.pageX;
+  if (orientation() == "vertical") scalingOffset = (!touchEvent(event)) ? event.pageY - header.offsetHeight : event.touches[0]!.pageY - header.offsetHeight;
   if (scalingOffset < scalingRange.minimum) scalingOffset = scalingRange.minimum;
   if (scalingOffset > scalingRange.maximum) scalingOffset = scalingRange.maximum;
   document.body.setAttribute("data-scaling-active","");
