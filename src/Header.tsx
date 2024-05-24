@@ -1,3 +1,4 @@
+import { createEffect } from "solid-js";
 import DecorativeImage from "./DecorativeImage.js";
 import Editor from "./Editor.js";
 import { activeEditor, settings } from "./STE.js";
@@ -17,16 +18,33 @@ import Cryptii from "./img/cryptii.svg";
 import Install from "./img/install.svg";
 import Template from "./img/template.svg";
 import Settings from "./img/settings.svg";
-import { JSX } from "solid-js";
+
+import type { JSX } from "solid-js";
 
 export function Header() {
+  let appMenubar: HTMLDivElement;
+
+  createEffect(() => {
+    for (const menu of appMenubar.querySelectorAll("menu-drop")){
+      menu.addEventListener("pointerenter",event => {
+        if (event.pointerType !== "mouse") return;
+        if (appMenubar.querySelectorAll("menu-drop:not([data-alternate])[data-open]").length === 0 || menu.matches("[data-alternate]") || menu.matches("[data-open]")) return;
+        menu.opener.focus();
+        for (const menu of appMenubar.querySelectorAll<MenuDropElement>("menu-drop[data-open]")){
+          menu.close();
+        }
+        menu.open();
+      });
+    }
+  });
+
   return (
     <header id="header">
       <div class="app-region"></div>
       <div class="app-icon">
         <DecorativeImage src={Icon} alt=""/>
       </div>
-      <div id="app_menubar" class="app-menubar">
+      <div ref={appMenubar!} class="app-menubar">
         <menu-drop id="file_menu">
           <button>File</button>
           <ul>

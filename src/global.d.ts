@@ -32,7 +32,7 @@ declare global {
 
   var header: HTMLElement;
 
-  var app_menubar: HTMLDivElement;
+  // var app_menubar: HTMLDivElement;
   var file_menu: MenuDropElement;
   var view_menu: MenuDropElement;
   var preview_menu: MenuDropElement;
