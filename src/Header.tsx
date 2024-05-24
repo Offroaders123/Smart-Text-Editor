@@ -5,11 +5,15 @@ import { showInstallPrompt } from "./dom.js";
 import Icon from "/img/icon.svg";
 import "./Header.scss";
 
-import type { JSX } from "solid-js";
+import type { JSX, Setter } from "solid-js";
 
-export function Header() {
+export interface HeaderProps {
+  setHeader: Setter<HTMLElement | null>;
+}
+
+export function Header(props: HeaderProps) {
   return (
-    <header id="header">
+    <header ref={props.setHeader}>
       <div class="app-region"/>
       <div class="app-icon">
         <DecorativeImage

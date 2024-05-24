@@ -1,5 +1,5 @@
 import { createEffect } from "solid-js";
-import { appearance, environment, orientation, preview as getPreview, scaler as getScaler, view, workspace as getWorkspace, workspaceTabs } from "./STE.js";
+import { appearance, environment, header as getHeader, orientation, preview as getPreview, scaler as getScaler, view, workspace as getWorkspace, workspaceTabs } from "./STE.js";
 import "./Scaler.scss";
 
 import type { Setter } from "solid-js";
@@ -40,6 +40,7 @@ export default function Scaler(props: ScalerProps) {
  * Sets the Split mode scaling when called from the Scaler's moving event listeners.
 */
 function setScaling(event: MouseEvent | TouchEvent): void {
+  const header: HTMLElement = getHeader();
   const workspace: HTMLDivElement = getWorkspace()!;
   const workspace_tabs: HTMLDivElement = workspaceTabs()!;
   const scaler: HTMLDivElement = getScaler()!;

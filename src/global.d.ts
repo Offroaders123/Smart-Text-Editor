@@ -30,7 +30,7 @@ declare global {
   var refresh_icon: SVGSymbolElement;
   var github_icon: SVGSymbolElement;
 
-  var header: HTMLElement;
+  // var header: HTMLElement;
 
   // var app_menubar: HTMLDivElement;
   var file_menu: MenuDropElement;

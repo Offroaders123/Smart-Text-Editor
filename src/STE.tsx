@@ -348,6 +348,8 @@ export const [installPrompt, setInstallPrompt] = createSignal<BeforeInstallPromp
 
 export const [cardBackdropShown, setCardBackdropShown] = createSignal<boolean>(false);
 
+export const [header, setHeader] = createSignal<HTMLElement | null>(null);
+
 export const [workspace, setWorkspace] = createSignal<HTMLDivElement | null>(null);
 
 export const [workspaceTabs, setWorkspaceTabs] = createSignal<HTMLDivElement | null>(null);
