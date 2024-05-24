@@ -1,10 +1,11 @@
+import { createSignal } from "solid-js";
+import { createStore } from "solid-js/store";
 import Prism from "./prism.js";
 
 import type { Card } from "./Card.js";
 import type Editor from "./Editor.js";
 import type { View } from "./Workspace.js";
 import type { Orientation } from "./Workspace.js";
-import { createSignal } from "solid-js";
 
 export interface SafeAreaInsets {
   left: number;
@@ -358,6 +359,8 @@ export const [workspaceEditors, setWorkspaceEditors] = createSignal<HTMLDivEleme
 export const [scaler, setScaler] = createSignal<HTMLDivElement | null>(null);
 
 export const [preview, setPreview] = createSignal<HTMLIFrameElement | null>(null);
+
+export const [editors, setEditors] = createStore<{ [identifier: string]: Editor | undefined; }>({});
 
 // if (appearance.parentWindow) document.documentElement.classList.add("startup-fade");
 if (appearance.appleHomeScreen) document.documentElement.classList.add("apple-home-screen");

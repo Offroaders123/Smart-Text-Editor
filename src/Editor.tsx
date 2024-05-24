@@ -1,5 +1,5 @@
 import Prism from "./prism.js";
-import { activeEditor, settings, setActiveEditor, activeDialog, environment, appearance, previewEditor, preview as getPreview, workspaceEditors, workspaceTabs, createEditorButton } from "./STE.js";
+import { activeEditor, settings, setActiveEditor, activeDialog, environment, appearance, previewEditor, preview as getPreview, workspaceEditors, workspaceTabs, createEditorButton, editors, setEditors } from "./STE.js";
 import { setPreviewSource, refreshPreview } from "./Workspace.js";
 import { getElementStyle, applyEditingBehavior, setTitle } from "./dom.js";
 import "./Editor.scss";
@@ -22,13 +22,11 @@ export interface EditorOpenOptions {
  * Creates a new Editor within the Workspace.
 */
 export class Editor extends NumTextElement {
-  static #editors: { [identifier: string]: Editor; } = {};
-
   /**
    * Queries an Editor by it's identifier.
   */
   static query(identifier: string): Editor | null {
-    return this.#editors[identifier] ?? null;
+    return editors[identifier] ?? null;
   }
 
   /**
@@ -278,7 +276,7 @@ export class Editor extends NumTextElement {
     preview_menu.main.append(this.previewOption);
 
     applyEditingBehavior(this);
-    Editor.#editors[this.identifier] = this;
+    setEditors(this.identifier, this);
     this.handle = handle ?? null;
 
     if (open || activeEditor() === null){
@@ -390,7 +388,7 @@ export class Editor extends NumTextElement {
     workspace_editors.removeChild(this);
     preview_menu.main.removeChild(this.previewOption);
 
-    delete Editor.#editors[this.identifier];
+    setEditors(this.identifier, undefined);
 
     if (transitionDuration !== 0){
       await new Promise(resolve => setTimeout(resolve,transitionDuration));
