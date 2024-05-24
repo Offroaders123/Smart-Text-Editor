@@ -1,4 +1,4 @@
-import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, environment, preview as getPreview, scaler as getScaler, workspace as getWorkspace, workspaceTabs } from "./STE.js";
+import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, workspaceTabs } from "./STE.js";
 import Editor from "./Editor.js";
 import { getElementStyle } from "./dom.js";
 
@@ -350,42 +350,6 @@ export async function refreshPreview({ force = false }: RefreshPreviewOptions = 
   preview.contentDocument?.close();
 
   if (change) editor.refresh = false;
-}
-
-/**
- * Sets the Split mode scaling when called from the Scaler's moving event listeners.
-*/
-export function setScaling(event: MouseEvent | TouchEvent): void {
-  const workspace: HTMLDivElement = getWorkspace()!;
-  const workspace_tabs: HTMLDivElement = workspaceTabs()!;
-  const scaler: HTMLDivElement = getScaler()!;
-  const preview: HTMLIFrameElement = getPreview()!;
-  const { safeAreaInsets } = appearance;
-  let scalingOffset = 0;
-  const scalingRange = {
-    minimum: ((orientation() == "vertical") ? workspace_tabs.offsetHeight : safeAreaInsets.left) + 80,
-    maximum: ((orientation() == "horizontal") ? window.innerWidth - safeAreaInsets.right : (orientation() == "vertical") ? (window.innerHeight - header.offsetHeight - safeAreaInsets.bottom) : 0) - 80
-  };
-  const touchEvent = (environment.touchDevice && event instanceof TouchEvent);
-
-  if (orientation() == "horizontal") scalingOffset = (!touchEvent) ? (event as MouseEvent).pageX : (event as TouchEvent).touches[0]!.pageX;
-  if (orientation() == "vertical") scalingOffset = (!touchEvent) ? (event as MouseEvent).pageY - header.offsetHeight : (event as TouchEvent).touches[0]!.pageY - header.offsetHeight;
-  if (scalingOffset < scalingRange.minimum) scalingOffset = scalingRange.minimum;
-  if (scalingOffset > scalingRange.maximum) scalingOffset = scalingRange.maximum;
-  document.body.setAttribute("data-scaling-active","");
-  workspace.style.setProperty("--scaling-offset",`${scalingOffset}px`);
-  scaler.style.setProperty("--scaling-offset",`${scalingOffset}px`);
-  preview.style.setProperty("--scaling-offset",`${scalingOffset}px`);
-}
-
-/**
- * Removes the Split mode scale handling when the user finishes moving the Scaler.
-*/
-export function disableScaling(event: MouseEvent | TouchEvent): void {
-  const touchEvent = (environment.touchDevice && event instanceof TouchEvent);
-  document.removeEventListener((!touchEvent) ? "mousemove" : "touchmove",setScaling);
-  document.removeEventListener((!touchEvent) ? "mouseup" : "touchend",disableScaling);
-  document.body.removeAttribute("data-scaling-change");
 }
 
 /**
