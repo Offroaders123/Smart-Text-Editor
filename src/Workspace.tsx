@@ -6,7 +6,7 @@ import { getElementStyle } from "./dom.js";
 import "./Workspace.scss";
 
 import type { Setter } from "solid-js";
-import type { default as Editor, EditorOptions } from "./Editor.js";
+import type { EditorElement, EditorOptions } from "./Editor.js";
 
 export interface WorkspaceProps {
   setWorkspace: Setter<HTMLDivElement | null>;
@@ -121,7 +121,7 @@ export async function setOrientation(orientationValue?: Orientation): Promise<vo
  * 
  * @see {@link previewEditor}
 */
-export async function setPreviewSource(previewEditorValue: Editor | null): Promise<void> {
+export async function setPreviewSource(previewEditorValue: EditorElement | null): Promise<void> {
   setPreviewEditor(previewEditorValue);
 
   if (previewEditorValue === null){
@@ -295,7 +295,7 @@ export interface RefreshPreviewOptions {
 export async function refreshPreview({ force = false }: RefreshPreviewOptions = {}): Promise<void> {
   if (view() === "code") return;
 
-  const editor: Editor | null = previewEditor() ?? activeEditor();
+  const editor: EditorElement | null = previewEditor() ?? activeEditor();
   if (editor === null) return;
   const change: boolean = editor.refresh && !settings.automaticRefresh;
   if (!change && !force) return;

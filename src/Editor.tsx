@@ -4,14 +4,16 @@ import { setPreviewSource, refreshPreview } from "./Workspace.js";
 import { getElementStyle, applyEditingBehavior, setTitle } from "./dom.js";
 import "./Editor.scss";
 
-export interface EditorOptions {
-  name?: string;
-  value?: string;
-  handle?: FileSystemFileHandle;
-  open?: boolean;
-  autoCreated?: boolean;
-  autoReplace?: boolean;
+export interface Editor {
+  name: string;
+  value: string;
+  handle: FileSystemFileHandle | null;
+  isOpen: boolean;
+  autoCreated: boolean;
+  autoReplace: boolean;
 }
+
+export interface EditorOptions extends Partial<Editor> {}
 
 export interface EditorOpenOptions {
   autoCreated?: boolean;
@@ -22,13 +24,13 @@ export interface EditorOpenOptions {
  * Creates a new Editor within the Workspace.
 */
 export function createEditor(options: EditorOptions = {}): void {
-  new Editor(options);
+  new EditorElement(options);
 }
 
   /**
    * Queries an Editor by it's identifier.
   */
-  export function query(identifier: string): Editor | null {
+  export function query(identifier: string): EditorElement | null {
     return editors[identifier] ?? null;
   }
 
@@ -56,7 +58,7 @@ export function createEditor(options: EditorOptions = {}): void {
     }
   }
 
-export default class Editor extends NumTextElement {
+export class EditorElement extends NumTextElement implements Editor {
   #name: string;
 
   readonly identifier = Math.random().toString();
@@ -110,7 +112,7 @@ export default class Editor extends NumTextElement {
 
   declare readonly autoReplace;
 
-  constructor({ name = "Untitled.txt", value = "", handle, open = true, autoCreated = false, autoReplace = true }: EditorOptions = {}) {
+  constructor({ name = "Untitled.txt", value = "", handle, isOpen = true, autoCreated = false, autoReplace = true }: EditorOptions = {}) {
     super();
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const create_editor_button: HTMLButtonElement = createEditorButton()!;
@@ -118,7 +120,7 @@ export default class Editor extends NumTextElement {
 
     this.#name = (!name.includes(".")) ? `${name}.txt` : name;
     this.editor.value = value;
-    this.isOpen = open;
+    this.isOpen = isOpen;
     this.autoCreated = autoCreated;
     this.autoReplace = autoReplace;
 
@@ -283,7 +285,7 @@ export default class Editor extends NumTextElement {
     setEditors(this.identifier, this);
     this.handle = handle ?? null;
 
-    if (open || activeEditor() === null){
+    if (isOpen || activeEditor() === null){
       this.open({ autoCreated, focusedOverride });
     }
 
@@ -302,7 +304,7 @@ export default class Editor extends NumTextElement {
   /**
    * Opens the editor in the workspace.
   */
-  open(this: Editor, { autoCreated = false, focusedOverride = false }: EditorOpenOptions = {}): void {
+  open(this: EditorElement, { autoCreated = false, focusedOverride = false }: EditorOpenOptions = {}): void {
     const focused = (document.activeElement === activeEditor()) || focusedOverride;
 
     activeEditor()?.tab.classList.remove("active");
@@ -429,13 +431,13 @@ export default class Editor extends NumTextElement {
    * 
    * @param wrap Future feature: Add support to toggle the wrapping behavior.
   */
-  getPrevious(_wrap: boolean = true): Editor | null {
+  getPrevious(_wrap: boolean = true): EditorElement | null {
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const { tab } = this;
     const editorTabs: HTMLButtonElement[] = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
     const previousTab: HTMLButtonElement | null = editorTabs[(editorTabs.indexOf(tab) || editorTabs.length) - 1] ?? null;
     const previousIdentifier: string | null = previousTab?.getAttribute("data-editor-identifier") ?? null;
-    const previousEditor: Editor | null = previousIdentifier ? query(previousIdentifier) : null;
+    const previousEditor: EditorElement | null = previousIdentifier ? query(previousIdentifier) : null;
     return previousEditor;
   }
 
@@ -446,13 +448,13 @@ export default class Editor extends NumTextElement {
    * 
    * @param wrap Future feature: Add support to toggle the wrapping behavior.
   */
-  getNext(_wrap: boolean = true): Editor | null {
+  getNext(_wrap: boolean = true): EditorElement | null {
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const { tab } = this;
     const editorTabs: HTMLButtonElement[] = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
     const nextTab: HTMLButtonElement | null = editorTabs[(editorTabs.indexOf(tab) !== editorTabs.length - 1) ? editorTabs.indexOf(tab) + 1 : 0] ?? null;
     const nextIdentifier: string | null = nextTab?.getAttribute("data-editor-identifier") ?? null;
-    const nextEditor: Editor | null = nextIdentifier ? query(nextIdentifier) : null;
+    const nextEditor: EditorElement | null = nextIdentifier ? query(nextIdentifier) : null;
     return nextEditor;
   }
 
@@ -517,10 +519,10 @@ export default class Editor extends NumTextElement {
   }
 }
 
-window.customElements.define("ste-editor",Editor);
+window.customElements.define("ste-editor",EditorElement);
 
 declare global {
   interface HTMLElementTagNameMap {
-    "ste-editor": Editor;
+    "ste-editor": EditorElement;
   }
 }

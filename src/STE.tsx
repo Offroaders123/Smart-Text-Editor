@@ -3,7 +3,7 @@ import { createStore } from "solid-js/store";
 import Prism from "./prism.js";
 
 import type { Card } from "./Card.js";
-import type Editor from "./Editor.js";
+import type { EditorElement } from "./Editor.js";
 import type { View } from "./Workspace.js";
 import type { Orientation } from "./Workspace.js";
 
@@ -79,7 +79,7 @@ export const appearance = {
    * Enables or disables syntax highlighting for all Num Text elements.
   */
   setSyntaxHighlighting(state: boolean): void {
-    for (const editor of document.querySelectorAll<Editor | NumTextElement>("ste-editor, num-text")){
+    for (const editor of document.querySelectorAll<EditorElement | NumTextElement>("ste-editor, num-text")){
       if (!(editor.syntaxLanguage in Prism.languages)) continue;
       (state) ? editor.syntaxHighlight.enable() : editor.syntaxHighlight.disable();
     }
@@ -215,14 +215,14 @@ export const preapprovedExtensions = ["txt","html","css","js","php","json","webm
 /**
  * A reference to the currently opened Editor.
 */
-export const [activeEditor, setActiveEditor] = createSignal<Editor | null>(null);
+export const [activeEditor, setActiveEditor] = createSignal<EditorElement | null>(null);
 
 /**
  * The identifier of the Editor to be used within the Preview.
  * 
  * When set to `null`, internally the value of `previewEditor` will be pointed to `activeEditor` when used.
 */
-export const [previewEditor, setPreviewEditor] = createSignal<Editor | null>(null);
+export const [previewEditor, setPreviewEditor] = createSignal<EditorElement | null>(null);
 
 /**
  * An array of all windows opened during the current session.
@@ -362,7 +362,7 @@ export const [scaler, setScaler] = createSignal<HTMLDivElement | null>(null);
 
 export const [preview, setPreview] = createSignal<HTMLIFrameElement | null>(null);
 
-export const [editors, setEditors] = createStore<{ [identifier: string]: Editor | undefined; }>({});
+export const [editors, setEditors] = createStore<{ [identifier: string]: EditorElement | undefined; }>({});
 
 // if (appearance.parentWindow) document.documentElement.classList.add("startup-fade");
 if (appearance.appleHomeScreen) document.documentElement.classList.add("apple-home-screen");
