@@ -1,6 +1,6 @@
 import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs } from "./STE.js";
 import DecorativeImage from "./DecorativeImage.js";
-import Editor from "./Editor.js";
+import { setTabsVisibility } from "./Editor.js";
 import { getElementStyle } from "./dom.js";
 import "./Card.scss";
 
@@ -204,7 +204,7 @@ class Card extends HTMLElement {
       icon.setAttribute("href","#arrow_icon");
       window.setTimeout(() => {
         workspace_tabs.style.setProperty("--minimize-tab-width",getElementStyle({ element: this, property: "width" }));
-        Editor.setTabsVisibility();
+        setTabsVisibility();
       },transitionDuration);
       if (this.contains(document.activeElement) && document.activeElement != this.controls.minimize) this.controls.minimize.focus();
     } else {

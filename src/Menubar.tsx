@@ -1,6 +1,6 @@
 import { createEffect } from "solid-js";
 import DecorativeImage from "./DecorativeImage.js";
-import Editor from "./Editor.js";
+import { createEditor } from "./Editor.js";
 import { activeEditor, settings } from "./STE.js";
 import { insertTemplate } from "./Tools.js";
 import { createDisplay, createWindow, openFiles, refreshPreview, saveFile, setOrientation, setPreviewSource, setView } from "./Workspace.js";
@@ -40,7 +40,7 @@ export default function Menubar() {
       <menu-drop id="file_menu">
         <button>File</button>
         <ul>
-          <li onclick={() => new Editor({ autoReplace: false })} data-shortcuts='{ "default": "Ctrl+Shift+X", "macOS": "Shift+Cmd+X" }'>New Editor</li>
+          <li onclick={() => createEditor({ autoReplace: false })} data-shortcuts='{ "default": "Ctrl+Shift+X", "macOS": "Shift+Cmd+X" }'>New Editor</li>
           <li part="create-window-option" onclick={() => createWindow()} data-shortcuts='{ "default": "Ctrl+Shift+C", "macOS": "Shift+Cmd+C" }'>New Window</li>
           <li onclick={() => openFiles()} data-shortcuts='{ "default": "Ctrl+O", "macOS": "Cmd+O" }'>Open</li>
           <li onclick={() => activeEditor()?.rename()} data-shortcuts='{ "default": "Ctrl+Shift+R", "macOS": "Shift+Cmd+R" }'>Rename</li>

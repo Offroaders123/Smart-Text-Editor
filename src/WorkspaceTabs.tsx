@@ -1,4 +1,4 @@
-import Editor from "./Editor.js";
+import { createEditor, query } from "./Editor.js";
 import { workspaceTabs } from "./STE.js";
 import "./WorkspaceTabs.scss";
 
@@ -24,10 +24,10 @@ export default function WorkspaceTabs(props: WorkspaceTabsProps) {
         event.preventDefault();
 
         if (event.key === "ArrowLeft"){
-          Editor.query(identifier)?.getPrevious()?.tab.focus();
+          query(identifier)?.getPrevious()?.tab.focus();
         }
         if (event.key === "ArrowRight"){
-          Editor.query(identifier)?.getNext()?.tab.focus();
+          query(identifier)?.getNext()?.tab.focus();
         }
       }}>
       <CreateEditorButton
@@ -57,7 +57,7 @@ function CreateEditorButton(props: CreateEditorButtonProps) {
         event.preventDefault();
       }}
       onclick={() => {
-        new Editor({ autoReplace: false });
+        createEditor({ autoReplace: false });
       }}>
       <svg>
         <use href="#close_icon"/>

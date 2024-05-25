@@ -21,11 +21,14 @@ export interface EditorOpenOptions {
 /**
  * Creates a new Editor within the Workspace.
 */
-export class Editor extends NumTextElement {
+export function createEditor(options: EditorOptions = {}): void {
+  new Editor(options);
+}
+
   /**
    * Queries an Editor by it's identifier.
   */
-  static query(identifier: string): Editor | null {
+  export function query(identifier: string): Editor | null {
     return editors[identifier] ?? null;
   }
 
@@ -34,9 +37,9 @@ export class Editor extends NumTextElement {
    * 
    * If the given identifier is already fully in view, no scrolling will happen.
   */
-  static setTabsVisibility(identifier: string | undefined = activeEditor()?.identifier): void {
+  export function setTabsVisibility(identifier: string | undefined = activeEditor()?.identifier): void {
     if (!identifier) return;
-    const editor = this.query(identifier);
+    const editor = query(identifier);
     if (editor === null) return;
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const { tab } = editor;
@@ -53,6 +56,7 @@ export class Editor extends NumTextElement {
     }
   }
 
+export default class Editor extends NumTextElement {
   #name: string;
 
   readonly identifier = Math.random().toString();
@@ -311,7 +315,7 @@ export class Editor extends NumTextElement {
     this.classList.add("active");
     setActiveEditor(this);
 
-    Editor.setTabsVisibility();
+    setTabsVisibility();
     setTitle({ content: this.#name });
 
     if ((((document.activeElement === document.body && activeDialog() !== null) || autoCreated) && !environment.touchDevice && appearance.parentWindow) || focused){
@@ -363,15 +367,15 @@ export class Editor extends NumTextElement {
 
     if (this.tab === editorTabs[0] && editorTabs[1] && this.tab.classList.contains("active")){
       const identifier = editorTabs[1].getAttribute("data-editor-identifier")!;
-      Editor.query(identifier)?.open();
+      query(identifier)?.open();
     }
     if (this.tab === editorTabs[editorTabs.length - 1] && this.tab !== editorTabs[0] && this.tab.classList.contains("active")){
       const identifier = editorTabs[editorTabs.length - 2]!.getAttribute("data-editor-identifier")!;
-      Editor.query(identifier)?.open();
+      query(identifier)?.open();
     }
     if (this.tab !== editorTabs[0] && this.tab.classList.contains("active")){
       const identifier = editorTabs[editorTabs.indexOf(this.tab) + 1]!.getAttribute("data-editor-identifier")!;
-      Editor.query(identifier)?.open();
+      query(identifier)?.open();
     }
 
     if (focused && activeEditor()?.editor !== undefined){
@@ -431,7 +435,7 @@ export class Editor extends NumTextElement {
     const editorTabs: HTMLButtonElement[] = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
     const previousTab: HTMLButtonElement | null = editorTabs[(editorTabs.indexOf(tab) || editorTabs.length) - 1] ?? null;
     const previousIdentifier: string | null = previousTab?.getAttribute("data-editor-identifier") ?? null;
-    const previousEditor: Editor | null = previousIdentifier ? Editor.query(previousIdentifier) : null;
+    const previousEditor: Editor | null = previousIdentifier ? query(previousIdentifier) : null;
     return previousEditor;
   }
 
@@ -448,7 +452,7 @@ export class Editor extends NumTextElement {
     const editorTabs: HTMLButtonElement[] = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
     const nextTab: HTMLButtonElement | null = editorTabs[(editorTabs.indexOf(tab) !== editorTabs.length - 1) ? editorTabs.indexOf(tab) + 1 : 0] ?? null;
     const nextIdentifier: string | null = nextTab?.getAttribute("data-editor-identifier") ?? null;
-    const nextEditor: Editor | null = nextIdentifier ? Editor.query(nextIdentifier) : null;
+    const nextEditor: Editor | null = nextIdentifier ? query(nextIdentifier) : null;
     return nextEditor;
   }
 
@@ -520,5 +524,3 @@ declare global {
     "ste-editor": Editor;
   }
 }
-
-export default Editor;
