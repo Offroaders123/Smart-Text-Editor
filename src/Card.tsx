@@ -1,6 +1,6 @@
 import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs } from "./STE.js";
 import DecorativeImage from "./DecorativeImage.js";
-import { setTabsVisibility } from "./Editor.js";
+import { query, setTabsVisibility } from "./Editor.js";
 import { getElementStyle } from "./dom.js";
 import "./Card.scss";
 
@@ -236,7 +236,7 @@ class Card extends HTMLElement {
       setActiveDialog(null);
       if (dialogPrevious()){
         const hidden = (getElementStyle({ element: dialogPrevious()!, property: "visibility" }) == "hidden");
-        (!workspace_editors.contains(dialogPrevious()!) && !hidden) ? dialogPrevious()!.focus({ preventScroll: true }) : activeEditor()?.focus({ preventScroll: true });
+        (!workspace_editors.contains(dialogPrevious()!) && !hidden) ? dialogPrevious()!.focus({ preventScroll: true }) : query(activeEditor()?.identifier)?.focus({ preventScroll: true });
         setDialogPrevious(null);
       }
     }

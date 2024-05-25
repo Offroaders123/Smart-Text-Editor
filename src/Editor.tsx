@@ -5,15 +5,18 @@ import { getElementStyle, applyEditingBehavior, setTitle } from "./dom.js";
 import "./Editor.scss";
 
 export interface Editor {
+  identifier: string;
   name: string;
   value: string;
   handle: FileSystemFileHandle | null;
   isOpen: boolean;
   autoCreated: boolean;
+  refresh: boolean;
+  unsaved: boolean;
   autoReplace: boolean;
 }
 
-export interface EditorOptions extends Partial<Editor> {}
+export interface EditorOptions extends Partial<Omit<Editor, "identifier" | "refresh" | "unsaved">> {}
 
 export interface EditorOpenOptions {
   autoCreated?: boolean;
@@ -30,8 +33,11 @@ export function createEditor(options: EditorOptions = {}): void {
   /**
    * Queries an Editor by it's identifier.
   */
-  export function query(identifier: string): EditorElement | null {
-    return editors[identifier] ?? null;
+  export function query(identifier: string | null | undefined): EditorElement | null {
+    if (typeof identifier !== "string") return null;
+    const editor: Editor | null = editors[identifier] ?? null;
+    if (editor === null) return null;
+    return document.querySelector<EditorElement>(`ste-editor[data-editor-identifier="${editor.identifier}"]`);
   }
 
   /**
@@ -139,7 +145,7 @@ export class EditorElement extends NumTextElement implements Editor {
       if (event.button !== 0 || document.activeElement.matches("[data-editor-rename]")) return;
 
       event.preventDefault();
-      if (this.tab !== activeEditor()?.tab){
+      if (this.tab !== query(activeEditor()?.identifier)?.tab){
         this.open();
       }
     });
@@ -149,7 +155,7 @@ export class EditorElement extends NumTextElement implements Editor {
       // Add a check to this to only apply this key handling if the Editor isn't currently being renamed in the Editor tab.
       if (event.key === " " || event.key === "Enter"){
         event.preventDefault();
-        if (this.tab !== activeEditor()?.tab){
+        if (this.tab !== query(activeEditor()?.identifier)?.tab){
           this.open();
         }
       }
@@ -215,7 +221,7 @@ export class EditorElement extends NumTextElement implements Editor {
       if (event.dataTransfer !== null){
         event.dataTransfer.dropEffect = "copy";
       }
-      if (this.tab !== activeEditor()?.tab){
+      if (this.tab !== query(activeEditor()?.identifier)?.tab){
         this.open();
       }
     });
@@ -252,13 +258,13 @@ export class EditorElement extends NumTextElement implements Editor {
     });
 
     if (activeEditor() !== null && activeEditor()!.autoCreated){
-      if (document.activeElement === activeEditor()!){
+      if (document.activeElement === query(activeEditor()!.identifier)!){
         focusedOverride = true;
       }
       if (autoReplace){
-        activeEditor()!.close();
+        query(activeEditor()!.identifier)!.close();
       } else {
-        activeEditor()!.autoCreated = false;
+        query(activeEditor()!.identifier)!.autoCreated = false;
       }
     }
 
@@ -307,8 +313,8 @@ export class EditorElement extends NumTextElement implements Editor {
   open(this: EditorElement, { autoCreated = false, focusedOverride = false }: EditorOpenOptions = {}): void {
     const focused = (document.activeElement === activeEditor()) || focusedOverride;
 
-    activeEditor()?.tab.classList.remove("active");
-    activeEditor()?.classList.remove("active");
+    query(activeEditor()?.identifier)?.tab.classList.remove("active");
+    query(activeEditor()?.identifier)?.classList.remove("active");
 
     this.tab.classList.add("active");
     if (autoCreated){
@@ -380,8 +386,8 @@ export class EditorElement extends NumTextElement implements Editor {
       query(identifier)?.open();
     }
 
-    if (focused && activeEditor()?.editor !== undefined){
-      activeEditor()?.focus({ preventScroll: true });
+    if (focused && query(activeEditor()?.identifier)?.editor !== undefined){
+      query(activeEditor()?.identifier)?.focus({ preventScroll: true });
     }
 
     this.tab.setAttribute("data-editor-change","");
@@ -495,7 +501,7 @@ export class EditorElement extends NumTextElement implements Editor {
       this.autoCreated = false;
     }
 
-    if (this.tab === activeEditor()?.tab){
+    if (this.tab === query(activeEditor()?.identifier)?.tab){
       setTitle({ content: rename });
     }
 

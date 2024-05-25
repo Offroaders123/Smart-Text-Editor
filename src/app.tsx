@@ -4,7 +4,7 @@ import { Main } from "./Main.js";
 import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, previewBase, setPreviewBase, setPreview, setScaler, setWorkspace, setWorkspaceEditors, setWorkspaceTabs, setCreateEditorButton, setHeader } from "./STE.js";
 import "./Card.js";
 import { insertTemplate } from "./Tools.js";
-import { createEditor, setTabsVisibility } from "./Editor.js";
+import { createEditor, query, setTabsVisibility } from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview } from "./Workspace.js";
 
 export default function App() {
@@ -115,17 +115,17 @@ document.body.addEventListener("keydown",event => {
     event.preventDefault();
     if (event.repeat) return;
     /* Future feature: If an editor tab is focused, close that editor instead of only the active editor */
-    activeEditor()?.close();
+    query(activeEditor()?.identifier)?.close();
   }
   if (((controlShift || (event.ctrlKey && shift && !command && environment.appleDevice)) && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("[") || pressed("{")))){
     event.preventDefault();
     if (event.repeat) return;
-    activeEditor()?.getPrevious()?.open();
+    query(activeEditor()?.identifier)?.getPrevious()?.open();
   }
   if (((control || (event.ctrlKey && !command && environment.appleDevice)) && !shift && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("]") || pressed("}")))){
     event.preventDefault();
     if (event.repeat) return;
-    activeEditor()?.getNext()?.open();
+    query(activeEditor()?.identifier)?.getNext()?.open();
   }
   if (((controlShift || shiftCommand) && pressed("n")) || ((controlShift || shiftCommand) && pressed("c"))){
     event.preventDefault();
@@ -140,7 +140,7 @@ document.body.addEventListener("keydown",event => {
   if ((controlShift || shiftCommand) && pressed("r")){
     event.preventDefault();
     if (event.repeat) return;
-    activeEditor()?.rename();
+    query(activeEditor()?.identifier)?.rename();
   }
   if ((control || command) && !shift && pressed("s")){
     event.preventDefault();
@@ -318,7 +318,7 @@ if (support.fileHandling && support.fileSystem){
       createEditor({ name, value, handle });
     }
     if (!environment.touchDevice){
-      activeEditor()?.focus({ preventScroll: true });
+      query(activeEditor()?.identifier)?.focus({ preventScroll: true });
     }
   });
 }
