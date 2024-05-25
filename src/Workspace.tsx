@@ -1,5 +1,5 @@
 import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace } from "./STE.js";
-import Editor from "./Editor.js";
+import { createEditor } from "./Editor.js";
 import WorkspaceTabs from "./WorkspaceTabs.js";
 import WorkspaceEditors from "./WorkspaceEditors.js";
 import { getElementStyle } from "./dom.js";
@@ -178,7 +178,7 @@ export async function openFiles(): Promise<void> {
       .map(result => result.value);
 
     for (const file of files){
-      new Editor(file);
+      createEditor(file);
     }
   } else {
     const handles = await window.showOpenFilePicker({ multiple: true }).catch(error => {
@@ -187,7 +187,7 @@ export async function openFiles(): Promise<void> {
     if (!handles) return;
     handles.forEach(async handle => {
       const file = await handle.getFile();
-      new Editor({ name: file.name, value: await file.text(), handle });
+      createEditor({ name: file.name, value: await file.text(), handle });
     });
   }
 }

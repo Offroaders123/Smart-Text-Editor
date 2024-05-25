@@ -4,7 +4,7 @@ import { Main } from "./Main.js";
 import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, previewBase, setPreviewBase, setPreview, setScaler, setWorkspace, setWorkspaceEditors, setWorkspaceTabs, setCreateEditorButton, setHeader } from "./STE.js";
 import "./Card.js";
 import { insertTemplate } from "./Tools.js";
-import Editor from "./Editor.js";
+import { createEditor } from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview } from "./Workspace.js";
 
 export default function App() {
@@ -34,7 +34,7 @@ const queryParameters = new URLSearchParams(window.location.search);
         for (const file of event.data.files as File[]){
           const { name } = file;
           const value = await file.text();
-          new Editor({ name, value });
+          createEditor({ name, value });
         }
         break;
       }
@@ -108,7 +108,7 @@ document.body.addEventListener("keydown",event => {
   if (((control || command) && !shift && pressed("n")) || ((controlShift || shiftCommand) && pressed("x"))){
     event.preventDefault();
     if (event.repeat) return;
-    new Editor({ autoReplace: false });
+    createEditor({ autoReplace: false });
   }
   if (((control || command) && pressed("w")) || ((controlShift || shiftCommand) && pressed("d"))){
     if (shift && pressed("w")) return window.close();
@@ -257,14 +257,14 @@ document.body.addEventListener("drop",event => {
           if (file === null) break;
           const { name } = file;
           const value = await file.text();
-          new Editor({ name, value });
+          createEditor({ name, value });
         } else {
           const handle = await item.getAsFileSystemHandle();
           if (!(handle instanceof FileSystemFileHandle)) break;
           const file = await handle.getFile();
           const { name } = file;
           const value = await file.text();
-          new Editor({ name, value, handle });
+          createEditor({ name, value, handle });
         }
         break;
       }
@@ -272,7 +272,7 @@ document.body.addEventListener("drop",event => {
         if (index !== 0) break;
         const value = event.dataTransfer?.getData("text");
         if (value !== "") break;
-        new Editor({ value });
+        createEditor({ value });
         break;
       }
     }
@@ -280,7 +280,7 @@ document.body.addEventListener("drop",event => {
 });
 
 window.requestAnimationFrame(() => {
-  new Editor({ autoCreated: true });
+  createEditor({ autoCreated: true });
 });
 
 if (appearance.parentWindow){
@@ -315,7 +315,7 @@ if (support.fileHandling && support.fileSystem){
       const file = await handle.getFile();
       const { name } = file;
       const value = await file.text();
-      new Editor({ name, value, handle });
+      createEditor({ name, value, handle });
     }
     if (!environment.touchDevice){
       activeEditor()?.focus({ preventScroll: true });

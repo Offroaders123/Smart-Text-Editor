@@ -40,7 +40,7 @@ export default function Scaler(props: ScalerProps) {
  * Sets the Split mode scaling when called from the Scaler's moving event listeners.
 */
 function setScaling(event: MouseEvent | TouchEvent): void {
-  const header: HTMLElement = getHeader();
+  const header: HTMLElement = getHeader()!;
   const workspace: HTMLDivElement = getWorkspace()!;
   const workspace_tabs: HTMLDivElement = workspaceTabs()!;
   const scaler: HTMLDivElement = getScaler()!;

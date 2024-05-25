@@ -1,5 +1,5 @@
 import { view } from "./STE.js";
-import Editor from "./Editor.js";
+import { createEditor } from "./Editor.js";
 import { setView } from "./Workspace.js";
 import { generate } from "./UUIDGeneratorCard.js";
 
@@ -32,7 +32,7 @@ export function insertTemplate(type: TemplateType): void {
 
   if (value === undefined) return;
 
-  new Editor({ name, value });
+  createEditor({ name, value });
   if (view() === "preview"){
     setView("split");
   }

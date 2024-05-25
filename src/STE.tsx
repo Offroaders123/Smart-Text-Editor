@@ -3,7 +3,7 @@ import { createStore } from "solid-js/store";
 import Prism from "./prism.js";
 
 import type { Card } from "./Card.js";
-import type Editor from "./Editor.js";
+import type { Editor } from "./Editor.js";
 import type { View } from "./Workspace.js";
 import type { Orientation } from "./Workspace.js";
 
@@ -79,7 +79,7 @@ export const appearance = {
    * Enables or disables syntax highlighting for all Num Text elements.
   */
   setSyntaxHighlighting(state: boolean): void {
-    for (const editor of document.querySelectorAll<Editor | NumTextElement>("ste-editor, num-text")){
+    for (const editor of document.querySelectorAll<NumTextElement>("num-text")){
       if (!(editor.syntaxLanguage in Prism.languages)) continue;
       (state) ? editor.syntaxHighlight.enable() : editor.syntaxHighlight.disable();
     }

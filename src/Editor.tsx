@@ -1,16 +1,62 @@
+import { createEffect } from "solid-js";
 import Prism from "./prism.js";
 import { activeEditor, settings, setActiveEditor, activeDialog, environment, appearance, previewEditor, preview as getPreview, workspaceEditors, workspaceTabs, createEditorButton, editors, setEditors } from "./STE.js";
 import { setPreviewSource, refreshPreview } from "./Workspace.js";
 import { getElementStyle, applyEditingBehavior, setTitle } from "./dom.js";
 import "./Editor.scss";
 
-export interface EditorOptions {
-  name?: string;
-  value?: string;
-  handle?: FileSystemFileHandle;
-  open?: boolean;
-  autoCreated?: boolean;
-  autoReplace?: boolean;
+export interface Editor {
+  identifier: string;
+  name: string;
+  value: string;
+  handle: FileSystemFileHandle | null;
+  open: boolean;
+  autoCreated: boolean;
+  refresh: boolean;
+  unsaved: boolean;
+  autoReplace: boolean;
+}
+
+export interface EditorOptions extends Partial<Omit<Editor, "identifier" | "refresh" | "unsaved">> {}
+
+export function createEditor({ name = "Untitled.txt", value = "", handle = null, open = true, autoCreated = false, autoReplace = true }: EditorOptions = {}): void {
+  const identifier: string = Math.random().toString();
+  const editor: Editor = { identifier, name, value, handle, open, autoCreated, autoReplace, refresh: false, unsaved: false };
+  setEditors(identifier, editor);
+}
+
+export interface EditorProps {
+  editor: Editor;
+}
+
+export default function Editor(props: EditorProps) {
+  let numText: NumTextElement;
+
+  createEffect(() => {
+    applyEditingBehavior(numText);
+
+    numText.addEventListener("input",() => {
+      if (props.editor.autoCreated){
+        setEditors(props.editor.identifier, "autoCreated", false);
+      }
+      if (!props.editor.refresh){
+        setEditors(props.editor.identifier, "refresh", true);
+      }
+      if (!props.editor.unsaved){
+        setEditors(props.editor.identifier, "unsaved", true);
+      }
+      refreshPreview();
+    });
+  });
+
+  return (
+    <num-text
+      ref={numText!}
+      classList={{ editor: true, active: props.editor.open }}
+      data-editor-identifier={props.editor.identifier}
+      value={props.editor.value}
+    />
+  );
 }
 
 export interface EditorOpenOptions {
@@ -21,11 +67,11 @@ export interface EditorOpenOptions {
 /**
  * Creates a new Editor within the Workspace.
 */
-export class Editor extends NumTextElement {
+class Editor4 extends NumTextElement {
   /**
    * Queries an Editor by it's identifier.
   */
-  static query(identifier: string): Editor | null {
+  static query(identifier: string): Editor4 | null {
     return editors[identifier] ?? null;
   }
 
@@ -298,7 +344,7 @@ export class Editor extends NumTextElement {
   /**
    * Opens the editor in the workspace.
   */
-  open(this: Editor, { autoCreated = false, focusedOverride = false }: EditorOpenOptions = {}): void {
+  open(this: Editor4, { autoCreated = false, focusedOverride = false }: EditorOpenOptions = {}): void {
     const focused = (document.activeElement === activeEditor()) || focusedOverride;
 
     activeEditor()?.tab.classList.remove("active");
@@ -311,7 +357,7 @@ export class Editor extends NumTextElement {
     this.classList.add("active");
     setActiveEditor(this);
 
-    Editor.setTabsVisibility();
+    Editor4.setTabsVisibility();
     setTitle({ content: this.#name });
 
     if ((((document.activeElement === document.body && activeDialog() !== null) || autoCreated) && !environment.touchDevice && appearance.parentWindow) || focused){
@@ -363,15 +409,15 @@ export class Editor extends NumTextElement {
 
     if (this.tab === editorTabs[0] && editorTabs[1] && this.tab.classList.contains("active")){
       const identifier = editorTabs[1].getAttribute("data-editor-identifier")!;
-      Editor.query(identifier)?.open();
+      Editor4.query(identifier)?.open();
     }
     if (this.tab === editorTabs[editorTabs.length - 1] && this.tab !== editorTabs[0] && this.tab.classList.contains("active")){
       const identifier = editorTabs[editorTabs.length - 2]!.getAttribute("data-editor-identifier")!;
-      Editor.query(identifier)?.open();
+      Editor4.query(identifier)?.open();
     }
     if (this.tab !== editorTabs[0] && this.tab.classList.contains("active")){
       const identifier = editorTabs[editorTabs.indexOf(this.tab) + 1]!.getAttribute("data-editor-identifier")!;
-      Editor.query(identifier)?.open();
+      Editor4.query(identifier)?.open();
     }
 
     if (focused && activeEditor()?.editor !== undefined){
@@ -425,13 +471,13 @@ export class Editor extends NumTextElement {
    * 
    * @param wrap Future feature: Add support to toggle the wrapping behavior.
   */
-  getPrevious(_wrap: boolean = true): Editor | null {
+  getPrevious(_wrap: boolean = true): Editor4 | null {
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const { tab } = this;
     const editorTabs: HTMLButtonElement[] = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
     const previousTab: HTMLButtonElement | null = editorTabs[(editorTabs.indexOf(tab) || editorTabs.length) - 1] ?? null;
     const previousIdentifier: string | null = previousTab?.getAttribute("data-editor-identifier") ?? null;
-    const previousEditor: Editor | null = previousIdentifier ? Editor.query(previousIdentifier) : null;
+    const previousEditor: Editor4 | null = previousIdentifier ? Editor4.query(previousIdentifier) : null;
     return previousEditor;
   }
 
@@ -442,13 +488,13 @@ export class Editor extends NumTextElement {
    * 
    * @param wrap Future feature: Add support to toggle the wrapping behavior.
   */
-  getNext(_wrap: boolean = true): Editor | null {
+  getNext(_wrap: boolean = true): Editor4 | null {
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const { tab } = this;
     const editorTabs: HTMLButtonElement[] = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
     const nextTab: HTMLButtonElement | null = editorTabs[(editorTabs.indexOf(tab) !== editorTabs.length - 1) ? editorTabs.indexOf(tab) + 1 : 0] ?? null;
     const nextIdentifier: string | null = nextTab?.getAttribute("data-editor-identifier") ?? null;
-    const nextEditor: Editor | null = nextIdentifier ? Editor.query(nextIdentifier) : null;
+    const nextEditor: Editor4 | null = nextIdentifier ? Editor4.query(nextIdentifier) : null;
     return nextEditor;
   }
 
@@ -512,13 +558,3 @@ export class Editor extends NumTextElement {
     return extension;
   }
 }
-
-window.customElements.define("ste-editor",Editor);
-
-declare global {
-  interface HTMLElementTagNameMap {
-    "ste-editor": Editor;
-  }
-}
-
-export default Editor;

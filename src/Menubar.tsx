@@ -1,7 +1,7 @@
 import { createEffect } from "solid-js";
 import DecorativeImage from "./DecorativeImage.js";
-import Editor from "./Editor.js";
-import { activeEditor, settings } from "./STE.js";
+import { Editor, createEditor } from "./Editor.js";
+import { activeEditor, editors, settings } from "./STE.js";
 import { insertTemplate } from "./Tools.js";
 import { createDisplay, createWindow, openFiles, refreshPreview, saveFile, setOrientation, setPreviewSource, setView } from "./Workspace.js";
 import { clearSiteCaches, showInstallPrompt } from "./dom.js";
@@ -40,7 +40,7 @@ export default function Menubar() {
       <menu-drop id="file_menu">
         <button>File</button>
         <ul>
-          <li onclick={() => new Editor({ autoReplace: false })} data-shortcuts='{ "default": "Ctrl+Shift+X", "macOS": "Shift+Cmd+X" }'>New Editor</li>
+          <li onclick={() => createEditor({ autoReplace: false })} data-shortcuts='{ "default": "Ctrl+Shift+X", "macOS": "Shift+Cmd+X" }'>New Editor</li>
           <li part="create-window-option" onclick={() => createWindow()} data-shortcuts='{ "default": "Ctrl+Shift+C", "macOS": "Shift+Cmd+C" }'>New Window</li>
           <li onclick={() => openFiles()} data-shortcuts='{ "default": "Ctrl+O", "macOS": "Cmd+O" }'>Open</li>
           <li onclick={() => activeEditor()?.rename()} data-shortcuts='{ "default": "Ctrl+Shift+R", "macOS": "Shift+Cmd+R" }'>Rename</li>
@@ -83,6 +83,7 @@ export default function Menubar() {
           <li onclick={() => preview_base_card.open()} data-shortcuts='{ "default": "Ctrl+Shift+B", "macOS": "Ctrl+Cmd+B" }' data-no-select>Base URL</li>
           <li><hr/></li>
           <li data-value="active-editor" data-selected onclick={() => setPreviewSource(null)}>Active Editor</li>
+         {Object.values(editors).map(editor => <PreviewOption editor={editor!}/>)}
         </ul>
       </menu-drop>
       <menu-drop id="tools_menu">
@@ -124,5 +125,24 @@ export default function Menubar() {
         </ul>
       </menu-drop>
     </div>
+  );
+}
+
+interface PreviewOptionProps {
+  editor: Editor;
+}
+
+function PreviewOption(props: PreviewOptionProps) {
+  return (
+    <li
+      part="option"
+      class="option"
+      data-editor-identifier={props.editor.identifier}
+      tabindex={-1}
+      onclick={() => {
+        setPreviewSource(this);
+      }}>
+      {props.editor.name}
+    </li>
   );
 }

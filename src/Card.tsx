@@ -1,6 +1,5 @@
 import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs } from "./STE.js";
 import DecorativeImage from "./DecorativeImage.js";
-import Editor from "./Editor.js";
 import { getElementStyle } from "./dom.js";
 import "./Card.scss";
 
