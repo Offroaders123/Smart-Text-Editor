@@ -85,7 +85,7 @@ export default function Menubar() {
           <li data-value="active-editor" data-selected onclick={() => setPreviewSource(null)}>Active Editor</li>
         </ul>
       </menu-drop>
-      <menu-drop id="tools_menu">
+      <menu-drop>
         <button>Tools</button>
         <ul>
           <li onclick={() => replace_text_card.open()} data-shortcuts='{ "default": "Ctrl+Shift+F", "macOS": "Shift+Cmd+F" }'>Replace Text</li>
