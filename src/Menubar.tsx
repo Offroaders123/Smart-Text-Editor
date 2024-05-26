@@ -1,7 +1,7 @@
 import { createEffect } from "solid-js";
 import DecorativeImage from "./DecorativeImage.js";
 import { createEditor, query } from "./Editor.js";
-import { activeEditor, setPreviewMenu, setViewMenu, settings } from "./STE.js";
+import { activeEditor, settings } from "./STE.js";
 import { insertTemplate } from "./Tools.js";
 import { createDisplay, createWindow, openFiles, refreshPreview, saveFile, setOrientation, setPreviewSource, setView } from "./Workspace.js";
 import { clearSiteCaches, showInstallPrompt } from "./dom.js";
@@ -18,7 +18,14 @@ import Install from "./img/install.svg";
 import Template from "./img/template.svg";
 import Settings from "./img/settings.svg";
 
-export default function Menubar() {
+import type { Setter } from "solid-js";
+
+export interface MenubarProps {
+  setViewMenu: Setter<MenuDropElement | null>;
+  setPreviewMenu: Setter<MenuDropElement | null>;
+}
+
+export default function Menubar(props: MenubarProps) {
   let appMenubar: HTMLDivElement;
 
   createEffect(() => {
@@ -65,7 +72,7 @@ export default function Menubar() {
           </li>
         </ul>
       </menu-drop>
-      <menu-drop ref={setViewMenu} data-select="no-appearance">
+      <menu-drop ref={props.setViewMenu} data-select="no-appearance">
         <button>View</button>
         <ul>
           <li data-selected onclick={() => setView('code')} data-shortcuts='{ "default": "Ctrl+Shift+1", "macOS": "Ctrl+Cmd+1" }' data-value="code">Code</li>
@@ -76,7 +83,7 @@ export default function Menubar() {
           <li onclick={() => createDisplay()} data-shortcuts='{ "default": "Ctrl+Shift+5", "macOS": "Ctrl+Cmd+5" }' data-no-select>Display</li>
         </ul>
       </menu-drop>
-      <menu-drop ref={setPreviewMenu} data-select="no-appearance">
+      <menu-drop ref={props.setPreviewMenu} data-select="no-appearance">
         <button>Preview</button>
         <ul>
           <li onclick={() => refreshPreview({ force: true })} data-shortcuts='{ "default": "Ctrl+Shift+Enter", "macOS": "Ctrl+Cmd+Return" }' data-no-select>Refresh</li>

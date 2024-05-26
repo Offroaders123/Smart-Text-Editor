@@ -1,7 +1,7 @@
 import { createEffect } from "solid-js";
 import { Header } from "./Header.js";
 import { Main } from "./Main.js";
-import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, previewBase, setPreviewBase, setPreview, setScaler, setWorkspace, setWorkspaceEditors, setWorkspaceTabs, setCreateEditorButton, setHeader } from "./STE.js";
+import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, previewBase, setPreviewBase, setPreview, setScaler, setWorkspace, setWorkspaceEditors, setWorkspaceTabs, setCreateEditorButton, setHeader, setViewMenu, setPreviewMenu } from "./STE.js";
 import "./Card.js";
 import { insertTemplate } from "./Tools.js";
 import { createEditor, query, setTabsVisibility } from "./Editor.js";
@@ -359,6 +359,8 @@ function changeQueryParameters(parameters: URLSearchParams): void {
     <>
       <Header
         setHeader={setHeader}
+        setViewMenu={setViewMenu}
+        setPreviewMenu={setPreviewMenu}
       />
       <Main
         setWorkspace={setWorkspace}
