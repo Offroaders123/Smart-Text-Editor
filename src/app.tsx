@@ -1,13 +1,29 @@
 import { createEffect } from "solid-js";
 import { Header } from "./Header.js";
 import { Main } from "./Main.js";
-import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings, previewBase, setPreviewBase, setPreview, setScaler, setWorkspace, setWorkspaceEditors, setWorkspaceTabs, setCreateEditorButton, setHeader, setViewMenu, setPreviewMenu } from "./STE.js";
+import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings } from "./STE.js";
 import "./Card.js";
 import { insertTemplate } from "./Tools.js";
 import { createEditor, query, setTabsVisibility } from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview } from "./Workspace.js";
 
-export default function App() {
+import type { Accessor, Setter } from "solid-js";
+
+export interface AppProps {
+  setHeader: Setter<HTMLElement | null>;
+  setViewMenu: Setter<MenuDropElement | null>;
+  setPreviewMenu: Setter<MenuDropElement | null>;
+  setWorkspace: Setter<HTMLDivElement | null>;
+  setWorkspaceTabs: Setter<HTMLDivElement | null>;
+  setCreateEditorButton: Setter<HTMLButtonElement | null>;
+  setWorkspaceEditors: Setter<HTMLDivElement | null>;
+  setScaler: Setter<HTMLDivElement | null>;
+  setPreview: Setter<HTMLIFrameElement | null>;
+  previewBase: Accessor<string | null>;
+  setPreviewBase: Setter<string | null>;
+}
+
+export default function App(props: AppProps) {
   createEffect(() => {
 const queryParameters = new URLSearchParams(window.location.search);
 
@@ -358,19 +374,19 @@ function changeQueryParameters(parameters: URLSearchParams): void {
   return (
     <>
       <Header
-        setHeader={setHeader}
-        setViewMenu={setViewMenu}
-        setPreviewMenu={setPreviewMenu}
+        setHeader={props.setHeader}
+        setViewMenu={props.setViewMenu}
+        setPreviewMenu={props.setPreviewMenu}
       />
       <Main
-        setWorkspace={setWorkspace}
-        setWorkspaceTabs={setWorkspaceTabs}
-        setCreateEditorButton={setCreateEditorButton}
-        setWorkspaceEditors={setWorkspaceEditors}
-        setScaler={setScaler}
-        setPreview={setPreview}
-        previewBase={previewBase}
-        setPreviewBase={setPreviewBase}
+        setWorkspace={props.setWorkspace}
+        setWorkspaceTabs={props.setWorkspaceTabs}
+        setCreateEditorButton={props.setCreateEditorButton}
+        setWorkspaceEditors={props.setWorkspaceEditors}
+        setScaler={props.setScaler}
+        setPreview={props.setPreview}
+        previewBase={props.previewBase}
+        setPreviewBase={props.setPreviewBase}
       />
     </>
   );
