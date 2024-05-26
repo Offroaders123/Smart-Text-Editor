@@ -52,7 +52,7 @@ export async function setView(type: View, { force = false }: SetViewOptions = {}
   document.body.setAttribute("data-view",type);
   document.body.classList.add(view());
   removeScaling();
-  viewMenu().select(view());
+  viewMenu()!.select(view());
 
   refreshPreview();
 

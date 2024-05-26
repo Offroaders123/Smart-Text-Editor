@@ -13,22 +13,22 @@ declare global {
     readonly availTop: number;
   }
 
-  var theme_color: HTMLMetaElement;
+  var theme_color: HTMLMetaElement; // unused, style feature
   var scrollbar_styles: HTMLStyleElement;
-  var theme_styles: HTMLStyleElement;
+  var theme_styles: HTMLStyleElement; // unused, style feature
 
-  var symbol_definitions: SVGSVGElement;
-  var arrow_icon: SVGSymbolElement;
-  var check_icon: SVGSymbolElement;
-  var back_icon: SVGSymbolElement;
-  var minimize_icon: SVGSymbolElement;
-  var close_icon: SVGSymbolElement;
-  var rename_icon: SVGSymbolElement;
-  var undo_icon: SVGSymbolElement;
-  var redo_icon: SVGSymbolElement;
-  var install_icon: SVGSymbolElement;
-  var refresh_icon: SVGSymbolElement;
-  var github_icon: SVGSymbolElement;
+  var symbol_definitions: SVGSVGElement; // styles only
+  var arrow_icon: SVGSymbolElement; // use-href only
+  var check_icon: SVGSymbolElement; // use-href only
+  var back_icon: SVGSymbolElement; // use-href only
+  var minimize_icon: SVGSymbolElement; // use-href only
+  var close_icon: SVGSymbolElement; // use-href only
+  var rename_icon: SVGSymbolElement; // use-href only
+  var undo_icon: SVGSymbolElement; // use-href only
+  var redo_icon: SVGSymbolElement; // use-href only
+  var install_icon: SVGSymbolElement; // use-href only
+  var refresh_icon: SVGSymbolElement; // use-href only
+  var github_icon: SVGSymbolElement; // use-href only
 
   // var header: HTMLElement;
 
