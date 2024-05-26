@@ -27,7 +27,8 @@ export interface EditorOpenOptions {
  * Creates a new Editor within the Workspace.
 */
 export function createEditor(options: EditorOptions = {}): void {
-  new EditorElement(options);
+  const editorElement = new EditorElement(options);
+  setEditors(editorElement.identifier, editorElement);
 }
 
   /**
@@ -64,7 +65,9 @@ export function createEditor(options: EditorOptions = {}): void {
     }
   }
 
-export class EditorElement extends NumTextElement implements Editor {
+export type { EditorElement };
+
+class EditorElement extends NumTextElement implements Editor {
   #name: string;
 
   readonly identifier = Math.random().toString();
@@ -288,7 +291,7 @@ export class EditorElement extends NumTextElement implements Editor {
     previewMenu()!.main.append(this.previewOption);
 
     applyEditingBehavior(this);
-    setEditors(this.identifier, this);
+    // setEditors(this.identifier, this);
     this.handle = handle ?? null;
 
     if (isOpen || activeEditor() === null){
