@@ -350,6 +350,8 @@ export const [cardBackdropShown, setCardBackdropShown] = createSignal<boolean>(f
 
 export const [header, setHeader] = createSignal<HTMLElement | null>(null);
 
+export const [viewMenu, setViewMenu] = createSignal<MenuDropElement | null>(null);
+
 export const [previewMenu, setPreviewMenu] = createSignal<MenuDropElement | null>(null);
 
 export const [workspace, setWorkspace] = createSignal<HTMLDivElement | null>(null);

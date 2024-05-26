@@ -1,7 +1,7 @@
 import { createEffect } from "solid-js";
 import DecorativeImage from "./DecorativeImage.js";
 import { createEditor, query } from "./Editor.js";
-import { activeEditor, setPreviewMenu, settings } from "./STE.js";
+import { activeEditor, setPreviewMenu, setViewMenu, settings } from "./STE.js";
 import { insertTemplate } from "./Tools.js";
 import { createDisplay, createWindow, openFiles, refreshPreview, saveFile, setOrientation, setPreviewSource, setView } from "./Workspace.js";
 import { clearSiteCaches, showInstallPrompt } from "./dom.js";
@@ -65,7 +65,7 @@ export default function Menubar() {
           </li>
         </ul>
       </menu-drop>
-      <menu-drop id="view_menu" data-select="no-appearance">
+      <menu-drop ref={setViewMenu} data-select="no-appearance">
         <button>View</button>
         <ul>
           <li data-selected onclick={() => setView('code')} data-shortcuts='{ "default": "Ctrl+Shift+1", "macOS": "Ctrl+Cmd+1" }' data-value="code">Code</li>

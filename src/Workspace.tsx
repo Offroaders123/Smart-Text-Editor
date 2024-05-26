@@ -1,4 +1,4 @@
-import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, previewMenu } from "./STE.js";
+import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, previewMenu, viewMenu } from "./STE.js";
 import { createEditor, query, setTabsVisibility } from "./Editor.js";
 import WorkspaceTabs from "./WorkspaceTabs.js";
 import WorkspaceEditors from "./WorkspaceEditors.js";
@@ -52,7 +52,7 @@ export async function setView(type: View, { force = false }: SetViewOptions = {}
   document.body.setAttribute("data-view",type);
   document.body.classList.add(view());
   removeScaling();
-  view_menu.select(view());
+  viewMenu().select(view());
 
   refreshPreview();
 
@@ -125,7 +125,7 @@ export async function setPreviewSource(previewEditorValue: Editor | null): Promi
   setPreviewEditor(previewEditorValue);
 
   if (previewEditorValue === null){
-    previewMenu().select("active-editor");
+    previewMenu()!.select("active-editor");
   }
 
   await refreshPreview({ force: true });

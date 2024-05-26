@@ -285,7 +285,7 @@ export class EditorElement extends NumTextElement implements Editor {
       refreshPreview();
     });
 
-    previewMenu().main.append(this.previewOption);
+    previewMenu()!.main.append(this.previewOption);
 
     applyEditingBehavior(this);
     setEditors(this.identifier, this);
@@ -398,7 +398,7 @@ export class EditorElement extends NumTextElement implements Editor {
     this.tab.classList.remove("active");
 
     workspace_editors.removeChild(this);
-    previewMenu().main.removeChild(this.previewOption);
+    previewMenu()!.main.removeChild(this.previewOption);
 
     setEditors(this.identifier, undefined);
 
