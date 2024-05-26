@@ -35,7 +35,7 @@ declare global {
   // var app_menubar: HTMLDivElement;
   var file_menu: MenuDropElement;
   var view_menu: MenuDropElement;
-  var preview_menu: MenuDropElement;
+  // var preview_menu: MenuDropElement;
   var tools_menu: MenuDropElement;
   var settings_menu: MenuDropElement;
 

@@ -1,4 +1,4 @@
-import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace } from "./STE.js";
+import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, previewMenu } from "./STE.js";
 import { createEditor, query, setTabsVisibility } from "./Editor.js";
 import WorkspaceTabs from "./WorkspaceTabs.js";
 import WorkspaceEditors from "./WorkspaceEditors.js";
@@ -125,7 +125,7 @@ export async function setPreviewSource(previewEditorValue: Editor | null): Promi
   setPreviewEditor(previewEditorValue);
 
   if (previewEditorValue === null){
-    preview_menu.select("active-editor");
+    previewMenu().select("active-editor");
   }
 
   await refreshPreview({ force: true });

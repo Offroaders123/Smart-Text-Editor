@@ -1,5 +1,5 @@
 import Prism from "./prism.js";
-import { activeEditor, settings, setActiveEditor, activeDialog, environment, appearance, previewEditor, preview as getPreview, workspaceEditors, workspaceTabs, createEditorButton, editors, setEditors } from "./STE.js";
+import { activeEditor, settings, setActiveEditor, activeDialog, environment, appearance, previewEditor, preview as getPreview, workspaceEditors, workspaceTabs, createEditorButton, editors, setEditors, previewMenu } from "./STE.js";
 import { setPreviewSource, refreshPreview } from "./Workspace.js";
 import { getElementStyle, applyEditingBehavior, setTitle } from "./dom.js";
 import "./Editor.scss";
@@ -285,7 +285,7 @@ export class EditorElement extends NumTextElement implements Editor {
       refreshPreview();
     });
 
-    preview_menu.main.append(this.previewOption);
+    previewMenu().main.append(this.previewOption);
 
     applyEditingBehavior(this);
     setEditors(this.identifier, this);
@@ -398,7 +398,7 @@ export class EditorElement extends NumTextElement implements Editor {
     this.tab.classList.remove("active");
 
     workspace_editors.removeChild(this);
-    preview_menu.main.removeChild(this.previewOption);
+    previewMenu().main.removeChild(this.previewOption);
 
     setEditors(this.identifier, undefined);
 

@@ -1,7 +1,7 @@
 import { createEffect } from "solid-js";
 import DecorativeImage from "./DecorativeImage.js";
 import { createEditor, query } from "./Editor.js";
-import { activeEditor, settings } from "./STE.js";
+import { activeEditor, setPreviewMenu, settings } from "./STE.js";
 import { insertTemplate } from "./Tools.js";
 import { createDisplay, createWindow, openFiles, refreshPreview, saveFile, setOrientation, setPreviewSource, setView } from "./Workspace.js";
 import { clearSiteCaches, showInstallPrompt } from "./dom.js";
@@ -76,7 +76,7 @@ export default function Menubar() {
           <li onclick={() => createDisplay()} data-shortcuts='{ "default": "Ctrl+Shift+5", "macOS": "Ctrl+Cmd+5" }' data-no-select>Display</li>
         </ul>
       </menu-drop>
-      <menu-drop id="preview_menu" data-select="no-appearance">
+      <menu-drop ref={setPreviewMenu} data-select="no-appearance">
         <button>Preview</button>
         <ul>
           <li onclick={() => refreshPreview({ force: true })} data-shortcuts='{ "default": "Ctrl+Shift+Enter", "macOS": "Ctrl+Cmd+Return" }' data-no-select>Refresh</li>
