@@ -27,7 +27,7 @@ export interface EditorOpenOptions {
  * Creates a new Editor within the Workspace.
 */
 export function createEditor(options: EditorOptions = {}): void {
-  const editorElement = new EditorElement(options);
+  const editorElement = new EditorLegacy(options);
   setEditors(editorElement.identifier, editorElement);
 }
 
@@ -196,6 +196,12 @@ export function rename(editor: Editor | null | undefined, name?: string): void {
   editor.name = name;
 }
 
+export interface EditorElement extends Editor, NumTextElement {
+  readonly tab: HTMLButtonElement;
+  readonly previewOption: MenuDropOption;
+  readonly extension: string;
+}
+
   /**
    * Queries an Editor by it's identifier.
   */
@@ -203,7 +209,7 @@ export function rename(editor: Editor | null | undefined, name?: string): void {
     if (typeof identifier !== "string") return null;
     const editor: Editor | null = editors[identifier] ?? null;
     if (editor === null) return null;
-    return document.querySelector<EditorElement>(`ste-editor[data-editor-identifier="${editor.identifier}"]`);
+    return document.querySelector<EditorLegacy>(`ste-editor[data-editor-identifier="${editor.identifier}"]`);
   }
 
   /**
@@ -230,9 +236,7 @@ export function rename(editor: Editor | null | undefined, name?: string): void {
     }
   }
 
-export type { EditorElement };
-
-class EditorElement extends NumTextElement implements Editor {
+class EditorLegacy extends NumTextElement implements Editor {
   #name: string;
 
   readonly identifier = Math.random().toString();
@@ -536,10 +540,10 @@ class EditorElement extends NumTextElement implements Editor {
   }
 }
 
-window.customElements.define("ste-editor",EditorElement);
+window.customElements.define("ste-editor",EditorLegacy);
 
 declare global {
   interface HTMLElementTagNameMap {
-    "ste-editor": EditorElement;
+    "ste-editor": EditorLegacy;
   }
 }
