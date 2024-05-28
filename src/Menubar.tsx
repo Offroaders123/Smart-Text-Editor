@@ -1,6 +1,6 @@
 import { createEffect } from "solid-js";
 import DecorativeImage from "./DecorativeImage.js";
-import { createEditor, query } from "./Editor.js";
+import { createEditor, query, rename } from "./Editor.js";
 import { activeEditor, settings } from "./STE.js";
 import { insertTemplate } from "./Tools.js";
 import { createDisplay, createWindow, openFiles, refreshPreview, saveFile, setOrientation, setPreviewSource, setView } from "./Workspace.js";
@@ -50,7 +50,7 @@ export default function Menubar(props: MenubarProps) {
           <li onclick={() => createEditor({ autoReplace: false })} data-shortcuts='{ "default": "Ctrl+Shift+X", "macOS": "Shift+Cmd+X" }'>New Editor</li>
           <li part="create-window-option" onclick={() => createWindow()} data-shortcuts='{ "default": "Ctrl+Shift+C", "macOS": "Shift+Cmd+C" }'>New Window</li>
           <li onclick={() => openFiles()} data-shortcuts='{ "default": "Ctrl+O", "macOS": "Cmd+O" }'>Open</li>
-          <li onclick={() => query(activeEditor()?.identifier)?.rename()} data-shortcuts='{ "default": "Ctrl+Shift+R", "macOS": "Shift+Cmd+R" }'>Rename</li>
+          <li onclick={() => rename(query(activeEditor()?.identifier))} data-shortcuts='{ "default": "Ctrl+Shift+R", "macOS": "Shift+Cmd+R" }'>Rename</li>
           <li onclick={() => saveFile()} data-shortcuts='{ "default": "Ctrl+S", "macOS": "Cmd+S" }'>Save</li>
           <li>Save As...
             <ul>

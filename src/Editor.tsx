@@ -67,6 +67,25 @@ export function getNext(editor: EditorElement | null | undefined, _wrap: boolean
   return nextEditor;
 }
 
+/**
+ * Renames the file of the editor.
+ * 
+ * @param name If a new name isn't provided, the user is prompted to provide one.
+*/
+export function rename(editor: Editor | null | undefined, name?: string): void {
+  if (editor === null || editor === undefined) return;
+
+  const currentName = editor.name;
+
+  if (name === undefined){
+    const result = prompt(`Enter a new file name for "${currentName}".`,currentName);
+    if (result === null) return;
+    name = result;
+  }
+
+  editor.name = name;
+}
+
   /**
    * Queries an Editor by it's identifier.
   */
@@ -450,23 +469,6 @@ class EditorElement extends NumTextElement implements Editor {
     if (document.body.getAttribute("data-editor-change") === changeIdentifier){
       document.body.removeAttribute("data-editor-change");
     }
-  }
-
-  /**
-   * Renames the file of the editor.
-   * 
-   * @param name If a new name isn't provided, the user is prompted to provide one.
-  */
-  rename(name?: string): void {
-    const currentName = this.#name;
-
-    if (name === undefined){
-      const result = prompt(`Enter a new file name for "${currentName}".`,currentName);
-      if (result === null) return;
-      name = result;
-    }
-
-    this.name = name;
   }
 
   get name(): string {

@@ -4,7 +4,7 @@ import { Main } from "./Main.js";
 import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings } from "./STE.js";
 import "./Card.js";
 import { insertTemplate } from "./Tools.js";
-import { createEditor, getNext, getPrevious, query, setTabsVisibility } from "./Editor.js";
+import { createEditor, getNext, getPrevious, query, rename, setTabsVisibility } from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview } from "./Workspace.js";
 
 import type { Accessor, Setter } from "solid-js";
@@ -156,7 +156,7 @@ document.body.addEventListener("keydown",event => {
   if ((controlShift || shiftCommand) && pressed("r")){
     event.preventDefault();
     if (event.repeat) return;
-    query(activeEditor()?.identifier)?.rename();
+    rename(query(activeEditor()?.identifier));
   }
   if ((control || command) && !shift && pressed("s")){
     event.preventDefault();

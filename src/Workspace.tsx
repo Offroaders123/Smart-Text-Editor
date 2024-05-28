@@ -1,5 +1,5 @@
 import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, previewMenu, viewMenu } from "./STE.js";
-import { createEditor, query, setTabsVisibility } from "./Editor.js";
+import { createEditor, query, rename, setTabsVisibility } from "./Editor.js";
 import WorkspaceTabs from "./WorkspaceTabs.js";
 import WorkspaceEditors from "./WorkspaceEditors.js";
 import { getElementStyle } from "./dom.js";
@@ -243,8 +243,8 @@ export async function saveFile(extension?: string): Promise<void> {
     // @ts-expect-error
     const currentName: string = query(activeEditor()?.identifier)?.name;
     const file = await handle.getFile();
-    const rename = file.name;
-    if (currentName != rename) identifier.rename(rename);
+    const newName = file.name;
+    if (currentName != newName) rename(identifier, newName);
   }
   if (query(activeEditor()?.identifier)?.autoCreated){
     activeEditor()!.autoCreated = false;
