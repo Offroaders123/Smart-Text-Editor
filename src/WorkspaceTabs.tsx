@@ -1,4 +1,4 @@
-import { createEditor, query } from "./Editor.js";
+import { createEditor, getNext, getPrevious, query } from "./Editor.js";
 import { workspaceTabs } from "./STE.js";
 import "./WorkspaceTabs.scss";
 
@@ -24,10 +24,10 @@ export default function WorkspaceTabs(props: WorkspaceTabsProps) {
         event.preventDefault();
 
         if (event.key === "ArrowLeft"){
-          query(identifier)?.getPrevious()?.tab.focus();
+          getPrevious(query(identifier))?.tab.focus();
         }
         if (event.key === "ArrowRight"){
-          query(identifier)?.getNext()?.tab.focus();
+          getNext(query(identifier))?.tab.focus();
         }
       }}>
       <CreateEditorButton

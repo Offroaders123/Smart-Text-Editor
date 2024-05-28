@@ -4,7 +4,7 @@ import { Main } from "./Main.js";
 import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings } from "./STE.js";
 import "./Card.js";
 import { insertTemplate } from "./Tools.js";
-import { createEditor, query, setTabsVisibility } from "./Editor.js";
+import { createEditor, getNext, getPrevious, query, setTabsVisibility } from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview } from "./Workspace.js";
 
 import type { Accessor, Setter } from "solid-js";
@@ -136,12 +136,12 @@ document.body.addEventListener("keydown",event => {
   if (((controlShift || (event.ctrlKey && shift && !command && environment.appleDevice)) && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("[") || pressed("{")))){
     event.preventDefault();
     if (event.repeat) return;
-    query(activeEditor()?.identifier)?.getPrevious()?.open();
+    getPrevious(query(activeEditor()?.identifier))?.open();
   }
   if (((control || (event.ctrlKey && !command && environment.appleDevice)) && !shift && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("]") || pressed("}")))){
     event.preventDefault();
     if (event.repeat) return;
-    query(activeEditor()?.identifier)?.getNext()?.open();
+    getNext(query(activeEditor()?.identifier))?.open();
   }
   if (((controlShift || shiftCommand) && pressed("n")) || ((controlShift || shiftCommand) && pressed("c"))){
     event.preventDefault();

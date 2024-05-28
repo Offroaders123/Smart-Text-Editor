@@ -31,6 +31,42 @@ export function createEditor(options: EditorOptions = {}): void {
   setEditors(editorElement.identifier, editorElement);
 }
 
+/**
+ * Gets the previous Editor to the left of this Editor.
+ * 
+ * If this Editor is the first one in the Workspace, it will wrap around to give the last Editor in the Workspace.
+ * 
+ * @param wrap Future feature: Add support to toggle the wrapping behavior.
+*/
+export function getPrevious(editor: EditorElement | null | undefined, _wrap: boolean = true): EditorElement | null {
+  if (editor === null || editor === undefined) return null;
+  const workspace_tabs: HTMLDivElement = workspaceTabs()!;
+  const { tab } = editor;
+  const editorTabs: HTMLButtonElement[] = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
+  const previousTab: HTMLButtonElement | null = editorTabs[(editorTabs.indexOf(tab) || editorTabs.length) - 1] ?? null;
+  const previousIdentifier: string | null = previousTab?.getAttribute("data-editor-identifier") ?? null;
+  const previousEditor: EditorElement | null = previousIdentifier ? query(previousIdentifier) : null;
+  return previousEditor;
+}
+
+/**
+ * Gets the next Editor to the right of this Editor.
+ * 
+ * If this Editor is the last one in the Workspace, it will wrap around to give the first Editor in the Workspace.
+ * 
+ * @param wrap Future feature: Add support to toggle the wrapping behavior.
+*/
+export function getNext(editor: EditorElement | null | undefined, _wrap: boolean = true): EditorElement | null {
+  if (editor === null || editor === undefined) return null;
+  const workspace_tabs: HTMLDivElement = workspaceTabs()!;
+  const { tab } = editor;
+  const editorTabs: HTMLButtonElement[] = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
+  const nextTab: HTMLButtonElement | null = editorTabs[(editorTabs.indexOf(tab) !== editorTabs.length - 1) ? editorTabs.indexOf(tab) + 1 : 0] ?? null;
+  const nextIdentifier: string | null = nextTab?.getAttribute("data-editor-identifier") ?? null;
+  const nextEditor: EditorElement | null = nextIdentifier ? query(nextIdentifier) : null;
+  return nextEditor;
+}
+
   /**
    * Queries an Editor by it's identifier.
   */
@@ -431,40 +467,6 @@ class EditorElement extends NumTextElement implements Editor {
     }
 
     this.name = name;
-  }
-
-  /**
-   * Gets the previous Editor to the left of this Editor.
-   * 
-   * If this Editor is the first one in the Workspace, it will wrap around to give the last Editor in the Workspace.
-   * 
-   * @param wrap Future feature: Add support to toggle the wrapping behavior.
-  */
-  getPrevious(_wrap: boolean = true): EditorElement | null {
-    const workspace_tabs: HTMLDivElement = workspaceTabs()!;
-    const { tab } = this;
-    const editorTabs: HTMLButtonElement[] = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
-    const previousTab: HTMLButtonElement | null = editorTabs[(editorTabs.indexOf(tab) || editorTabs.length) - 1] ?? null;
-    const previousIdentifier: string | null = previousTab?.getAttribute("data-editor-identifier") ?? null;
-    const previousEditor: EditorElement | null = previousIdentifier ? query(previousIdentifier) : null;
-    return previousEditor;
-  }
-
-  /**
-   * Gets the next Editor to the right of this Editor.
-   * 
-   * If this Editor is the last one in the Workspace, it will wrap around to give the first Editor in the Workspace.
-   * 
-   * @param wrap Future feature: Add support to toggle the wrapping behavior.
-  */
-  getNext(_wrap: boolean = true): EditorElement | null {
-    const workspace_tabs: HTMLDivElement = workspaceTabs()!;
-    const { tab } = this;
-    const editorTabs: HTMLButtonElement[] = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
-    const nextTab: HTMLButtonElement | null = editorTabs[(editorTabs.indexOf(tab) !== editorTabs.length - 1) ? editorTabs.indexOf(tab) + 1 : 0] ?? null;
-    const nextIdentifier: string | null = nextTab?.getAttribute("data-editor-identifier") ?? null;
-    const nextEditor: EditorElement | null = nextIdentifier ? query(nextIdentifier) : null;
-    return nextEditor;
   }
 
   get name(): string {
