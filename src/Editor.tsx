@@ -68,6 +68,36 @@ export function getNext(editor: EditorElement | null | undefined, _wrap: boolean
 }
 
 /**
+ * Opens the editor in the workspace.
+*/
+export function open(editor: EditorElement | null | undefined, { autoCreated = false, focusedOverride = false }: EditorOpenOptions = {}): void {
+  if (editor === null || editor === undefined) return;
+
+  const focused = (document.activeElement === activeEditor()) || focusedOverride;
+
+  query(activeEditor()?.identifier)?.tab.classList.remove("active");
+  query(activeEditor()?.identifier)?.classList.remove("active");
+
+  editor.tab.classList.add("active");
+  if (autoCreated){
+    editor.autoCreated = true;
+  }
+  editor.classList.add("active");
+  setActiveEditor(editor);
+
+  setTabsVisibility();
+  setTitle({ content: editor.name });
+
+  if ((((document.activeElement === document.body && activeDialog() !== null) || autoCreated) && !environment.touchDevice && appearance.parentWindow) || focused){
+    editor.focus({ preventScroll: true });
+  }
+
+  if (previewEditor() === null){
+    refreshPreview({ force: settings.automaticRefresh !== false });
+  }
+}
+
+/**
  * Renames the file of the editor.
  * 
  * @param name If a new name isn't provided, the user is prompted to provide one.
@@ -204,7 +234,7 @@ class EditorElement extends NumTextElement implements Editor {
 
       event.preventDefault();
       if (this.tab !== query(activeEditor()?.identifier)?.tab){
-        this.open();
+        open(this);
       }
     });
 
@@ -214,7 +244,7 @@ class EditorElement extends NumTextElement implements Editor {
       if (event.key === " " || event.key === "Enter"){
         event.preventDefault();
         if (this.tab !== query(activeEditor()?.identifier)?.tab){
-          this.open();
+          open(this);
         }
       }
     });
@@ -280,7 +310,7 @@ class EditorElement extends NumTextElement implements Editor {
         event.dataTransfer.dropEffect = "copy";
       }
       if (this.tab !== query(activeEditor()?.identifier)?.tab){
-        this.open();
+        open(this);
       }
     });
 
@@ -350,7 +380,7 @@ class EditorElement extends NumTextElement implements Editor {
     this.handle = handle ?? null;
 
     if (isOpen || activeEditor() === null){
-      this.open({ autoCreated, focusedOverride });
+      open(this, { autoCreated, focusedOverride });
     }
 
     this.syntaxLanguage = this.extension;
@@ -363,34 +393,6 @@ class EditorElement extends NumTextElement implements Editor {
         document.body.removeAttribute("data-editor-change");
       }
     },transitionDuration);
-  }
-
-  /**
-   * Opens the editor in the workspace.
-  */
-  open(this: EditorElement, { autoCreated = false, focusedOverride = false }: EditorOpenOptions = {}): void {
-    const focused = (document.activeElement === activeEditor()) || focusedOverride;
-
-    query(activeEditor()?.identifier)?.tab.classList.remove("active");
-    query(activeEditor()?.identifier)?.classList.remove("active");
-
-    this.tab.classList.add("active");
-    if (autoCreated){
-      this.autoCreated = true;
-    }
-    this.classList.add("active");
-    setActiveEditor(this);
-
-    setTabsVisibility();
-    setTitle({ content: this.#name });
-
-    if ((((document.activeElement === document.body && activeDialog() !== null) || autoCreated) && !environment.touchDevice && appearance.parentWindow) || focused){
-      this.focus({ preventScroll: true });
-    }
-
-    if (previewEditor() === null){
-      refreshPreview({ force: settings.automaticRefresh !== false });
-    }
   }
 
   /**
@@ -433,15 +435,15 @@ class EditorElement extends NumTextElement implements Editor {
 
     if (this.tab === editorTabs[0] && editorTabs[1] && this.tab.classList.contains("active")){
       const identifier = editorTabs[1].getAttribute("data-editor-identifier")!;
-      query(identifier)?.open();
+      open(query(identifier));
     }
     if (this.tab === editorTabs[editorTabs.length - 1] && this.tab !== editorTabs[0] && this.tab.classList.contains("active")){
       const identifier = editorTabs[editorTabs.length - 2]!.getAttribute("data-editor-identifier")!;
-      query(identifier)?.open();
+      open(query(identifier));
     }
     if (this.tab !== editorTabs[0] && this.tab.classList.contains("active")){
       const identifier = editorTabs[editorTabs.indexOf(this.tab) + 1]!.getAttribute("data-editor-identifier")!;
-      query(identifier)?.open();
+      open(query(identifier));
     }
 
     if (focused && query(activeEditor()?.identifier)?.editor !== undefined){
