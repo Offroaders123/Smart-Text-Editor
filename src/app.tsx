@@ -4,7 +4,7 @@ import { Main } from "./Main.js";
 import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings } from "./STE.js";
 import "./Card.js";
 import { insertTemplate } from "./Tools.js";
-import { createEditor, getNext, getPrevious, open, query, rename, setTabsVisibility } from "./Editor.js";
+import { close, createEditor, getNext, getPrevious, open, query, rename, setTabsVisibility } from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview } from "./Workspace.js";
 
 import type { Accessor, Setter } from "solid-js";
@@ -131,7 +131,7 @@ document.body.addEventListener("keydown",event => {
     event.preventDefault();
     if (event.repeat) return;
     /* Future feature: If an editor tab is focused, close that editor instead of only the active editor */
-    query(activeEditor()?.identifier)?.close();
+    close(query(activeEditor()?.identifier));
   }
   if (((controlShift || (event.ctrlKey && shift && !command && environment.appleDevice)) && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("[") || pressed("{")))){
     event.preventDefault();

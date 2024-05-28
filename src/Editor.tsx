@@ -98,6 +98,86 @@ export function open(editor: EditorElement | null | undefined, { autoCreated = f
 }
 
 /**
+ * Closes the editor in the workspace.
+*/
+export async function close(editor: EditorElement | null | undefined): Promise<void> {
+  if (editor === null || editor === undefined) return;
+
+  if (editor.unsaved){
+    const confirmation: boolean = confirm(`Are you sure you would like to close "${editor.name}"?\nRecent changes have not yet been saved.`);
+    if (!confirmation) return;
+  }
+
+  const workspace_tabs: HTMLDivElement = workspaceTabs()!;
+  const workspace_editors: HTMLDivElement = workspaceEditors()!;
+  const preview: HTMLIFrameElement = getPreview()!;
+  const editorTabs = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
+  const changeIdentifier: string = Math.random().toString();
+  const focused: boolean = document.activeElement === editor;
+
+  if (editorTabs.length !== 1){
+    document.body.setAttribute("data-editor-change",changeIdentifier);
+    editor.tab.style.setProperty("--tab-margin-right",`-${editor.tab.offsetWidth}px`);
+  } else if (document.body.hasAttribute("data-editor-change")){
+    document.body.removeAttribute("data-editor-change");
+    for (const tab of workspace_tabs.querySelectorAll(".tab[data-editor-change]")){
+      tab.remove();
+    }
+  }
+
+  const transitionDuration = (document.body.hasAttribute("data-editor-change")) ? parseInt(`${Number(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`) : 0;
+
+  if (editor.tab === editorTabs[0] && editorTabs.length === 1){
+    setActiveEditor(null);
+    setTitle({ reset: true });
+    preview.src = "about:blank";
+  }
+
+  if (previewEditor() === editor){
+    setPreviewSource(null);
+  }
+
+  if (editor.tab === editorTabs[0] && editorTabs[1] && editor.tab.classList.contains("active")){
+    const identifier = editorTabs[1].getAttribute("data-editor-identifier")!;
+    open(query(identifier));
+  }
+  if (editor.tab === editorTabs[editorTabs.length - 1] && editor.tab !== editorTabs[0] && editor.tab.classList.contains("active")){
+    const identifier = editorTabs[editorTabs.length - 2]!.getAttribute("data-editor-identifier")!;
+    open(query(identifier));
+  }
+  if (editor.tab !== editorTabs[0] && editor.tab.classList.contains("active")){
+    const identifier = editorTabs[editorTabs.indexOf(editor.tab) + 1]!.getAttribute("data-editor-identifier")!;
+    open(query(identifier));
+  }
+
+  if (focused && query(activeEditor()?.identifier)?.editor !== undefined){
+    query(activeEditor()?.identifier)?.focus({ preventScroll: true });
+  }
+
+  editor.tab.setAttribute("data-editor-change","");
+  if (editor.tab === document.activeElement){
+    editor.tab.blur();
+  }
+  editor.tab.tabIndex = -1;
+  editor.tab.classList.remove("active");
+
+  workspace_editors.removeChild(editor);
+  previewMenu()!.main.removeChild(editor.previewOption);
+
+  setEditors(editor.identifier, undefined);
+
+  if (transitionDuration !== 0){
+    await new Promise(resolve => setTimeout(resolve,transitionDuration));
+  }
+  if (workspace_tabs.contains(editor.tab)){
+    workspace_tabs.removeChild(editor.tab);
+  }
+  if (document.body.getAttribute("data-editor-change") === changeIdentifier){
+    document.body.removeAttribute("data-editor-change");
+  }
+}
+
+/**
  * Renames the file of the editor.
  * 
  * @param name If a new name isn't provided, the user is prompted to provide one.
@@ -328,7 +408,7 @@ class EditorElement extends NumTextElement implements Editor {
 
     this.editorClose.addEventListener("click",async event => {
       event.stopPropagation();
-      await this.close();
+      await close(this);
     });
 
     this.classList.add("editor");
@@ -350,7 +430,7 @@ class EditorElement extends NumTextElement implements Editor {
         focusedOverride = true;
       }
       if (autoReplace){
-        query(activeEditor()!.identifier)!.close();
+        close(query(activeEditor()!.identifier)!);
       } else {
         query(activeEditor()!.identifier)!.autoCreated = false;
       }
@@ -393,84 +473,6 @@ class EditorElement extends NumTextElement implements Editor {
         document.body.removeAttribute("data-editor-change");
       }
     },transitionDuration);
-  }
-
-  /**
-   * Closes the editor in the workspace.
-  */
-  async close(): Promise<void> {
-    if (this.unsaved){
-      const confirmation: boolean = confirm(`Are you sure you would like to close "${this.#name}"?\nRecent changes have not yet been saved.`);
-      if (!confirmation) return;
-    }
-
-    const workspace_tabs: HTMLDivElement = workspaceTabs()!;
-    const workspace_editors: HTMLDivElement = workspaceEditors()!;
-    const preview: HTMLIFrameElement = getPreview()!;
-    const editorTabs = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
-    const changeIdentifier: string = Math.random().toString();
-    const focused: boolean = document.activeElement === this;
-
-    if (editorTabs.length !== 1){
-      document.body.setAttribute("data-editor-change",changeIdentifier);
-      this.tab.style.setProperty("--tab-margin-right",`-${this.tab.offsetWidth}px`);
-    } else if (document.body.hasAttribute("data-editor-change")){
-      document.body.removeAttribute("data-editor-change");
-      for (const tab of workspace_tabs.querySelectorAll(".tab[data-editor-change]")){
-        tab.remove();
-      }
-    }
-
-    const transitionDuration = (document.body.hasAttribute("data-editor-change")) ? parseInt(`${Number(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`) : 0;
-
-    if (this.tab === editorTabs[0] && editorTabs.length === 1){
-      setActiveEditor(null);
-      setTitle({ reset: true });
-      preview.src = "about:blank";
-    }
-
-    if (previewEditor() === this){
-      setPreviewSource(null);
-    }
-
-    if (this.tab === editorTabs[0] && editorTabs[1] && this.tab.classList.contains("active")){
-      const identifier = editorTabs[1].getAttribute("data-editor-identifier")!;
-      open(query(identifier));
-    }
-    if (this.tab === editorTabs[editorTabs.length - 1] && this.tab !== editorTabs[0] && this.tab.classList.contains("active")){
-      const identifier = editorTabs[editorTabs.length - 2]!.getAttribute("data-editor-identifier")!;
-      open(query(identifier));
-    }
-    if (this.tab !== editorTabs[0] && this.tab.classList.contains("active")){
-      const identifier = editorTabs[editorTabs.indexOf(this.tab) + 1]!.getAttribute("data-editor-identifier")!;
-      open(query(identifier));
-    }
-
-    if (focused && query(activeEditor()?.identifier)?.editor !== undefined){
-      query(activeEditor()?.identifier)?.focus({ preventScroll: true });
-    }
-
-    this.tab.setAttribute("data-editor-change","");
-    if (this.tab === document.activeElement){
-      this.tab.blur();
-    }
-    this.tab.tabIndex = -1;
-    this.tab.classList.remove("active");
-
-    workspace_editors.removeChild(this);
-    previewMenu()!.main.removeChild(this.previewOption);
-
-    setEditors(this.identifier, undefined);
-
-    if (transitionDuration !== 0){
-      await new Promise(resolve => setTimeout(resolve,transitionDuration));
-    }
-    if (workspace_tabs.contains(this.tab)){
-      workspace_tabs.removeChild(this.tab);
-    }
-    if (document.body.getAttribute("data-editor-change") === changeIdentifier){
-      document.body.removeAttribute("data-editor-change");
-    }
   }
 
   get name(): string {
