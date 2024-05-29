@@ -1,5 +1,6 @@
 import { createSignal } from "solid-js";
 import { Widget } from "./Card.js";
+import { query } from "./Editor.js";
 import { activeEditor } from "./STE.js";
 import { applyEditingBehavior } from "./dom.js";
 
@@ -8,7 +9,7 @@ export default function ReplaceTextCard() {
   const [replaceValue, setReplaceValue] = createSignal<string>("");
 
   function replace(): void {
-    const editor = activeEditor();
+    const editor = query(activeEditor());
     if (!editor) return;
     const replaced = editor.value.split(findValue()).join(replaceValue());
     if (replaced != editor.value) editor.value = replaced;

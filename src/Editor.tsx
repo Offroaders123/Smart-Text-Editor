@@ -33,7 +33,7 @@ export function createEditor(options: EditorOptions = {}): void {
 
   const { autoCreated, focusedOverride } = editorElement;
   if (editorElement.isOpen || activeEditor() === null){
-    open(editorElement, { autoCreated, focusedOverride });
+    open(editorElement.identifier, { autoCreated, focusedOverride });
     editorElement.focusedOverride = false;
   }
 }
@@ -45,15 +45,15 @@ export function createEditor(options: EditorOptions = {}): void {
  * 
  * @param wrap Future feature: Add support to toggle the wrapping behavior.
 */
-export function getPrevious(editor: EditorElement | null | undefined, _wrap: boolean = true): EditorElement | null {
-  if (editor === null || editor === undefined) return null;
+export function getPrevious(identifier: string | null, _wrap: boolean = true): string | null {
+  const editor = query(identifier);
+  if (editor === null) return null;
   const workspace_tabs: HTMLDivElement = workspaceTabs()!;
   const { tab } = editor;
   const editorTabs: HTMLButtonElement[] = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
   const previousTab: HTMLButtonElement | null = editorTabs[(editorTabs.indexOf(tab) || editorTabs.length) - 1] ?? null;
   const previousIdentifier: string | null = previousTab?.getAttribute("data-editor-identifier") ?? null;
-  const previousEditor: EditorElement | null = previousIdentifier ? query(previousIdentifier) : null;
-  return previousEditor;
+  return previousIdentifier;
 }
 
 /**
@@ -63,34 +63,35 @@ export function getPrevious(editor: EditorElement | null | undefined, _wrap: boo
  * 
  * @param wrap Future feature: Add support to toggle the wrapping behavior.
 */
-export function getNext(editor: EditorElement | null | undefined, _wrap: boolean = true): EditorElement | null {
-  if (editor === null || editor === undefined) return null;
+export function getNext(identifier: string | null, _wrap: boolean = true): string | null {
+  const editor = query(identifier);
+  if (editor === null) return null;
   const workspace_tabs: HTMLDivElement = workspaceTabs()!;
   const { tab } = editor;
   const editorTabs: HTMLButtonElement[] = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
   const nextTab: HTMLButtonElement | null = editorTabs[(editorTabs.indexOf(tab) !== editorTabs.length - 1) ? editorTabs.indexOf(tab) + 1 : 0] ?? null;
   const nextIdentifier: string | null = nextTab?.getAttribute("data-editor-identifier") ?? null;
-  const nextEditor: EditorElement | null = nextIdentifier ? query(nextIdentifier) : null;
-  return nextEditor;
+  return nextIdentifier;
 }
 
 /**
  * Opens the editor in the workspace.
 */
-export function open(editor: EditorElement | null | undefined, { autoCreated = false, focusedOverride = false }: EditorOpenOptions = {}): void {
-  if (editor === null || editor === undefined) return;
+export function open(identifier: string | null, { autoCreated = false, focusedOverride = false }: EditorOpenOptions = {}): void {
+  const editor = query(identifier);
+  if (editor === null) return;
 
   const focused = (document.activeElement === activeEditor()) || focusedOverride;
 
-  query(activeEditor()?.identifier)?.tab.classList.remove("active");
-  query(activeEditor()?.identifier)?.classList.remove("active");
+  query(activeEditor())?.tab.classList.remove("active");
+  query(activeEditor())?.classList.remove("active");
 
   editor.tab.classList.add("active");
   if (autoCreated){
     editor.autoCreated = true;
   }
   editor.classList.add("active");
-  setActiveEditor(editor);
+  setActiveEditor(editor.identifier);
 
   setTabsVisibility();
   setTitle({ content: editor.name });
@@ -107,8 +108,9 @@ export function open(editor: EditorElement | null | undefined, { autoCreated = f
 /**
  * Closes the editor in the workspace.
 */
-export async function close(editor: EditorElement | null | undefined): Promise<void> {
-  if (editor === null || editor === undefined) return;
+export async function close(identifier: string | null): Promise<void> {
+  const editor = query(identifier);
+  if (editor === null) return;
 
   if (editor.unsaved){
     const confirmation: boolean = confirm(`Are you sure you would like to close "${editor.name}"?\nRecent changes have not yet been saved.`);
@@ -140,25 +142,25 @@ export async function close(editor: EditorElement | null | undefined): Promise<v
     preview.src = "about:blank";
   }
 
-  if (previewEditor() === editor){
+  if (previewEditor() === editor.identifier){
     setPreviewSource(null);
   }
 
   if (editor.tab === editorTabs[0] && editorTabs[1] && editor.tab.classList.contains("active")){
     const identifier = editorTabs[1].getAttribute("data-editor-identifier")!;
-    open(query(identifier));
+    open(identifier);
   }
   if (editor.tab === editorTabs[editorTabs.length - 1] && editor.tab !== editorTabs[0] && editor.tab.classList.contains("active")){
     const identifier = editorTabs[editorTabs.length - 2]!.getAttribute("data-editor-identifier")!;
-    open(query(identifier));
+    open(identifier);
   }
   if (editor.tab !== editorTabs[0] && editor.tab.classList.contains("active")){
     const identifier = editorTabs[editorTabs.indexOf(editor.tab) + 1]!.getAttribute("data-editor-identifier")!;
-    open(query(identifier));
+    open(identifier);
   }
 
-  if (focused && query(activeEditor()?.identifier)?.editor !== undefined){
-    query(activeEditor()?.identifier)?.focus({ preventScroll: true });
+  if (focused && query(activeEditor())?.editor !== undefined){
+    query(activeEditor())?.focus({ preventScroll: true });
   }
 
   editor.tab.setAttribute("data-editor-change","");
@@ -189,8 +191,9 @@ export async function close(editor: EditorElement | null | undefined): Promise<v
  * 
  * @param name If a new name isn't provided, the user is prompted to provide one.
 */
-export function rename(editor: Editor | null | undefined, name?: string): void {
-  if (editor === null || editor === undefined) return;
+export function rename(identifier: string | null, name?: string): void {
+  const editor = query(identifier);
+  if (editor === null) return;
 
   const currentName = editor.name;
 
@@ -206,13 +209,14 @@ export function rename(editor: Editor | null | undefined, name?: string): void {
 export interface EditorElement extends Editor, NumTextElement {
   readonly tab: HTMLButtonElement;
   readonly previewOption: MenuDropOption;
+  readonly basename: string;
   readonly extension: string;
 }
 
   /**
    * Queries an Editor by it's identifier.
   */
-  export function query(identifier: string | null | undefined): EditorElement | null {
+  export function query(identifier: string | null): EditorElement | null {
     if (typeof identifier !== "string") return null;
     const editor: Editor | null = editors[identifier] ?? null;
     if (editor === null) return null;
@@ -224,7 +228,7 @@ export interface EditorElement extends Editor, NumTextElement {
    * 
    * If the given identifier is already fully in view, no scrolling will happen.
   */
-  export function setTabsVisibility(identifier: string | undefined = activeEditor()?.identifier): void {
+  export function setTabsVisibility(identifier: string | null = activeEditor()): void {
     if (!identifier) return;
     const editor = query(identifier);
     if (editor === null) return;
@@ -326,8 +330,8 @@ class EditorLegacy extends NumTextElement implements Editor {
       if (event.button !== 0 || document.activeElement.matches("[data-editor-rename]")) return;
 
       event.preventDefault();
-      if (this.tab !== query(activeEditor()?.identifier)?.tab){
-        open(this);
+      if (this.tab !== query(activeEditor())?.tab){
+        open(this.identifier);
       }
     });
 
@@ -336,8 +340,8 @@ class EditorLegacy extends NumTextElement implements Editor {
       // Add a check to this to only apply this key handling if the Editor isn't currently being renamed in the Editor tab.
       if (event.key === " " || event.key === "Enter"){
         event.preventDefault();
-        if (this.tab !== query(activeEditor()?.identifier)?.tab){
-          open(this);
+        if (this.tab !== query(activeEditor())?.tab){
+          open(this.identifier);
         }
       }
     });
@@ -402,8 +406,8 @@ class EditorLegacy extends NumTextElement implements Editor {
       if (event.dataTransfer !== null){
         event.dataTransfer.dropEffect = "copy";
       }
-      if (this.tab !== query(activeEditor()?.identifier)?.tab){
-        open(this);
+      if (this.tab !== query(activeEditor())?.tab){
+        open(this.identifier);
       }
     });
 
@@ -421,7 +425,7 @@ class EditorLegacy extends NumTextElement implements Editor {
 
     this.editorClose.addEventListener("click",async event => {
       event.stopPropagation();
-      await close(this);
+      await close(this.identifier);
     });
 
     this.classList.add("editor");
@@ -435,17 +439,17 @@ class EditorLegacy extends NumTextElement implements Editor {
     this.previewOption.innerText = this.#name;
 
     this.previewOption.addEventListener("click",() => {
-      setPreviewSource(this);
+      setPreviewSource(this.identifier);
     });
 
-    if (activeEditor() !== null && activeEditor()!.autoCreated){
-      if (document.activeElement === query(activeEditor()!.identifier)!){
+    if (activeEditor() !== null && query(activeEditor()!)!.autoCreated){
+      if (document.activeElement === query(activeEditor()!)!){
         this.focusedOverride = true;
       }
       if (autoReplace){
-        close(query(activeEditor()!.identifier)!);
+        close(activeEditor()!);
       } else {
-        query(activeEditor()!.identifier)!.autoCreated = false;
+        query(activeEditor()!)!.autoCreated = false;
       }
     }
 
@@ -525,11 +529,11 @@ class EditorLegacy extends NumTextElement implements Editor {
       this.autoCreated = false;
     }
 
-    if (this.tab === query(activeEditor()?.identifier)?.tab){
+    if (this.tab === query(activeEditor())?.tab){
       setTitle({ content: rename });
     }
 
-    if ((previewEditor() === null && activeEditor() === this) || previewEditor() === this){
+    if ((previewEditor() === null && activeEditor() === this.identifier) || previewEditor() === this.identifier){
       refreshPreview({ force: true });
     }
   }

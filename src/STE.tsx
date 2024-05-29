@@ -213,16 +213,16 @@ export function unsavedWork(): boolean {
 export const preapprovedExtensions = ["txt","html","css","js","php","json","webmanifest","bbmodel","xml","yaml","yml","dist","config","ini","md","markdown","mcmeta","lang","properties","uidx","material","h","fragment","vertex","fxh","hlsl","ihlsl","svg"] as const;
 
 /**
- * A reference to the currently opened Editor.
+ * The identifier of the currently opened Editor.
 */
-export const [activeEditor, setActiveEditor] = createSignal<Editor | null>(null);
+export const [activeEditor, setActiveEditor] = createSignal<string | null>(null);
 
 /**
  * The identifier of the Editor to be used within the Preview.
  * 
  * When set to `null`, internally the value of `previewEditor` will be pointed to `activeEditor` when used.
 */
-export const [previewEditor, setPreviewEditor] = createSignal<Editor | null>(null);
+export const [previewEditor, setPreviewEditor] = createSignal<string | null>(null);
 
 /**
  * An array of all windows opened during the current session.

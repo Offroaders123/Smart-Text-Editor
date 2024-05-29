@@ -131,17 +131,17 @@ document.body.addEventListener("keydown",event => {
     event.preventDefault();
     if (event.repeat) return;
     /* Future feature: If an editor tab is focused, close that editor instead of only the active editor */
-    close(query(activeEditor()?.identifier));
+    close(activeEditor());
   }
   if (((controlShift || (event.ctrlKey && shift && !command && environment.appleDevice)) && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("[") || pressed("{")))){
     event.preventDefault();
     if (event.repeat) return;
-    open(getPrevious(query(activeEditor()?.identifier)));
+    open(getPrevious(activeEditor()));
   }
   if (((control || (event.ctrlKey && !command && environment.appleDevice)) && !shift && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("]") || pressed("}")))){
     event.preventDefault();
     if (event.repeat) return;
-    open(getNext(query(activeEditor()?.identifier)));
+    open(getNext(activeEditor()));
   }
   if (((controlShift || shiftCommand) && pressed("n")) || ((controlShift || shiftCommand) && pressed("c"))){
     event.preventDefault();
@@ -156,7 +156,7 @@ document.body.addEventListener("keydown",event => {
   if ((controlShift || shiftCommand) && pressed("r")){
     event.preventDefault();
     if (event.repeat) return;
-    rename(query(activeEditor()?.identifier));
+    rename(activeEditor());
   }
   if ((control || command) && !shift && pressed("s")){
     event.preventDefault();
@@ -334,7 +334,7 @@ if (support.fileHandling && support.fileSystem){
       createEditor({ name, value, handle });
     }
     if (!environment.touchDevice){
-      query(activeEditor()?.identifier)?.focus({ preventScroll: true });
+      query(activeEditor())?.focus({ preventScroll: true });
     }
   });
 }
