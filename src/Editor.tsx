@@ -11,6 +11,7 @@ export interface Editor {
   handle: FileSystemFileHandle | null;
   isOpen: boolean;
   autoCreated: boolean;
+  focusedOverride: boolean;
   refresh: boolean;
   unsaved: boolean;
   autoReplace: boolean;
@@ -29,6 +30,12 @@ export interface EditorOpenOptions {
 export function createEditor(options: EditorOptions = {}): void {
   const editorElement = new EditorLegacy(options);
   setEditors(editorElement.identifier, editorElement);
+
+  const { autoCreated, focusedOverride } = editorElement;
+  if (editorElement.isOpen || activeEditor() === null){
+    open(editorElement, { autoCreated, focusedOverride });
+    editorElement.focusedOverride = false;
+  }
 }
 
 /**
@@ -290,6 +297,8 @@ class EditorLegacy extends NumTextElement implements Editor {
 
   declare readonly autoReplace;
 
+  focusedOverride: boolean = false;
+
   constructor({ name = "Untitled.txt", value = "", handle, isOpen = true, autoCreated = false, autoReplace = true }: EditorOptions = {}) {
     super();
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
@@ -302,7 +311,7 @@ class EditorLegacy extends NumTextElement implements Editor {
     this.autoCreated = autoCreated;
     this.autoReplace = autoReplace;
 
-    let focusedOverride: boolean | undefined;
+    // let focusedOverride: boolean | undefined;
     const changeIdentifier = Math.random().toString();
 
     document.body.setAttribute("data-editor-change",changeIdentifier);
@@ -431,7 +440,7 @@ class EditorLegacy extends NumTextElement implements Editor {
 
     if (activeEditor() !== null && activeEditor()!.autoCreated){
       if (document.activeElement === query(activeEditor()!.identifier)!){
-        focusedOverride = true;
+        this.focusedOverride = true;
       }
       if (autoReplace){
         close(query(activeEditor()!.identifier)!);
@@ -463,9 +472,9 @@ class EditorLegacy extends NumTextElement implements Editor {
     // setEditors(this.identifier, this);
     this.handle = handle ?? null;
 
-    if (isOpen || activeEditor() === null){
-      open(this, { autoCreated, focusedOverride });
-    }
+    // if (isOpen || activeEditor() === null){
+    //   open(this, { autoCreated, focusedOverride });
+    // }
 
     this.syntaxLanguage = this.extension;
     if ((settings.syntaxHighlighting === true) && (this.syntaxLanguage in Prism.languages)){
