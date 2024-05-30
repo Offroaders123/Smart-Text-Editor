@@ -201,13 +201,13 @@ export async function openFiles(): Promise<void> {
 */
 export async function saveFile(extension?: string): Promise<void> {
   if (extension || !support.fileSystem){
-    if (!extension) extension = query(activeEditor())?.extension;
+    if (!extension) extension = query(activeEditor())?.ref.extension;
     const anchor = document.createElement("a");
-    const link = window.URL.createObjectURL(new Blob([query(activeEditor())?.editor.value ?? ""]));
+    const link = window.URL.createObjectURL(new Blob([query(activeEditor())?.ref.editor.value ?? ""]));
     anchor.href = link;
     anchor.download = `${
       // @ts-expect-error
-      query(activeEditor())?.basename satisfies string
+      query(activeEditor())?.ref.basename satisfies string
     }.${extension}`;
     anchor.click();
     window.URL.revokeObjectURL(link);
@@ -215,42 +215,42 @@ export async function saveFile(extension?: string): Promise<void> {
     const identifier: EditorElement | null = query(activeEditor());
     let handle: void | FileSystemFileHandle;
     if (identifier === null) throw new Error("No editors are open, couldn't save anything!");
-    if (!identifier.handle){
+    if (!identifier.state.handle){
       handle = await window.showSaveFilePicker({
         suggestedName:
           // @ts-expect-error
-          query(activeEditor())?.name satisfies string,
-        startIn: (identifier.handle) ? identifier.handle : "desktop"
+          query(activeEditor())?.state.name satisfies string,
+        startIn: (identifier.state.handle) ? identifier.state.handle : "desktop"
       }).catch(error => {
         if (error.message.toLowerCase().includes("abort")) return;
       });
       if (!handle) return;
-      identifier.handle = handle;
-    } else handle = identifier.handle!;
-    const stream = await identifier.handle?.createWritable().catch(error => {
+      identifier.state.handle = handle;
+    } else handle = identifier.state.handle!;
+    const stream = await identifier.state.handle?.createWritable().catch(error => {
       alert(`"${
         // @ts-expect-error
-        query(activeEditor())?.name satisfies string
+        query(activeEditor())?.state.name satisfies string
       }" could not be saved.`);
       if (error.toString().toLowerCase().includes("not allowed")) return;
     });
     if (!stream) return;
     await stream.write(
       // @ts-expect-error
-      query(activeEditor())?.editor.value satisfies string
+      query(activeEditor())?.ref.editor.value satisfies string
     );
     await stream.close();
     // @ts-expect-error
-    const currentName: string = query(activeEditor())?.name;
+    const currentName: string = query(activeEditor())?.state.name;
     const file = await handle.getFile();
     const newName = file.name;
-    if (currentName != newName) rename(identifier.identifier, newName);
+    if (currentName != newName) rename(identifier.state.identifier, newName);
   }
-  if (query(activeEditor())?.autoCreated){
-    query(activeEditor()!)!.autoCreated = false;
+  if (query(activeEditor())?.state.autoCreated){
+    query(activeEditor()!)!.state.autoCreated = false;
   }
-  if (query(activeEditor())?.unsaved){
-    query(activeEditor()!)!.unsaved = false;
+  if (query(activeEditor())?.state.unsaved){
+    query(activeEditor()!)!.state.unsaved = false;
   }
   await refreshPreview({ force: true });
 }
@@ -266,7 +266,7 @@ export function createDisplay(): void {
     features = (appearance.standalone || appearance.fullscreen) ? "popup" : "",
     baseURL = settings.previewBase;
   // @ts-expect-error
-  let source: string = query(activeEditor())?.editor.value;
+  let source: string = query(activeEditor())?.ref.editor.value;
   if (baseURL) source = `<!DOCTYPE html>\n<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
   const link = window.URL.createObjectURL(new Blob([source],{ type: "text/html" })),
     win = window.open(link,"_blank",features);
@@ -280,7 +280,7 @@ export function createDisplay(): void {
     if (win === null) return;
     if (!win.document.title){
       // @ts-expect-error
-      win.document.title = query(activeEditor())?.name;
+      win.document.title = query(activeEditor())?.state.name;
     }
   },20);
 }
@@ -297,12 +297,12 @@ export async function refreshPreview({ force = false }: RefreshPreviewOptions = 
 
   const editor: EditorElement | null = query(previewEditor() ?? activeEditor());
   if (editor === null) return;
-  const change: boolean = editor.refresh && !settings.automaticRefresh;
+  const change: boolean = editor.state.refresh && !settings.automaticRefresh;
   if (!change && !force) return;
   
   const preview: HTMLIFrameElement = getPreview()!;
   const baseURL: string | null = settings.previewBase;
-  let source: string = editor.editor.value;
+  let source: string = editor.ref.editor.value;
   if (baseURL !== null){
     source = `<!DOCTYPE html>\n<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
   }
@@ -317,7 +317,7 @@ export async function refreshPreview({ force = false }: RefreshPreviewOptions = 
   preview.contentDocument?.write(source);
   preview.contentDocument?.close();
 
-  if (change) editor.refresh = false;
+  if (change) editor.state.refresh = false;
 }
 
 /**

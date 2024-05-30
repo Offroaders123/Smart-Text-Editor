@@ -334,7 +334,7 @@ if (support.fileHandling && support.fileSystem){
       createEditor({ name, value, handle });
     }
     if (!environment.touchDevice){
-      query(activeEditor())?.focus({ preventScroll: true });
+      query(activeEditor())?.ref.focus({ preventScroll: true });
     }
   });
 }

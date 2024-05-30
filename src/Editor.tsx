@@ -49,7 +49,7 @@ export function getPrevious(identifier: string | null, _wrap: boolean = true): s
   const editor = query(identifier);
   if (editor === null) return null;
   const workspace_tabs: HTMLDivElement = workspaceTabs()!;
-  const { tab } = editor;
+  const { tab } = editor.ref;
   const editorTabs: HTMLButtonElement[] = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
   const previousTab: HTMLButtonElement | null = editorTabs[(editorTabs.indexOf(tab) || editorTabs.length) - 1] ?? null;
   const previousIdentifier: string | null = previousTab?.getAttribute("data-editor-identifier") ?? null;
@@ -67,7 +67,7 @@ export function getNext(identifier: string | null, _wrap: boolean = true): strin
   const editor = query(identifier);
   if (editor === null) return null;
   const workspace_tabs: HTMLDivElement = workspaceTabs()!;
-  const { tab } = editor;
+  const { tab } = editor.ref;
   const editorTabs: HTMLButtonElement[] = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
   const nextTab: HTMLButtonElement | null = editorTabs[(editorTabs.indexOf(tab) !== editorTabs.length - 1) ? editorTabs.indexOf(tab) + 1 : 0] ?? null;
   const nextIdentifier: string | null = nextTab?.getAttribute("data-editor-identifier") ?? null;
@@ -83,21 +83,21 @@ export function open(identifier: string | null, { autoCreated = false, focusedOv
 
   const focused = (document.activeElement === activeEditor()) || focusedOverride;
 
-  query(activeEditor())?.tab.classList.remove("active");
-  query(activeEditor())?.classList.remove("active");
+  query(activeEditor())?.ref.tab.classList.remove("active");
+  query(activeEditor())?.ref.classList.remove("active");
 
-  editor.tab.classList.add("active");
+  editor.ref.tab.classList.add("active");
   if (autoCreated){
-    editor.autoCreated = true;
+    editor.state.autoCreated = true;
   }
-  editor.classList.add("active");
-  setActiveEditor(editor.identifier);
+  editor.ref.classList.add("active");
+  setActiveEditor(editor.state.identifier);
 
   setTabsVisibility();
-  setTitle({ content: editor.name });
+  setTitle({ content: editor.state.name });
 
   if ((((document.activeElement === document.body && activeDialog() !== null) || autoCreated) && !environment.touchDevice && appearance.parentWindow) || focused){
-    editor.focus({ preventScroll: true });
+    editor.ref.focus({ preventScroll: true });
   }
 
   if (previewEditor() === null){
@@ -112,8 +112,8 @@ export async function close(identifier: string | null): Promise<void> {
   const editor = query(identifier);
   if (editor === null) return;
 
-  if (editor.unsaved){
-    const confirmation: boolean = confirm(`Are you sure you would like to close "${editor.name}"?\nRecent changes have not yet been saved.`);
+  if (editor.state.unsaved){
+    const confirmation: boolean = confirm(`Are you sure you would like to close "${editor.state.name}"?\nRecent changes have not yet been saved.`);
     if (!confirmation) return;
   }
 
@@ -122,11 +122,11 @@ export async function close(identifier: string | null): Promise<void> {
   const preview: HTMLIFrameElement = getPreview()!;
   const editorTabs = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
   const changeIdentifier: string = Math.random().toString();
-  const focused: boolean = document.activeElement === editor;
+  const focused: boolean = document.activeElement === editor.ref;
 
   if (editorTabs.length !== 1){
     document.body.setAttribute("data-editor-change",changeIdentifier);
-    editor.tab.style.setProperty("--tab-margin-right",`-${editor.tab.offsetWidth}px`);
+    editor.ref.tab.style.setProperty("--tab-margin-right",`-${editor.ref.tab.offsetWidth}px`);
   } else if (document.body.hasAttribute("data-editor-change")){
     document.body.removeAttribute("data-editor-change");
     for (const tab of workspace_tabs.querySelectorAll(".tab[data-editor-change]")){
@@ -136,50 +136,50 @@ export async function close(identifier: string | null): Promise<void> {
 
   const transitionDuration = (document.body.hasAttribute("data-editor-change")) ? parseInt(`${Number(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`) : 0;
 
-  if (editor.tab === editorTabs[0] && editorTabs.length === 1){
+  if (editor.ref.tab === editorTabs[0] && editorTabs.length === 1){
     setActiveEditor(null);
     setTitle({ reset: true });
     preview.src = "about:blank";
   }
 
-  if (previewEditor() === editor.identifier){
+  if (previewEditor() === editor.state.identifier){
     setPreviewSource(null);
   }
 
-  if (editor.tab === editorTabs[0] && editorTabs[1] && editor.tab.classList.contains("active")){
+  if (editor.ref.tab === editorTabs[0] && editorTabs[1] && editor.ref.tab.classList.contains("active")){
     const identifier = editorTabs[1].getAttribute("data-editor-identifier")!;
     open(identifier);
   }
-  if (editor.tab === editorTabs[editorTabs.length - 1] && editor.tab !== editorTabs[0] && editor.tab.classList.contains("active")){
+  if (editor.ref.tab === editorTabs[editorTabs.length - 1] && editor.ref.tab !== editorTabs[0] && editor.ref.tab.classList.contains("active")){
     const identifier = editorTabs[editorTabs.length - 2]!.getAttribute("data-editor-identifier")!;
     open(identifier);
   }
-  if (editor.tab !== editorTabs[0] && editor.tab.classList.contains("active")){
-    const identifier = editorTabs[editorTabs.indexOf(editor.tab) + 1]!.getAttribute("data-editor-identifier")!;
+  if (editor.ref.tab !== editorTabs[0] && editor.ref.tab.classList.contains("active")){
+    const identifier = editorTabs[editorTabs.indexOf(editor.ref.tab) + 1]!.getAttribute("data-editor-identifier")!;
     open(identifier);
   }
 
-  if (focused && query(activeEditor())?.editor !== undefined){
-    query(activeEditor())?.focus({ preventScroll: true });
+  if (focused && query(activeEditor())?.ref.editor !== undefined){
+    query(activeEditor())?.ref.focus({ preventScroll: true });
   }
 
-  editor.tab.setAttribute("data-editor-change","");
-  if (editor.tab === document.activeElement){
-    editor.tab.blur();
+  editor.ref.tab.setAttribute("data-editor-change","");
+  if (editor.ref.tab === document.activeElement){
+    editor.ref.tab.blur();
   }
-  editor.tab.tabIndex = -1;
-  editor.tab.classList.remove("active");
+  editor.ref.tab.tabIndex = -1;
+  editor.ref.tab.classList.remove("active");
 
-  workspace_editors.removeChild(editor);
-  previewMenu()!.main.removeChild(editor.previewOption);
+  workspace_editors.removeChild(editor.ref);
+  previewMenu()!.main.removeChild(editor.ref.previewOption);
 
-  setEditors(editor.identifier, undefined);
+  setEditors(editor.state.identifier, undefined);
 
   if (transitionDuration !== 0){
     await new Promise(resolve => setTimeout(resolve,transitionDuration));
   }
-  if (workspace_tabs.contains(editor.tab)){
-    workspace_tabs.removeChild(editor.tab);
+  if (workspace_tabs.contains(editor.ref.tab)){
+    workspace_tabs.removeChild(editor.ref.tab);
   }
   if (document.body.getAttribute("data-editor-change") === changeIdentifier){
     document.body.removeAttribute("data-editor-change");
@@ -195,7 +195,7 @@ export function rename(identifier: string | null, name?: string): void {
   const editor = query(identifier);
   if (editor === null) return;
 
-  const currentName = editor.name;
+  const currentName = editor.state.name;
 
   if (name === undefined){
     const result = prompt(`Enter a new file name for "${currentName}".`,currentName);
@@ -203,14 +203,17 @@ export function rename(identifier: string | null, name?: string): void {
     name = result;
   }
 
-  editor.name = name;
+  editor.state.name = name;
 }
 
-export interface EditorElement extends Editor, NumTextElement {
-  readonly tab: HTMLButtonElement;
-  readonly previewOption: MenuDropOption;
-  readonly basename: string;
-  readonly extension: string;
+export interface EditorElement {
+  readonly ref: NumTextElement & {
+    readonly tab: HTMLButtonElement;
+    readonly previewOption: MenuDropOption;
+    readonly basename: string;
+    readonly extension: string;
+  }
+  readonly state: Editor;
 }
 
   /**
@@ -220,7 +223,9 @@ export interface EditorElement extends Editor, NumTextElement {
     if (typeof identifier !== "string") return null;
     const editor: Editor | null = editors[identifier] ?? null;
     if (editor === null) return null;
-    return document.querySelector<EditorLegacy>(`ste-editor[data-editor-identifier="${editor.identifier}"]`);
+    const ref: EditorElement["ref"] | null = document.querySelector<EditorLegacy>(`ste-editor[data-editor-identifier="${editor.identifier}"]`);
+    if (ref === null) return null;
+    return { ref, state: editor };
   }
 
   /**
@@ -233,7 +238,7 @@ export interface EditorElement extends Editor, NumTextElement {
     const editor = query(identifier);
     if (editor === null) return;
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
-    const { tab } = editor;
+    const { tab } = editor.ref;
     const obstructedLeft: boolean = (tab.offsetLeft <= workspace_tabs.scrollLeft);
     const obstructedRight: boolean = ((tab.offsetLeft + tab.clientWidth) >= (workspace_tabs.scrollLeft + workspace_tabs.clientWidth));
     let spacingOffset = 0;
@@ -330,7 +335,7 @@ class EditorLegacy extends NumTextElement implements Editor {
       if (event.button !== 0 || document.activeElement.matches("[data-editor-rename]")) return;
 
       event.preventDefault();
-      if (this.tab !== query(activeEditor())?.tab){
+      if (this.tab !== query(activeEditor())?.ref.tab){
         open(this.identifier);
       }
     });
@@ -340,7 +345,7 @@ class EditorLegacy extends NumTextElement implements Editor {
       // Add a check to this to only apply this key handling if the Editor isn't currently being renamed in the Editor tab.
       if (event.key === " " || event.key === "Enter"){
         event.preventDefault();
-        if (this.tab !== query(activeEditor())?.tab){
+        if (this.tab !== query(activeEditor())?.ref.tab){
           open(this.identifier);
         }
       }
@@ -406,7 +411,7 @@ class EditorLegacy extends NumTextElement implements Editor {
       if (event.dataTransfer !== null){
         event.dataTransfer.dropEffect = "copy";
       }
-      if (this.tab !== query(activeEditor())?.tab){
+      if (this.tab !== query(activeEditor())?.ref.tab){
         open(this.identifier);
       }
     });
@@ -442,14 +447,14 @@ class EditorLegacy extends NumTextElement implements Editor {
       setPreviewSource(this.identifier);
     });
 
-    if (activeEditor() !== null && query(activeEditor()!)!.autoCreated){
-      if (document.activeElement === query(activeEditor()!)!){
+    if (activeEditor() !== null && query(activeEditor()!)!.state.autoCreated){
+      if (document.activeElement === query(activeEditor()!)!.ref){
         this.focusedOverride = true;
       }
       if (autoReplace){
         close(activeEditor()!);
       } else {
-        query(activeEditor()!)!.autoCreated = false;
+        query(activeEditor()!)!.state.autoCreated = false;
       }
     }
 
@@ -529,7 +534,7 @@ class EditorLegacy extends NumTextElement implements Editor {
       this.autoCreated = false;
     }
 
-    if (this.tab === query(activeEditor())?.tab){
+    if (this.tab === query(activeEditor())?.ref.tab){
       setTitle({ content: rename });
     }
 

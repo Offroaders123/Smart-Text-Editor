@@ -236,7 +236,7 @@ class Card extends HTMLElement {
       setActiveDialog(null);
       if (dialogPrevious()){
         const hidden = (getElementStyle({ element: dialogPrevious()!, property: "visibility" }) == "hidden");
-        (!workspace_editors.contains(dialogPrevious()!) && !hidden) ? dialogPrevious()!.focus({ preventScroll: true }) : query(activeEditor())?.focus({ preventScroll: true });
+        (!workspace_editors.contains(dialogPrevious()!) && !hidden) ? dialogPrevious()!.focus({ preventScroll: true }) : query(activeEditor())?.ref.focus({ preventScroll: true });
         setDialogPrevious(null);
       }
     }
