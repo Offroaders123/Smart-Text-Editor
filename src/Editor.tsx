@@ -17,7 +17,7 @@ export interface Editor {
   autoReplace: boolean;
 }
 
-export interface EditorOptions extends Partial<Omit<Editor, "identifier" | "refresh" | "unsaved">> {}
+export interface EditorOptions extends Partial<Omit<Editor, "identifier" | "focusedOverride" | "refresh" | "unsaved">> {}
 
 export interface EditorOpenOptions {
   autoCreated?: boolean;
