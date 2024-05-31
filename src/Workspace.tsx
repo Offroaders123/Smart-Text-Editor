@@ -201,7 +201,7 @@ export async function openFiles(): Promise<void> {
 */
 export async function saveFile(extension?: string): Promise<void> {
   if (extension || !support.fileSystem){
-    if (!extension) extension = query(activeEditor())?.ref.extension;
+    if (!extension) extension = query(activeEditor())?.extension;
     const anchor = document.createElement("a");
     const link = window.URL.createObjectURL(new Blob([query(activeEditor())?.ref.editor.value ?? ""]));
     anchor.href = link;

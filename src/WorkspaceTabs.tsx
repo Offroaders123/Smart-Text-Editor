@@ -24,10 +24,10 @@ export default function WorkspaceTabs(props: WorkspaceTabsProps) {
         event.preventDefault();
 
         if (event.key === "ArrowLeft"){
-          query(getPrevious(identifier))?.ref.tab.focus();
+          query(getPrevious(identifier))?.tab.focus();
         }
         if (event.key === "ArrowRight"){
-          query(getNext(identifier))?.ref.tab.focus();
+          query(getNext(identifier))?.tab.focus();
         }
       }}>
       <CreateEditorButton
