@@ -96,18 +96,18 @@ export type { Card };
  * The base component for the Alert, Dialog, and Widget card types.
 */
 class Card extends HTMLElement {
-  private readonly type: CardType = this.getAttribute("data-type") as CardType;
-  private readonly header: HTMLDivElement = this.querySelector<HTMLDivElement>(".header")!;
-  private readonly back: HTMLButtonElement | null = this.querySelector<HTMLButtonElement>(".card-back");
-  private readonly heading: HTMLDivElement = this.header.querySelector<HTMLDivElement>(".heading")!;
-  private readonly controls: CardControls = Object.assign(document.createElement("div"),{
-    minimize: document.createElement("button"),
-    close: document.createElement("button")
-  });
-
   constructor() {
     super();
 
+    const type: CardType = this.getAttribute("data-type") as CardType;
+    const header: HTMLDivElement = this.querySelector<HTMLDivElement>(".header")!;
+    const back: HTMLButtonElement | null = this.querySelector<HTMLButtonElement>(".card-back");
+    const heading: HTMLDivElement = header.querySelector<HTMLDivElement>(".heading")!;
+    const controls: CardControls = Object.assign(document.createElement("div"),{
+      minimize: document.createElement("button"),
+      close: document.createElement("button")
+    });
+  
     this.classList.add("Card");
 
     this.addEventListener("keydown",event => {
@@ -123,32 +123,32 @@ class Card extends HTMLElement {
       }
     });
 
-    this.back?.addEventListener("click",() => openCard(this.header.getAttribute("data-card-parent")!, this.id));
+    back?.addEventListener("click",() => openCard(header.getAttribute("data-card-parent")!, this.id));
 
-    this.controls.classList.add("card-controls");
+    controls.classList.add("card-controls");
 
-    this.controls.minimize.classList.add("control");
-    this.controls.minimize.setAttribute("data-control","minimize");
-    this.controls.minimize.append(MinimizeIcon() as Element);
+    controls.minimize.classList.add("control");
+    controls.minimize.setAttribute("data-control","minimize");
+    controls.minimize.append(MinimizeIcon() as Element);
 
-    this.controls.minimize.addEventListener("keydown",event => {
+    controls.minimize.addEventListener("keydown",event => {
       if (event.key != "Enter") return;
       event.preventDefault();
       if (event.repeat) return;
-      this.controls?.minimize.click();
+      controls?.minimize.click();
     });
 
-    this.controls.minimize.addEventListener("click",() => minimizeCard(this.id));
+    controls.minimize.addEventListener("click",() => minimizeCard(this.id));
 
-    this.controls.close.classList.add("control");
-    this.controls.close.setAttribute("data-control","close");
-    this.controls.close.append(CloseIcon() as Element);
+    controls.close.classList.add("control");
+    controls.close.setAttribute("data-control","close");
+    controls.close.append(CloseIcon() as Element);
 
-    this.controls.close.addEventListener("click",() => closeCard(this.id));
+    controls.close.addEventListener("click",() => closeCard(this.id));
 
-    this.controls.appendChild(this.controls.minimize);
-    this.controls.appendChild(this.controls.close);
-    this.header.appendChild(this.controls);
+    controls.appendChild(controls.minimize);
+    controls.appendChild(controls.close);
+    header.appendChild(controls);
   }
 }
 
