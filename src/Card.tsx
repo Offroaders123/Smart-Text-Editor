@@ -97,8 +97,8 @@ export type { Card };
 */
 class Card extends HTMLElement {
   readonly type: CardType = this.getAttribute("type") as CardType;
-  readonly header: HTMLDivElement = this.querySelector<HTMLDivElement>(".header")!;
-  readonly back: HTMLButtonElement | null = this.querySelector<HTMLButtonElement>(".card-back");
+  private readonly header: HTMLDivElement = this.querySelector<HTMLDivElement>(".header")!;
+  private readonly back: HTMLButtonElement | null = this.querySelector<HTMLButtonElement>(".card-back");
   readonly heading: HTMLDivElement = this.header.querySelector<HTMLDivElement>(".heading")!;
   readonly controls: CardControls = Object.assign(document.createElement("div"),{
     minimize: document.createElement("button"),
