@@ -2,7 +2,7 @@ import { createEffect } from "solid-js";
 import { Header } from "./Header.js";
 import { Main } from "./Main.js";
 import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings } from "./STE.js";
-import { closeCard, minimizeCard } from "./Card.js";
+import { closeCard, minimizeCard, openCard } from "./Card.js";
 import { insertTemplate } from "./Tools.js";
 import { close, createEditor, getNext, getPrevious, open, query, rename, setTabsVisibility } from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview } from "./Workspace.js";
@@ -40,7 +40,7 @@ const queryParameters = new URLSearchParams(window.location.search);
 
   navigator.serviceWorker.addEventListener("message",async event => {
     switch (event.data.action){
-      case "clear-site-caches-complete": cleared_cache_card.open(); break;
+      case "clear-site-caches-complete": openCard(cleared_cache_card); break;
       case "share-target": {
         for (const file of event.data.files as File[]){
           const { name } = file;
@@ -187,32 +187,32 @@ document.body.addEventListener("keydown",event => {
   if ((controlShift || shiftCommand) && pressed("B")){
     event.preventDefault();
     if (event.repeat) return;
-    preview_base_card.open();
+    openCard(preview_base_card);
   }
   if ((controlShift || shiftCommand) && pressed("f")){
     event.preventDefault();
     if (event.repeat) return;
-    replace_text_card.open();
+    openCard(replace_text_card);
   }/*
   if ((controlShift || shiftCommand) && pressed("k")){
     event.preventDefault();
     if (event.repeat) return;
-    color_picker_card.open();
+    openCard(color_picker_card);
   }*/
   if ((controlShift || shiftCommand) && pressed("g")){
     event.preventDefault();
     if (event.repeat) return;
-    json_formatter_card.open();
+    openCard(json_formatter_card);
   }
   if ((controlShift || shiftCommand) && pressed("y")){
     event.preventDefault();
     if (event.repeat) return;
-    uri_encoder_card.open();
+    openCard(uri_encoder_card);
   }
   if ((controlShift || shiftCommand) && pressed("o")){
     event.preventDefault();
     if (event.repeat) return;
-    uuid_generator_card.open();
+    openCard(uuid_generator_card);
   }
   if ((controlShift || shiftCommand) && pressed("h")){
     event.preventDefault();
@@ -229,7 +229,7 @@ document.body.addEventListener("keydown",event => {
   if ((control || command) && (pressed(",") || pressed("<"))){
     event.preventDefault();
     if (event.repeat) return;
-    settings_card.open();
+    openCard(settings_card);
   }
 },{ capture: true });
 
@@ -336,7 +336,7 @@ if (queryParameters.get("template")){
 }
 
 if (queryParameters.get("settings")){
-  settings_card.open();
+  openCard(settings_card);
   removeQueryParameters(["settings"]);
 }
 

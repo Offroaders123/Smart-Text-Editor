@@ -5,6 +5,7 @@ import { activeEditor, settings } from "./STE.js";
 import { insertTemplate } from "./Tools.js";
 import { createDisplay, createWindow, openFiles, refreshPreview, saveFile, setOrientation, setPreviewSource, setView } from "./Workspace.js";
 import { clearSiteCaches, showInstallPrompt } from "./dom.js";
+import { openCard } from "./Card.js";
 import WebFormatter from "./img/web-formatter.svg";
 import Sharedrop from "./img/sharedrop.svg";
 import Diffchecker from "./img/diffchecker.svg";
@@ -87,7 +88,7 @@ export default function Menubar(props: MenubarProps) {
         <button>Preview</button>
         <ul>
           <li onclick={() => refreshPreview({ force: true })} data-shortcuts='{ "default": "Ctrl+Shift+Enter", "macOS": "Ctrl+Cmd+Return" }' data-no-select>Refresh</li>
-          <li onclick={() => preview_base_card.open()} data-shortcuts='{ "default": "Ctrl+Shift+B", "macOS": "Ctrl+Cmd+B" }' data-no-select>Base URL</li>
+          <li onclick={() => openCard(preview_base_card)} data-shortcuts='{ "default": "Ctrl+Shift+B", "macOS": "Ctrl+Cmd+B" }' data-no-select>Base URL</li>
           <li><hr/></li>
           <li data-value="active-editor" data-selected onclick={() => setPreviewSource(null)}>Active Editor</li>
         </ul>
@@ -95,11 +96,11 @@ export default function Menubar(props: MenubarProps) {
       <menu-drop>
         <button>Tools</button>
         <ul>
-          <li onclick={() => replace_text_card.open()} data-shortcuts='{ "default": "Ctrl+Shift+F", "macOS": "Shift+Cmd+F" }'>Replace Text</li>
-          {/* <li onclick={() => color_picker_card.open()} data-shortcuts='{ "default": "Ctrl+Shift+K", "macOS": "Shift+Cmd+K" }'>Color Picker</li> */}
-          <li onclick={() => json_formatter_card.open()} data-shortcuts='{ "default": "Ctrl+Shift+G", "macOS": "Shift+Cmd+G" }'>JSON Formatter</li>
-          <li onclick={() => uri_encoder_card.open()} data-shortcuts='{ "default": "Ctrl+Shift+Y", "macOS": "Shift+Cmd+Y" }'>URI Encoder</li>
-          <li onclick={() => uuid_generator_card.open()} data-shortcuts='{ "default": "Ctrl+Shift+O", "macOS": "Shift+Cmd+O" }'>UUID Generator</li>
+          <li onclick={() => openCard(replace_text_card)} data-shortcuts='{ "default": "Ctrl+Shift+F", "macOS": "Shift+Cmd+F" }'>Replace Text</li>
+          {/* <li onclick={() => openCard(color_picker_card)} data-shortcuts='{ "default": "Ctrl+Shift+K", "macOS": "Shift+Cmd+K" }'>Color Picker</li> */}
+          <li onclick={() => openCard(json_formatter_card)} data-shortcuts='{ "default": "Ctrl+Shift+G", "macOS": "Shift+Cmd+G" }'>JSON Formatter</li>
+          <li onclick={() => openCard(uri_encoder_card)} data-shortcuts='{ "default": "Ctrl+Shift+Y", "macOS": "Shift+Cmd+Y" }'>URI Encoder</li>
+          <li onclick={() => openCard(uuid_generator_card)} data-shortcuts='{ "default": "Ctrl+Shift+O", "macOS": "Shift+Cmd+O" }'>UUID Generator</li>
           <li>Insert Templates...
             <ul>
               <li onclick={() => insertTemplate('html')} data-shortcuts='{ "default": "Ctrl+Shift+H", "macOS": "Shift+Cmd+H" }'>HTML</li>
@@ -122,10 +123,10 @@ export default function Menubar(props: MenubarProps) {
         </ul>
       </menu-drop>
       <menu-drop id="settings_menu" data-alternate>
-        <button onclick={() => settings_card.open()}>Settings</button>
+        <button onclick={() => openCard(settings_card)}>Settings</button>
         <ul data-show-icons>
           <li part="install-option" onclick={() => showInstallPrompt()}><DecorativeImage src={Install} alt=""/>Install</li>
-          <li onclick={() => theme_card.open()}><DecorativeImage src={Template} alt=""/>Theme Settings</li>
+          <li onclick={() => openCard(theme_card)}><DecorativeImage src={Template} alt=""/>Theme Settings</li>
           <li part="clear-site-caches-option" onclick={() => clearSiteCaches()}><DecorativeImage src={Settings} alt=""/>Clear Cache</li>
           <li onclick={() => settings.reset({ confirm: true })}><DecorativeImage src={Settings} alt=""/>Reset Settings</li>
         </ul>

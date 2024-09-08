@@ -1,6 +1,6 @@
 import ArrowIcon from "./ArrowIcon.js";
 import InstallIcon from "./InstallIcon.js";
-import { Dialog } from "./Card.js";
+import { Dialog, openCard } from "./Card.js";
 import Checkbox from "./Checkbox.js";
 import { appearance, settings } from "./STE.js";
 import { clearSiteCaches, showInstallPrompt } from "./dom.js";
@@ -54,7 +54,7 @@ export default function SettingsCard() {
           </button>
           <button
             id="theme_button"
-            onclick={() => theme_card.open()}
+            onclick={() => openCard(theme_card)}
             data-card-previous="theme_card">
             Customize Theme
             <ArrowIcon/>

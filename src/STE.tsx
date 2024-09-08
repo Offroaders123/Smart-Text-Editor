@@ -1,6 +1,7 @@
 import { createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 import Prism from "./prism.js";
+import { openCard } from "./Card.js";
 
 import type { Editor } from "./Editor.js";
 import type { View } from "./Workspace.js";
@@ -313,7 +314,7 @@ export const settings = {
     this.previewBase = null;
     setPreviewBase(null);
 
-    if (showPrompt) reset_settings_card.open();
+    if (showPrompt) openCard(reset_settings_card);
     return true;
   }
 }
