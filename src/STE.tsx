@@ -314,7 +314,7 @@ export const settings = {
     this.previewBase = null;
     setPreviewBase(null);
 
-    if (showPrompt) openCard(reset_settings_card);
+    if (showPrompt) openCard(reset_settings_card.id);
     return true;
   }
 }

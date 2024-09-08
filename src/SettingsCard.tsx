@@ -54,7 +54,7 @@ export default function SettingsCard() {
           </button>
           <button
             id="theme_button"
-            onclick={() => openCard(theme_card)}
+            onclick={() => openCard(theme_card.id)}
             data-card-previous="theme_card">
             Customize Theme
             <ArrowIcon/>

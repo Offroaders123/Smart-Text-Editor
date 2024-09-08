@@ -121,7 +121,7 @@ class Card extends HTMLElement {
       }
     });
 
-    this.back?.addEventListener("click",() => openCard(document.querySelector<Card>(`#${this.header?.getAttribute("data-card-parent")}`)!, this));
+    this.back?.addEventListener("click",() => openCard(this.header.getAttribute("data-card-parent")!, this.id));
 
     this.controls.classList.add("card-controls");
 
@@ -136,13 +136,13 @@ class Card extends HTMLElement {
       this.controls?.minimize.click();
     });
 
-    this.controls.minimize.addEventListener("click",() => minimizeCard(this));
+    this.controls.minimize.addEventListener("click",() => minimizeCard(this.id));
 
     this.controls.close.classList.add("control");
     this.controls.close.setAttribute("data-control","close");
     this.controls.close.append(CloseIcon() as Element);
 
-    this.controls.close.addEventListener("click",() => closeCard(this));
+    this.controls.close.addEventListener("click",() => closeCard(this.id));
 
     this.controls.appendChild(this.controls.minimize);
     this.controls.appendChild(this.controls.close);
@@ -150,19 +150,17 @@ class Card extends HTMLElement {
   }
 }
 
-  export function openCard(self: string | Card, previous?: Card): void {
-    if (typeof self === "string") {
-      self = document.getElementById(self)! as Card;
-    }
+  export function openCard(id: string, previous?: string): void {
+    const self = document.getElementById(id)! as Card;
 
-    if (self.matches("[active]") && !self.hasAttribute("data-alert-timeout")) return closeCard(self);
+    if (self.matches("[active]") && !self.hasAttribute("data-alert-timeout")) return closeCard(id);
     if (self.type != "alert"){
       document.querySelectorAll<Card>(`ste-card[active]`).forEach(card => {
         if (card.type != "dialog" && card.type != self.type) return;
-        closeCard(card);
+        closeCard(card.id);
         if (!card.matches(".minimize")) return;
         const transitionDuration = parseInt(`${Number(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
-        window.setTimeout(() => minimizeCard(card),transitionDuration);
+        window.setTimeout(() => minimizeCard(card.id),transitionDuration);
       });
     }
     self.setAttribute("active","");
@@ -173,7 +171,7 @@ class Card extends HTMLElement {
       window.setTimeout(() => {
         if (self.getAttribute("data-alert-timeout") != timeoutIdentifier) return;
         self.removeAttribute("data-alert-timeout");
-        closeCard(self);
+        closeCard(id);
       },4000);
     }
     if (self.type == "dialog"){
@@ -186,17 +184,15 @@ class Card extends HTMLElement {
       const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 500}`);
       window.setTimeout(() => {
         if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
-        if (previous) self.querySelector<HTMLElement>(`[data-card-previous="${previous.id}"]`)!.focus();
+        if (previous) self.querySelector<HTMLElement>(`[data-card-previous="${previous}"]`)!.focus();
       },transitionDuration);
       setActiveDialog(self.id);
     }
     if (self.type == "widget") setActiveWidget(self.id);
   }
 
-  export function minimizeCard(self: string | Card): void {
-    if (typeof self === "string") {
-      self = document.getElementById(self)! as Card;
-    }
+  export function minimizeCard(id: string): void {
+    const self = document.getElementById(id)! as Card;
 
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const icon = self.controls.minimize.querySelector("svg")!;
@@ -234,15 +230,13 @@ class Card extends HTMLElement {
     },transitionDuration);
   }
 
-  export function closeCard(self: string | Card): void {
-    if (typeof self === "string") {
-      self = document.getElementById(self)! as Card;
-    }
+  export function closeCard(id: string): void {
+    const self = document.getElementById(id)! as Card;
 
     self.removeAttribute("active");
     if (self.matches(".minimize")){
       const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
-      window.setTimeout(() => minimizeCard(self),transitionDuration);
+      window.setTimeout(() => minimizeCard(id),transitionDuration);
     }
     if (self.type == "dialog"){
       const workspace_editors: HTMLDivElement = workspaceEditors()!;

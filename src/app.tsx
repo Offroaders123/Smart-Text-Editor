@@ -40,7 +40,7 @@ const queryParameters = new URLSearchParams(window.location.search);
 
   navigator.serviceWorker.addEventListener("message",async event => {
     switch (event.data.action){
-      case "clear-site-caches-complete": openCard(cleared_cache_card); break;
+      case "clear-site-caches-complete": openCard(cleared_cache_card.id); break;
       case "share-target": {
         for (const file of event.data.files as File[]){
           const { name } = file;
@@ -187,32 +187,32 @@ document.body.addEventListener("keydown",event => {
   if ((controlShift || shiftCommand) && pressed("B")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard(preview_base_card);
+    openCard(preview_base_card.id);
   }
   if ((controlShift || shiftCommand) && pressed("f")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard(replace_text_card);
+    openCard(replace_text_card.id);
   }/*
   if ((controlShift || shiftCommand) && pressed("k")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard(color_picker_card);
+    openCard(color_picker_card.id);
   }*/
   if ((controlShift || shiftCommand) && pressed("g")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard(json_formatter_card);
+    openCard(json_formatter_card.id);
   }
   if ((controlShift || shiftCommand) && pressed("y")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard(uri_encoder_card);
+    openCard(uri_encoder_card.id);
   }
   if ((controlShift || shiftCommand) && pressed("o")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard(uuid_generator_card);
+    openCard(uuid_generator_card.id);
   }
   if ((controlShift || shiftCommand) && pressed("h")){
     event.preventDefault();
@@ -229,7 +229,7 @@ document.body.addEventListener("keydown",event => {
   if ((control || command) && (pressed(",") || pressed("<"))){
     event.preventDefault();
     if (event.repeat) return;
-    openCard(settings_card);
+    openCard(settings_card.id);
   }
 },{ capture: true });
 
@@ -336,7 +336,7 @@ if (queryParameters.get("template")){
 }
 
 if (queryParameters.get("settings")){
-  openCard(settings_card);
+  openCard(settings_card.id);
   removeQueryParameters(["settings"]);
 }
 
