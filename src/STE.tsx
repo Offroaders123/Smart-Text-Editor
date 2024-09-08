@@ -2,7 +2,6 @@ import { createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 import Prism from "./prism.js";
 
-import type { Card } from "./Card.js";
 import type { Editor } from "./Editor.js";
 import type { View } from "./Workspace.js";
 import type { Orientation } from "./Workspace.js";
@@ -320,19 +319,19 @@ export const settings = {
 }
 
 /**
- * A reference to the currently opened Dialog.
+ * The currently opened Dialog.
 */
-export const [activeDialog, setActiveDialog] = createSignal<Card | null>(null);
+export const [activeDialog, setActiveDialog] = createSignal<string | null>(null);
 
 /**
- * A reference to the previously opened Dialog, if the active one has a back button.
+ * The previously opened Dialog, if the active one has a back button.
 */
-export const [dialogPrevious, setDialogPrevious] = createSignal<Card | null>(null);
+export const [dialogPrevious, setDialogPrevious] = createSignal<string | null>(null);
 
 /**
- * A reference to the currently opened Widget.
+ * The currently opened Widget.
 */
-export const [activeWidget, setActiveWidget] = createSignal<Card | null>(null);
+export const [activeWidget, setActiveWidget] = createSignal<string | null>(null);
 
 export const [previewBase, setPreviewBase] = createSignal<string | null>(settings.previewBase);
 

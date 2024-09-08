@@ -92,6 +92,21 @@ export interface CardControls extends HTMLDivElement {
 
 export type { Card };
 
+export function openCard(id: string): void {
+  const card = document.getElementById(id)! as Card;
+  Card.prototype.open.call(card);
+}
+
+export function minimizeCard(id: string): void {
+  const card = document.getElementById(id)! as Card;
+  Card.prototype.minimize.call(card);
+}
+
+export function closeCard(id: string): void {
+  const card = document.getElementById(id)! as Card;
+  Card.prototype.close.call(card);
+}
+
 /**
  * The base component for the Alert, Dialog, and Widget card types.
 */
@@ -175,7 +190,7 @@ class Card extends HTMLElement {
       document.body.addEventListener("keydown",Card.#catchCardNavigation);
       setCardBackdropShown(true);
       if (!activeDialog() && !dialogPrevious()){
-        setDialogPrevious(document.activeElement as Card);
+        setDialogPrevious(document.activeElement?.id ?? null);
       }
       document.querySelectorAll<MenuDropElement>("menu-drop[data-open]").forEach(menu => menu.close());
       const transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 500}`);
@@ -183,9 +198,9 @@ class Card extends HTMLElement {
         if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
         if (previous) this.querySelector<HTMLElement>(`[data-card-previous="${previous.id}"]`)!.focus();
       },transitionDuration);
-      setActiveDialog(this);
+      setActiveDialog(this.id);
     }
-    if (this.type == "widget") setActiveWidget(this);
+    if (this.type == "widget") setActiveWidget(this.id);
   }
 
   minimize(): void {
@@ -237,8 +252,8 @@ class Card extends HTMLElement {
       setCardBackdropShown(false);
       setActiveDialog(null);
       if (dialogPrevious()){
-        const hidden = (getElementStyle({ element: dialogPrevious()!, property: "visibility" }) == "hidden");
-        (!workspace_editors.contains(dialogPrevious()!) && !hidden) ? dialogPrevious()!.focus({ preventScroll: true }) : query(activeEditor())?.ref.focus({ preventScroll: true });
+        const hidden = (getElementStyle({ element: document.getElementById(dialogPrevious()!)!, property: "visibility" }) == "hidden");
+        (!workspace_editors.contains(document.getElementById(dialogPrevious()!)!) && !hidden) ? document.getElementById(dialogPrevious()!)!.focus({ preventScroll: true }) : query(activeEditor())?.ref.focus({ preventScroll: true });
         setDialogPrevious(null);
       }
     }
@@ -258,7 +273,7 @@ class Card extends HTMLElement {
 
   static #catchCardNavigation(event: KeyboardEvent): void {
     if (!activeDialog() || event.key != "Tab" || document.activeElement != document.body) return;
-    const navigable = Card.#getNavigableElements({ container: activeDialog()!, scope: true });
+    const navigable = Card.#getNavigableElements({ container: document.getElementById(activeDialog()!)!, scope: true });
     event.preventDefault();
     navigable[((!event.shiftKey) ? 0 : navigable.length - 1)]?.focus();
   }

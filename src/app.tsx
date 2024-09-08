@@ -2,7 +2,7 @@ import { createEffect } from "solid-js";
 import { Header } from "./Header.js";
 import { Main } from "./Main.js";
 import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings } from "./STE.js";
-import "./Card.js";
+import { closeCard, minimizeCard } from "./Card.js";
 import { insertTemplate } from "./Tools.js";
 import { close, createEditor, getNext, getPrevious, open, query, rename, setTabsVisibility } from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview } from "./Workspace.js";
@@ -110,7 +110,7 @@ document.body.addEventListener("keydown",event => {
   if (pressed("Escape")){
     event.preventDefault();
     if (event.repeat) return;
-    if (activeDialog() && !document.activeElement?.matches("menu-drop[data-open]")) activeDialog()!.close();
+    if (activeDialog() && !document.activeElement?.matches("menu-drop[data-open]")) closeCard(activeDialog()!);
   }
   if (((control || command) && !shift && pressed("n")) || ((controlShift || shiftCommand) && pressed("x"))){
     event.preventDefault();
@@ -223,7 +223,7 @@ document.body.addEventListener("keydown",event => {
     event.preventDefault();
     if (event.repeat || !activeWidget()) return;
     if (activeWidget()){
-      activeWidget()!.minimize();
+      minimizeCard(activeWidget()!);
     }
   }
   if ((control || command) && (pressed(",") || pressed("<"))){
