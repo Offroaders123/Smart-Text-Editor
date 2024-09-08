@@ -17,19 +17,6 @@ declare global {
   var scrollbar_styles: HTMLStyleElement;
   var theme_styles: HTMLStyleElement; // unused, style feature
 
-  var symbol_definitions: SVGSVGElement; // styles only
-  var arrow_icon: SVGSymbolElement; // use-href only
-  var check_icon: SVGSymbolElement; // use-href only
-  var back_icon: SVGSymbolElement; // use-href only
-  var minimize_icon: SVGSymbolElement; // use-href only
-  var close_icon: SVGSymbolElement; // use-href only
-  var rename_icon: SVGSymbolElement; // use-href only
-  var undo_icon: SVGSymbolElement; // use-href only
-  var redo_icon: SVGSymbolElement; // use-href only
-  var install_icon: SVGSymbolElement; // use-href only
-  var refresh_icon: SVGSymbolElement; // use-href only
-  var github_icon: SVGSymbolElement; // use-href only
-
   // var header: HTMLElement;
 
   // var app_menubar: HTMLDivElement;

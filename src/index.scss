@@ -361,10 +361,6 @@ menu-drop::part(divider) {
   border-bottom-right-radius: 0;
 }
 
-#symbol_definitions {
-  display: none;
-}
-
 :root.apple-home-screen #file_menu::part(create-window-option) {
   display: none;
 }
