@@ -64,7 +64,6 @@ async function removeOutdatedVersions(): Promise<void> {
   }));
 
   await clients.claim();
-  await messageClients({ action: "service-worker-activated" });
 }
 
 /**

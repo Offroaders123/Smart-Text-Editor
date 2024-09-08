@@ -38,13 +38,8 @@ const queryParameters = new URLSearchParams(window.location.search);
   await navigator.serviceWorker.register("service-worker.js");
   if (navigator.serviceWorker.controller === null) return;
 
-  if (navigator.serviceWorker.controller.state === "activated"){
-    activateManifest();
-  }
-
   navigator.serviceWorker.addEventListener("message",async event => {
     switch (event.data.action){
-      case "service-worker-activated": activateManifest(); break;
       case "clear-site-caches-complete": cleared_cache_card.open(); break;
       case "share-target": {
         for (const file of event.data.files as File[]){
@@ -62,10 +57,6 @@ const queryParameters = new URLSearchParams(window.location.search);
   if (queryParameters.get("share-target") !== null){
     navigator.serviceWorker.controller.postMessage({ action: "share-target" });
     removeQueryParameters(["share-target"]);
-  }
-
-  function activateManifest(): void {
-    document.querySelector<HTMLLinkElement>("link[rel='manifest']")!.href = "manifest.webmanifest";
   }
 })();
 
