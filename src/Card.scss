@@ -1,4 +1,4 @@
-ste-card {
+.Card {
   --card-header-padding-right: max(var(--safe-area-inset-right),8px);
   display: flex;
   flex-direction: column;
@@ -15,23 +15,23 @@ ste-card {
   transition-property: visibility, opacity, transform;
 }
 
-ste-card:not([data-active]) {
+.Card:not([data-active]) {
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
 }
 
-ste-card[data-active] {
+.Card[data-active] {
   visibility: visible;
   opacity: 1;
   z-index: calc(var(--card-z-index) + 1);
 }
 
-ste-card:not([data-type="dialog"]) {
+.Card:not([data-type="dialog"]) {
   margin: var(--margin) max(var(--safe-area-inset-right),var(--margin)) max(var(--safe-area-inset-bottom),var(--margin)) max(var(--safe-area-inset-left),var(--margin));
 }
 
-ste-card[data-type="alert"] {
+.Card[data-type="alert"] {
   --margin: 16px;
   position: absolute;
   right: 0;
@@ -41,11 +41,11 @@ ste-card[data-type="alert"] {
   --card-z-index: 5;
 }
 
-ste-card[data-type="alert"]:not([data-active]) {
+.Card[data-type="alert"]:not([data-active]) {
   transform: translateX(calc(100% + var(--margin) * 2));
 }
 
-ste-card[data-type="widget"] {
+.Card[data-type="widget"] {
   --margin: 8px;
   position: absolute;
   right: 0;
@@ -54,15 +54,15 @@ ste-card[data-type="widget"] {
   transform-origin: center top;
 }
 
-ste-card[data-type="widget"]:not([data-active]) {
+.Card[data-type="widget"]:not([data-active]) {
   transform: scaleY(0.25);
 }
 
-ste-card[data-type="widget"][data-minimize-change] {
+.Card[data-type="widget"][data-minimize-change] {
   transition-property: margin-right, margin-top, border-top-right-radius, border-bottom-right-radius, box-shadow, visibility, opacity, transform;
 }
 
-ste-card[data-type="widget"].minimize {
+.Card[data-type="widget"].minimize {
   margin-right: calc(var(--card-border-width) * -1);
   margin-top: 3px;
   --card-border-radius: 10px;
@@ -71,17 +71,17 @@ ste-card[data-type="widget"].minimize {
   box-shadow: 0 4px 7px #00000050;
 }
 
-ste-card[data-type="dialog"] {
+.Card[data-type="dialog"] {
   position: absolute;
   --card-border-radius: 14px;
   --card-z-index: 3;
 }
 
-ste-card[data-type="dialog"]:not([data-active]) {
+.Card[data-type="dialog"]:not([data-active]) {
   transform: scale(0.5);
 }
 
-ste-card .header {
+.Card .header {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -90,18 +90,18 @@ ste-card .header {
   --card-header-border-width: 1px;
 }
 
-ste-card[data-type="widget"][data-minimize-change] .header {
+.Card[data-type="widget"][data-minimize-change] .header {
   background-clip: content-box;
   transition: var(--card-transition-duration);
   transition-property: margin-bottom, border-color;
 }
 
-ste-card[data-type="widget"].minimize .header {
+.Card[data-type="widget"].minimize .header {
   margin-bottom: calc(var(--card-header-border-width) * -1);
   border-color: transparent;
 }
 
-ste-card .header .card-back {
+.Card .header .card-back {
   margin-right: auto;
   padding: 10px;
   display: flex;
@@ -110,23 +110,23 @@ ste-card .header .card-back {
   outline: none;
 }
 
-ste-card .header:not([data-card-parent]) .card-back {
+.Card .header:not([data-card-parent]) .card-back {
   display: none;
 }
 
-ste-card .header .card-back:where(:hover,:active,:focus-visible) {
+.Card .header .card-back:where(:hover,:active,:focus-visible) {
   color: #ffffff;
   background: #ffffff24;
 }
 
-ste-card .header .card-back svg {
+.Card .header .card-back svg {
   width: 12px;
   height: 12px;
   /* aspect-ratio: 1 / 1; */
   fill: currentColor;
 }
 
-ste-card .header .icon {
+.Card .header .icon {
   margin: 8px;
   margin-left: 12px;
   margin-right: 0;
@@ -135,45 +135,45 @@ ste-card .header .icon {
   /* aspect-ratio: 1 / 1; */
 }
 
-ste-card .header .heading {
+.Card .header .heading {
   white-space: pre;
   z-index: -1;
 }
 
-ste-card:not([data-type="alert"]) .header .heading {
+.Card:not([data-type="alert"]) .header .heading {
   position: absolute;
 }
 
-ste-card[data-type="alert"] .header .heading {
+.Card[data-type="alert"] .header .heading {
   margin: 0 auto;
 }
 
-ste-card[data-type="widget"][data-minimize-change] .header .heading {
+.Card[data-type="widget"][data-minimize-change] .header .heading {
   transform-origin: calc(50% - calc(var(--card-minimize-width) + var(--card-header-padding-right)) * 0.5) center;
   transition: var(--card-transition-duration);
   transition-property: visibility, opacity, transform;
 }
 
-ste-card[data-type="widget"].minimize .header .heading {
+.Card[data-type="widget"].minimize .header .heading {
   visibility: hidden;
   opacity: 0;
   transform: scale(0);
 }
 
-ste-card[data-type="dialog"] .header .heading {
+.Card[data-type="dialog"] .header .heading {
   font-size: 16px;
 }
 
-ste-card .header .card-controls {
+.Card .header .card-controls {
   margin-left: auto;
   display: flex;
 }
 
-ste-card[data-type="alert"] .header .card-controls {
+.Card[data-type="alert"] .header .card-controls {
   display: none;
 }
 
-ste-card .header .card-controls .control {
+.Card .header .card-controls .control {
   padding: var(--control-padding,0px);
   display: flex;
   background: var(--control-background);
@@ -183,92 +183,92 @@ ste-card .header .card-controls .control {
   --control-background: none;
 }
 
-ste-card .header .card-controls .control:where(:hover,:active,:focus-visible) {
+.Card .header .card-controls .control:where(:hover,:active,:focus-visible) {
   color: #ffffff;
   --control-background: #ffffff24;
 }
 
-ste-card .header .card-controls .control[data-control="close"]:where(:hover,:active,:focus-visible) {
+.Card .header .card-controls .control[data-control="close"]:where(:hover,:active,:focus-visible) {
   --control-background: #cc2a24;
 }
 
-ste-card:not([data-type="widget"]) .header .card-controls .control[data-control="minimize"] {
+.Card:not([data-type="widget"]) .header .card-controls .control[data-control="minimize"] {
   display: none;
 }
 
-ste-card[data-type="widget"].minimize .header .card-controls .control {
+.Card[data-type="widget"].minimize .header .card-controls .control {
   --control-padding: 6px;
 }
 
-ste-card[data-type="widget"].minimize .header .card-controls .control[data-control="minimize"] {
+.Card[data-type="widget"].minimize .header .card-controls .control[data-control="minimize"] {
   border-radius: calc(var(--card-border-radius) - var(--card-border-width));
 }
 
-ste-card[data-type="widget"].minimize .header .card-controls .control[data-control="close"] {
+.Card[data-type="widget"].minimize .header .card-controls .control[data-control="close"] {
   margin-left: var(--card-header-padding-right);
   margin-right: calc(var(--card-minimize-width) * -1);
   visibility: hidden;
   opacity: 0;
 }
 
-ste-card[data-type="widget"][data-minimize-change] .header .card-controls .control {
+.Card[data-type="widget"][data-minimize-change] .header .card-controls .control {
   transition: var(--card-transition-duration);
   transition-property: padding;
 }
 
-ste-card[data-type="widget"][data-minimize-change] .header .card-controls .control[data-control="minimize"] {
+.Card[data-type="widget"][data-minimize-change] .header .card-controls .control[data-control="minimize"] {
   transition-property: padding, border-radius;
 }
 
-ste-card[data-type="widget"][data-minimize-change] .header .card-controls .control[data-control="close"] {
+.Card[data-type="widget"][data-minimize-change] .header .card-controls .control[data-control="close"] {
   transition-property: margin-left, margin-right, padding, visibility, opacity;
 }
 
-ste-card .header .card-controls .control svg {
+.Card .header .card-controls .control svg {
   width: 12px;
   height: 12px;
   /* aspect-ratio: 1 / 1; */
   fill: currentColor;
 }
 
-ste-card .header .card-controls .control[data-control="close"]:hover svg {
+.Card .header .card-controls .control[data-control="close"]:hover svg {
   color: #ffffff;
 }
 
-ste-card[data-type="widget"].minimize .header .card-controls .control[data-control="minimize"] svg {
+.Card[data-type="widget"].minimize .header .card-controls .control[data-control="minimize"] svg {
   transform: rotateY(180deg);
 }
 
-ste-card[data-type="widget"][data-minimize-change] .header .card-controls .control[data-control="close"] svg {
+.Card[data-type="widget"][data-minimize-change] .header .card-controls .control[data-control="close"] svg {
   transition: transform var(--card-transition-duration);
 }
 
-ste-card[data-type="widget"].minimize .header .card-controls .control[data-control="close"] svg {
+.Card[data-type="widget"].minimize .header .card-controls .control[data-control="close"] svg {
   transform: scale(0);
 }
 
-ste-card .main {
+.Card .main {
   display: flex;
   flex-direction: column;
 }
 
-ste-card:not([data-type="widget"]) .main {
+.Card:not([data-type="widget"]) .main {
   padding: 16px;
   gap: 16px;
 }
 
-ste-card[data-type="widget"] .main {
+.Card[data-type="widget"] .main {
   padding: 14px;
   gap: 14px;
   transform-origin: calc(100% - calc(var(--card-minimize-width) + var(--card-header-padding-right)) * 0.5) top;
 }
 
-ste-card[data-type="widget"][data-minimize-change] .main {
+.Card[data-type="widget"][data-minimize-change] .main {
   transition: var(--card-transition-duration);
   transition-property: margin-left, margin-bottom, visibility, opacity, transform;
 }
 
-ste-card[data-type="widget"].minimize .main {
+.Card[data-type="widget"].minimize .main {
   margin-left: calc(calc(var(--card-main-width) - var(--card-header-padding-right)) * -1 + var(--card-minimize-width));
   margin-bottom: calc(var(--card-main-height) * -1);
   visibility: hidden;
@@ -276,44 +276,44 @@ ste-card[data-type="widget"].minimize .main {
   transform: scale(0);
 }
 
-ste-card .main .content {
+.Card .main .content {
   display: flex;
   justify-content: space-around;
 }
 
-ste-card .main .content .item {
+.Card .main .content .item {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-ste-card:not([data-type="widget"]) .main .content .item {
+.Card:not([data-type="widget"]) .main .content .item {
   gap: 16px;
 }
 
-ste-card[data-type="widget"] .main .content .item {
+.Card[data-type="widget"] .main .content .item {
   gap: 14px;
 }
 
-ste-card .main .content .item.start {
+.Card .main .content .item.start {
   align-items: flex-start;
 }
 
-ste-card .options {
+.Card .options {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-ste-card:not([data-type="widget"]) .options {
+.Card:not([data-type="widget"]) .options {
   gap: 16px;
 }
 
-ste-card[data-type="widget"] .options {
+.Card[data-type="widget"] .options {
   gap: 14px;
 }
 
-ste-card .main button {
+.Card .main button {
   padding: 2px 8px;
   min-width: 74px;
   display: flex;
@@ -329,44 +329,44 @@ ste-card .main button {
   transition-property: color, background-color, border-color, border-radius;
 }
 
-ste-card .main button:where(:hover,:active,:focus-visible) {
+.Card .main button:where(:hover,:active,:focus-visible) {
   color: #ffffff;
   background: #4f4f4f;
 }
 
-ste-card .main button:focus-visible {
+.Card .main button:focus-visible {
   border-color: #c0c0c0;
 }
 
-ste-card .main button.warning:where(:hover,:active,:focus-visible) {
+.Card .main button.warning:where(:hover,:active,:focus-visible) {
   background: #b12f25;
 }
 
-ste-card .options button > img {
+.Card .options button > img {
   width: 16px;
   height: 16px;
   /* aspect-ratio: 1 / 1; */
 }
 
-ste-card .options button > svg {
+.Card .options button > svg {
   width: 12px;
   height: 12px;
   /* aspect-ratio: 1 / 1; */
   fill: currentColor;
 }
 
-ste-card num-text {
+.Card num-text {
   width: 32ch;
   height: 12ch;
   --background: #2d2d2d;
   border-radius: 6px;
 }
 
-ste-card num-text.expand {
+.Card num-text.expand {
   height: 20ch;
 }
 
-ste-card num-text::part(container)::before {
+.Card num-text::part(container)::before {
   content: "";
   position: absolute;
   width: 100%;
@@ -377,7 +377,7 @@ ste-card num-text::part(container)::before {
   z-index: 2;
 }
 
-ste-card input:is([data-type="text"],[data-type="url"]) {
+.Card input:is([data-type="text"],[data-type="url"]) {
   border-radius: 6px;
   box-shadow: 0 2px 3px #00000090 inset;
 }

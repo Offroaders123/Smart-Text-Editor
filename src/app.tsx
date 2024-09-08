@@ -246,7 +246,7 @@ document.body.addEventListener("contextmenu",event => {
 document.body.addEventListener("dragover",event => {
   event.preventDefault();
   if (event.dataTransfer === null || !(event.target instanceof Element)) return;
-  event.dataTransfer.dropEffect = (event.target.matches("menu-drop, header, ste-card") || event.target.closest("menu-drop, header, ste-card")) ? "none" : "copy";
+  event.dataTransfer.dropEffect = (event.target.matches("menu-drop, header, .Card") || event.target.closest("menu-drop, header, .Card")) ? "none" : "copy";
 });
 
 document.body.addEventListener("drop",event => {

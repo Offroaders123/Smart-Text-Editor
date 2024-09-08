@@ -108,6 +108,8 @@ class Card extends HTMLElement {
   constructor() {
     super();
 
+    this.classList.add("Card");
+
     this.addEventListener("keydown",event => {
       if (this.getAttribute("data-type") != "dialog" || event.key != "Tab") return;
       const navigable = getNavigableElements({ container: this, scope: true });
@@ -155,7 +157,7 @@ class Card extends HTMLElement {
 
     if (self.matches("[data-active]") && !self.hasAttribute("data-alert-timeout")) return closeCard(id);
     if (self.type != "alert"){
-      document.querySelectorAll<Card>(`ste-card[data-active]`).forEach(card => {
+      document.querySelectorAll<Card>(`.Card[data-active]`).forEach(card => {
         if (card.type != "dialog" && card.type != self.type) return;
         closeCard(card.id);
         if (!card.matches(".minimize")) return;
