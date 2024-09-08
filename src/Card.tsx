@@ -96,11 +96,11 @@ export type { Card };
  * The base component for the Alert, Dialog, and Widget card types.
 */
 class Card extends HTMLElement {
-  readonly type: CardType = this.getAttribute("data-type") as CardType;
+  private readonly type: CardType = this.getAttribute("data-type") as CardType;
   private readonly header: HTMLDivElement = this.querySelector<HTMLDivElement>(".header")!;
   private readonly back: HTMLButtonElement | null = this.querySelector<HTMLButtonElement>(".card-back");
-  readonly heading: HTMLDivElement = this.header.querySelector<HTMLDivElement>(".heading")!;
-  readonly controls: CardControls = Object.assign(document.createElement("div"),{
+  private readonly heading: HTMLDivElement = this.header.querySelector<HTMLDivElement>(".heading")!;
+  private readonly controls: CardControls = Object.assign(document.createElement("div"),{
     minimize: document.createElement("button"),
     close: document.createElement("button")
   });
@@ -156,9 +156,9 @@ class Card extends HTMLElement {
     const self = document.getElementById(id)! as Card;
 
     if (self.matches("[data-active]") && !self.hasAttribute("data-alert-timeout")) return closeCard(id);
-    if (self.type != "alert"){
+    if (getCardType(self) != "alert"){
       document.querySelectorAll<Card>(`.Card[data-active]`).forEach(card => {
-        if (card.type != "dialog" && card.type != self.type) return;
+        if (getCardType(card) != "dialog" && getCardType(card) != getCardType(self)) return;
         closeCard(card.id);
         if (!card.matches(".minimize")) return;
         const transitionDuration = parseInt(`${Number(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
@@ -166,8 +166,8 @@ class Card extends HTMLElement {
       });
     }
     self.setAttribute("data-active","");
-    if (self.type == "widget" && cardBackdropShown()) setCardBackdropShown(false);
-    if (self.type == "alert"){
+    if (getCardType(self) == "widget" && cardBackdropShown()) setCardBackdropShown(false);
+    if (getCardType(self) == "alert"){
       const timeoutIdentifier = Math.random().toString();
       self.setAttribute("data-alert-timeout",timeoutIdentifier);
       window.setTimeout(() => {
@@ -176,7 +176,7 @@ class Card extends HTMLElement {
         closeCard(id);
       },4000);
     }
-    if (self.type == "dialog"){
+    if (getCardType(self) == "dialog"){
       document.body.addEventListener("keydown",catchCardNavigation);
       setCardBackdropShown(true);
       if (!activeDialog() && !dialogPrevious()){
@@ -190,14 +190,14 @@ class Card extends HTMLElement {
       },transitionDuration);
       setActiveDialog(self.id);
     }
-    if (self.type == "widget") setActiveWidget(self.id);
+    if (getCardType(self) == "widget") setActiveWidget(self.id);
   }
 
   export function minimizeCard(id: string): void {
     const self = document.getElementById(id)! as Card;
 
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
-    const icon = self.controls.minimize.querySelector("svg")!;
+    const icon = getCardControls(self).minimize.querySelector("svg")!;
     const main = self.querySelector<HTMLDivElement>(".main")!;
     const changeIdentifier = Math.random().toString();
 
@@ -206,8 +206,8 @@ class Card extends HTMLElement {
     const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
     if (!self.matches(".minimize")){
       self.classList.add("minimize");
-      if (self.controls === undefined) return;
-      self.style.setProperty("--card-minimize-width",`${self.controls.minimize.querySelector("svg")!.clientWidth + parseInt(getElementStyle({ element: self.controls.minimize, property: "--control-padding" }),10) * 2}px`);
+      if (getCardControls(self) === undefined) return;
+      self.style.setProperty("--card-minimize-width",`${getCardControls(self).minimize.querySelector("svg")!.clientWidth + parseInt(getElementStyle({ element: getCardControls(self).minimize, property: "--control-padding" }),10) * 2}px`);
       self.style.setProperty("--card-main-width",`${main.clientWidth}px`);
       self.style.setProperty("--card-main-height",`${main.clientHeight}px`);
       icon.replaceWith(ArrowIcon() as Element);
@@ -215,7 +215,7 @@ class Card extends HTMLElement {
         workspace_tabs.style.setProperty("--minimize-tab-width",getElementStyle({ element: self, property: "width" }));
         setTabsVisibility();
       },transitionDuration);
-      if (self.contains(document.activeElement) && document.activeElement != self.controls.minimize) self.controls.minimize.focus();
+      if (self.contains(document.activeElement) && document.activeElement != getCardControls(self).minimize) getCardControls(self).minimize.focus();
     } else {
       self.classList.remove("minimize");
       window.setTimeout(() => {
@@ -240,7 +240,7 @@ class Card extends HTMLElement {
       const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
       window.setTimeout(() => minimizeCard(id),transitionDuration);
     }
-    if (self.type == "dialog"){
+    if (getCardType(self) == "dialog"){
       const workspace_editors: HTMLDivElement = workspaceEditors()!;
       document.body.removeEventListener("keydown",catchCardNavigation);
       setCardBackdropShown(false);
@@ -251,7 +251,7 @@ class Card extends HTMLElement {
         setDialogPrevious(null);
       }
     }
-    if (self.type == "widget") setActiveWidget(null);
+    if (getCardType(self) == "widget") setActiveWidget(null);
   }
 
   /**
@@ -270,6 +270,14 @@ class Card extends HTMLElement {
     const navigable = getNavigableElements({ container: document.getElementById(activeDialog()!)!, scope: true });
     event.preventDefault();
     navigable[((!event.shiftKey) ? 0 : navigable.length - 1)]?.focus();
+  }
+
+  function getCardType(self: Card): CardType {
+    return self.getAttribute("data-type")! as CardType;
+  }
+
+  function getCardControls(self: Card): CardControls {
+    return self.querySelector<CardControls>(".card-controls")!;
   }
 
 export interface GetNavigableElementsOptions {
