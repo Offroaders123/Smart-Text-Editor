@@ -92,21 +92,6 @@ export interface CardControls extends HTMLDivElement {
 
 export type { Card };
 
-export function openCard(card: string | Card): void {
-  if (typeof card === "string") card = document.getElementById(card)! as Card;
-  open(card);
-}
-
-export function minimizeCard(card: string | Card): void {
-  if (typeof card === "string") card = document.getElementById(card)! as Card;
-  minimize(card);
-}
-
-export function closeCard(card: string | Card): void {
-  if (typeof card === "string") card = document.getElementById(card)! as Card;
-  close(card);
-}
-
 /**
  * The base component for the Alert, Dialog, and Widget card types.
 */
@@ -136,7 +121,7 @@ class Card extends HTMLElement {
       }
     });
 
-    this.back?.addEventListener("click",() => open(document.querySelector<Card>(`#${this.header?.getAttribute("data-card-parent")}`)!, this));
+    this.back?.addEventListener("click",() => openCard(document.querySelector<Card>(`#${this.header?.getAttribute("data-card-parent")}`)!, this));
 
     this.controls.classList.add("card-controls");
 
@@ -151,13 +136,13 @@ class Card extends HTMLElement {
       this.controls?.minimize.click();
     });
 
-    this.controls.minimize.addEventListener("click",() => minimize(this));
+    this.controls.minimize.addEventListener("click",() => minimizeCard(this));
 
     this.controls.close.classList.add("control");
     this.controls.close.setAttribute("data-control","close");
     this.controls.close.append(CloseIcon() as Element);
 
-    this.controls.close.addEventListener("click",() => close(this));
+    this.controls.close.addEventListener("click",() => closeCard(this));
 
     this.controls.appendChild(this.controls.minimize);
     this.controls.appendChild(this.controls.close);
@@ -165,15 +150,19 @@ class Card extends HTMLElement {
   }
 }
 
-  function open(self: Card, previous?: Card): void {
-    if (self.matches("[active]") && !self.hasAttribute("data-alert-timeout")) return close(self);
+  export function openCard(self: string | Card, previous?: Card): void {
+    if (typeof self === "string") {
+      self = document.getElementById(self)! as Card;
+    }
+
+    if (self.matches("[active]") && !self.hasAttribute("data-alert-timeout")) return closeCard(self);
     if (self.type != "alert"){
       document.querySelectorAll<Card>(`ste-card[active]`).forEach(card => {
         if (card.type != "dialog" && card.type != self.type) return;
-        close(card);
+        closeCard(card);
         if (!card.matches(".minimize")) return;
         const transitionDuration = parseInt(`${Number(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
-        window.setTimeout(() => minimize(card),transitionDuration);
+        window.setTimeout(() => minimizeCard(card),transitionDuration);
       });
     }
     self.setAttribute("active","");
@@ -184,7 +173,7 @@ class Card extends HTMLElement {
       window.setTimeout(() => {
         if (self.getAttribute("data-alert-timeout") != timeoutIdentifier) return;
         self.removeAttribute("data-alert-timeout");
-        close(self);
+        closeCard(self);
       },4000);
     }
     if (self.type == "dialog"){
@@ -204,7 +193,11 @@ class Card extends HTMLElement {
     if (self.type == "widget") setActiveWidget(self.id);
   }
 
-  function minimize(self: Card): void {
+  export function minimizeCard(self: string | Card): void {
+    if (typeof self === "string") {
+      self = document.getElementById(self)! as Card;
+    }
+
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const icon = self.controls.minimize.querySelector("svg")!;
     const main = self.querySelector<HTMLDivElement>(".main")!;
@@ -241,11 +234,15 @@ class Card extends HTMLElement {
     },transitionDuration);
   }
 
-  function close(self: Card): void {
+  export function closeCard(self: string | Card): void {
+    if (typeof self === "string") {
+      self = document.getElementById(self)! as Card;
+    }
+
     self.removeAttribute("active");
     if (self.matches(".minimize")){
       const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
-      window.setTimeout(() => minimize(self),transitionDuration);
+      window.setTimeout(() => minimizeCard(self),transitionDuration);
     }
     if (self.type == "dialog"){
       const workspace_editors: HTMLDivElement = workspaceEditors()!;
