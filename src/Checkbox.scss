@@ -57,7 +57,7 @@
   background: #ffffff1c;
 }
 
-.checkbox label .check {
+.checkbox label svg {
   padding: calc(var(--check-padding) + var(--checkbox-check-border-width));
   position: absolute;
   width: calc(var(--check-size) + calc(calc(var(--check-padding) + var(--checkbox-check-border-width)) * 2));
@@ -69,7 +69,7 @@
   transition: transform 125ms ease-in;
 }
 
-.checkbox input[type="checkbox"]:checked + label .check {
+.checkbox input[type="checkbox"]:checked + label svg {
   transform: rotate(0deg) scale(1);
   transition-timing-function: ease-out;
 }

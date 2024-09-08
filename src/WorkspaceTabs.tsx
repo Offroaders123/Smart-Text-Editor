@@ -1,3 +1,4 @@
+import CloseIcon from "./CloseIcon.js";
 import { createEditor, getNext, getPrevious, query } from "./Editor.js";
 import { workspaceTabs } from "./STE.js";
 import "./WorkspaceTabs.scss";
@@ -59,9 +60,7 @@ function CreateEditorButton(props: CreateEditorButtonProps) {
       onclick={() => {
         createEditor({ autoReplace: false });
       }}>
-      <svg>
-        <use href="#close_icon"/>
-      </svg>
+      <CloseIcon/>
     </button>
   );
 }

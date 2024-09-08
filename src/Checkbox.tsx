@@ -1,3 +1,4 @@
+import CheckIcon from "./CheckIcon.js";
 import "./Checkbox.scss";
 
 import type { JSX, FlowProps } from "solid-js";
@@ -36,9 +37,7 @@ export default function Checkbox(props: FlowProps<CheckboxProps, string>) {
         checked={props.checked}
       />
       <label for={props.id}>
-        <svg class="check">
-          <use href="#check_icon"/>
-        </svg>
+        <CheckIcon/>
         {props.children}
       </label>
     </div>

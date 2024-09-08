@@ -1,3 +1,5 @@
+import ArrowIcon from "./ArrowIcon.js";
+import InstallIcon from "./InstallIcon.js";
 import { Dialog } from "./Card.js";
 import Checkbox from "./Checkbox.js";
 import { appearance, settings } from "./STE.js";
@@ -47,9 +49,7 @@ export default function SettingsCard() {
           <button
             id="install_button"
             onclick={() => showInstallPrompt()}>
-            <svg>
-              <use href="#install_icon"/>
-            </svg>
+            <InstallIcon/>
             Install
           </button>
           <button
@@ -57,9 +57,7 @@ export default function SettingsCard() {
             onclick={() => theme_card.open()}
             data-card-previous="theme_card">
             Customize Theme
-            <svg>
-              <use href="#arrow_icon"/>
-            </svg>
+            <ArrowIcon/>
           </button>
         </>,
         <>

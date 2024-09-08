@@ -1,4 +1,5 @@
 import Prism from "./prism.js";
+import CloseIcon from "./CloseIcon.js";
 import { activeEditor, settings, setActiveEditor, activeDialog, environment, appearance, previewEditor, preview as getPreview, workspaceEditors, workspaceTabs, createEditorButton, editors, setEditors, previewMenu } from "./STE.js";
 import { setPreviewSource, refreshPreview } from "./Workspace.js";
 import { getElementStyle, applyEditingBehavior, setTitle } from "./dom.js";
@@ -421,7 +422,7 @@ class EditorLegacy extends NumTextElement implements Editor {
 
     this.editorClose.classList.add("option");
     this.editorClose.tabIndex = -1;
-    this.editorClose.innerHTML = "<svg><use href='#close_icon'/></svg>";
+    this.editorClose.append(CloseIcon() as Element);
 
     this.editorClose.addEventListener("mousedown",event => {
       event.preventDefault();

@@ -1,4 +1,7 @@
 import DecorativeImage from "./DecorativeImage.js";
+import InstallIcon from "./InstallIcon.js";
+import RefreshIcon from "./RefreshIcon.js";
+import GitHubIcon from "./GitHubIcon.js";
 import Menubar from "./Menubar.js";
 import { refreshPreview } from "./Workspace.js";
 import { showInstallPrompt } from "./dom.js";
@@ -39,17 +42,17 @@ function Omnibox() {
         id="install_option"
         title="Install"
         onclick={() => showInstallPrompt()}
-        icon="#install_icon"
+        icon={<InstallIcon/>}
       />
       <OmniboxButton
         title="Refresh Preview"
         onclick={() => refreshPreview({ force: true })}
-        icon="#refresh_icon"
+        icon={<RefreshIcon/>}
       />
       <OmniboxAnchor
         href="https://github.com/Offroaders123/Smart-Text-Editor"
         title="Smart Text Editor on GitHub"
-        icon="#github_icon"
+        icon={<GitHubIcon/>}
       />
     </div>
   );
@@ -59,7 +62,7 @@ interface OmniboxButtonProps {
   id?: string;
   title: string;
   onclick: JSX.CustomEventHandlersLowerCase<HTMLButtonElement>["onclick"];
-  icon: string;
+  icon: JSX.Element;
 }
 
 function OmniboxButton(props: OmniboxButtonProps) {
@@ -71,7 +74,7 @@ function OmniboxButton(props: OmniboxButtonProps) {
       tabindex={-1}
       onclick={props.onclick}
       onmousedown={event => event.preventDefault()}>
-      <OmniboxIcon href={props.icon}/>
+      {props.icon}
     </button>
   );
 }
@@ -79,7 +82,7 @@ function OmniboxButton(props: OmniboxButtonProps) {
 interface OmniboxAnchorProps {
   href: string;
   title: string;
-  icon: string;
+  icon: JSX.Element;
 }
 
 function OmniboxAnchor(props: OmniboxAnchorProps) {
@@ -90,19 +93,7 @@ function OmniboxAnchor(props: OmniboxAnchorProps) {
       title={props.title}
       tabindex={-1}
       onmousedown={event => event.preventDefault()}>
-      <OmniboxIcon href={props.icon}/>
+      {props.icon}
     </a>
-  );
-}
-
-interface OmniboxIconProps {
-  href: string;
-}
-
-function OmniboxIcon(props: OmniboxIconProps) {
-  return (
-    <svg>
-      <use href={props.href}/>
-    </svg>
   );
 }

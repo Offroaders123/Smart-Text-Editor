@@ -1,5 +1,9 @@
 import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs } from "./STE.js";
 import DecorativeImage from "./DecorativeImage.js";
+import ArrowIcon from "./ArrowIcon.js";
+import BackIcon from "./BackIcon.js";
+import MinimizeIcon from "./MinimizeIcon.js";
+import CloseIcon from "./CloseIcon.js";
 import { query, setTabsVisibility } from "./Editor.js";
 import { getElementStyle } from "./dom.js";
 import "./Card.scss";
@@ -42,9 +46,7 @@ export function Dialog(props: DialogProps) {
     <ste-card id={props.id} type="dialog">
       <div class="header" data-card-parent={props.cardParent}>
         <button class="card-back">
-          <svg>
-            <use href="#back_icon"/>
-          </svg>
+          <BackIcon/>
         </button>
         <span class="heading">{props.headingText}</span>
       </div>
@@ -125,7 +127,7 @@ class Card extends HTMLElement {
 
     this.controls.minimize.classList.add("control");
     this.controls.minimize.setAttribute("data-control","minimize");
-    this.controls.minimize.innerHTML = `<svg><use href="#minimize_icon"/></svg>`;
+    this.controls.minimize.append(MinimizeIcon() as Element);
 
     this.controls.minimize.addEventListener("keydown",event => {
       if (event.key != "Enter") return;
@@ -138,7 +140,7 @@ class Card extends HTMLElement {
 
     this.controls.close.classList.add("control");
     this.controls.close.setAttribute("data-control","close");
-    this.controls.close.innerHTML = `<svg><use href="#close_icon"/></svg>`;
+    this.controls.close.append(CloseIcon() as Element);
 
     this.controls.close.addEventListener("click",() => this.close());
 
@@ -188,7 +190,7 @@ class Card extends HTMLElement {
 
   minimize(): void {
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
-    const icon = this.controls.minimize.querySelector<SVGUseElement>("svg use")!;
+    const icon = this.controls.minimize.querySelector("svg")!;
     const main = this.querySelector<HTMLDivElement>(".main")!;
     const changeIdentifier = Math.random().toString();
 
@@ -201,7 +203,7 @@ class Card extends HTMLElement {
       this.style.setProperty("--card-minimize-width",`${this.controls.minimize.querySelector("svg")!.clientWidth + parseInt(getElementStyle({ element: this.controls.minimize, property: "--control-padding" }),10) * 2}px`);
       this.style.setProperty("--card-main-width",`${main.clientWidth}px`);
       this.style.setProperty("--card-main-height",`${main.clientHeight}px`);
-      icon.setAttribute("href","#arrow_icon");
+      icon.replaceWith(ArrowIcon() as Element);
       window.setTimeout(() => {
         workspace_tabs.style.setProperty("--minimize-tab-width",getElementStyle({ element: this, property: "width" }));
         setTabsVisibility();
@@ -214,7 +216,7 @@ class Card extends HTMLElement {
       },transitionDuration);
       this.style.removeProperty("--card-main-width");
       this.style.removeProperty("--card-main-height");
-      icon.setAttribute("href","#minimize_icon");
+      icon.replaceWith(MinimizeIcon() as Element);
       workspace_tabs.style.removeProperty("--minimize-tab-width");
     }
     window.setTimeout(() => {
