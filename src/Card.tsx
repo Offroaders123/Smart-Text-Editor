@@ -94,17 +94,17 @@ export type { Card };
 
 export function openCard(card: string | Card): void {
   if (typeof card === "string") card = document.getElementById(card)! as Card;
-  open.call(card);
+  open(card);
 }
 
 export function minimizeCard(card: string | Card): void {
   if (typeof card === "string") card = document.getElementById(card)! as Card;
-  minimize.call(card);
+  minimize(card);
 }
 
 export function closeCard(card: string | Card): void {
   if (typeof card === "string") card = document.getElementById(card)! as Card;
-  close.call(card);
+  close(card);
 }
 
 /**
@@ -136,7 +136,7 @@ class Card extends HTMLElement {
       }
     });
 
-    this.back?.addEventListener("click",() => open.call(document.querySelector<Card>(`#${this.header?.getAttribute("data-card-parent")}`)!, this));
+    this.back?.addEventListener("click",() => open(document.querySelector<Card>(`#${this.header?.getAttribute("data-card-parent")}`)!, this));
 
     this.controls.classList.add("card-controls");
 
@@ -151,13 +151,13 @@ class Card extends HTMLElement {
       this.controls?.minimize.click();
     });
 
-    this.controls.minimize.addEventListener("click",() => minimize.call(this));
+    this.controls.minimize.addEventListener("click",() => minimize(this));
 
     this.controls.close.classList.add("control");
     this.controls.close.setAttribute("data-control","close");
     this.controls.close.append(CloseIcon() as Element);
 
-    this.controls.close.addEventListener("click",() => close.call(this));
+    this.controls.close.addEventListener("click",() => close(this));
 
     this.controls.appendChild(this.controls.minimize);
     this.controls.appendChild(this.controls.close);
@@ -165,89 +165,89 @@ class Card extends HTMLElement {
   }
 }
 
-  function open(this: Card, previous?: Card): void {
-    if (this.matches("[active]") && !this.hasAttribute("data-alert-timeout")) return close.call(this);
-    if (this.type != "alert"){
+  function open(self: Card, previous?: Card): void {
+    if (self.matches("[active]") && !self.hasAttribute("data-alert-timeout")) return close(self);
+    if (self.type != "alert"){
       document.querySelectorAll<Card>(`ste-card[active]`).forEach(card => {
-        if (card.type != "dialog" && card.type != this.type) return;
-        close.call(card);
+        if (card.type != "dialog" && card.type != self.type) return;
+        close(card);
         if (!card.matches(".minimize")) return;
         const transitionDuration = parseInt(`${Number(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
-        window.setTimeout(() => minimize.call(card),transitionDuration);
+        window.setTimeout(() => minimize(card),transitionDuration);
       });
     }
-    this.setAttribute("active","");
-    if (this.type == "widget" && cardBackdropShown()) setCardBackdropShown(false);
-    if (this.type == "alert"){
+    self.setAttribute("active","");
+    if (self.type == "widget" && cardBackdropShown()) setCardBackdropShown(false);
+    if (self.type == "alert"){
       const timeoutIdentifier = Math.random().toString();
-      this.setAttribute("data-alert-timeout",timeoutIdentifier);
+      self.setAttribute("data-alert-timeout",timeoutIdentifier);
       window.setTimeout(() => {
-        if (this.getAttribute("data-alert-timeout") != timeoutIdentifier) return;
-        this.removeAttribute("data-alert-timeout");
-        close.call(this);
+        if (self.getAttribute("data-alert-timeout") != timeoutIdentifier) return;
+        self.removeAttribute("data-alert-timeout");
+        close(self);
       },4000);
     }
-    if (this.type == "dialog"){
+    if (self.type == "dialog"){
       document.body.addEventListener("keydown",catchCardNavigation);
       setCardBackdropShown(true);
       if (!activeDialog() && !dialogPrevious()){
         setDialogPrevious(document.activeElement?.id ?? null);
       }
       document.querySelectorAll<MenuDropElement>("menu-drop[data-open]").forEach(menu => menu.close());
-      const transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 500}`);
+      const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 500}`);
       window.setTimeout(() => {
         if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
-        if (previous) this.querySelector<HTMLElement>(`[data-card-previous="${previous.id}"]`)!.focus();
+        if (previous) self.querySelector<HTMLElement>(`[data-card-previous="${previous.id}"]`)!.focus();
       },transitionDuration);
-      setActiveDialog(this.id);
+      setActiveDialog(self.id);
     }
-    if (this.type == "widget") setActiveWidget(this.id);
+    if (self.type == "widget") setActiveWidget(self.id);
   }
 
-  function minimize(this: Card): void {
+  function minimize(self: Card): void {
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
-    const icon = this.controls.minimize.querySelector("svg")!;
-    const main = this.querySelector<HTMLDivElement>(".main")!;
+    const icon = self.controls.minimize.querySelector("svg")!;
+    const main = self.querySelector<HTMLDivElement>(".main")!;
     const changeIdentifier = Math.random().toString();
 
-    this.setAttribute("data-minimize-change",changeIdentifier);
+    self.setAttribute("data-minimize-change",changeIdentifier);
     workspace_tabs.setAttribute("data-minimize-change",changeIdentifier);
-    const transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
-    if (!this.matches(".minimize")){
-      this.classList.add("minimize");
-      if (this.controls === undefined) return;
-      this.style.setProperty("--card-minimize-width",`${this.controls.minimize.querySelector("svg")!.clientWidth + parseInt(getElementStyle({ element: this.controls.minimize, property: "--control-padding" }),10) * 2}px`);
-      this.style.setProperty("--card-main-width",`${main.clientWidth}px`);
-      this.style.setProperty("--card-main-height",`${main.clientHeight}px`);
+    const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
+    if (!self.matches(".minimize")){
+      self.classList.add("minimize");
+      if (self.controls === undefined) return;
+      self.style.setProperty("--card-minimize-width",`${self.controls.minimize.querySelector("svg")!.clientWidth + parseInt(getElementStyle({ element: self.controls.minimize, property: "--control-padding" }),10) * 2}px`);
+      self.style.setProperty("--card-main-width",`${main.clientWidth}px`);
+      self.style.setProperty("--card-main-height",`${main.clientHeight}px`);
       icon.replaceWith(ArrowIcon() as Element);
       window.setTimeout(() => {
-        workspace_tabs.style.setProperty("--minimize-tab-width",getElementStyle({ element: this, property: "width" }));
+        workspace_tabs.style.setProperty("--minimize-tab-width",getElementStyle({ element: self, property: "width" }));
         setTabsVisibility();
       },transitionDuration);
-      if (this.contains(document.activeElement) && document.activeElement != this.controls.minimize) this.controls.minimize.focus();
+      if (self.contains(document.activeElement) && document.activeElement != self.controls.minimize) self.controls.minimize.focus();
     } else {
-      this.classList.remove("minimize");
+      self.classList.remove("minimize");
       window.setTimeout(() => {
-        if (this.getAttribute("data-minimize-change") == changeIdentifier) this.style.removeProperty("--card-minimize-width");
+        if (self.getAttribute("data-minimize-change") == changeIdentifier) self.style.removeProperty("--card-minimize-width");
       },transitionDuration);
-      this.style.removeProperty("--card-main-width");
-      this.style.removeProperty("--card-main-height");
+      self.style.removeProperty("--card-main-width");
+      self.style.removeProperty("--card-main-height");
       icon.replaceWith(MinimizeIcon() as Element);
       workspace_tabs.style.removeProperty("--minimize-tab-width");
     }
     window.setTimeout(() => {
-      if (this.getAttribute("data-minimize-change") == changeIdentifier) this.removeAttribute("data-minimize-change");
+      if (self.getAttribute("data-minimize-change") == changeIdentifier) self.removeAttribute("data-minimize-change");
       if (workspace_tabs.getAttribute("data-minimize-change") == changeIdentifier) workspace_tabs.removeAttribute("data-minimize-change");
     },transitionDuration);
   }
 
-  function close(this: Card): void {
-    this.removeAttribute("active");
-    if (this.matches(".minimize")){
-      const transitionDuration = parseInt(`${Number(getElementStyle({ element: this, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
-      window.setTimeout(() => minimize.call(this),transitionDuration);
+  function close(self: Card): void {
+    self.removeAttribute("active");
+    if (self.matches(".minimize")){
+      const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
+      window.setTimeout(() => minimize(self),transitionDuration);
     }
-    if (this.type == "dialog"){
+    if (self.type == "dialog"){
       const workspace_editors: HTMLDivElement = workspaceEditors()!;
       document.body.removeEventListener("keydown",catchCardNavigation);
       setCardBackdropShown(false);
@@ -258,7 +258,7 @@ class Card extends HTMLElement {
         setDialogPrevious(null);
       }
     }
-    if (this.type == "widget") setActiveWidget(null);
+    if (self.type == "widget") setActiveWidget(null);
   }
 
   /**
