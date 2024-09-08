@@ -19,7 +19,7 @@ export interface AlertProps {
 
 export function Alert(props: AlertProps) {
   return (
-    <ste-card id={props.id} type="alert">
+    <ste-card id={props.id} data-type="alert">
       <div class="header">
         <DecorativeImage class="icon" src={props.headingIcon} alt=""/>
         <span class="heading">{props.headingText}</span>
@@ -43,7 +43,7 @@ export interface DialogProps {
 
 export function Dialog(props: DialogProps) {
   return (
-    <ste-card id={props.id} type="dialog">
+    <ste-card id={props.id} data-type="dialog">
       <div class="header" data-card-parent={props.cardParent}>
         <button class="card-back">
           <BackIcon/>
@@ -69,7 +69,7 @@ export interface WidgetProps {
 
 export function Widget(props: WidgetProps) {
   return (
-    <ste-card id={props.id} type="widget">
+    <ste-card id={props.id} data-type="widget">
       <div class="header">
         <span class="heading">{props.headingText}</span>
       </div>
@@ -96,7 +96,7 @@ export type { Card };
  * The base component for the Alert, Dialog, and Widget card types.
 */
 class Card extends HTMLElement {
-  readonly type: CardType = this.getAttribute("type") as CardType;
+  readonly type: CardType = this.getAttribute("data-type") as CardType;
   private readonly header: HTMLDivElement = this.querySelector<HTMLDivElement>(".header")!;
   private readonly back: HTMLButtonElement | null = this.querySelector<HTMLButtonElement>(".card-back");
   readonly heading: HTMLDivElement = this.header.querySelector<HTMLDivElement>(".heading")!;
@@ -109,7 +109,7 @@ class Card extends HTMLElement {
     super();
 
     this.addEventListener("keydown",event => {
-      if (this.getAttribute("type") != "dialog" || event.key != "Tab") return;
+      if (this.getAttribute("data-type") != "dialog" || event.key != "Tab") return;
       const navigable = getNavigableElements({ container: this, scope: true });
       if (!event.shiftKey){
         if (document.activeElement != navigable[navigable.length - 1]) return;
@@ -153,9 +153,9 @@ class Card extends HTMLElement {
   export function openCard(id: string, previous?: string): void {
     const self = document.getElementById(id)! as Card;
 
-    if (self.matches("[active]") && !self.hasAttribute("data-alert-timeout")) return closeCard(id);
+    if (self.matches("[data-active]") && !self.hasAttribute("data-alert-timeout")) return closeCard(id);
     if (self.type != "alert"){
-      document.querySelectorAll<Card>(`ste-card[active]`).forEach(card => {
+      document.querySelectorAll<Card>(`ste-card[data-active]`).forEach(card => {
         if (card.type != "dialog" && card.type != self.type) return;
         closeCard(card.id);
         if (!card.matches(".minimize")) return;
@@ -163,7 +163,7 @@ class Card extends HTMLElement {
         window.setTimeout(() => minimizeCard(card.id),transitionDuration);
       });
     }
-    self.setAttribute("active","");
+    self.setAttribute("data-active","");
     if (self.type == "widget" && cardBackdropShown()) setCardBackdropShown(false);
     if (self.type == "alert"){
       const timeoutIdentifier = Math.random().toString();
@@ -233,7 +233,7 @@ class Card extends HTMLElement {
   export function closeCard(id: string): void {
     const self = document.getElementById(id)! as Card;
 
-    self.removeAttribute("active");
+    self.removeAttribute("data-active");
     if (self.matches(".minimize")){
       const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
       window.setTimeout(() => minimizeCard(id),transitionDuration);

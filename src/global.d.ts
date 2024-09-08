@@ -75,8 +75,8 @@ declare global {
 declare module "solid-js" {
   export namespace JSX {
     interface CardHTMLAttributes<T> extends HTMLAttributes<T> {
-      type: CardType;
-      active?: boolean;
+      "data-type": CardType;
+      "data-active"?: boolean;
     }
 
     interface NumTextHTMLAttributes<T> extends HTMLAttributes<T> {

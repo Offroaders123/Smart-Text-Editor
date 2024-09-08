@@ -15,23 +15,23 @@ ste-card {
   transition-property: visibility, opacity, transform;
 }
 
-ste-card:not([active]) {
+ste-card:not([data-active]) {
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
 }
 
-ste-card[active] {
+ste-card[data-active] {
   visibility: visible;
   opacity: 1;
   z-index: calc(var(--card-z-index) + 1);
 }
 
-ste-card:not([type="dialog"]) {
+ste-card:not([data-type="dialog"]) {
   margin: var(--margin) max(var(--safe-area-inset-right),var(--margin)) max(var(--safe-area-inset-bottom),var(--margin)) max(var(--safe-area-inset-left),var(--margin));
 }
 
-ste-card[type="alert"] {
+ste-card[data-type="alert"] {
   --margin: 16px;
   position: absolute;
   right: 0;
@@ -41,11 +41,11 @@ ste-card[type="alert"] {
   --card-z-index: 5;
 }
 
-ste-card[type="alert"]:not([active]) {
+ste-card[data-type="alert"]:not([data-active]) {
   transform: translateX(calc(100% + var(--margin) * 2));
 }
 
-ste-card[type="widget"] {
+ste-card[data-type="widget"] {
   --margin: 8px;
   position: absolute;
   right: 0;
@@ -54,15 +54,15 @@ ste-card[type="widget"] {
   transform-origin: center top;
 }
 
-ste-card[type="widget"]:not([active]) {
+ste-card[data-type="widget"]:not([data-active]) {
   transform: scaleY(0.25);
 }
 
-ste-card[type="widget"][data-minimize-change] {
+ste-card[data-type="widget"][data-minimize-change] {
   transition-property: margin-right, margin-top, border-top-right-radius, border-bottom-right-radius, box-shadow, visibility, opacity, transform;
 }
 
-ste-card[type="widget"].minimize {
+ste-card[data-type="widget"].minimize {
   margin-right: calc(var(--card-border-width) * -1);
   margin-top: 3px;
   --card-border-radius: 10px;
@@ -71,13 +71,13 @@ ste-card[type="widget"].minimize {
   box-shadow: 0 4px 7px #00000050;
 }
 
-ste-card[type="dialog"] {
+ste-card[data-type="dialog"] {
   position: absolute;
   --card-border-radius: 14px;
   --card-z-index: 3;
 }
 
-ste-card[type="dialog"]:not([active]) {
+ste-card[data-type="dialog"]:not([data-active]) {
   transform: scale(0.5);
 }
 
@@ -90,13 +90,13 @@ ste-card .header {
   --card-header-border-width: 1px;
 }
 
-ste-card[type="widget"][data-minimize-change] .header {
+ste-card[data-type="widget"][data-minimize-change] .header {
   background-clip: content-box;
   transition: var(--card-transition-duration);
   transition-property: margin-bottom, border-color;
 }
 
-ste-card[type="widget"].minimize .header {
+ste-card[data-type="widget"].minimize .header {
   margin-bottom: calc(var(--card-header-border-width) * -1);
   border-color: transparent;
 }
@@ -140,27 +140,27 @@ ste-card .header .heading {
   z-index: -1;
 }
 
-ste-card:not([type="alert"]) .header .heading {
+ste-card:not([data-type="alert"]) .header .heading {
   position: absolute;
 }
 
-ste-card[type="alert"] .header .heading {
+ste-card[data-type="alert"] .header .heading {
   margin: 0 auto;
 }
 
-ste-card[type="widget"][data-minimize-change] .header .heading {
+ste-card[data-type="widget"][data-minimize-change] .header .heading {
   transform-origin: calc(50% - calc(var(--card-minimize-width) + var(--card-header-padding-right)) * 0.5) center;
   transition: var(--card-transition-duration);
   transition-property: visibility, opacity, transform;
 }
 
-ste-card[type="widget"].minimize .header .heading {
+ste-card[data-type="widget"].minimize .header .heading {
   visibility: hidden;
   opacity: 0;
   transform: scale(0);
 }
 
-ste-card[type="dialog"] .header .heading {
+ste-card[data-type="dialog"] .header .heading {
   font-size: 16px;
 }
 
@@ -169,7 +169,7 @@ ste-card .header .card-controls {
   display: flex;
 }
 
-ste-card[type="alert"] .header .card-controls {
+ste-card[data-type="alert"] .header .card-controls {
   display: none;
 }
 
@@ -192,35 +192,35 @@ ste-card .header .card-controls .control[data-control="close"]:where(:hover,:act
   --control-background: #cc2a24;
 }
 
-ste-card:not([type="widget"]) .header .card-controls .control[data-control="minimize"] {
+ste-card:not([data-type="widget"]) .header .card-controls .control[data-control="minimize"] {
   display: none;
 }
 
-ste-card[type="widget"].minimize .header .card-controls .control {
+ste-card[data-type="widget"].minimize .header .card-controls .control {
   --control-padding: 6px;
 }
 
-ste-card[type="widget"].minimize .header .card-controls .control[data-control="minimize"] {
+ste-card[data-type="widget"].minimize .header .card-controls .control[data-control="minimize"] {
   border-radius: calc(var(--card-border-radius) - var(--card-border-width));
 }
 
-ste-card[type="widget"].minimize .header .card-controls .control[data-control="close"] {
+ste-card[data-type="widget"].minimize .header .card-controls .control[data-control="close"] {
   margin-left: var(--card-header-padding-right);
   margin-right: calc(var(--card-minimize-width) * -1);
   visibility: hidden;
   opacity: 0;
 }
 
-ste-card[type="widget"][data-minimize-change] .header .card-controls .control {
+ste-card[data-type="widget"][data-minimize-change] .header .card-controls .control {
   transition: var(--card-transition-duration);
   transition-property: padding;
 }
 
-ste-card[type="widget"][data-minimize-change] .header .card-controls .control[data-control="minimize"] {
+ste-card[data-type="widget"][data-minimize-change] .header .card-controls .control[data-control="minimize"] {
   transition-property: padding, border-radius;
 }
 
-ste-card[type="widget"][data-minimize-change] .header .card-controls .control[data-control="close"] {
+ste-card[data-type="widget"][data-minimize-change] .header .card-controls .control[data-control="close"] {
   transition-property: margin-left, margin-right, padding, visibility, opacity;
 }
 
@@ -235,15 +235,15 @@ ste-card .header .card-controls .control[data-control="close"]:hover svg {
   color: #ffffff;
 }
 
-ste-card[type="widget"].minimize .header .card-controls .control[data-control="minimize"] svg {
+ste-card[data-type="widget"].minimize .header .card-controls .control[data-control="minimize"] svg {
   transform: rotateY(180deg);
 }
 
-ste-card[type="widget"][data-minimize-change] .header .card-controls .control[data-control="close"] svg {
+ste-card[data-type="widget"][data-minimize-change] .header .card-controls .control[data-control="close"] svg {
   transition: transform var(--card-transition-duration);
 }
 
-ste-card[type="widget"].minimize .header .card-controls .control[data-control="close"] svg {
+ste-card[data-type="widget"].minimize .header .card-controls .control[data-control="close"] svg {
   transform: scale(0);
 }
 
@@ -252,23 +252,23 @@ ste-card .main {
   flex-direction: column;
 }
 
-ste-card:not([type="widget"]) .main {
+ste-card:not([data-type="widget"]) .main {
   padding: 16px;
   gap: 16px;
 }
 
-ste-card[type="widget"] .main {
+ste-card[data-type="widget"] .main {
   padding: 14px;
   gap: 14px;
   transform-origin: calc(100% - calc(var(--card-minimize-width) + var(--card-header-padding-right)) * 0.5) top;
 }
 
-ste-card[type="widget"][data-minimize-change] .main {
+ste-card[data-type="widget"][data-minimize-change] .main {
   transition: var(--card-transition-duration);
   transition-property: margin-left, margin-bottom, visibility, opacity, transform;
 }
 
-ste-card[type="widget"].minimize .main {
+ste-card[data-type="widget"].minimize .main {
   margin-left: calc(calc(var(--card-main-width) - var(--card-header-padding-right)) * -1 + var(--card-minimize-width));
   margin-bottom: calc(var(--card-main-height) * -1);
   visibility: hidden;
@@ -287,11 +287,11 @@ ste-card .main .content .item {
   align-items: center;
 }
 
-ste-card:not([type="widget"]) .main .content .item {
+ste-card:not([data-type="widget"]) .main .content .item {
   gap: 16px;
 }
 
-ste-card[type="widget"] .main .content .item {
+ste-card[data-type="widget"] .main .content .item {
   gap: 14px;
 }
 
@@ -305,11 +305,11 @@ ste-card .options {
   align-items: center;
 }
 
-ste-card:not([type="widget"]) .options {
+ste-card:not([data-type="widget"]) .options {
   gap: 16px;
 }
 
-ste-card[type="widget"] .options {
+ste-card[data-type="widget"] .options {
   gap: 14px;
 }
 
@@ -377,7 +377,7 @@ ste-card num-text::part(container)::before {
   z-index: 2;
 }
 
-ste-card input:is([type="text"],[type="url"]) {
+ste-card input:is([data-type="text"],[data-type="url"]) {
   border-radius: 6px;
   box-shadow: 0 2px 3px #00000090 inset;
 }
