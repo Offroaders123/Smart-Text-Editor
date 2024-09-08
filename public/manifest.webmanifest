@@ -25,24 +25,6 @@
       "sizes": "1024x1024"
     },
     {
-      "platform": "macOS",
-      "src": "./img/app-macOS-192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "platform": "macOS",
-      "src": "./img/app-macOS-512.png",
-      "type": "image/png",
-      "sizes": "512x512"
-    },
-    {
-      "platform": "macOS",
-      "src": "./img/app-macOS-1024.png",
-      "type": "image/png",
-      "sizes": "1024x1024"
-    },
-    {
       "src": "./img/app-maskable-192.png",
       "type": "image/png",
       "sizes": "192x192",

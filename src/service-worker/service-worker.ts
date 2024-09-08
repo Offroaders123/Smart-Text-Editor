@@ -5,8 +5,6 @@ const NAME = "Smart Text Editor";
 const VERSION = "v4.27.5";
 const CACHE_NAME = `${NAME} ${VERSION}`;
 
-const IS_MACOS_DEVICE: boolean = (/(macOS|Mac)/i.test(navigator.userAgentData?.platform ?? navigator.platform) && navigator.maxTouchPoints < 1);
-
 const SHARE_FILES: File[] = [];
 
 self.addEventListener("activate",event => {
@@ -22,32 +20,6 @@ self.addEventListener("fetch",async event => {
         SHARE_FILES.push(file as File);
       }
       event.respondWith(Response.redirect("./?share-target=true",303));
-    })());
-    return;
-  }
-
-  if (event.request.url === `${(self.location.href.match(/(.*\/).*/) || "")[1]}manifest.webmanifest`){
-    event.respondWith((async () => {
-      const cached = await caches.match(event.request);
-      if (cached !== undefined) return cached;
-
-      const fetched = await fetch("./manifest.webmanifest");
-      const manifest = await fetched.json();
-
-      manifest.icons = manifest.icons.filter((icon: { platform: string; purpose: string; }) => {
-        switch (true){
-          case !IS_MACOS_DEVICE && icon.platform !== "macOS":
-          case IS_MACOS_DEVICE && icon.platform === "macOS" || icon.purpose === "maskable": {
-            return icon;
-          }
-        }
-      });
-
-      const result = new Response(JSON.stringify(manifest,null,2),{ headers: { "Content-Type": "text/json" } });
-
-      await cacheRequest(event.request,result);
-
-      return result;
     })());
     return;
   }
