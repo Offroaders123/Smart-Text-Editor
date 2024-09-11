@@ -377,7 +377,7 @@
   z-index: 2;
 }
 
-.Card input:is([data-type="text"],[data-type="url"]) {
+.Card input:is([type="text"],[type="url"]) {
   border-radius: 6px;
   box-shadow: 0 2px 3px #00000090 inset;
 }
