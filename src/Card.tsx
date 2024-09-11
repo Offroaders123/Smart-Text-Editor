@@ -98,21 +98,22 @@ export type { Card };
 class Card extends HTMLElement {
   constructor() {
     super();
+    const card = this;
 
-    const type: CardType = this.getAttribute("data-type") as CardType;
-    const header: HTMLDivElement = this.querySelector<HTMLDivElement>(".header")!;
-    const back: HTMLButtonElement | null = this.querySelector<HTMLButtonElement>(".card-back");
+    const type: CardType = card.getAttribute("data-type") as CardType;
+    const header: HTMLDivElement = card.querySelector<HTMLDivElement>(".header")!;
+    const back: HTMLButtonElement | null = card.querySelector<HTMLButtonElement>(".card-back");
     const heading: HTMLDivElement = header.querySelector<HTMLDivElement>(".heading")!;
     const controls: CardControls = Object.assign(document.createElement("div"),{
       minimize: document.createElement("button"),
       close: document.createElement("button")
     });
   
-    this.classList.add("Card");
+    card.classList.add("Card");
 
-    this.addEventListener("keydown",event => {
-      if (this.getAttribute("data-type") != "dialog" || event.key != "Tab") return;
-      const navigable = getNavigableElements({ container: this, scope: true });
+    card.addEventListener("keydown",event => {
+      if (card.getAttribute("data-type") != "dialog" || event.key != "Tab") return;
+      const navigable = getNavigableElements({ container: card, scope: true });
       if (!event.shiftKey){
         if (document.activeElement != navigable[navigable.length - 1]) return;
         event.preventDefault();
@@ -123,7 +124,7 @@ class Card extends HTMLElement {
       }
     });
 
-    back?.addEventListener("click",() => openCard(header.getAttribute("data-card-parent")!, this.id));
+    back?.addEventListener("click",() => openCard(header.getAttribute("data-card-parent")!, card.id));
 
     controls.classList.add("card-controls");
 
@@ -138,13 +139,13 @@ class Card extends HTMLElement {
       controls?.minimize.click();
     });
 
-    controls.minimize.addEventListener("click",() => minimizeCard(this.id));
+    controls.minimize.addEventListener("click",() => minimizeCard(card.id));
 
     controls.close.classList.add("control");
     controls.close.setAttribute("data-control","close");
     controls.close.append(CloseIcon() as Element);
 
-    controls.close.addEventListener("click",() => closeCard(this.id));
+    controls.close.addEventListener("click",() => closeCard(card.id));
 
     controls.appendChild(controls.minimize);
     controls.appendChild(controls.close);
