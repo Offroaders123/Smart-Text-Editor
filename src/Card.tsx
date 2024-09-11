@@ -20,7 +20,7 @@ export interface AlertProps {
 
 export function Alert(props: AlertProps) {
   return (
-    <Card id={props.id} data-type="alert">
+    <Card id={props.id} type="alert">
       <div class="header">
         <DecorativeImage class="icon" src={props.headingIcon} alt=""/>
         <span class="heading">{props.headingText}</span>
@@ -44,7 +44,7 @@ export interface DialogProps {
 
 export function Dialog(props: DialogProps) {
   return (
-    <Card id={props.id} data-type="dialog">
+    <Card id={props.id} type="dialog">
       <div class="header" data-card-parent={props.cardParent}>
         <button class="card-back">
           <BackIcon/>
@@ -70,7 +70,7 @@ export interface WidgetProps {
 
 export function Widget(props: WidgetProps) {
   return (
-    <Card id={props.id} data-type="widget">
+    <Card id={props.id} type="widget">
       <div class="header">
         <span class="heading">{props.headingText}</span>
       </div>
@@ -93,8 +93,8 @@ export interface CardControls extends HTMLDivElement {
 
 interface CardProps extends ParentProps {
   id: string;
-  "data-type": CardType;
-  "data-active"?: boolean;
+  type: CardType;
+  active?: boolean;
 }
 
 /**
@@ -160,7 +160,7 @@ function Card(props: CardProps) {
     <div
       id={props.id}
       class="Card"
-      data-type={props["data-type"]}
+      data-type={props.type}
       ref={card!}>
       {props.children}
     </div>
