@@ -1,5 +1,3 @@
-import type { Card, CardType } from "./Card.js";
-
 declare global {
   interface Navigator {
     /**
@@ -38,7 +36,7 @@ declare global {
   // var scaler: HTMLDivElement;
   // var preview: HTMLIFrameElement;
 
-  var settings_card: Card;
+  var settings_card: HTMLDivElement;
   var default_orientation_setting: MenuDropElement;
   var syntax_highlighting_setting: HTMLInputElement;
   var automatic_refresh_setting: HTMLInputElement;
@@ -46,39 +44,34 @@ declare global {
   var theme_button: HTMLButtonElement;
   var clear_site_caches_button: HTMLButtonElement;
 
-  var theme_card: Card;
+  var theme_card: HTMLDivElement;
   var theme_setting: NumTextElement;
 
-  var preview_base_card: Card;
+  var preview_base_card: HTMLDivElement;
 
-  var reset_settings_card: Card;
-  var cleared_cache_card: Card;
+  var reset_settings_card: HTMLDivElement;
+  var cleared_cache_card: HTMLDivElement;
 
-  var replace_text_card: Card;
+  var replace_text_card: HTMLDivElement;
 
-  var color_picker_card: Card;
+  var color_picker_card: HTMLDivElement;
   var picker_preview: HTMLDivElement;
   var picker_input: HTMLInputElement;
   var red_channel: HTMLInputElement;
   var green_channel: HTMLInputElement;
   var blue_channel: HTMLInputElement;
 
-  var json_formatter_card: Card;
+  var json_formatter_card: HTMLDivElement;
 
-  var uri_encoder_card: Card;
+  var uri_encoder_card: HTMLDivElement;
   var encoder_input: NumTextElement;
   var encoder_type: HTMLInputElement;
 
-  var uuid_generator_card: Card;
+  var uuid_generator_card: HTMLDivElement;
 }
 
 declare module "solid-js" {
   export namespace JSX {
-    interface CardHTMLAttributes<T> extends HTMLAttributes<T> {
-      "data-type": CardType;
-      "data-active"?: boolean;
-    }
-
     interface NumTextHTMLAttributes<T> extends HTMLAttributes<T> {
       placeholder?: string;
       value?: string;
@@ -87,7 +80,6 @@ declare module "solid-js" {
     interface HTMLElementTags {
       "menu-drop": HTMLAttributes<MenuDropElement>;
       "num-text": NumTextHTMLAttributes<NumTextElement>;
-      "ste-card": CardHTMLAttributes<Card>;
     }
   }
 }

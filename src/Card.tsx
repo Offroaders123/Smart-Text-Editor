@@ -1,3 +1,4 @@
+import { onMount } from "solid-js";
 import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs } from "./STE.js";
 import DecorativeImage from "./DecorativeImage.js";
 import ArrowIcon from "./ArrowIcon.js";
@@ -8,7 +9,7 @@ import { query, setTabsVisibility } from "./Editor.js";
 import { getElementStyle } from "./dom.js";
 import "./Card.scss";
 
-import type { JSX } from "solid-js";
+import type { ParentProps, JSX } from "solid-js";
 
 export interface AlertProps {
   id: string;
@@ -19,7 +20,7 @@ export interface AlertProps {
 
 export function Alert(props: AlertProps) {
   return (
-    <ste-card id={props.id} data-type="alert">
+    <Card id={props.id} data-type="alert">
       <div class="header">
         <DecorativeImage class="icon" src={props.headingIcon} alt=""/>
         <span class="heading">{props.headingText}</span>
@@ -29,7 +30,7 @@ export function Alert(props: AlertProps) {
           {props.mainContent}
         </div>
       </div>
-    </ste-card>
+    </Card>
   );
 }
 
@@ -43,7 +44,7 @@ export interface DialogProps {
 
 export function Dialog(props: DialogProps) {
   return (
-    <ste-card id={props.id} data-type="dialog">
+    <Card id={props.id} data-type="dialog">
       <div class="header" data-card-parent={props.cardParent}>
         <button class="card-back">
           <BackIcon/>
@@ -56,7 +57,7 @@ export function Dialog(props: DialogProps) {
         </div>
         {props.options?.map(row => <div class="options">{row}</div>)}
       </div>
-    </ste-card>
+    </Card>
   );
 }
 
@@ -69,7 +70,7 @@ export interface WidgetProps {
 
 export function Widget(props: WidgetProps) {
   return (
-    <ste-card id={props.id} data-type="widget">
+    <Card id={props.id} data-type="widget">
       <div class="header">
         <span class="heading">{props.headingText}</span>
       </div>
@@ -79,7 +80,7 @@ export function Widget(props: WidgetProps) {
         </div>
         {props.options.map(row => <div class="options">{row}</div>)}
       </div>
-    </ste-card>
+    </Card>
   );
 }
 
@@ -90,16 +91,19 @@ export interface CardControls extends HTMLDivElement {
   readonly close: HTMLButtonElement;
 }
 
-export type { Card };
+interface CardProps extends ParentProps {
+  id: string;
+  "data-type": CardType;
+  "data-active"?: boolean;
+}
 
 /**
  * The base component for the Alert, Dialog, and Widget card types.
 */
-class Card extends HTMLElement {
-  constructor() {
-    super();
-    const card = this;
+function Card(props: CardProps) {
+  let card: HTMLDivElement;
 
+  onMount(() => {
     const type: CardType = card.getAttribute("data-type") as CardType;
     const header: HTMLDivElement = card.querySelector<HTMLDivElement>(".header")!;
     const back: HTMLButtonElement | null = card.querySelector<HTMLButtonElement>(".card-back");
@@ -109,7 +113,7 @@ class Card extends HTMLElement {
       close: document.createElement("button")
     });
   
-    card.classList.add("Card");
+    // card.classList.add("Card");
 
     card.addEventListener("keydown",event => {
       if (card.getAttribute("data-type") != "dialog" || event.key != "Tab") return;
@@ -150,15 +154,25 @@ class Card extends HTMLElement {
     controls.appendChild(controls.minimize);
     controls.appendChild(controls.close);
     header.appendChild(controls);
-  }
+  });
+
+  return (
+    <div
+      id={props.id}
+      class="Card"
+      data-type={props["data-type"]}
+      ref={card!}>
+      {props.children}
+    </div>
+  );
 }
 
   export function openCard(id: string, previous?: string): void {
-    const self = document.getElementById(id)! as Card;
+    const self = document.getElementById(id)! as HTMLDivElement;
 
     if (self.matches("[data-active]") && !self.hasAttribute("data-alert-timeout")) return closeCard(id);
     if (getCardType(self) != "alert"){
-      document.querySelectorAll<Card>(`.Card[data-active]`).forEach(card => {
+      document.querySelectorAll<HTMLDivElement>(`.Card[data-active]`).forEach(card => {
         if (getCardType(card) != "dialog" && getCardType(card) != getCardType(self)) return;
         closeCard(card.id);
         if (!card.matches(".minimize")) return;
@@ -195,7 +209,7 @@ class Card extends HTMLElement {
   }
 
   export function minimizeCard(id: string): void {
-    const self = document.getElementById(id)! as Card;
+    const self = document.getElementById(id)! as HTMLDivElement;
 
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const icon = getCardControls(self).minimize.querySelector("svg")!;
@@ -234,7 +248,7 @@ class Card extends HTMLElement {
   }
 
   export function closeCard(id: string): void {
-    const self = document.getElementById(id)! as Card;
+    const self = document.getElementById(id)! as HTMLDivElement;
 
     self.removeAttribute("data-active");
     if (self.matches(".minimize")){
@@ -273,23 +287,15 @@ class Card extends HTMLElement {
     navigable[((!event.shiftKey) ? 0 : navigable.length - 1)]?.focus();
   }
 
-  function getCardType(self: Card): CardType {
+  function getCardType(self: HTMLDivElement): CardType {
     return self.getAttribute("data-type")! as CardType;
   }
 
-  function getCardControls(self: Card): CardControls {
+  function getCardControls(self: HTMLDivElement): CardControls {
     return self.querySelector<CardControls>(".card-controls")!;
   }
 
 export interface GetNavigableElementsOptions {
   container: HTMLElement;
   scope?: boolean | string;
-}
-
-window.customElements.define("ste-card",Card);
-
-declare global {
-  interface HTMLElementTagNameMap {
-    "ste-card": Card;
-  }
 }
