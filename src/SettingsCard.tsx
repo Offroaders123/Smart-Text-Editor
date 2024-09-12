@@ -3,6 +3,7 @@ import InstallIcon from "./InstallIcon.js";
 import Dialog from "./Dialog.js";
 import { openCard } from "./Card.js";
 import CardItem from "./CardItem.js";
+import CardOptions from "./CardOptions.js";
 import Checkbox from "./Checkbox.js";
 import { appearance, settings } from "./STE.js";
 import { clearSiteCaches, showInstallPrompt } from "./dom.js";
@@ -46,8 +47,9 @@ export default function SettingsCard() {
           </Checkbox>
         </CardItem>
       ]}
-      options={[
+      options={
         <>
+        <CardOptions>
           <button
             id="install_button"
             onclick={() => showInstallPrompt()}>
@@ -61,8 +63,8 @@ export default function SettingsCard() {
             Customize Theme
             <ArrowIcon/>
           </button>
-        </>,
-        <>
+        </CardOptions>
+        <CardOptions>
           <button
             id="clear_site_caches_button"
             class="warning"
@@ -74,8 +76,9 @@ export default function SettingsCard() {
             onclick={() => settings.reset({ confirm: true })}>
             Reset Settings
           </button>
+        </CardOptions>
         </>
-      ]}
+      }
     />
   );
 }

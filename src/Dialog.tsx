@@ -8,7 +8,7 @@ export interface DialogProps {
   parent?: string;
   heading: string;
   main: JSX.Element[];
-  options?: JSX.Element[];
+  options?: JSX.Element;
 }
 
 export default function Dialog(props: DialogProps) {

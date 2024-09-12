@@ -1,5 +1,6 @@
 import Widget from "./Widget.js";
 import CardItem from "./CardItem.js";
+import CardOptions from "./CardOptions.js";
 import { applyEditingBehavior } from "./dom.js";
 
 export default function ColorPickerCard() {
@@ -28,13 +29,13 @@ export default function ColorPickerCard() {
           <input id="blue_channel" type="range"/>
         </CardItem>
       ]}
-      options={[
-        <>
+      options={
+        <CardOptions>
           <button onclick={() => /* copyPicker() */ {}}>Copy</button>
           <button onclick={() => /* insertPicker() */ {}}>Insert</button>
           <button onclick={() => /* deletePicker() */ {}}>Delete</button>
-        </>
-      ]}
+        </CardOptions>
+      }
     />
   );
 }

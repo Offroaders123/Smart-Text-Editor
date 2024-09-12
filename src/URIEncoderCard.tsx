@@ -1,5 +1,6 @@
 import Widget from "./Widget.js";
 import CardItem from "./CardItem.js";
+import CardOptions from "./CardOptions.js";
 import Checkbox from "./Checkbox.js";
 import { applyEditingBehavior } from "./dom.js";
 
@@ -32,14 +33,18 @@ export default function URIEncoderCard() {
           />
         </CardItem>
       ]}
-      options={[
+      options={
         <>
+        <CardOptions>
           <button onclick={() => encode()}>Encode</button>
           <button onclick={() => decode()}>Decode</button>
           <button onclick={() => clear()}>Clear</button>
-        </>,
+        </CardOptions>
+        <CardOptions>
         <Checkbox id="encoder_type">Enable URI Component</Checkbox>
-      ]}
+        </CardOptions>
+        </>
+      }
     />
   );
 }

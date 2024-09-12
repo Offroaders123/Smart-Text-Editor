@@ -19,12 +19,14 @@ export default function ThemeCard() {
         //   />
         // </CardItem>
       ]}
-      // options={[
+      // options={
+      //   <CardOptions>
       //   <button
       //     onclick={() => resetTheme()}>
       //     Reset Theme
       //   </button>
-      // ]}
+      //   </CardOptions>
+      // }
     />
   );
 }

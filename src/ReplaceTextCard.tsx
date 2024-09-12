@@ -1,6 +1,7 @@
 import { createSignal } from "solid-js";
 import Widget from "./Widget.js";
 import CardItem from "./CardItem.js";
+import CardOptions from "./CardOptions.js";
 import { query } from "./Editor.js";
 import { activeEditor } from "./STE.js";
 import { applyEditingBehavior } from "./dom.js";
@@ -48,13 +49,13 @@ export default function ReplaceTextCard() {
           />
         </CardItem>
       ]}
-      options={[
-        <>
+      options={
+        <CardOptions>
           <button onclick={() => replace()}>Replace</button>
           <button onclick={() => flip()}>Flip</button>
           <button onclick={() => clear()}>Clear</button>
-        </>
-      ]}
+        </CardOptions>
+      }
     />
   );
 }

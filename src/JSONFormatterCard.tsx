@@ -1,6 +1,7 @@
 import { createSignal } from "solid-js";
 import Widget from "./Widget.js";
 import CardItem from "./CardItem.js";
+import CardOptions from "./CardOptions.js";
 import { applyEditingBehavior } from "./dom.js";
 
 export default function JSONFormatterCard() {
@@ -57,13 +58,13 @@ export default function JSONFormatterCard() {
           />
         </CardItem>
       ]}
-      options={[
-        <>
+      options={
+        <CardOptions>
           <button onclick={() => format()}>Format</button>
           <button onclick={() => collapse()}>Collapse</button>
           <button onclick={() => clear()}>Clear</button>
-        </>
-      ]}
+        </CardOptions>
+      }
     />
   );
 }

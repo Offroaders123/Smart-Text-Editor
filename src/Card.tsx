@@ -5,7 +5,6 @@ import ArrowIcon from "./ArrowIcon.js";
 import BackIcon from "./BackIcon.js";
 import MinimizeIcon from "./MinimizeIcon.js";
 import CloseIcon from "./CloseIcon.js";
-import CardOptions from "./CardOptions.js";
 import { query, setTabsVisibility } from "./Editor.js";
 import { getElementStyle } from "./dom.js";
 import "./Card.scss";
@@ -27,7 +26,7 @@ export interface CardProps {
   heading: string;
   icon?: string;
   main: JSX.Element[];
-  options?: JSX.Element[];
+  options?: JSX.Element;
 }
 
 /**
@@ -83,7 +82,7 @@ export default function Card(props: CardProps) {
         <div class="content">
           {props.main}
         </div>
-        {props.options?.map(row => <CardOptions>{row}</CardOptions>)}
+        {props.options}
       </div>
     </div>
   );

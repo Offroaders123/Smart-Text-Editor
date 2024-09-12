@@ -7,7 +7,7 @@ export interface WidgetProps {
   id: string;
   heading: string;
   main: JSX.Element[];
-  options: JSX.Element[];
+  options: JSX.Element;
 }
 
 export default function Widget(props: WidgetProps) {
