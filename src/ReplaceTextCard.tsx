@@ -30,8 +30,8 @@ export default function ReplaceTextCard() {
   return (
     <Widget
       id="replace_text_card"
-      headingText="Replace Text"
-      mainContent={[
+      heading="Replace Text"
+      main={[
         <div class="item list expand">
           <num-text
             ref={ref => applyEditingBehavior(ref)}

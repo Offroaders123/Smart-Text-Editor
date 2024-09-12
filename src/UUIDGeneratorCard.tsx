@@ -8,8 +8,8 @@ export default function UUIDGeneratorCard() {
   return (
     <Widget
       id="uuid_generator_card"
-      headingText="UUID Generator"
-      mainContent={[
+      heading="UUID Generator"
+      main={[
         <div class="item expand">
           <input
             ref={ref => applyEditingBehavior(ref)}

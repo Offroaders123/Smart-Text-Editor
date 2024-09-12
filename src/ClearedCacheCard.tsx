@@ -5,9 +5,9 @@ export default function ClearedCacheCard() {
   return (
     <Alert
       id="cleared_cache_card"
-      headingText="Cleared Cache"
-      headingIcon={Template}
-      mainContent={[
+      heading="Cleared Cache"
+      icon={Template}
+      main={[
         <div class="item">Successfully cleared offline cache!</div>
       ]}
     />

@@ -25,8 +25,8 @@ export default function PreviewBaseCard(props: PreviewBaseCardProps) {
   return (
     <Dialog
       id="preview_base_card"
-      headingText="Base URL"
-      mainContent={[
+      heading="Base URL"
+      main={[
         <div class="item list expand">
           <input
             ref={ref => applyEditingBehavior(ref)}

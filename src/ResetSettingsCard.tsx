@@ -5,9 +5,9 @@ export default function ResetSettingsCard() {
   return (
     <Alert
       id="reset_settings_card"
-      headingText="Reset Settings"
-      headingIcon={Settings}
-      mainContent={[
+      heading="Reset Settings"
+      icon={Settings}
+      main={[
         <div class="item">Your settings have been reset!</div>
       ]}
     />

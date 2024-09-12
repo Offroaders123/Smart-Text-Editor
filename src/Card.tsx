@@ -22,10 +22,10 @@ export interface CardProps {
   id: string;
   type: CardType;
   active?: boolean;
-  cardParent?: string;
-  headingText: string;
-  headingIcon?: string;
-  mainContent: JSX.Element[];
+  parent?: string;
+  heading: string;
+  icon?: string;
+  main: JSX.Element[];
   options?: JSX.Element[];
 }
 
@@ -54,16 +54,16 @@ export default function Card(props: CardProps) {
           navigable[navigable.length - 1]?.focus();
         }
       }}>
-      <div class="header" data-card-parent={props.type === "dialog" && props.cardParent} ref={header!}>
+      <div class="header" data-card-parent={props.type === "dialog" && props.parent} ref={header!}>
         <Show when={props.type === "alert"}>
-          <DecorativeImage class="icon" src={props.headingIcon!} alt=""/>
+          <DecorativeImage class="icon" src={props.icon!} alt=""/>
         </Show>
         <Show when={props.type === "dialog"}>
           <button class="card-back" onclick={() => openCard(header.getAttribute("data-card-parent")!, card.id)}>
             <BackIcon/>
           </button>
         </Show>
-        <span class="heading">{props.headingText}</span>
+        <span class="heading">{props.heading}</span>
         <div class="card-controls">
           <button class="control" data-control="minimize" onkeydown={event => {
             if (event.key != "Enter") return;
@@ -80,7 +80,7 @@ export default function Card(props: CardProps) {
       </div>
       <div class="main">
         <div class="content">
-          {props.mainContent}
+          {props.main}
         </div>
         {props.options?.map(row => <div class="options">{row}</div>)}
       </div>

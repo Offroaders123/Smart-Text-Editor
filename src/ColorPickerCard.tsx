@@ -5,8 +5,8 @@ export default function ColorPickerCard() {
   return (
     <Widget
       id="color_picker_card"
-      headingText="Color Picker"
-      mainContent={[
+      heading="Color Picker"
+      main={[
         <div class="item list">
           <div id="picker_preview"></div>
           <input

@@ -5,9 +5,9 @@ import type { JSX } from "solid-js";
 
 export interface DialogProps {
   id: string;
-  cardParent?: string;
-  headingText: string;
-  mainContent: JSX.Element[];
+  parent?: string;
+  heading: string;
+  main: JSX.Element[];
   options?: JSX.Element[];
 }
 
@@ -16,9 +16,9 @@ export default function Dialog(props: DialogProps) {
     <Card
       id={props.id}
       type="dialog"
-      cardParent={props.cardParent}
-      headingText={props.headingText}
-      mainContent={props.mainContent}
+      parent={props.parent}
+      heading={props.heading}
+      main={props.main}
       options={props.options}
     />
   );

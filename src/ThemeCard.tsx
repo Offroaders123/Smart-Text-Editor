@@ -4,9 +4,9 @@ export default function ThemeCard() {
   return (
     <Dialog
       id="theme_card"
-      cardParent="settings_card"
-      headingText="Theme"
-      mainContent={[
+      parent="settings_card"
+      heading="Theme"
+      main={[
         <div class="item list">
           <span style="line-height: 1.6;">Custom workspace theme settings<br/>will be featured in a later update.</span>
         </div>,

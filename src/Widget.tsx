@@ -5,8 +5,8 @@ import type { JSX } from "solid-js";
 
 export interface WidgetProps {
   id: string;
-  headingText: string;
-  mainContent: JSX.Element[];
+  heading: string;
+  main: JSX.Element[];
   options: JSX.Element[];
 }
 
@@ -15,8 +15,8 @@ export default function Widget(props: WidgetProps) {
     <Card
       id={props.id}
       type="widget"
-      headingText={props.headingText}
-      mainContent={props.mainContent}
+      heading={props.heading}
+      main={props.main}
       options={props.options}
     />
   );

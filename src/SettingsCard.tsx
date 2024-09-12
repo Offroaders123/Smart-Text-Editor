@@ -10,8 +10,8 @@ export default function SettingsCard() {
   return (
     <Dialog
       id="settings_card"
-      headingText="Settings"
-      mainContent={[
+      heading="Settings"
+      main={[
         <div class="item list start">
           <div class="select">
             <label>Default Orientation:</label>

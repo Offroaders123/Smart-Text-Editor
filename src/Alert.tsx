@@ -5,9 +5,9 @@ import type { JSX } from "solid-js";
 
 export interface AlertProps {
   id: string;
-  headingText: string;
-  headingIcon: string;
-  mainContent: JSX.Element[];
+  heading: string;
+  icon: string;
+  main: JSX.Element[];
 }
 
 export default function Alert(props: AlertProps) {
@@ -15,9 +15,9 @@ export default function Alert(props: AlertProps) {
     <Card
       id={props.id}
       type="alert"
-      headingText={props.headingText}
-      headingIcon={props.headingIcon}
-      mainContent={props.mainContent}
+      heading={props.heading}
+      icon={props.icon}
+      main={props.main}
     />
   );
 }

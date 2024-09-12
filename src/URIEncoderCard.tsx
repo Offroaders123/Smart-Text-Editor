@@ -20,8 +20,8 @@ export default function URIEncoderCard() {
   return (
     <Widget
       id="uri_encoder_card"
-      headingText="URI Encoder"
-      mainContent={[
+      heading="URI Encoder"
+      main={[
         <div class="item expand">
           <num-text
             ref={ref => applyEditingBehavior(ref)}

@@ -41,8 +41,8 @@ export default function JSONFormatterCard() {
   return (
     <Widget
       id="json_formatter_card"
-      headingText="JSON Formatter"
-      mainContent={[
+      heading="JSON Formatter"
+      main={[
         <div class="item expand">
           <num-text
             ref={ref => {
