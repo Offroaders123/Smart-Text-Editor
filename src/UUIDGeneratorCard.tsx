@@ -1,5 +1,6 @@
 import { createSignal } from "solid-js";
 import Widget from "./Widget.js";
+import CardItem from "./CardItem.js";
 import { applyEditingBehavior } from "./dom.js";
 
 export default function UUIDGeneratorCard() {
@@ -10,7 +11,7 @@ export default function UUIDGeneratorCard() {
       id="uuid_generator_card"
       heading="UUID Generator"
       main={[
-        <div class="item expand">
+        <CardItem expand>
           <input
             ref={ref => applyEditingBehavior(ref)}
             type="text"
@@ -20,7 +21,7 @@ export default function UUIDGeneratorCard() {
             onclick={event => event.currentTarget.select()}
             onkeydown={event => event.currentTarget.click()}
           />
-        </div>
+        </CardItem>
       ]}
       options={[
         <button

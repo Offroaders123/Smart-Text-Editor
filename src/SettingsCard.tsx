@@ -2,6 +2,7 @@ import ArrowIcon from "./ArrowIcon.js";
 import InstallIcon from "./InstallIcon.js";
 import Dialog from "./Dialog.js";
 import { openCard } from "./Card.js";
+import CardItem from "./CardItem.js";
 import Checkbox from "./Checkbox.js";
 import { appearance, settings } from "./STE.js";
 import { clearSiteCaches, showInstallPrompt } from "./dom.js";
@@ -12,7 +13,7 @@ export default function SettingsCard() {
       id="settings_card"
       heading="Settings"
       main={[
-        <div class="item list start">
+        <CardItem list start>
           <div class="select">
             <label>Default Orientation:</label>
             <menu-drop id="default_orientation_setting" data-select>
@@ -43,7 +44,7 @@ export default function SettingsCard() {
             checked>
             Automatically Refresh Preview
           </Checkbox>
-        </div>
+        </CardItem>
       ]}
       options={[
         <>

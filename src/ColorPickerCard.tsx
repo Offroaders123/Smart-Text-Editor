@@ -1,4 +1,5 @@
 import Widget from "./Widget.js";
+import CardItem from "./CardItem.js";
 import { applyEditingBehavior } from "./dom.js";
 
 export default function ColorPickerCard() {
@@ -7,7 +8,7 @@ export default function ColorPickerCard() {
       id="color_picker_card"
       heading="Color Picker"
       main={[
-        <div class="item list">
+        <CardItem list>
           <div id="picker_preview"></div>
           <input
             ref={ref => applyEditingBehavior(ref)}
@@ -17,15 +18,15 @@ export default function ColorPickerCard() {
             maxlength="7"
             placeholder="#rrggbb"
           />
-        </div>,
-        <div class="item list">
+        </CardItem>,
+        <CardItem list>
           <label for="red_channel">Red</label>
           <input id="red_channel" type="range"/>
           <label for="green_channel">Green</label>
           <input id="green_channel" type="range"/>
           <label for="blue_channel">Blue</label>
           <input id="blue_channel" type="range"/>
-        </div>
+        </CardItem>
       ]}
       options={[
         <>

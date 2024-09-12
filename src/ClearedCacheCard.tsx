@@ -1,4 +1,5 @@
 import Alert from "./Alert.js";
+import CardItem from "./CardItem.js";
 import Template from "./img/template.svg";
 
 export default function ClearedCacheCard() {
@@ -8,7 +9,7 @@ export default function ClearedCacheCard() {
       heading="Cleared Cache"
       icon={Template}
       main={[
-        <div class="item">Successfully cleared offline cache!</div>
+        <CardItem>Successfully cleared offline cache!</CardItem>
       ]}
     />
   );

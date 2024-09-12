@@ -1,4 +1,5 @@
 import Alert from "./Alert.js";
+import CardItem from "./CardItem.js";
 import Settings from "./img/settings.svg";
 
 export default function ResetSettingsCard() {
@@ -8,7 +9,7 @@ export default function ResetSettingsCard() {
       heading="Reset Settings"
       icon={Settings}
       main={[
-        <div class="item">Your settings have been reset!</div>
+        <CardItem>Your settings have been reset!</CardItem>
       ]}
     />
   );

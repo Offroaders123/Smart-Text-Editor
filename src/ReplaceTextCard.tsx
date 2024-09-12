@@ -1,5 +1,6 @@
 import { createSignal } from "solid-js";
 import Widget from "./Widget.js";
+import CardItem from "./CardItem.js";
 import { query } from "./Editor.js";
 import { activeEditor } from "./STE.js";
 import { applyEditingBehavior } from "./dom.js";
@@ -32,7 +33,7 @@ export default function ReplaceTextCard() {
       id="replace_text_card"
       heading="Replace Text"
       main={[
-        <div class="item list expand">
+        <CardItem list expand>
           <num-text
             ref={ref => applyEditingBehavior(ref)}
             placeholder="Text to find..."
@@ -45,7 +46,7 @@ export default function ReplaceTextCard() {
             value={replaceValue()}
             oninput={event => setReplaceValue(event.currentTarget.value)}
           />
-        </div>
+        </CardItem>
       ]}
       options={[
         <>

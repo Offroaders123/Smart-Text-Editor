@@ -1,5 +1,6 @@
 import { createEffect, createMemo } from "solid-js";
 import Dialog from "./Dialog.js";
+import CardItem from "./CardItem.js";
 import { settings } from "./STE.js";
 import { refreshPreview } from "./Workspace.js";
 import { applyEditingBehavior } from "./dom.js";
@@ -27,7 +28,7 @@ export default function PreviewBaseCard(props: PreviewBaseCardProps) {
       id="preview_base_card"
       heading="Base URL"
       main={[
-        <div class="item list expand">
+        <CardItem list expand>
           <input
             ref={ref => applyEditingBehavior(ref)}
             type="url"
@@ -53,7 +54,7 @@ export default function PreviewBaseCard(props: PreviewBaseCardProps) {
               }
             }}
           />
-        </div>
+        </CardItem>
       ]}
       options={[
         <button

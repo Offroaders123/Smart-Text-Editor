@@ -1,4 +1,5 @@
 import Widget from "./Widget.js";
+import CardItem from "./CardItem.js";
 import Checkbox from "./Checkbox.js";
 import { applyEditingBehavior } from "./dom.js";
 
@@ -22,14 +23,14 @@ export default function URIEncoderCard() {
       id="uri_encoder_card"
       heading="URI Encoder"
       main={[
-        <div class="item expand">
+        <CardItem expand>
           <num-text
             ref={ref => applyEditingBehavior(ref)}
             id="encoder_input"
             class="expand"
             placeholder="Text to encode..."
           />
-        </div>
+        </CardItem>
       ]}
       options={[
         <>

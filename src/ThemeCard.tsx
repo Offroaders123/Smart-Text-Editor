@@ -1,4 +1,5 @@
 import Dialog from "./Dialog.js";
+import CardItem from "./CardItem.js";
 
 export default function ThemeCard() {
   return (
@@ -7,16 +8,16 @@ export default function ThemeCard() {
       parent="settings_card"
       heading="Theme"
       main={[
-        <div class="item list">
+        <CardItem list>
           <span style="line-height: 1.6;">Custom workspace theme settings<br/>will be featured in a later update.</span>
-        </div>,
-        // <div class="item list expand">
+        </CardItem>,
+        // <CardItem list expand>
         //   <num-text
         //     ref={ref => applyEditingBehavior(ref)}
         //     id="theme_setting"
         //     placeholder="CSS to modify..."
         //   />
-        // </div>
+        // </CardItem>
       ]}
       // options={[
       //   <button

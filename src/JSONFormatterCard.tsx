@@ -1,5 +1,6 @@
 import { createSignal } from "solid-js";
 import Widget from "./Widget.js";
+import CardItem from "./CardItem.js";
 import { applyEditingBehavior } from "./dom.js";
 
 export default function JSONFormatterCard() {
@@ -43,7 +44,7 @@ export default function JSONFormatterCard() {
       id="json_formatter_card"
       heading="JSON Formatter"
       main={[
-        <div class="item expand">
+        <CardItem expand>
           <num-text
             ref={ref => {
               applyEditingBehavior(ref);
@@ -54,7 +55,7 @@ export default function JSONFormatterCard() {
             placeholder="JSON data to format..."
             value={value()}
           />
-        </div>
+        </CardItem>
       ]}
       options={[
         <>
