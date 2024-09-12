@@ -1,4 +1,4 @@
-import { Widget } from "./Card.js";
+import Widget from "./Widget.js";
 import Checkbox from "./Checkbox.js";
 import { applyEditingBehavior } from "./dom.js";
 

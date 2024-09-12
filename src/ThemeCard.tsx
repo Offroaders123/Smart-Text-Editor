@@ -1,4 +1,4 @@
-import { Dialog } from "./Card.js";
+import Dialog from "./Dialog.js";
 
 export default function ThemeCard() {
   return (

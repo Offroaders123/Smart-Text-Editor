@@ -1,4 +1,4 @@
-import { Widget } from "./Card.js";
+import Widget from "./Widget.js";
 import { applyEditingBehavior } from "./dom.js";
 
 export default function ColorPickerCard() {

@@ -11,65 +11,6 @@ import "./Card.scss";
 
 import type { JSX } from "solid-js";
 
-export interface AlertProps {
-  id: string;
-  headingText: string;
-  headingIcon: string;
-  mainContent: JSX.Element[];
-}
-
-export function Alert(props: AlertProps) {
-  return (
-    <Card
-      id={props.id}
-      type="alert"
-      headingText={props.headingText}
-      headingIcon={props.headingIcon}
-      mainContent={props.mainContent}
-    />
-  );
-}
-
-export interface DialogProps {
-  id: string;
-  cardParent?: string;
-  headingText: string;
-  mainContent: JSX.Element[];
-  options?: JSX.Element[];
-}
-
-export function Dialog(props: DialogProps) {
-  return (
-    <Card
-      id={props.id}
-      type="dialog"
-      cardParent={props.cardParent}
-      headingText={props.headingText}
-      mainContent={props.mainContent}
-      options={props.options}
-    />
-  );
-}
-
-export interface WidgetProps {
-  id: string;
-  headingText: string;
-  mainContent: JSX.Element[];
-  options: JSX.Element[];
-}
-
-export function Widget(props: WidgetProps) {
-  return (
-    <Card
-      id={props.id}
-      type="widget"
-      headingText={props.headingText}
-      mainContent={props.mainContent}
-      options={props.options}
-    />
-  );
-}
-
 export type CardType = "alert" | "widget" | "dialog";
 
 export interface CardControls {
@@ -77,7 +18,7 @@ export interface CardControls {
   readonly close: HTMLButtonElement;
 }
 
-interface CardProps {
+export interface CardProps {
   id: string;
   type: CardType;
   active?: boolean;
@@ -91,7 +32,7 @@ interface CardProps {
 /**
  * The base component for the Alert, Dialog, and Widget card types.
 */
-function Card(props: CardProps) {
+export default function Card(props: CardProps) {
   let card: HTMLDivElement;
   let header: HTMLDivElement;
 

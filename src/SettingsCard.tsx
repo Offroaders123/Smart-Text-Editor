@@ -1,6 +1,7 @@
 import ArrowIcon from "./ArrowIcon.js";
 import InstallIcon from "./InstallIcon.js";
-import { Dialog, openCard } from "./Card.js";
+import Dialog from "./Dialog.js";
+import { openCard } from "./Card.js";
 import Checkbox from "./Checkbox.js";
 import { appearance, settings } from "./STE.js";
 import { clearSiteCaches, showInstallPrompt } from "./dom.js";

@@ -1,5 +1,5 @@
 import { createSignal } from "solid-js";
-import { Widget } from "./Card.js";
+import Widget from "./Widget.js";
 import { query } from "./Editor.js";
 import { activeEditor } from "./STE.js";
 import { applyEditingBehavior } from "./dom.js";

@@ -1,4 +1,4 @@
-import { Alert } from "./Card.js";
+import Alert from "./Alert.js";
 import Settings from "./img/settings.svg";
 
 export default function ResetSettingsCard() {

@@ -1,5 +1,5 @@
 import { createEffect, createMemo } from "solid-js";
-import { Dialog } from "./Card.js";
+import Dialog from "./Dialog.js";
 import { settings } from "./STE.js";
 import { refreshPreview } from "./Workspace.js";
 import { applyEditingBehavior } from "./dom.js";

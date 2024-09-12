@@ -1,4 +1,4 @@
-import { Alert } from "./Card.js";
+import Alert from "./Alert.js";
 import Template from "./img/template.svg";
 
 export default function ClearedCacheCard() {
