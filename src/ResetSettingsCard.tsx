@@ -8,9 +8,9 @@ export default function ResetSettingsCard() {
       id="reset_settings_card"
       heading="Reset Settings"
       icon={Settings}
-      main={[
+      main={
         <CardItem>Your settings have been reset!</CardItem>
-      ]}
+      }
     />
   );
 }

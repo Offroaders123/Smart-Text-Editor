@@ -8,7 +8,7 @@ export default function ColorPickerCard() {
     <Widget
       id="color_picker_card"
       heading="Color Picker"
-      main={[
+      main={<>
         <CardItem list>
           <div id="picker_preview"></div>
           <input
@@ -19,7 +19,7 @@ export default function ColorPickerCard() {
             maxlength="7"
             placeholder="#rrggbb"
           />
-        </CardItem>,
+        </CardItem>
         <CardItem list>
           <label for="red_channel">Red</label>
           <input id="red_channel" type="range"/>
@@ -28,7 +28,7 @@ export default function ColorPickerCard() {
           <label for="blue_channel">Blue</label>
           <input id="blue_channel" type="range"/>
         </CardItem>
-      ]}
+      </>}
       options={
         <CardOptions>
           <button onclick={() => /* copyPicker() */ {}}>Copy</button>

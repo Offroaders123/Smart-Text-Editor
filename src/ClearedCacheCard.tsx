@@ -8,9 +8,9 @@ export default function ClearedCacheCard() {
       id="cleared_cache_card"
       heading="Cleared Cache"
       icon={Template}
-      main={[
+      main={
         <CardItem>Successfully cleared offline cache!</CardItem>
-      ]}
+      }
     />
   );
 }

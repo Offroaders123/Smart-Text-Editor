@@ -7,7 +7,7 @@ export interface DialogProps {
   id: string;
   parent?: string;
   heading: string;
-  main: JSX.Element[];
+  main: JSX.Element;
   options?: JSX.Element;
 }
 

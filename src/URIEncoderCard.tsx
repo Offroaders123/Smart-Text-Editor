@@ -23,7 +23,7 @@ export default function URIEncoderCard() {
     <Widget
       id="uri_encoder_card"
       heading="URI Encoder"
-      main={[
+      main={
         <CardItem expand>
           <num-text
             ref={ref => applyEditingBehavior(ref)}
@@ -32,7 +32,7 @@ export default function URIEncoderCard() {
             placeholder="Text to encode..."
           />
         </CardItem>
-      ]}
+      }
       options={
         <>
         <CardOptions>

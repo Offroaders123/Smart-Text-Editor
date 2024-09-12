@@ -13,7 +13,7 @@ export default function SettingsCard() {
     <Dialog
       id="settings_card"
       heading="Settings"
-      main={[
+      main={
         <CardItem list start>
           <div class="select">
             <label>Default Orientation:</label>
@@ -46,7 +46,7 @@ export default function SettingsCard() {
             Automatically Refresh Preview
           </Checkbox>
         </CardItem>
-      ]}
+      }
       options={
         <>
         <CardOptions>

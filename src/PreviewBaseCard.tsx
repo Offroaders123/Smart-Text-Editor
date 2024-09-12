@@ -28,7 +28,7 @@ export default function PreviewBaseCard(props: PreviewBaseCardProps) {
     <Dialog
       id="preview_base_card"
       heading="Base URL"
-      main={[
+      main={
         <CardItem list expand>
           <input
             ref={ref => applyEditingBehavior(ref)}
@@ -56,7 +56,7 @@ export default function PreviewBaseCard(props: PreviewBaseCardProps) {
             }}
           />
         </CardItem>
-      ]}
+      }
       options={
         <CardOptions>
         <button

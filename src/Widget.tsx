@@ -6,7 +6,7 @@ import type { JSX } from "solid-js";
 export interface WidgetProps {
   id: string;
   heading: string;
-  main: JSX.Element[];
+  main: JSX.Element;
   options: JSX.Element;
 }
 

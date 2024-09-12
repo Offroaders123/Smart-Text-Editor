@@ -11,7 +11,7 @@ export default function UUIDGeneratorCard() {
     <Widget
       id="uuid_generator_card"
       heading="UUID Generator"
-      main={[
+      main={
         <CardItem expand>
           <input
             ref={ref => applyEditingBehavior(ref)}
@@ -23,7 +23,7 @@ export default function UUIDGeneratorCard() {
             onkeydown={event => event.currentTarget.click()}
           />
         </CardItem>
-      ]}
+      }
       options={
         <CardOptions>
         <button

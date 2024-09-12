@@ -33,7 +33,7 @@ export default function ReplaceTextCard() {
     <Widget
       id="replace_text_card"
       heading="Replace Text"
-      main={[
+      main={
         <CardItem list expand>
           <num-text
             ref={ref => applyEditingBehavior(ref)}
@@ -48,7 +48,7 @@ export default function ReplaceTextCard() {
             oninput={event => setReplaceValue(event.currentTarget.value)}
           />
         </CardItem>
-      ]}
+      }
       options={
         <CardOptions>
           <button onclick={() => replace()}>Replace</button>

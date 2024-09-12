@@ -7,7 +7,7 @@ export interface AlertProps {
   id: string;
   heading: string;
   icon: string;
-  main: JSX.Element[];
+  main: JSX.Element;
 }
 
 export default function Alert(props: AlertProps) {

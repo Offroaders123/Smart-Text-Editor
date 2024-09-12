@@ -7,10 +7,10 @@ export default function ThemeCard() {
       id="theme_card"
       parent="settings_card"
       heading="Theme"
-      main={[
+      main={<>
         <CardItem list>
           <span style="line-height: 1.6;">Custom workspace theme settings<br/>will be featured in a later update.</span>
-        </CardItem>,
+        </CardItem>{
         // <CardItem list expand>
         //   <num-text
         //     ref={ref => applyEditingBehavior(ref)}
@@ -18,7 +18,7 @@ export default function ThemeCard() {
         //     placeholder="CSS to modify..."
         //   />
         // </CardItem>
-      ]}
+      }</>}
       // options={
       //   <CardOptions>
       //   <button

@@ -44,7 +44,7 @@ export default function JSONFormatterCard() {
     <Widget
       id="json_formatter_card"
       heading="JSON Formatter"
-      main={[
+      main={
         <CardItem expand>
           <num-text
             ref={ref => {
@@ -57,7 +57,7 @@ export default function JSONFormatterCard() {
             value={value()}
           />
         </CardItem>
-      ]}
+      }
       options={
         <CardOptions>
           <button onclick={() => format()}>Format</button>

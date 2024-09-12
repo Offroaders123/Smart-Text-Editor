@@ -25,7 +25,7 @@ export interface CardProps {
   parent?: string;
   heading: string;
   icon?: string;
-  main: JSX.Element[];
+  main: JSX.Element;
   options?: JSX.Element;
 }
 
