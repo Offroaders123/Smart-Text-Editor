@@ -1,4 +1,4 @@
-import { onMount } from "solid-js";
+import { onMount, Show } from "solid-js";
 import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs } from "./STE.js";
 import DecorativeImage from "./DecorativeImage.js";
 import ArrowIcon from "./ArrowIcon.js";
@@ -9,7 +9,7 @@ import { query, setTabsVisibility } from "./Editor.js";
 import { getElementStyle } from "./dom.js";
 import "./Card.scss";
 
-import type { ParentProps, JSX } from "solid-js";
+import type { JSX } from "solid-js";
 
 export interface AlertProps {
   id: string;
@@ -20,17 +20,13 @@ export interface AlertProps {
 
 export function Alert(props: AlertProps) {
   return (
-    <Card id={props.id} type="alert">
-      <div class="header">
-        <DecorativeImage class="icon" src={props.headingIcon} alt=""/>
-        <span class="heading">{props.headingText}</span>
-      </div>
-      <div class="main">
-        <div class="content">
-          {props.mainContent}
-        </div>
-      </div>
-    </Card>
+    <Card
+      id={props.id}
+      type="alert"
+      headingText={props.headingText}
+      headingIcon={props.headingIcon}
+      mainContent={props.mainContent}
+    />
   );
 }
 
@@ -44,20 +40,14 @@ export interface DialogProps {
 
 export function Dialog(props: DialogProps) {
   return (
-    <Card id={props.id} type="dialog">
-      <div class="header" data-card-parent={props.cardParent}>
-        <button class="card-back">
-          <BackIcon/>
-        </button>
-        <span class="heading">{props.headingText}</span>
-      </div>
-      <div class="main">
-        <div class="content">
-          {props.mainContent}
-        </div>
-        {props.options?.map(row => <div class="options">{row}</div>)}
-      </div>
-    </Card>
+    <Card
+      id={props.id}
+      type="dialog"
+      cardParent={props.cardParent}
+      headingText={props.headingText}
+      mainContent={props.mainContent}
+      options={props.options}
+    />
   );
 }
 
@@ -70,17 +60,13 @@ export interface WidgetProps {
 
 export function Widget(props: WidgetProps) {
   return (
-    <Card id={props.id} type="widget">
-      <div class="header">
-        <span class="heading">{props.headingText}</span>
-      </div>
-      <div class="main">
-        <div class="content">
-          {props.mainContent}
-        </div>
-        {props.options.map(row => <div class="options">{row}</div>)}
-      </div>
-    </Card>
+    <Card
+      id={props.id}
+      type="widget"
+      headingText={props.headingText}
+      mainContent={props.mainContent}
+      options={props.options}
+    />
   );
 }
 
@@ -91,10 +77,15 @@ export interface CardControls extends HTMLDivElement {
   readonly close: HTMLButtonElement;
 }
 
-interface CardProps extends ParentProps {
+interface CardProps {
   id: string;
   type: CardType;
   active?: boolean;
+  cardParent?: string;
+  headingText: string;
+  headingIcon?: string;
+  mainContent: JSX.Element[];
+  options?: JSX.Element[];
 }
 
 /**
@@ -162,7 +153,23 @@ function Card(props: CardProps) {
       class="Card"
       data-type={props.type}
       ref={card!}>
-      {props.children}
+      <div class="header" data-card-parent={props.type === "dialog" && props.cardParent}>
+        <Show when={props.type === "alert"}>
+          <DecorativeImage class="icon" src={props.headingIcon!} alt=""/>
+        </Show>
+        <Show when={props.type === "dialog"}>
+          <button class="card-back">
+            <BackIcon/>
+          </button>
+        </Show>
+        <span class="heading">{props.headingText}</span>
+      </div>
+      <div class="main">
+        <div class="content">
+          {props.mainContent}
+        </div>
+        {props.options?.map(row => <div class="options">{row}</div>)}
+      </div>
     </div>
   );
 }
