@@ -1,0 +1,21 @@
+.Card[data-type="alert"] {
+  --margin: 16px;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  --card-border-radius: 10px;
+  pointer-events: none;
+  --card-z-index: 5;
+}
+
+.Card[data-type="alert"]:not([data-active]) {
+  transform: translateX(calc(100% + var(--margin) * 2));
+}
+
+.Card[data-type="alert"] .header .heading {
+  margin: 0 auto;
+}
+
+.Card[data-type="alert"] .header .card-controls {
+  display: none;
+}

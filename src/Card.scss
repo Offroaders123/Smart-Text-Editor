@@ -31,56 +31,6 @@
   margin: var(--margin) max(var(--safe-area-inset-right),var(--margin)) max(var(--safe-area-inset-bottom),var(--margin)) max(var(--safe-area-inset-left),var(--margin));
 }
 
-.Card[data-type="alert"] {
-  --margin: 16px;
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  --card-border-radius: 10px;
-  pointer-events: none;
-  --card-z-index: 5;
-}
-
-.Card[data-type="alert"]:not([data-active]) {
-  transform: translateX(calc(100% + var(--margin) * 2));
-}
-
-.Card[data-type="widget"] {
-  --margin: 8px;
-  position: absolute;
-  right: 0;
-  top: 0;
-  --card-border-radius: 12px;
-  transform-origin: center top;
-}
-
-.Card[data-type="widget"]:not([data-active]) {
-  transform: scaleY(0.25);
-}
-
-.Card[data-type="widget"][data-minimize-change] {
-  transition-property: margin-right, margin-top, border-top-right-radius, border-bottom-right-radius, box-shadow, visibility, opacity, transform;
-}
-
-.Card[data-type="widget"].minimize {
-  margin-right: calc(var(--card-border-width) * -1);
-  margin-top: 3px;
-  --card-border-radius: 10px;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  box-shadow: 0 4px 7px #00000050;
-}
-
-.Card[data-type="dialog"] {
-  position: absolute;
-  --card-border-radius: 14px;
-  --card-z-index: 3;
-}
-
-.Card[data-type="dialog"]:not([data-active]) {
-  transform: scale(0.5);
-}
-
 .Card .header {
   display: flex;
   justify-content: center;
@@ -88,17 +38,6 @@
   background: #ffffff12;
   border-bottom: var(--card-header-border-width) solid #000000;
   --card-header-border-width: 1px;
-}
-
-.Card[data-type="widget"][data-minimize-change] .header {
-  background-clip: content-box;
-  transition: var(--card-transition-duration);
-  transition-property: margin-bottom, border-color;
-}
-
-.Card[data-type="widget"].minimize .header {
-  margin-bottom: calc(var(--card-header-border-width) * -1);
-  border-color: transparent;
 }
 
 .Card .header .card-back {
@@ -144,33 +83,9 @@
   position: absolute;
 }
 
-.Card[data-type="alert"] .header .heading {
-  margin: 0 auto;
-}
-
-.Card[data-type="widget"][data-minimize-change] .header .heading {
-  transform-origin: calc(50% - calc(var(--card-minimize-width) + var(--card-header-padding-right)) * 0.5) center;
-  transition: var(--card-transition-duration);
-  transition-property: visibility, opacity, transform;
-}
-
-.Card[data-type="widget"].minimize .header .heading {
-  visibility: hidden;
-  opacity: 0;
-  transform: scale(0);
-}
-
-.Card[data-type="dialog"] .header .heading {
-  font-size: 16px;
-}
-
 .Card .header .card-controls {
   margin-left: auto;
   display: flex;
-}
-
-.Card[data-type="alert"] .header .card-controls {
-  display: none;
 }
 
 .Card .header .card-controls .control {
@@ -196,34 +111,6 @@
   display: none;
 }
 
-.Card[data-type="widget"].minimize .header .card-controls .control {
-  --control-padding: 6px;
-}
-
-.Card[data-type="widget"].minimize .header .card-controls .control[data-control="minimize"] {
-  border-radius: calc(var(--card-border-radius) - var(--card-border-width));
-}
-
-.Card[data-type="widget"].minimize .header .card-controls .control[data-control="close"] {
-  margin-left: var(--card-header-padding-right);
-  margin-right: calc(var(--card-minimize-width) * -1);
-  visibility: hidden;
-  opacity: 0;
-}
-
-.Card[data-type="widget"][data-minimize-change] .header .card-controls .control {
-  transition: var(--card-transition-duration);
-  transition-property: padding;
-}
-
-.Card[data-type="widget"][data-minimize-change] .header .card-controls .control[data-control="minimize"] {
-  transition-property: padding, border-radius;
-}
-
-.Card[data-type="widget"][data-minimize-change] .header .card-controls .control[data-control="close"] {
-  transition-property: margin-left, margin-right, padding, visibility, opacity;
-}
-
 .Card .header .card-controls .control svg {
   width: 12px;
   height: 12px;
@@ -235,18 +122,6 @@
   color: #ffffff;
 }
 
-.Card[data-type="widget"].minimize .header .card-controls .control[data-control="minimize"] svg {
-  transform: rotateY(180deg);
-}
-
-.Card[data-type="widget"][data-minimize-change] .header .card-controls .control[data-control="close"] svg {
-  transition: transform var(--card-transition-duration);
-}
-
-.Card[data-type="widget"].minimize .header .card-controls .control[data-control="close"] svg {
-  transform: scale(0);
-}
-
 .Card .main {
   display: flex;
   flex-direction: column;
@@ -255,25 +130,6 @@
 .Card:not([data-type="widget"]) .main {
   padding: 16px;
   gap: 16px;
-}
-
-.Card[data-type="widget"] .main {
-  padding: 14px;
-  gap: 14px;
-  transform-origin: calc(100% - calc(var(--card-minimize-width) + var(--card-header-padding-right)) * 0.5) top;
-}
-
-.Card[data-type="widget"][data-minimize-change] .main {
-  transition: var(--card-transition-duration);
-  transition-property: margin-left, margin-bottom, visibility, opacity, transform;
-}
-
-.Card[data-type="widget"].minimize .main {
-  margin-left: calc(calc(var(--card-main-width) - var(--card-header-padding-right)) * -1 + var(--card-minimize-width));
-  margin-bottom: calc(var(--card-main-height) * -1);
-  visibility: hidden;
-  opacity: 0;
-  transform: scale(0);
 }
 
 .Card .main .content {
@@ -291,10 +147,6 @@
   gap: 16px;
 }
 
-.Card[data-type="widget"] .main .content .item {
-  gap: 14px;
-}
-
 .Card .main .content .item.start {
   align-items: flex-start;
 }
@@ -307,10 +159,6 @@
 
 .Card:not([data-type="widget"]) .options {
   gap: 16px;
-}
-
-.Card[data-type="widget"] .options {
-  gap: 14px;
 }
 
 .Card .main button {

@@ -1,4 +1,5 @@
 import Card from "./Card.js";
+import "./Alert.scss";
 
 import type { JSX } from "solid-js";
 

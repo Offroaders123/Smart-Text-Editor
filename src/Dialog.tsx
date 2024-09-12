@@ -1,4 +1,5 @@
 import Card from "./Card.js";
+import "./Dialog.scss";
 
 import type { JSX } from "solid-js";
 

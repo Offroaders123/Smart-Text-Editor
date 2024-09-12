@@ -1,0 +1,13 @@
+.Card[data-type="dialog"] {
+  position: absolute;
+  --card-border-radius: 14px;
+  --card-z-index: 3;
+}
+
+.Card[data-type="dialog"]:not([data-active]) {
+  transform: scale(0.5);
+}
+
+.Card[data-type="dialog"] .header .heading {
+  font-size: 16px;
+}
