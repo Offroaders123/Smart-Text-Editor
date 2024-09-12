@@ -1,4 +1,4 @@
-import { onMount, Show } from "solid-js";
+import { Show } from "solid-js";
 import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs } from "./STE.js";
 import DecorativeImage from "./DecorativeImage.js";
 import ArrowIcon from "./ArrowIcon.js";
@@ -72,7 +72,7 @@ export function Widget(props: WidgetProps) {
 
 export type CardType = "alert" | "widget" | "dialog";
 
-export interface CardControls extends HTMLDivElement {
+export interface CardControls {
   readonly minimize: HTMLButtonElement;
   readonly close: HTMLButtonElement;
 }
@@ -93,76 +93,49 @@ interface CardProps {
 */
 function Card(props: CardProps) {
   let card: HTMLDivElement;
-
-  onMount(() => {
-    const type: CardType = card.getAttribute("data-type") as CardType;
-    const header: HTMLDivElement = card.querySelector<HTMLDivElement>(".header")!;
-    const back: HTMLButtonElement | null = card.querySelector<HTMLButtonElement>(".card-back");
-    const heading: HTMLDivElement = header.querySelector<HTMLDivElement>(".heading")!;
-    const controls: CardControls = Object.assign(document.createElement("div"),{
-      minimize: document.createElement("button"),
-      close: document.createElement("button")
-    });
-  
-    // card.classList.add("Card");
-
-    card.addEventListener("keydown",event => {
-      if (card.getAttribute("data-type") != "dialog" || event.key != "Tab") return;
-      const navigable = getNavigableElements({ container: card, scope: true });
-      if (!event.shiftKey){
-        if (document.activeElement != navigable[navigable.length - 1]) return;
-        event.preventDefault();
-        navigable[0]?.focus();
-      } else if (document.activeElement == navigable[0]){
-        event.preventDefault();
-        navigable[navigable.length - 1]?.focus();
-      }
-    });
-
-    back?.addEventListener("click",() => openCard(header.getAttribute("data-card-parent")!, card.id));
-
-    controls.classList.add("card-controls");
-
-    controls.minimize.classList.add("control");
-    controls.minimize.setAttribute("data-control","minimize");
-    controls.minimize.append(MinimizeIcon() as Element);
-
-    controls.minimize.addEventListener("keydown",event => {
-      if (event.key != "Enter") return;
-      event.preventDefault();
-      if (event.repeat) return;
-      controls?.minimize.click();
-    });
-
-    controls.minimize.addEventListener("click",() => minimizeCard(card.id));
-
-    controls.close.classList.add("control");
-    controls.close.setAttribute("data-control","close");
-    controls.close.append(CloseIcon() as Element);
-
-    controls.close.addEventListener("click",() => closeCard(card.id));
-
-    controls.appendChild(controls.minimize);
-    controls.appendChild(controls.close);
-    header.appendChild(controls);
-  });
+  let header: HTMLDivElement;
 
   return (
     <div
       id={props.id}
       class="Card"
       data-type={props.type}
-      ref={card!}>
-      <div class="header" data-card-parent={props.type === "dialog" && props.cardParent}>
+      ref={card!}
+      onkeydown={event => {
+        if (card.getAttribute("data-type") != "dialog" || event.key != "Tab") return;
+        const navigable = getNavigableElements({ container: card, scope: true });
+        if (!event.shiftKey){
+          if (document.activeElement != navigable[navigable.length - 1]) return;
+          event.preventDefault();
+          navigable[0]?.focus();
+        } else if (document.activeElement == navigable[0]){
+          event.preventDefault();
+          navigable[navigable.length - 1]?.focus();
+        }
+      }}>
+      <div class="header" data-card-parent={props.type === "dialog" && props.cardParent} ref={header!}>
         <Show when={props.type === "alert"}>
           <DecorativeImage class="icon" src={props.headingIcon!} alt=""/>
         </Show>
         <Show when={props.type === "dialog"}>
-          <button class="card-back">
+          <button class="card-back" onclick={() => openCard(header.getAttribute("data-card-parent")!, card.id)}>
             <BackIcon/>
           </button>
         </Show>
         <span class="heading">{props.headingText}</span>
+        <div class="card-controls">
+          <button class="control" data-control="minimize" onkeydown={event => {
+            if (event.key != "Enter") return;
+            event.preventDefault();
+            if (event.repeat) return;
+            event.currentTarget.click();
+          }} onclick={() => minimizeCard(card.id)}>
+            <MinimizeIcon/>
+          </button>
+          <button class="control" data-control="close" onclick={() => closeCard(card.id)}>
+            <CloseIcon/>
+          </button>
+        </div>
       </div>
       <div class="main">
         <div class="content">
@@ -299,7 +272,9 @@ function Card(props: CardProps) {
   }
 
   function getCardControls(self: HTMLDivElement): CardControls {
-    return self.querySelector<CardControls>(".card-controls")!;
+    const controls: HTMLButtonElement[] = [...self.querySelectorAll<HTMLButtonElement>(".card-controls .control")];
+    const [minimize, close] = controls as [HTMLButtonElement, HTMLButtonElement];
+    return { minimize, close };
   }
 
 export interface GetNavigableElementsOptions {
