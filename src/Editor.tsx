@@ -6,16 +6,16 @@ import { getElementStyle, applyEditingBehavior, setTitle } from "./dom.js";
 import "./Editor.scss";
 
 export interface Editor {
-  identifier: string;
+  readonly identifier: string;
   name: string;
   value: string;
   handle: FileSystemFileHandle | null;
-  isOpen: boolean;
+  readonly isOpen: boolean;
   autoCreated: boolean;
   focusedOverride: boolean;
   refresh: boolean;
   unsaved: boolean;
-  autoReplace: boolean;
+  readonly autoReplace: boolean;
 }
 
 export interface EditorOptions extends Partial<Omit<Editor, "identifier" | "focusedOverride" | "refresh" | "unsaved">> {}
