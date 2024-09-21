@@ -223,7 +223,7 @@ export interface EditorElement {
     if (typeof identifier !== "string") return null;
     const editor: Editor | null = editors[identifier] ?? null;
     if (editor === null) return null;
-    const ref = document.querySelector<EditorLegacy>(`ste-editor[data-editor-identifier="${editor.identifier}"]`);
+    const ref = document.querySelector<EditorLegacy>(`.Editor[data-editor-identifier="${editor.identifier}"]`);
     if (ref === null) return null;
     const { tab, previewOption, basename, extension } = ref;
     return { ref: ref satisfies NumTextElement, tab, previewOption, basename, extension, state: editor };
@@ -434,7 +434,7 @@ class EditorLegacy extends NumTextElement implements Editor {
       await close(this.identifier);
     });
 
-    this.classList.add("editor");
+    this.classList.add("Editor");
     this.setAttribute("data-editor-identifier",this.identifier);
     this.setAttribute("value",this.value);
 

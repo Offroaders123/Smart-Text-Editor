@@ -79,7 +79,7 @@ export const appearance = {
    * Enables or disables syntax highlighting for all Num Text elements.
   */
   setSyntaxHighlighting(state: boolean): void {
-    for (const editor of document.querySelectorAll<NumTextElement>("ste-editor, num-text")){
+    for (const editor of document.querySelectorAll<NumTextElement>(".Editor, num-text")){
       if (!(editor.syntaxLanguage in Prism.languages)) continue;
       (state) ? editor.syntaxHighlight.enable() : editor.syntaxHighlight.disable();
     }

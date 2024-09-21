@@ -1,4 +1,4 @@
-main .workspace .editor {
+main .workspace .Editor {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -11,40 +11,40 @@ main .workspace .editor {
   --scrollbar-border-width: 5px;
 }
 
-body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .editor {
+body:where([data-view-change],[data-orientation-change]):not([data-scaling-change]) main .workspace .Editor {
   transition: var(--main-transition-duration);
   transition-property: border-width, border-color;
 }
 
-body.split.horizontal main .workspace .editor {
+body.split.horizontal main .workspace .Editor {
   border-right-width: 0;
 }
 
-body.preview.horizontal main .workspace .editor {
+body.preview.horizontal main .workspace .Editor {
   border-right-width: 0;
 }
 
 @media (orientation: portrait) and (max-aspect-ratio: 5 / 8) {
-  body.split.horizontal main .workspace .editor {
+  body.split.horizontal main .workspace .Editor {
     border-bottom-color: var(--preview-border-color);
   }
-  body.preview.horizontal main .workspace .editor {
+  body.preview.horizontal main .workspace .Editor {
     border-bottom-color: var(--preview-border-color);
   }
 }
 
-body.split.vertical main .workspace .editor {
+body.split.vertical main .workspace .Editor {
   border-bottom-width: 0;
 }
 
-body.preview.vertical main .workspace .editor {
+body.preview.vertical main .workspace .Editor {
   border-bottom-width: 0;
 }
 
-main .workspace .editor:not(.active) {
+main .workspace .Editor:not(.active) {
   z-index: -1;
 }
 
-main .workspace .editor.active {
+main .workspace .Editor.active {
   visibility: visible;
 }
