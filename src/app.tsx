@@ -259,7 +259,7 @@ document.body.addEventListener("drop",event => {
   [...event.dataTransfer.items].forEach(async (item,index) => {
     switch (item.kind){
       case "file": {
-        if (!support.fileSystem || !("getAsFileSystemHandle")){
+        if (!support.fileSystem || !("getAsFileSystemHandle" in item)){
           const file = item.getAsFile();
           if (file === null) break;
           const { name } = file;
