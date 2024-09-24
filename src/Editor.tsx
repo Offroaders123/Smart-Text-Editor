@@ -273,7 +273,7 @@ class EditorLegacy extends NumTextElement implements Editor {
     return this.tab.hasAttribute("data-editor-auto-created");
   }
 
-  set autoCreated(value) {
+  private set autoCreated(value) {
     if (value){
       this.tab.setAttribute("data-editor-auto-created","");
     } else {
@@ -285,7 +285,7 @@ class EditorLegacy extends NumTextElement implements Editor {
     return this.tab.hasAttribute("data-editor-refresh");
   }
 
-  set refresh(value) {
+  private set refresh(value) {
     if (value){
       this.tab.setAttribute("data-editor-refresh","");
     } else {
@@ -297,7 +297,7 @@ class EditorLegacy extends NumTextElement implements Editor {
     return this.tab.hasAttribute("data-editor-unsaved");
   }
 
-  set unsaved(value) {
+  private set unsaved(value) {
     if (value){
       this.tab.setAttribute("data-editor-unsaved","");
     } else {
@@ -502,7 +502,7 @@ class EditorLegacy extends NumTextElement implements Editor {
     return this.#name;
   }
 
-  set name(rename) {
+  private set name(rename) {
     const { basename, extension } = this;
 
     if (!rename.includes(".")){
