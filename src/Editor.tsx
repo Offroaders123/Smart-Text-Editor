@@ -11,18 +11,32 @@ import type { Accessor, Setter } from "solid-js";
 
 export interface Editor {
   readonly identifier: string;
-  name: string;
-  value: string;
-  handle: FileSystemFileHandle | null;
+  getName: Accessor<string>;
+  setName: Setter<string>;
+  getValue: Accessor<string>;
+  setValue: Setter<string>;
+  getHandle: Accessor<FileSystemFileHandle | null>;
+  setHandle: Setter<FileSystemFileHandle | null>;
   readonly isOpen: boolean;
-  autoCreated: boolean;
-  focusedOverride: boolean;
-  refresh: boolean;
-  unsaved: boolean;
+  getAutoCreated: Accessor<boolean>;
+  setAutoCreated: Setter<boolean>;
+  getFocusedOverride: Accessor<boolean>;
+  setFocusedOverride: Setter<boolean>;
+  getRefresh: Accessor<boolean>;
+  setRefresh: Setter<boolean>;
+  getUnsaved: Accessor<boolean>;
+  setUnsaved: Setter<boolean>;
   readonly autoReplace: boolean;
 }
 
-export interface EditorOptions extends Partial<Omit<Editor, "identifier" | "focusedOverride" | "refresh" | "unsaved">> {}
+export interface EditorOptions {
+  name?: string;
+  value?: string;
+  handle?: FileSystemFileHandle | null;
+  isOpen?: boolean;
+  autoCreated?: boolean;
+  autoReplace?: boolean;
+}
 
 export interface EditorOpenOptions {
   autoCreated?: boolean;
@@ -36,10 +50,11 @@ export function createEditor(options: EditorOptions = {}): void {
   const editorElement = new EditorLegacy(options);
   setEditors(editorElement.identifier, editorElement);
 
-  const { autoCreated, focusedOverride } = editorElement;
+  const autoCreated = editorElement.getAutoCreated();
+  const focusedOverride = editorElement.getFocusedOverride();
   if (editorElement.isOpen || activeEditor() === null){
     open(editorElement.identifier, { autoCreated, focusedOverride });
-    editorElement.focusedOverride = false;
+    editorElement.setFocusedOverride(false);
   }
 }
 
@@ -93,13 +108,13 @@ export function open(identifier: string | null, { autoCreated = false, focusedOv
 
   editor.tab.classList.add("active");
   if (autoCreated){
-    editor.state.autoCreated = true;
+    editor.state.setAutoCreated(true);
   }
   editor.ref.classList.add("active");
   setActiveEditor(editor.state.identifier);
 
   setTabsVisibility();
-  setTitle({ content: editor.state.name });
+  setTitle({ content: editor.state.getName() });
 
   if ((((document.activeElement === document.body && activeDialog() !== null) || autoCreated) && !environment.touchDevice && appearance.parentWindow) || focused){
     editor.ref.focus({ preventScroll: true });
@@ -117,8 +132,8 @@ export async function close(identifier: string | null): Promise<void> {
   const editor = query(identifier);
   if (editor === null) return;
 
-  if (editor.state.unsaved){
-    const confirmation: boolean = confirm(`Are you sure you would like to close "${editor.state.name}"?\nRecent changes have not yet been saved.`);
+  if (editor.state.getUnsaved()){
+    const confirmation: boolean = confirm(`Are you sure you would like to close "${editor.state.getName()}"?\nRecent changes have not yet been saved.`);
     if (!confirmation) return;
   }
 
@@ -200,7 +215,7 @@ export function rename(identifier: string | null, name?: string): void {
   const editor = query(identifier);
   if (editor === null) return;
 
-  const currentName = editor.state.name;
+  const currentName = editor.state.getName();
 
   if (name === undefined){
     const result = prompt(`Enter a new file name for "${currentName}".`,currentName);
@@ -208,7 +223,7 @@ export function rename(identifier: string | null, name?: string): void {
     name = result;
   }
 
-  editor.state.name = name;
+  editor.state.setName(name);
 }
 
 export interface EditorElement {
@@ -230,8 +245,8 @@ export interface EditorElement {
     const ref = document.querySelector<EditorLegacy>(`.Editor[data-editor-identifier="${editor.identifier}"]`);
     if (ref === null) return null;
     const { tab, previewOption } = ref;
-    const basename = getBasename(ref.name);
-    const extension = getExtension(ref.name);
+    const basename = getBasename(ref.getName());
+    const extension = getExtension(ref.getName());
     return { ref: ref satisfies NumTextElement, tab, previewOption, basename, extension, state: ref satisfies Editor }; // `['state']` ideally will be the `editor` value instead.
   }
 
@@ -262,96 +277,48 @@ export interface EditorElement {
 class EditorLegacy extends NumTextElement implements Editor {
   // #name: string;
 
-  private getName: Accessor<string>;
+  getName: Accessor<string>;
 
-  private setName: Setter<string>;
+  setName: Setter<string>;
 
   readonly identifier = Math.random().toString();
 
-  private getValue: Accessor<string>;
+  getValue: Accessor<string>;
 
-  private setValue: Setter<string>;
+  setValue: Setter<string>;
 
   private _setValue(value: string): void {
     this.setValue(value);
     super.value = value;
   }
 
-  override get value(): string {
-    return this.getValue();
-  }
-
-  override set value(value) {
-    this._setValue(value);
-  }
-
   readonly tab: HTMLButtonElement;
 
   readonly previewOption: MenuDropOption;
 
-  private getHandle: Accessor<FileSystemFileHandle | null>;
+  getHandle: Accessor<FileSystemFileHandle | null>;
 
-  private setHandle: Setter<FileSystemFileHandle | null>;
-
-  get handle(): FileSystemFileHandle | null {
-    return this.getHandle();
-  }
-
-  set handle(value) {
-    this.setHandle(value);
-  }
+  setHandle: Setter<FileSystemFileHandle | null>;
 
   declare readonly isOpen;
 
-  private getAutoCreated: Accessor<boolean>;
+  getAutoCreated: Accessor<boolean>;
 
-  private setAutoCreated: Setter<boolean>;
+  setAutoCreated: Setter<boolean>;
 
-  get autoCreated(): boolean {
-    return this.getAutoCreated();
-  }
+  getRefresh: Accessor<boolean>;
 
-  private set autoCreated(value) {
-    this.setAutoCreated(value);
-  }
+  setRefresh: Setter<boolean>;
 
-  private getRefresh: Accessor<boolean>;
+  getUnsaved: Accessor<boolean>;
 
-  private setRefresh: Setter<boolean>;
-
-  get refresh(): boolean {
-    return this.getRefresh();
-  }
-
-  private set refresh(value) {
-    this.setRefresh(value);
-  }
-
-  private getUnsaved: Accessor<boolean>;
-
-  private setUnsaved: Setter<boolean>;
-
-  get unsaved(): boolean {
-    return this.getUnsaved();
-  }
-
-  private set unsaved(value) {
-    this.setUnsaved(value);
-  }
+  setUnsaved: Setter<boolean>;
 
   readonly autoReplace;
 
-  private getFocusedOverride: Accessor<boolean>;
+  getFocusedOverride: Accessor<boolean>;
 
-  private setFocusedOverride: Setter<boolean>;
-
-  get focusedOverride(): boolean {
-    return this.getFocusedOverride();
-  }
-
-  set focusedOverride(value) {
-    this.setFocusedOverride(value);
-  }
+  setFocusedOverride: Setter<boolean>;
 
   constructor({ name = "Untitled.txt", value = "", handle, isOpen = true, autoCreated = false, autoReplace = true }: EditorOptions = {}) {
     super();
@@ -399,18 +366,18 @@ class EditorLegacy extends NumTextElement implements Editor {
     this.setAttribute("data-editor-identifier",this.identifier);
     this.setAttribute("value",this.value);
 
-    if (activeEditor() !== null && query(activeEditor()!)!.state.autoCreated){
+    if (activeEditor() !== null && query(activeEditor()!)!.state.getAutoCreated()){
       if (document.activeElement === query(activeEditor()!)!.ref){
-        this.focusedOverride = true;
+        this.setFocusedOverride(true);
       }
       if (autoReplace){
         close(activeEditor()!);
       } else {
-        query(activeEditor()!)!.state.autoCreated = false;
+        query(activeEditor()!)!.state.setAutoCreated(false);
       }
     }
 
-    this.tab = EditorTab({ identifier, getName, setName: name => { this.name = name; }, getAutoCreated, getRefresh, getUnsaved }) as HTMLButtonElement;
+    this.tab = EditorTab({ identifier, getName, setName: name => { this.setName(name); }, getAutoCreated, getRefresh, getUnsaved }) as HTMLButtonElement;
     this.previewOption = PreviewOption({ identifier, getName }) as MenuDropOption;
 
     // this.tab.append(this.editorName,this.editorClose);
@@ -419,14 +386,14 @@ class EditorLegacy extends NumTextElement implements Editor {
 
     this.editor.addEventListener("input",() => {
       this.setValue(this.editor.value);
-      if (this.autoCreated){
-        this.autoCreated = false;
+      if (this.getAutoCreated()){
+        this.setAutoCreated(false);
       }
-      if (!this.refresh){
-        this.refresh = true;
+      if (!this.getRefresh()){
+        this.setRefresh(true);
       }
-      if (!this.unsaved){
-        this.unsaved = true;
+      if (!this.getUnsaved()){
+        this.setUnsaved(true);
       }
       refreshPreview();
     });
@@ -453,11 +420,7 @@ class EditorLegacy extends NumTextElement implements Editor {
     },transitionDuration);
   }
 
-  get name(): string {
-    return this.getName();
-  }
-
-  private set name(rename) {
+  private _setName(rename: string): void {
     const [ basename, extension ] = [getBasename(this.getName()), getExtension(this.getName())];
     console.log(basename, extension);
 
@@ -487,8 +450,8 @@ class EditorLegacy extends NumTextElement implements Editor {
       this.syntaxLanguage = syntaxLanguage;
     }
 
-    if (this.autoCreated){
-      this.autoCreated = false;
+    if (this.getAutoCreated()){
+      this.setAutoCreated(false);
     }
 
     if (this.tab === query(activeEditor())?.tab){
@@ -501,13 +464,13 @@ class EditorLegacy extends NumTextElement implements Editor {
   }
 }
 
-  function getBasename(name: string): string {
+  export function getBasename(name: string): string {
     if (!name.includes(".")) return name;
     const basename: string = name.split(".").slice(0,-1).join(".");
     return basename;
   }
 
-  function getExtension(name: string): string {
+  export function getExtension(name: string): string {
     if (!name.includes(".")) return "";
     const extension: string = name.split(".").pop()!;
     return extension;

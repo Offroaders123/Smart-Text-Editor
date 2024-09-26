@@ -1,5 +1,5 @@
 import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, previewMenu, viewMenu } from "./STE.js";
-import { createEditor, query, rename, setTabsVisibility } from "./Editor.js";
+import { createEditor, getBasename, query, rename, setTabsVisibility } from "./Editor.js";
 import WorkspaceTabs from "./WorkspaceTabs.js";
 import WorkspaceEditors from "./WorkspaceEditors.js";
 import { getElementStyle } from "./dom.js";
@@ -207,7 +207,7 @@ export async function saveFile(extension?: string): Promise<void> {
     anchor.href = link;
     anchor.download = `${
       // @ts-expect-error
-      query(activeEditor())?.ref.basename satisfies string
+      getBasename(query(activeEditor())?.state.getName()) satisfies string
     }.${extension}`;
     anchor.click();
     window.URL.revokeObjectURL(link);
@@ -215,22 +215,22 @@ export async function saveFile(extension?: string): Promise<void> {
     const identifier: EditorElement | null = query(activeEditor());
     let handle: void | FileSystemFileHandle;
     if (identifier === null) throw new Error("No editors are open, couldn't save anything!");
-    if (!identifier.state.handle){
+    if (!identifier.state.getHandle()){
       handle = await window.showSaveFilePicker({
         suggestedName:
           // @ts-expect-error
-          query(activeEditor())?.state.name satisfies string,
-        startIn: (identifier.state.handle) ? identifier.state.handle : "desktop"
+          query(activeEditor())?.state.getName() satisfies string,
+        startIn: (identifier.state.getHandle()) ? identifier.state.getHandle()! : "desktop"
       }).catch(error => {
         if (error.message.toLowerCase().includes("abort")) return;
       });
       if (!handle) return;
-      identifier.state.handle = handle;
-    } else handle = identifier.state.handle!;
-    const stream = await identifier.state.handle?.createWritable().catch(error => {
+      identifier.state.setHandle(handle);
+    } else handle = identifier.state.getHandle()!;
+    const stream = await identifier.state.getHandle()?.createWritable().catch(error => {
       alert(`"${
         // @ts-expect-error
-        query(activeEditor())?.state.name satisfies string
+        query(activeEditor())?.state.getName() satisfies string
       }" could not be saved.`);
       if (error.toString().toLowerCase().includes("not allowed")) return;
     });
@@ -241,16 +241,16 @@ export async function saveFile(extension?: string): Promise<void> {
     );
     await stream.close();
     // @ts-expect-error
-    const currentName: string = query(activeEditor())?.state.name;
+    const currentName: string = query(activeEditor())?.state.getName();
     const file = await handle.getFile();
     const newName = file.name;
     if (currentName != newName) rename(identifier.state.identifier, newName);
   }
-  if (query(activeEditor())?.state.autoCreated){
-    query(activeEditor()!)!.state.autoCreated = false;
+  if (query(activeEditor())?.state.getAutoCreated()){
+    query(activeEditor()!)!.state.setAutoCreated(false);
   }
-  if (query(activeEditor())?.state.unsaved){
-    query(activeEditor()!)!.state.unsaved = false;
+  if (query(activeEditor())?.state.getUnsaved()){
+    query(activeEditor()!)!.state.setUnsaved(false);
   }
   await refreshPreview({ force: true });
 }
@@ -280,7 +280,7 @@ export function createDisplay(): void {
     if (win === null) return;
     if (!win.document.title){
       // @ts-expect-error
-      win.document.title = query(activeEditor())?.state.name;
+      win.document.title = query(activeEditor())?.state.getName();
     }
   },20);
 }
@@ -297,7 +297,7 @@ export async function refreshPreview({ force = false }: RefreshPreviewOptions = 
 
   const editor: EditorElement | null = query(previewEditor() ?? activeEditor());
   if (editor === null) return;
-  const change: boolean = editor.state.refresh && !settings.automaticRefresh;
+  const change: boolean = editor.state.getRefresh() && !settings.automaticRefresh;
   if (!change && !force) return;
   
   const preview: HTMLIFrameElement = getPreview()!;
@@ -317,7 +317,7 @@ export async function refreshPreview({ force = false }: RefreshPreviewOptions = 
   preview.contentDocument?.write(source);
   preview.contentDocument?.close();
 
-  if (change) editor.state.refresh = false;
+  if (change) editor.state.setRefresh(false);
 }
 
 /**

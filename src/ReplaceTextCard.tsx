@@ -13,8 +13,8 @@ export default function ReplaceTextCard() {
   function replace(): void {
     const editor = query(activeEditor());
     if (!editor) return;
-    const replaced = editor.state.value.split(findValue()).join(replaceValue());
-    if (replaced != editor.state.value) editor.state.value = replaced;
+    const replaced = editor.state.getValue().split(findValue()).join(replaceValue());
+    if (replaced != editor.state.getValue()) editor.state.setValue(replaced);
   }
 
   function flip(): void {
