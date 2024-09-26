@@ -1,4 +1,4 @@
-import { createEffect, createSignal } from "solid-js";
+import { createSignal } from "solid-js";
 import Prism from "./prism.js";
 import EditorTab from "./EditorTab.js";
 import PreviewOption from "./PreviewOption.js";
@@ -272,12 +272,17 @@ class EditorLegacy extends NumTextElement implements Editor {
 
   private setValue: Setter<string>;
 
+  private _setValue(value: string): void {
+    this.setValue(value);
+    super.value = value;
+  }
+
   override get value(): string {
     return this.getValue();
   }
 
   override set value(value) {
-    this.setValue(value);
+    this._setValue(value);
   }
 
   readonly tab: HTMLButtonElement;
@@ -368,9 +373,6 @@ class EditorLegacy extends NumTextElement implements Editor {
     this.setName((!name.includes(".")) ? `${name}.txt` : name);
     this.getValue = getValue;
     this.setValue = setValue;
-    createEffect(() => {
-      super.value = this.getValue();
-    });
     this.value = value;
     this.getHandle = getHandle;
     this.setHandle = setHandle;
