@@ -268,6 +268,19 @@ class EditorLegacy extends NumTextElement implements Editor {
 
   readonly identifier = Math.random().toString();
 
+  private getValue: Accessor<string>;
+
+  private setValue: Setter<string>;
+
+  override get value(): string {
+    return this.getValue();
+  }
+
+  override set value(value) {
+    this.setValue(value);
+    super.value = value;
+  }
+
   readonly tab: HTMLButtonElement;
 
   readonly previewOption: MenuDropOption;
@@ -343,7 +356,8 @@ class EditorLegacy extends NumTextElement implements Editor {
     const workspace_editors: HTMLDivElement = workspaceEditors()!;
 
     const { identifier } = this;
-    const [getName, setName] = createSignal(name);
+    const [getName, setName] = createSignal<string>(name);
+    const [getValue, setValue] = createSignal<string>(value);
     const [getHandle, setHandle] = createSignal<FileSystemFileHandle | null>(handle ?? null);
     const [getAutoCreated, setAutoCreated] = createSignal<boolean>(autoCreated);
     const [getRefresh, setRefresh] = createSignal<boolean>(false);
@@ -353,7 +367,9 @@ class EditorLegacy extends NumTextElement implements Editor {
     this.getName = getName;
     this.setName = setName;
     this.setName((!name.includes(".")) ? `${name}.txt` : name);
-    this.editor.value = value;
+    this.getValue = getValue;
+    this.setValue = setValue;
+    this.value = value;
     this.getHandle = getHandle;
     this.setHandle = setHandle;
     this.isOpen = isOpen;
@@ -398,6 +414,7 @@ class EditorLegacy extends NumTextElement implements Editor {
     workspace_editors.append(this);
 
     this.editor.addEventListener("input",() => {
+      this.setValue(this.editor.value);
       if (this.autoCreated){
         this.autoCreated = false;
       }
