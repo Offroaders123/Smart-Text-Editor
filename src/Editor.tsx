@@ -268,13 +268,9 @@ class EditorLegacy extends NumTextElement implements Editor {
 
   readonly identifier = Math.random().toString();
 
-  get tab(): HTMLButtonElement {
-    return workspaceTabs()?.querySelector(`.tab[data-editor-identifier="${this.identifier}"]`)!;
-  }
+  readonly tab: HTMLButtonElement;
 
-  get previewOption(): MenuDropOption {
-    return previewMenu()?.querySelector(`.option[data-editor-identifier="${this.identifier}"]`)!;
-  }
+  readonly previewOption: MenuDropOption;
 
   declare handle: FileSystemFileHandle | null;
   declare readonly isOpen;
@@ -367,8 +363,11 @@ class EditorLegacy extends NumTextElement implements Editor {
       }
     }
 
+    this.tab = EditorTab({ identifier, getName, setName: name => { this.name = name; }, getAutoCreated, getRefresh, getUnsaved }) as HTMLButtonElement;
+    this.previewOption = PreviewOption({ identifier, getName }) as MenuDropOption;
+
     // this.tab.append(this.editorName,this.editorClose);
-    workspace_tabs.insertBefore(EditorTab({ identifier, getName, setName: name => { this.name = name; }, getAutoCreated, getRefresh, getUnsaved }) as Element,create_editor_button);
+    workspace_tabs.insertBefore(this.tab,create_editor_button);
     workspace_editors.append(this);
 
     this.editor.addEventListener("input",() => {
@@ -384,7 +383,7 @@ class EditorLegacy extends NumTextElement implements Editor {
       refreshPreview();
     });
 
-    previewMenu()!.main.append(PreviewOption({ identifier, getName }) as Element);
+    previewMenu()!.main.append(this.previewOption);
 
     applyEditingBehavior(this);
     // setEditors(this.identifier, this);
