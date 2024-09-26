@@ -1,6 +1,7 @@
 import { createSignal } from "solid-js";
 import Prism from "./prism.js";
 import EditorTab from "./EditorTab.js";
+import PreviewOption from "./PreviewOption.js";
 import { activeEditor, settings, setActiveEditor, activeDialog, environment, appearance, previewEditor, preview as getPreview, workspaceEditors, workspaceTabs, createEditorButton, editors, setEditors, previewMenu } from "./STE.js";
 import { setPreviewSource, refreshPreview } from "./Workspace.js";
 import { getElementStyle, applyEditingBehavior, setTitle } from "./dom.js";
@@ -271,7 +272,9 @@ class EditorLegacy extends NumTextElement implements Editor {
     return workspaceTabs()?.querySelector(`.tab[data-editor-identifier="${this.identifier}"]`)!;
   }
 
-  readonly previewOption: MenuDropOption = document.createElement("li");
+  get previewOption(): MenuDropOption {
+    return previewMenu()?.querySelector(`.option[data-editor-identifier="${this.identifier}"]`)!;
+  }
 
   declare handle: FileSystemFileHandle | null;
   declare readonly isOpen;
@@ -353,16 +356,6 @@ class EditorLegacy extends NumTextElement implements Editor {
     this.setAttribute("data-editor-identifier",this.identifier);
     this.setAttribute("value",this.value);
 
-    this.previewOption.part.add("option");
-    this.previewOption.classList.add("option");
-    this.previewOption.setAttribute("data-editor-identifier",this.identifier);
-    this.previewOption.tabIndex = -1;
-    this.previewOption.innerText = this.getName();
-
-    this.previewOption.addEventListener("click",() => {
-      setPreviewSource(this.identifier);
-    });
-
     if (activeEditor() !== null && query(activeEditor()!)!.state.autoCreated){
       if (document.activeElement === query(activeEditor()!)!.ref){
         this.focusedOverride = true;
@@ -391,7 +384,7 @@ class EditorLegacy extends NumTextElement implements Editor {
       refreshPreview();
     });
 
-    previewMenu()!.main.append(this.previewOption);
+    previewMenu()!.main.append(PreviewOption({ identifier, getName }) as Element);
 
     applyEditingBehavior(this);
     // setEditors(this.identifier, this);
@@ -428,7 +421,7 @@ class EditorLegacy extends NumTextElement implements Editor {
     }
 
     // this.editorName.innerText = rename;
-    this.previewOption.innerText = rename;
+    // this.previewOption.innerText = rename;
 
     this.setName(rename);
 
