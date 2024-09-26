@@ -1,3 +1,4 @@
+import { createSignal, Show } from "solid-js";
 import CloseIcon from "./CloseIcon.js";
 import { applyEditingBehavior } from "./dom.js";
 import { open, close, query } from "./Editor.js";
@@ -16,6 +17,8 @@ export interface EditorTabProps {
 
 export default function EditorTab(props: EditorTabProps) {
   let editorName: HTMLSpanElement;
+  let editorRename: HTMLInputElement;
+  const [getRenaming, setRenaming] = createSignal<boolean>(false);
 
   return (
     <button
@@ -46,51 +49,15 @@ export default function EditorTab(props: EditorTabProps) {
       oncontextmenu={event => {
         if (event.target !== event.currentTarget) return;
   
-        let editorRename = event.currentTarget.querySelector<HTMLInputElement>("[data-editor-rename]");
-        if (editorRename === null){
-          editorRename = document.createElement("input");
+        const isRenaming: boolean = getRenaming();
+        if (!isRenaming){
+          setRenaming(true);
         } else {
           return editorRename.blur();
         }
   
-        editorRename.type = "text";
-        editorRename.placeholder = props.getName();
-        editorRename.tabIndex = -1;
-        editorRename.value = props.getName();
-        editorRename.setAttribute("data-editor-rename","");
-        editorRename.style.setProperty("--editor-name-width",`${editorName.offsetWidth}px`);
-  
-        editorRename.addEventListener("keydown",event => {
-          if (editorRename === null) return;
-          if (event.key === "Escape"){
-            editorRename.blur();
-          }
-        });
-  
-        editorRename.addEventListener("input",() => {
-          if (editorRename === null) return;
-          editorRename.style.width = "0px";
-          editorRename.offsetWidth;
-          editorRename.style.setProperty("--editor-rename-width",`${editorRename.scrollWidth + 1}px`);
-          editorRename.style.removeProperty("width");
-        });
-  
-        editorRename.addEventListener("change",() => {
-          if (editorRename === null) return;
-          const { value: name } = editorRename;
-          if (editorRename.value){
-            props.setName(name);
-          }
-          editorRename.blur();
-        });
-  
-        editorRename.addEventListener("blur",() => {
-          if (editorRename === null) return;
-          editorRename.remove();
-        });
-  
-        event.currentTarget.insertBefore(editorRename,event.currentTarget.firstChild);
-        applyEditingBehavior(editorRename);
+        // event.currentTarget.insertBefore(editorRename,event.currentTarget.firstChild);
+        // applyEditingBehavior(editorRename);
   
         editorRename.focus();
         editorRename.select();
@@ -106,6 +73,41 @@ export default function EditorTab(props: EditorTabProps) {
           open(props.identifier);
         }
       }}>
+      <Show when={getRenaming()}>
+        <input
+          type="text"
+          placeholder={props.getName()}
+          tabindex={-1}
+          value={props.getName()}
+          data-editor-rename
+          style={{
+            "--editor-name-width": `${editorName!.offsetWidth}px`
+          }}
+          onkeydown={event => {
+            if (event.key === "Escape"){
+              event.currentTarget.blur();
+            }
+          }}
+          oninput={event => {
+            event.currentTarget.style.width = "0px";
+            event.currentTarget.offsetWidth;
+            event.currentTarget.style.setProperty("--editor-rename-width",`${event.currentTarget.scrollWidth + 1}px`);
+            event.currentTarget.style.removeProperty("width");
+          }}
+          onchange={event => {
+            const { value: name } = event.currentTarget;
+            if (event.currentTarget.value){
+              props.setName(name);
+            }
+            event.currentTarget.blur();
+          }}
+          onblur={_event => {
+            // event.currentTarget.remove();
+            setRenaming(false);
+          }}
+          ref={ref => { editorRename = ref; applyEditingBehavior(ref); }}
+        />
+      </Show>
       <span
         attr:data-editor-name={props.getName()}
         ref={editorName!}>
