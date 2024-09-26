@@ -1,9 +1,12 @@
+import { createSignal } from "solid-js";
 import Prism from "./prism.js";
-import CloseIcon from "./CloseIcon.js";
+import EditorTab from "./EditorTab.js";
 import { activeEditor, settings, setActiveEditor, activeDialog, environment, appearance, previewEditor, preview as getPreview, workspaceEditors, workspaceTabs, createEditorButton, editors, setEditors, previewMenu } from "./STE.js";
 import { setPreviewSource, refreshPreview } from "./Workspace.js";
 import { getElementStyle, applyEditingBehavior, setTitle } from "./dom.js";
 import "./Editor.scss";
+
+import type { Accessor, Setter } from "solid-js";
 
 export interface Editor {
   readonly identifier: string;
@@ -260,51 +263,49 @@ class EditorLegacy extends NumTextElement implements Editor {
 
   readonly identifier = Math.random().toString();
 
-  readonly tab = document.createElement("button");
-
-  readonly editorName = document.createElement("span");
-
-  readonly editorClose = document.createElement("button");
+  get tab(): HTMLButtonElement {
+    return workspaceTabs()?.querySelector(`.tab[data-editor-identifier="${this.identifier}"]`)!;
+  }
 
   readonly previewOption: MenuDropOption = document.createElement("li");
 
   declare handle: FileSystemFileHandle | null;
   declare readonly isOpen;
 
+  private getAutoCreated: Accessor<boolean>;
+
+  private setAutoCreated: Setter<boolean>;
+
   get autoCreated(): boolean {
-    return this.tab.hasAttribute("data-editor-auto-created");
+    return this.getAutoCreated();
   }
 
   private set autoCreated(value) {
-    if (value){
-      this.tab.setAttribute("data-editor-auto-created","");
-    } else {
-      this.tab.removeAttribute("data-editor-auto-created");
-    }
+    this.setAutoCreated(value);
   }
 
+  private getRefresh: Accessor<boolean>;
+
+  private setRefresh: Setter<boolean>;
+
   get refresh(): boolean {
-    return this.tab.hasAttribute("data-editor-refresh");
+    return this.getRefresh();
   }
 
   private set refresh(value) {
-    if (value){
-      this.tab.setAttribute("data-editor-refresh","");
-    } else {
-      this.tab.removeAttribute("data-editor-refresh");
-    }
+    this.setRefresh(value);
   }
 
+  private getUnsaved: Accessor<boolean>;
+
+  private setUnsaved: Setter<boolean>;
+
   get unsaved(): boolean {
-    return this.tab.hasAttribute("data-editor-unsaved");
+    return this.getUnsaved();
   }
 
   private set unsaved(value) {
-    if (value){
-      this.tab.setAttribute("data-editor-unsaved","");
-    } else {
-      this.tab.removeAttribute("data-editor-unsaved");
-    }
+    this.setUnsaved(value);
   }
 
   declare readonly autoReplace;
@@ -317,10 +318,21 @@ class EditorLegacy extends NumTextElement implements Editor {
     const create_editor_button: HTMLButtonElement = createEditorButton()!;
     const workspace_editors: HTMLDivElement = workspaceEditors()!;
 
+    const { identifier } = this;
+    const [getName, setName] = createSignal(name);
+    const [getAutoCreated, setAutoCreated] = createSignal<boolean>(autoCreated);
+    const [getRefresh, setRefresh] = createSignal<boolean>(false);
+    const [getUnsaved, setUnsaved] = createSignal<boolean>(false);
+
     this.#name = (!name.includes(".")) ? `${name}.txt` : name;
     this.editor.value = value;
     this.isOpen = isOpen;
-    this.autoCreated = autoCreated;
+    this.getAutoCreated = getAutoCreated;
+    this.setAutoCreated = setAutoCreated;
+    this.getRefresh = getRefresh;
+    this.setRefresh = setRefresh;
+    this.getUnsaved = getUnsaved;
+    this.setUnsaved = setUnsaved;
     this.autoReplace = autoReplace;
 
     // let focusedOverride: boolean | undefined;
@@ -329,112 +341,7 @@ class EditorLegacy extends NumTextElement implements Editor {
     document.body.setAttribute("data-editor-change",changeIdentifier);
     const transitionDuration = parseInt(`${Number(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
 
-    this.tab.classList.add("tab");
-    this.tab.setAttribute("data-editor-identifier",this.identifier);
-    if (value) this.refresh = true;
-
-    this.tab.addEventListener("mousedown",event => {
-      if (document.activeElement === null) return;
-      if (event.button !== 0 || document.activeElement.matches("[data-editor-rename]")) return;
-
-      event.preventDefault();
-      if (this.tab !== query(activeEditor())?.tab){
-        open(this.identifier);
-      }
-    });
-
-    this.tab.addEventListener("keydown",event => {
-      // This is where the accidental Enter key trapping for Editor renaming is being taken over.
-      // Add a check to this to only apply this key handling if the Editor isn't currently being renamed in the Editor tab.
-      if (event.key === " " || event.key === "Enter"){
-        event.preventDefault();
-        if (this.tab !== query(activeEditor())?.tab){
-          open(this.identifier);
-        }
-      }
-    });
-
-    this.tab.addEventListener("contextmenu",event => {
-      if (event.target !== this.tab) return;
-
-      let editorRename = this.tab.querySelector<HTMLInputElement>("[data-editor-rename]");
-      if (editorRename === null){
-        editorRename = document.createElement("input");
-      } else {
-        return editorRename.blur();
-      }
-
-      editorRename.type = "text";
-      editorRename.placeholder = this.#name;
-      editorRename.tabIndex = -1;
-      editorRename.value = this.#name;
-      editorRename.setAttribute("data-editor-rename","");
-      editorRename.style.setProperty("--editor-name-width",`${this.editorName.offsetWidth}px`);
-
-      editorRename.addEventListener("keydown",event => {
-        if (editorRename === null) return;
-        if (event.key === "Escape"){
-          editorRename.blur();
-        }
-      });
-
-      editorRename.addEventListener("input",() => {
-        if (editorRename === null) return;
-        editorRename.style.width = "0px";
-        editorRename.offsetWidth;
-        editorRename.style.setProperty("--editor-rename-width",`${editorRename.scrollWidth + 1}px`);
-        editorRename.style.removeProperty("width");
-      });
-
-      editorRename.addEventListener("change",() => {
-        if (editorRename === null) return;
-        const { value: name } = editorRename;
-        if (editorRename.value){
-          this.name = name;
-        }
-        editorRename.blur();
-      });
-
-      editorRename.addEventListener("blur",() => {
-        if (editorRename === null) return;
-        editorRename.remove();
-      });
-
-      this.tab.insertBefore(editorRename,this.tab.firstChild);
-      applyEditingBehavior(editorRename);
-
-      editorRename.focus();
-      editorRename.select();
-    });
-
-    this.tab.addEventListener("dragover",event => {
-      event.preventDefault();
-      event.stopPropagation();
-
-      if (event.dataTransfer !== null){
-        event.dataTransfer.dropEffect = "copy";
-      }
-      if (this.tab !== query(activeEditor())?.tab){
-        open(this.identifier);
-      }
-    });
-
-    this.editorName.setAttribute("data-editor-name",this.#name);
-    this.editorName.innerText = this.#name;
-
-    this.editorClose.classList.add("option");
-    this.editorClose.tabIndex = -1;
-    this.editorClose.append(CloseIcon() as Element);
-
-    this.editorClose.addEventListener("mousedown",event => {
-      event.preventDefault();
-      event.stopPropagation();
-    });
-
-    this.editorClose.addEventListener("click",async event => {
-      event.stopPropagation();
-      await close(this.identifier);
-    });
+    if (value) this.setRefresh(true);
 
     this.classList.add("Editor");
     this.setAttribute("data-editor-identifier",this.identifier);
@@ -461,8 +368,8 @@ class EditorLegacy extends NumTextElement implements Editor {
       }
     }
 
-    this.tab.append(this.editorName,this.editorClose);
-    workspace_tabs.insertBefore(this.tab,create_editor_button);
+    // this.tab.append(this.editorName,this.editorClose);
+    workspace_tabs.insertBefore(EditorTab({ identifier, getName, setName, getAutoCreated, getRefresh, getUnsaved }) as Element,create_editor_button);
     workspace_editors.append(this);
 
     this.editor.addEventListener("input",() => {
@@ -513,7 +420,7 @@ class EditorLegacy extends NumTextElement implements Editor {
       rename = `${basename}${rename}`;
     }
 
-    this.editorName.innerText = rename;
+    // this.editorName.innerText = rename;
     this.previewOption.innerText = rename;
 
     this.#name = rename;
