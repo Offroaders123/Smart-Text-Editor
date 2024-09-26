@@ -311,9 +311,19 @@ class EditorLegacy extends NumTextElement implements Editor {
     this.setUnsaved(value);
   }
 
-  declare readonly autoReplace;
+  readonly autoReplace;
 
-  focusedOverride: boolean = false;
+  private getFocusedOverride: Accessor<boolean>;
+
+  private setFocusedOverride: Setter<boolean>;
+
+  get focusedOverride(): boolean {
+    return this.getFocusedOverride();
+  }
+
+  set focusedOverride(value) {
+    this.setFocusedOverride(value);
+  }
 
   constructor({ name = "Untitled.txt", value = "", handle, isOpen = true, autoCreated = false, autoReplace = true }: EditorOptions = {}) {
     super();
@@ -326,6 +336,7 @@ class EditorLegacy extends NumTextElement implements Editor {
     const [getAutoCreated, setAutoCreated] = createSignal<boolean>(autoCreated);
     const [getRefresh, setRefresh] = createSignal<boolean>(false);
     const [getUnsaved, setUnsaved] = createSignal<boolean>(false);
+    const [getFocusedOverride, setFocusedOverride] = createSignal<boolean>(false);
 
     this.getName = getName;
     this.setName = setName;
@@ -339,6 +350,8 @@ class EditorLegacy extends NumTextElement implements Editor {
     this.getUnsaved = getUnsaved;
     this.setUnsaved = setUnsaved;
     this.autoReplace = autoReplace;
+    this.getFocusedOverride = getFocusedOverride;
+    this.setFocusedOverride = setFocusedOverride;
 
     // let focusedOverride: boolean | undefined;
     const changeIdentifier = Math.random().toString();
