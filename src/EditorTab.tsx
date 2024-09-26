@@ -4,12 +4,12 @@ import { applyEditingBehavior } from "./dom.js";
 import { open, close, query } from "./Editor.js";
 import { activeEditor } from "./STE.js";
 
-import type { Accessor, Setter } from "solid-js";
+import type { Accessor } from "solid-js";
 
 export interface EditorTabProps {
   identifier: string;
   getName: Accessor<string>;
-  setName: Setter<string>;
+  setName: (name: string) => void;
   getAutoCreated: Accessor<boolean>;
   getRefresh: Accessor<boolean>;
   getUnsaved: Accessor<boolean>;

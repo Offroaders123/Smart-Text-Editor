@@ -375,7 +375,7 @@ class EditorLegacy extends NumTextElement implements Editor {
     }
 
     // this.tab.append(this.editorName,this.editorClose);
-    workspace_tabs.insertBefore(EditorTab({ identifier, getName, setName, getAutoCreated, getRefresh, getUnsaved }) as Element,create_editor_button);
+    workspace_tabs.insertBefore(EditorTab({ identifier, getName, setName: name => { this.name = name; }, getAutoCreated, getRefresh, getUnsaved }) as Element,create_editor_button);
     workspace_editors.append(this);
 
     this.editor.addEventListener("input",() => {
