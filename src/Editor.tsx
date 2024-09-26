@@ -272,7 +272,18 @@ class EditorLegacy extends NumTextElement implements Editor {
 
   readonly previewOption: MenuDropOption;
 
-  declare handle: FileSystemFileHandle | null;
+  private getHandle: Accessor<FileSystemFileHandle | null>;
+
+  private setHandle: Setter<FileSystemFileHandle | null>;
+
+  get handle(): FileSystemFileHandle | null {
+    return this.getHandle();
+  }
+
+  set handle(value) {
+    this.setHandle(value);
+  }
+
   declare readonly isOpen;
 
   private getAutoCreated: Accessor<boolean>;
@@ -333,6 +344,7 @@ class EditorLegacy extends NumTextElement implements Editor {
 
     const { identifier } = this;
     const [getName, setName] = createSignal(name);
+    const [getHandle, setHandle] = createSignal<FileSystemFileHandle | null>(handle ?? null);
     const [getAutoCreated, setAutoCreated] = createSignal<boolean>(autoCreated);
     const [getRefresh, setRefresh] = createSignal<boolean>(false);
     const [getUnsaved, setUnsaved] = createSignal<boolean>(false);
@@ -342,6 +354,8 @@ class EditorLegacy extends NumTextElement implements Editor {
     this.setName = setName;
     this.setName((!name.includes(".")) ? `${name}.txt` : name);
     this.editor.value = value;
+    this.getHandle = getHandle;
+    this.setHandle = setHandle;
     this.isOpen = isOpen;
     this.getAutoCreated = getAutoCreated;
     this.setAutoCreated = setAutoCreated;
@@ -400,7 +414,7 @@ class EditorLegacy extends NumTextElement implements Editor {
 
     applyEditingBehavior(this);
     // setEditors(this.identifier, this);
-    this.handle = handle ?? null;
+    // this.handle = handle ?? null;
 
     // if (isOpen || activeEditor() === null){
     //   open(this, { autoCreated, focusedOverride });
