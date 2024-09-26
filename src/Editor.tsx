@@ -231,7 +231,7 @@ export interface EditorElement {
     const { tab, previewOption } = ref;
     const basename = getBasename(ref.name);
     const extension = getExtension(ref.name);
-    return { ref: ref satisfies NumTextElement, tab, previewOption, basename, extension, state: editor };
+    return { ref: ref satisfies NumTextElement, tab, previewOption, basename, extension, state: ref satisfies Editor }; // `['state']` ideally will be the `editor` value instead.
   }
 
   /**
@@ -259,7 +259,11 @@ export interface EditorElement {
   }
 
 class EditorLegacy extends NumTextElement implements Editor {
-  #name: string;
+  // #name: string;
+
+  private getName: Accessor<string>;
+
+  private setName: Setter<string>;
 
   readonly identifier = Math.random().toString();
 
@@ -324,7 +328,9 @@ class EditorLegacy extends NumTextElement implements Editor {
     const [getRefresh, setRefresh] = createSignal<boolean>(false);
     const [getUnsaved, setUnsaved] = createSignal<boolean>(false);
 
-    this.#name = (!name.includes(".")) ? `${name}.txt` : name;
+    this.getName = getName;
+    this.setName = setName;
+    this.setName((!name.includes(".")) ? `${name}.txt` : name);
     this.editor.value = value;
     this.isOpen = isOpen;
     this.getAutoCreated = getAutoCreated;
@@ -351,7 +357,7 @@ class EditorLegacy extends NumTextElement implements Editor {
     this.previewOption.classList.add("option");
     this.previewOption.setAttribute("data-editor-identifier",this.identifier);
     this.previewOption.tabIndex = -1;
-    this.previewOption.innerText = this.#name;
+    this.previewOption.innerText = this.getName();
 
     this.previewOption.addEventListener("click",() => {
       setPreviewSource(this.identifier);
@@ -395,7 +401,7 @@ class EditorLegacy extends NumTextElement implements Editor {
     //   open(this, { autoCreated, focusedOverride });
     // }
 
-    this.syntaxLanguage = getExtension(this.#name);
+    this.syntaxLanguage = getExtension(this.getName());
     if ((settings.syntaxHighlighting === true) && (this.syntaxLanguage in Prism.languages)){
       this.syntaxHighlight.enable();
     }
@@ -408,11 +414,12 @@ class EditorLegacy extends NumTextElement implements Editor {
   }
 
   get name(): string {
-    return this.#name;
+    return this.getName();
   }
 
   private set name(rename) {
-    const [ basename, extension ] = [getBasename(this.#name), getExtension(this.#name)];
+    const [ basename, extension ] = [getBasename(this.getName()), getExtension(this.getName())];
+    console.log(basename, extension);
 
     if (!rename.includes(".")){
       rename = `${rename}.${extension}`;
@@ -423,9 +430,9 @@ class EditorLegacy extends NumTextElement implements Editor {
     // this.editorName.innerText = rename;
     this.previewOption.innerText = rename;
 
-    this.#name = rename;
+    this.setName(rename);
 
-    const syntaxLanguage: string = getExtension(this.#name);
+    const syntaxLanguage: string = getExtension(this.getName());
     const isLoadedLanguage: boolean = syntaxLanguage in Prism.languages;
 
     if (isLoadedLanguage){
