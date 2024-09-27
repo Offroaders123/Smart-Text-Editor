@@ -15,6 +15,10 @@ export class Editor {
   setName: Setter<string>;
   getValue: Accessor<string>;
   setValue: Setter<string>;
+  getSyntaxLanguage: Accessor<string>;
+  setSyntaxLanguage: Setter<string>;
+  getSyntaxHighlight: Accessor<boolean>;
+  setSyntaxHighlight: Setter<boolean>;
   readonly tab: HTMLButtonElement;
   readonly previewOption: MenuDropOption;
   getHandle: Accessor<FileSystemFileHandle | null>;
@@ -35,6 +39,8 @@ export class Editor {
     const { identifier } = this;
     const [getName, setName] = createSignal<string>(name);
     const [getValue, setValue] = createSignal<string>(value);
+    const [getSyntaxLanguage, setSyntaxLanguage] = createSignal<string>("");
+    const [getSyntaxHighlight, setSyntaxHighlight] = createSignal<boolean>(false);
     const [getHandle, setHandle] = createSignal<FileSystemFileHandle | null>(handle ?? null);
     const [getAutoCreated, setAutoCreated] = createSignal<boolean>(autoCreated);
     const [getRefresh, setRefresh] = createSignal<boolean>(false);
@@ -47,6 +53,10 @@ export class Editor {
     this.getValue = getValue;
     this.setValue = setValue;
     this.setValue(value);
+    this.getSyntaxLanguage = getSyntaxLanguage;
+    this.setSyntaxLanguage = setSyntaxLanguage;
+    this.getSyntaxHighlight = getSyntaxHighlight;
+    this.setSyntaxHighlight = setSyntaxHighlight;
     this.getHandle = getHandle;
     this.setHandle = setHandle;
     this.isOpen = isOpen;
@@ -82,7 +92,7 @@ export class Editor {
   }
 }
 
-  type _EditorLegacy = Editor & NumTextElement;
+  type _EditorLegacy = Editor;
 
   function _setValue(this: _EditorLegacy, value: string): void {
     this.setValue(value);
@@ -108,15 +118,15 @@ export class Editor {
     const isLoadedLanguage: boolean = syntaxLanguage in Prism.languages;
 
     if (isLoadedLanguage){
-      this.syntaxLanguage = syntaxLanguage;
+      this.setSyntaxLanguage(syntaxLanguage);
     }
     if (settings.syntaxHighlighting === true && isLoadedLanguage){
-      this.syntaxHighlight.enable();
+      this.setSyntaxHighlight(true);
     } else {
-      this.syntaxHighlight.disable();
+      this.setSyntaxHighlight(false);
     }
-    if (syntaxLanguage !== this.syntaxLanguage){
-      this.syntaxLanguage = syntaxLanguage;
+    if (syntaxLanguage !== this.getSyntaxLanguage()){
+      this.setSyntaxLanguage(syntaxLanguage);
     }
 
     if (this.getAutoCreated()){
