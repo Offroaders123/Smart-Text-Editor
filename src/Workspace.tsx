@@ -1,5 +1,5 @@
 import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, previewMenu, viewMenu } from "./STE.js";
-import { createEditor, getBasename, getExtension, query, rename, setTabsVisibility } from "./Editor.js";
+import { createEditor, query, rename, setTabsVisibility } from "./Editor.js";
 import WorkspaceTabs from "./WorkspaceTabs.js";
 import WorkspaceEditors from "./WorkspaceEditors.js";
 import { getElementStyle } from "./dom.js";
@@ -202,13 +202,13 @@ export async function openFiles(): Promise<void> {
 export async function saveFile(extension?: string): Promise<void> {
   if (extension || !support.fileSystem){
     // @ts-expect-error
-    if (!extension) extension = getExtension(query(activeEditor())?.getName());
+    if (!extension) extension = query(activeEditor())?.getExtension() satisfies string;
     const anchor = document.createElement("a");
     const link = window.URL.createObjectURL(new Blob([query(activeEditor())?.ref.editor.value ?? ""]));
     anchor.href = link;
     anchor.download = `${
       // @ts-expect-error
-      getBasename(query(activeEditor())?.getName()) satisfies string
+      query(activeEditor())?.getExtension() satisfies string
     }.${extension}`;
     anchor.click();
     window.URL.revokeObjectURL(link);

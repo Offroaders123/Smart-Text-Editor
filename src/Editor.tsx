@@ -66,6 +66,20 @@ export class Editor {
     this.tab = EditorTab({ identifier, getName, setName: name => { this.setName(name); }, getAutoCreated, getRefresh, getUnsaved }) as HTMLButtonElement;
     this.previewOption = PreviewOption({ identifier, getName }) as MenuDropOption;
   }
+
+  getBasename(): string {
+    const name: string = this.getName();
+    if (!name.includes(".")) return name;
+    const basename: string = name.split(".").slice(0,-1).join(".");
+    return basename;
+  }
+
+  getExtension(): string {
+    const name: string = this.getName();
+    if (!name.includes(".")) return "";
+    const extension: string = name.split(".").pop()!;
+    return extension;
+  }
 }
 
 export interface EditorOptions {
@@ -362,7 +376,7 @@ class EditorLegacy extends NumTextElement {
     //   open(this, { autoCreated, focusedOverride });
     // }
 
-    this.syntaxLanguage = getExtension(self.getName());
+    this.syntaxLanguage = self.getExtension();
     if ((settings.syntaxHighlighting === true) && (this.syntaxLanguage in Prism.languages)){
       this.syntaxHighlight.enable();
     }
@@ -375,7 +389,7 @@ class EditorLegacy extends NumTextElement {
   }
 
   private _setName(rename: string): void {
-    const [ basename, extension ] = [getBasename(this.self.getName()), getExtension(this.self.getName())];
+    const [ basename, extension ] = [this.self.getBasename(), this.self.getExtension()];
     console.log(basename, extension);
 
     if (!rename.includes(".")){
@@ -389,7 +403,7 @@ class EditorLegacy extends NumTextElement {
 
     this.self.setName(rename);
 
-    const syntaxLanguage: string = getExtension(this.self.getName());
+    const syntaxLanguage: string = this.self.getExtension();
     const isLoadedLanguage: boolean = syntaxLanguage in Prism.languages;
 
     if (isLoadedLanguage){
@@ -417,18 +431,6 @@ class EditorLegacy extends NumTextElement {
     }
   }
 }
-
-  export function getBasename(name: string): string {
-    if (!name.includes(".")) return name;
-    const basename: string = name.split(".").slice(0,-1).join(".");
-    return basename;
-  }
-
-  export function getExtension(name: string): string {
-    if (!name.includes(".")) return "";
-    const extension: string = name.split(".").pop()!;
-    return extension;
-  }
 
 window.customElements.define("ste-editor",EditorLegacy);
 
