@@ -327,7 +327,9 @@ function EditorElement(self: Editor) {
 
   let ref: NumTextElement;
 
-  onMount(() => {
+  onMount(async () => {
+    await new Promise<void>(queueMicrotask);
+
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const create_editor_button: HTMLButtonElement = createEditorButton()!;
     const workspace_editors: HTMLDivElement = workspaceEditors()!;
