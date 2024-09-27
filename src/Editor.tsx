@@ -9,12 +9,14 @@ import "./Editor.scss";
 
 import type { Accessor, Setter } from "solid-js";
 
-export interface Editor {
-  readonly identifier: string;
+export class Editor {
+  readonly identifier: string = Math.random().toString();
   getName: Accessor<string>;
   setName: Setter<string>;
   getValue: Accessor<string>;
   setValue: Setter<string>;
+  readonly tab: HTMLButtonElement;
+  readonly previewOption: MenuDropOption;
   getHandle: Accessor<FileSystemFileHandle | null>;
   setHandle: Setter<FileSystemFileHandle | null>;
   readonly isOpen: boolean;
@@ -27,6 +29,42 @@ export interface Editor {
   getUnsaved: Accessor<boolean>;
   setUnsaved: Setter<boolean>;
   readonly autoReplace: boolean;
+  readonly ref: NumTextElement;
+
+  constructor({ name = "Untitled.txt", value = "", handle, isOpen = true, autoCreated = false, autoReplace = true }: EditorOptions = {}) {
+    const { identifier } = this;
+    const [getName, setName] = createSignal<string>(name);
+    const [getValue, setValue] = createSignal<string>(value);
+    const [getHandle, setHandle] = createSignal<FileSystemFileHandle | null>(handle ?? null);
+    const [getAutoCreated, setAutoCreated] = createSignal<boolean>(autoCreated);
+    const [getRefresh, setRefresh] = createSignal<boolean>(false);
+    const [getUnsaved, setUnsaved] = createSignal<boolean>(false);
+    const [getFocusedOverride, setFocusedOverride] = createSignal<boolean>(false);
+
+    this.getName = getName;
+    this.setName = setName;
+    this.setName((!name.includes(".")) ? `${name}.txt` : name);
+    this.getValue = getValue;
+    this.setValue = setValue;
+    this.setValue(value);
+    this.getHandle = getHandle;
+    this.setHandle = setHandle;
+    this.isOpen = isOpen;
+    this.getAutoCreated = getAutoCreated;
+    this.setAutoCreated = setAutoCreated;
+    this.getRefresh = getRefresh;
+    this.setRefresh = setRefresh;
+    this.getUnsaved = getUnsaved;
+    this.setUnsaved = setUnsaved;
+    this.autoReplace = autoReplace;
+    this.getFocusedOverride = getFocusedOverride;
+    this.setFocusedOverride = setFocusedOverride;
+
+    if (value) this.setRefresh(true);
+
+    this.tab = EditorTab({ identifier, getName, setName: name => { this.setName(name); }, getAutoCreated, getRefresh, getUnsaved }) as HTMLButtonElement;
+    this.previewOption = PreviewOption({ identifier, getName }) as MenuDropOption;
+  }
 }
 
 export interface EditorOptions {
@@ -48,13 +86,13 @@ export interface EditorOpenOptions {
 */
 export function createEditor(options: EditorOptions = {}): void {
   const editorElement = new EditorLegacy(options);
-  setEditors(editorElement.identifier, editorElement);
+  setEditors(editorElement.self.identifier, editorElement.self);
 
-  const autoCreated = editorElement.getAutoCreated();
-  const focusedOverride = editorElement.getFocusedOverride();
-  if (editorElement.isOpen || activeEditor() === null){
-    open(editorElement.identifier, { autoCreated, focusedOverride });
-    editorElement.setFocusedOverride(false);
+  const autoCreated = editorElement.self.getAutoCreated();
+  const focusedOverride = editorElement.self.getFocusedOverride();
+  if (editorElement.self.isOpen || activeEditor() === null){
+    open(editorElement.self.identifier, { autoCreated, focusedOverride });
+    editorElement.self.setFocusedOverride(false);
   }
 }
 
@@ -108,13 +146,13 @@ export function open(identifier: string | null, { autoCreated = false, focusedOv
 
   editor.tab.classList.add("active");
   if (autoCreated){
-    editor.state.setAutoCreated(true);
+    editor.setAutoCreated(true);
   }
   editor.ref.classList.add("active");
-  setActiveEditor(editor.state.identifier);
+  setActiveEditor(editor.identifier);
 
   setTabsVisibility();
-  setTitle({ content: editor.state.getName() });
+  setTitle({ content: editor.getName() });
 
   if ((((document.activeElement === document.body && activeDialog() !== null) || autoCreated) && !environment.touchDevice && appearance.parentWindow) || focused){
     editor.ref.focus({ preventScroll: true });
@@ -132,8 +170,8 @@ export async function close(identifier: string | null): Promise<void> {
   const editor = query(identifier);
   if (editor === null) return;
 
-  if (editor.state.getUnsaved()){
-    const confirmation: boolean = confirm(`Are you sure you would like to close "${editor.state.getName()}"?\nRecent changes have not yet been saved.`);
+  if (editor.getUnsaved()){
+    const confirmation: boolean = confirm(`Are you sure you would like to close "${editor.getName()}"?\nRecent changes have not yet been saved.`);
     if (!confirmation) return;
   }
 
@@ -162,7 +200,7 @@ export async function close(identifier: string | null): Promise<void> {
     preview.src = "about:blank";
   }
 
-  if (previewEditor() === editor.state.identifier){
+  if (previewEditor() === editor.identifier){
     setPreviewSource(null);
   }
 
@@ -193,7 +231,7 @@ export async function close(identifier: string | null): Promise<void> {
   workspace_editors.removeChild(editor.ref);
   previewMenu()!.main.removeChild(editor.previewOption);
 
-  setEditors(editor.state.identifier, undefined);
+  setEditors(editor.identifier, undefined);
 
   if (transitionDuration !== 0){
     await new Promise(resolve => setTimeout(resolve,transitionDuration));
@@ -215,7 +253,7 @@ export function rename(identifier: string | null, name?: string): void {
   const editor = query(identifier);
   if (editor === null) return;
 
-  const currentName = editor.state.getName();
+  const currentName = editor.getName();
 
   if (name === undefined){
     const result = prompt(`Enter a new file name for "${currentName}".`,currentName);
@@ -223,31 +261,17 @@ export function rename(identifier: string | null, name?: string): void {
     name = result;
   }
 
-  editor.state.setName(name);
-}
-
-export interface EditorElement {
-  readonly ref: NumTextElement;
-  readonly tab: HTMLButtonElement;
-  readonly previewOption: MenuDropOption;
-  readonly basename: string;
-  readonly extension: string;
-  readonly state: Editor;
+  editor.setName(name);
 }
 
   /**
    * Queries an Editor by it's identifier.
   */
-  export function query(identifier: string | null): EditorElement | null {
+  export function query(identifier: string | null): Editor | null {
     if (typeof identifier !== "string") return null;
     const editor: Editor | null = editors[identifier] ?? null;
     if (editor === null) return null;
-    const ref = document.querySelector<EditorLegacy>(`.Editor[data-editor-identifier="${editor.identifier}"]`);
-    if (ref === null) return null;
-    const { tab, previewOption } = ref;
-    const basename = getBasename(ref.getName());
-    const extension = getExtension(ref.getName());
-    return { ref: ref satisfies NumTextElement, tab, previewOption, basename, extension, state: ref satisfies Editor }; // `['state']` ideally will be the `editor` value instead.
+    return editor;
   }
 
   /**
@@ -274,85 +298,17 @@ export interface EditorElement {
     }
   }
 
-class EditorLegacy extends NumTextElement implements Editor {
-  // #name: string;
+class EditorLegacy extends NumTextElement {
+  readonly self: Editor;
 
-  getName: Accessor<string>;
-
-  setName: Setter<string>;
-
-  readonly identifier = Math.random().toString();
-
-  getValue: Accessor<string>;
-
-  setValue: Setter<string>;
-
-  private _setValue(value: string): void {
-    this.setValue(value);
-    super.value = value;
-  }
-
-  readonly tab: HTMLButtonElement;
-
-  readonly previewOption: MenuDropOption;
-
-  getHandle: Accessor<FileSystemFileHandle | null>;
-
-  setHandle: Setter<FileSystemFileHandle | null>;
-
-  declare readonly isOpen;
-
-  getAutoCreated: Accessor<boolean>;
-
-  setAutoCreated: Setter<boolean>;
-
-  getRefresh: Accessor<boolean>;
-
-  setRefresh: Setter<boolean>;
-
-  getUnsaved: Accessor<boolean>;
-
-  setUnsaved: Setter<boolean>;
-
-  readonly autoReplace;
-
-  getFocusedOverride: Accessor<boolean>;
-
-  setFocusedOverride: Setter<boolean>;
-
-  constructor({ name = "Untitled.txt", value = "", handle, isOpen = true, autoCreated = false, autoReplace = true }: EditorOptions = {}) {
+  constructor(options: EditorOptions = {}) {
     super();
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const create_editor_button: HTMLButtonElement = createEditorButton()!;
     const workspace_editors: HTMLDivElement = workspaceEditors()!;
 
-    const { identifier } = this;
-    const [getName, setName] = createSignal<string>(name);
-    const [getValue, setValue] = createSignal<string>(value);
-    const [getHandle, setHandle] = createSignal<FileSystemFileHandle | null>(handle ?? null);
-    const [getAutoCreated, setAutoCreated] = createSignal<boolean>(autoCreated);
-    const [getRefresh, setRefresh] = createSignal<boolean>(false);
-    const [getUnsaved, setUnsaved] = createSignal<boolean>(false);
-    const [getFocusedOverride, setFocusedOverride] = createSignal<boolean>(false);
-
-    this.getName = getName;
-    this.setName = setName;
-    this.setName((!name.includes(".")) ? `${name}.txt` : name);
-    this.getValue = getValue;
-    this.setValue = setValue;
-    this.value = value;
-    this.getHandle = getHandle;
-    this.setHandle = setHandle;
-    this.isOpen = isOpen;
-    this.getAutoCreated = getAutoCreated;
-    this.setAutoCreated = setAutoCreated;
-    this.getRefresh = getRefresh;
-    this.setRefresh = setRefresh;
-    this.getUnsaved = getUnsaved;
-    this.setUnsaved = setUnsaved;
-    this.autoReplace = autoReplace;
-    this.getFocusedOverride = getFocusedOverride;
-    this.setFocusedOverride = setFocusedOverride;
+    const self = new Editor(options);
+    this.self = self;
 
     // let focusedOverride: boolean | undefined;
     const changeIdentifier = Math.random().toString();
@@ -360,45 +316,42 @@ class EditorLegacy extends NumTextElement implements Editor {
     document.body.setAttribute("data-editor-change",changeIdentifier);
     const transitionDuration = parseInt(`${Number(getElementStyle({ element: workspace_tabs, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
 
-    if (value) this.setRefresh(true);
+    if (self.getValue()) self.setRefresh(true);
 
     this.classList.add("Editor");
-    this.setAttribute("data-editor-identifier",this.identifier);
-    this.setAttribute("value",this.value);
+    this.setAttribute("data-editor-identifier",self.identifier);
+    this.setAttribute("value",self.getValue());
 
-    if (activeEditor() !== null && query(activeEditor()!)!.state.getAutoCreated()){
+    if (activeEditor() !== null && query(activeEditor()!)!.getAutoCreated()){
       if (document.activeElement === query(activeEditor()!)!.ref){
-        this.setFocusedOverride(true);
+        self.setFocusedOverride(true);
       }
-      if (autoReplace){
+      if (self.autoReplace){
         close(activeEditor()!);
       } else {
-        query(activeEditor()!)!.state.setAutoCreated(false);
+        query(activeEditor()!)!.setAutoCreated(false);
       }
     }
 
-    this.tab = EditorTab({ identifier, getName, setName: name => { this.setName(name); }, getAutoCreated, getRefresh, getUnsaved }) as HTMLButtonElement;
-    this.previewOption = PreviewOption({ identifier, getName }) as MenuDropOption;
-
     // this.tab.append(this.editorName,this.editorClose);
-    workspace_tabs.insertBefore(this.tab,create_editor_button);
+    workspace_tabs.insertBefore(self.tab,create_editor_button);
     workspace_editors.append(this);
 
     this.editor.addEventListener("input",() => {
-      this.setValue(this.editor.value);
-      if (this.getAutoCreated()){
-        this.setAutoCreated(false);
+      self.setValue(this.editor.value);
+      if (self.getAutoCreated()){
+        self.setAutoCreated(false);
       }
-      if (!this.getRefresh()){
-        this.setRefresh(true);
+      if (!self.getRefresh()){
+        self.setRefresh(true);
       }
-      if (!this.getUnsaved()){
-        this.setUnsaved(true);
+      if (!self.getUnsaved()){
+        self.setUnsaved(true);
       }
       refreshPreview();
     });
 
-    previewMenu()!.main.append(this.previewOption);
+    previewMenu()!.main.append(self.previewOption);
 
     applyEditingBehavior(this);
     // setEditors(this.identifier, this);
@@ -408,7 +361,7 @@ class EditorLegacy extends NumTextElement implements Editor {
     //   open(this, { autoCreated, focusedOverride });
     // }
 
-    this.syntaxLanguage = getExtension(this.getName());
+    this.syntaxLanguage = getExtension(self.getName());
     if ((settings.syntaxHighlighting === true) && (this.syntaxLanguage in Prism.languages)){
       this.syntaxHighlight.enable();
     }
@@ -421,7 +374,7 @@ class EditorLegacy extends NumTextElement implements Editor {
   }
 
   private _setName(rename: string): void {
-    const [ basename, extension ] = [getBasename(this.getName()), getExtension(this.getName())];
+    const [ basename, extension ] = [getBasename(this.self.getName()), getExtension(this.self.getName())];
     console.log(basename, extension);
 
     if (!rename.includes(".")){
@@ -433,9 +386,9 @@ class EditorLegacy extends NumTextElement implements Editor {
     // this.editorName.innerText = rename;
     // this.previewOption.innerText = rename;
 
-    this.setName(rename);
+    this.self.setName(rename);
 
-    const syntaxLanguage: string = getExtension(this.getName());
+    const syntaxLanguage: string = getExtension(this.self.getName());
     const isLoadedLanguage: boolean = syntaxLanguage in Prism.languages;
 
     if (isLoadedLanguage){
@@ -450,15 +403,15 @@ class EditorLegacy extends NumTextElement implements Editor {
       this.syntaxLanguage = syntaxLanguage;
     }
 
-    if (this.getAutoCreated()){
-      this.setAutoCreated(false);
+    if (this.self.getAutoCreated()){
+      this.self.setAutoCreated(false);
     }
 
-    if (this.tab === query(activeEditor())?.tab){
+    if (this.self.tab === query(activeEditor())?.tab){
       setTitle({ content: rename });
     }
 
-    if ((previewEditor() === null && activeEditor() === this.identifier) || previewEditor() === this.identifier){
+    if ((previewEditor() === null && activeEditor() === this.self.identifier) || previewEditor() === this.self.identifier){
       refreshPreview({ force: true });
     }
   }

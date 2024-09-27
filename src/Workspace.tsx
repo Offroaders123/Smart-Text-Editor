@@ -1,12 +1,12 @@
 import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, previewMenu, viewMenu } from "./STE.js";
-import { createEditor, getBasename, query, rename, setTabsVisibility } from "./Editor.js";
+import { createEditor, getBasename, getExtension, query, rename, setTabsVisibility } from "./Editor.js";
 import WorkspaceTabs from "./WorkspaceTabs.js";
 import WorkspaceEditors from "./WorkspaceEditors.js";
 import { getElementStyle } from "./dom.js";
 import "./Workspace.scss";
 
 import type { Setter } from "solid-js";
-import type { EditorElement, EditorOptions } from "./Editor.js";
+import type { Editor, EditorOptions } from "./Editor.js";
 
 export interface WorkspaceProps {
   setWorkspace: Setter<HTMLDivElement | null>;
@@ -201,36 +201,37 @@ export async function openFiles(): Promise<void> {
 */
 export async function saveFile(extension?: string): Promise<void> {
   if (extension || !support.fileSystem){
-    if (!extension) extension = query(activeEditor())?.extension;
+    // @ts-expect-error
+    if (!extension) extension = getExtension(query(activeEditor())?.getName());
     const anchor = document.createElement("a");
     const link = window.URL.createObjectURL(new Blob([query(activeEditor())?.ref.editor.value ?? ""]));
     anchor.href = link;
     anchor.download = `${
       // @ts-expect-error
-      getBasename(query(activeEditor())?.state.getName()) satisfies string
+      getBasename(query(activeEditor())?.getName()) satisfies string
     }.${extension}`;
     anchor.click();
     window.URL.revokeObjectURL(link);
   } else {
-    const identifier: EditorElement | null = query(activeEditor());
+    const identifier: Editor | null = query(activeEditor());
     let handle: void | FileSystemFileHandle;
     if (identifier === null) throw new Error("No editors are open, couldn't save anything!");
-    if (!identifier.state.getHandle()){
+    if (!identifier.getHandle()){
       handle = await window.showSaveFilePicker({
         suggestedName:
           // @ts-expect-error
-          query(activeEditor())?.state.getName() satisfies string,
-        startIn: (identifier.state.getHandle()) ? identifier.state.getHandle()! : "desktop"
+          query(activeEditor())?.getName() satisfies string,
+        startIn: (identifier.getHandle()) ? identifier.getHandle()! : "desktop"
       }).catch(error => {
         if (error.message.toLowerCase().includes("abort")) return;
       });
       if (!handle) return;
-      identifier.state.setHandle(handle);
-    } else handle = identifier.state.getHandle()!;
-    const stream = await identifier.state.getHandle()?.createWritable().catch(error => {
+      identifier.setHandle(handle);
+    } else handle = identifier.getHandle()!;
+    const stream = await identifier.getHandle()?.createWritable().catch(error => {
       alert(`"${
         // @ts-expect-error
-        query(activeEditor())?.state.getName() satisfies string
+        query(activeEditor())?.getName() satisfies string
       }" could not be saved.`);
       if (error.toString().toLowerCase().includes("not allowed")) return;
     });
@@ -241,16 +242,16 @@ export async function saveFile(extension?: string): Promise<void> {
     );
     await stream.close();
     // @ts-expect-error
-    const currentName: string = query(activeEditor())?.state.getName();
+    const currentName: string = query(activeEditor())?.getName();
     const file = await handle.getFile();
     const newName = file.name;
-    if (currentName != newName) rename(identifier.state.identifier, newName);
+    if (currentName != newName) rename(identifier.identifier, newName);
   }
-  if (query(activeEditor())?.state.getAutoCreated()){
-    query(activeEditor()!)!.state.setAutoCreated(false);
+  if (query(activeEditor())?.getAutoCreated()){
+    query(activeEditor()!)!.setAutoCreated(false);
   }
-  if (query(activeEditor())?.state.getUnsaved()){
-    query(activeEditor()!)!.state.setUnsaved(false);
+  if (query(activeEditor())?.getUnsaved()){
+    query(activeEditor()!)!.setUnsaved(false);
   }
   await refreshPreview({ force: true });
 }
@@ -280,7 +281,7 @@ export function createDisplay(): void {
     if (win === null) return;
     if (!win.document.title){
       // @ts-expect-error
-      win.document.title = query(activeEditor())?.state.getName();
+      win.document.title = query(activeEditor())?.getName();
     }
   },20);
 }
@@ -295,9 +296,9 @@ export interface RefreshPreviewOptions {
 export async function refreshPreview({ force = false }: RefreshPreviewOptions = {}): Promise<void> {
   if (view() === "code") return;
 
-  const editor: EditorElement | null = query(previewEditor() ?? activeEditor());
+  const editor: Editor | null = query(previewEditor() ?? activeEditor());
   if (editor === null) return;
-  const change: boolean = editor.state.getRefresh() && !settings.automaticRefresh;
+  const change: boolean = editor.getRefresh() && !settings.automaticRefresh;
   if (!change && !force) return;
   
   const preview: HTMLIFrameElement = getPreview()!;
@@ -317,7 +318,7 @@ export async function refreshPreview({ force = false }: RefreshPreviewOptions = 
   preview.contentDocument?.write(source);
   preview.contentDocument?.close();
 
-  if (change) editor.state.setRefresh(false);
+  if (change) editor.setRefresh(false);
 }
 
 /**
