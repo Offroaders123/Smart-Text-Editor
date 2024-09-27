@@ -215,14 +215,14 @@ export const preapprovedExtensions = ["txt","html","css","js","php","json","webm
 /**
  * The identifier of the currently opened Editor.
 */
-export const [activeEditor, setActiveEditor] = createSignal<string | null>(null);
+export const [activeEditor, setActiveEditor] = createSignal<Editor | null>(null);
 
 /**
  * The identifier of the Editor to be used within the Preview.
  * 
  * When set to `null`, internally the value of `previewEditor` will be pointed to `activeEditor` when used.
 */
-export const [previewEditor, setPreviewEditor] = createSignal<string | null>(null);
+export const [previewEditor, setPreviewEditor] = createSignal<Editor | null>(null);
 
 /**
  * An array of all windows opened during the current session.

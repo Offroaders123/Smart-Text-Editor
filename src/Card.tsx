@@ -5,7 +5,7 @@ import ArrowIcon from "./ArrowIcon.js";
 import BackIcon from "./BackIcon.js";
 import MinimizeIcon from "./MinimizeIcon.js";
 import CloseIcon from "./CloseIcon.js";
-import { query, setTabsVisibility } from "./Editor.js";
+import { setTabsVisibility } from "./Editor.js";
 import { getElementStyle } from "./dom.js";
 import "./Card.scss";
 
@@ -183,7 +183,7 @@ export default function Card(props: CardProps) {
       setActiveDialog(null);
       if (dialogPrevious()){
         const hidden = (getElementStyle({ element: document.getElementById(dialogPrevious()!)!, property: "visibility" }) == "hidden");
-        (!workspace_editors.contains(document.getElementById(dialogPrevious()!)!) && !hidden) ? document.getElementById(dialogPrevious()!)!.focus({ preventScroll: true }) : query(activeEditor())?.ref.focus({ preventScroll: true });
+        (!workspace_editors.contains(document.getElementById(dialogPrevious()!)!) && !hidden) ? document.getElementById(dialogPrevious()!)!.focus({ preventScroll: true }) : activeEditor()?.ref.focus({ preventScroll: true });
         setDialogPrevious(null);
       }
     }

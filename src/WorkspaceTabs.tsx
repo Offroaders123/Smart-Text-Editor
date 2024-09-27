@@ -20,15 +20,16 @@ export default function WorkspaceTabs(props: WorkspaceTabsProps) {
         if (!workspaceTabs()!.contains(document.activeElement) || !(document.activeElement instanceof HTMLElement)) return;
 
         const identifier = document.activeElement.getAttribute("data-editor-identifier");
-        if (identifier === null) return;
+        const editor = query(identifier);
+        if (editor === null) return;
 
         event.preventDefault();
 
         if (event.key === "ArrowLeft"){
-          query(getPrevious(identifier))?.tab.focus();
+          getPrevious(editor)?.tab.focus();
         }
         if (event.key === "ArrowRight"){
-          query(getNext(identifier))?.tab.focus();
+          getNext(editor)?.tab.focus();
         }
       }}>
       <CreateEditorButton

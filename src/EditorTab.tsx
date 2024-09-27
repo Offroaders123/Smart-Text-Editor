@@ -1,18 +1,13 @@
 import { createSignal, Show } from "solid-js";
 import CloseIcon from "./CloseIcon.js";
 import { applyEditingBehavior } from "./dom.js";
-import { open, close, query } from "./Editor.js";
+import { open, close } from "./Editor.js";
 import { activeEditor } from "./STE.js";
 
-import type { Accessor } from "solid-js";
+import type { Editor } from "./Editor.js";
 
 export interface EditorTabProps {
-  identifier: string;
-  getName: Accessor<string>;
-  setName: (name: string) => void;
-  getAutoCreated: Accessor<boolean>;
-  getRefresh: Accessor<boolean>;
-  getUnsaved: Accessor<boolean>;
+  editor: Editor;
 }
 
 export default function EditorTab(props: EditorTabProps) {
@@ -23,17 +18,17 @@ export default function EditorTab(props: EditorTabProps) {
   return (
     <button
       class="tab"
-      attr:data-editor-identifier={props.identifier}
-      attr:data-editor-auto-created={props.getAutoCreated() ? "" : null}
-      attr:data-editor-refresh={props.getRefresh() ? "" : null}
-      attr:data-editor-unsaved={props.getUnsaved() ? "" : null}
+      attr:data-editor-identifier={props.editor.identifier}
+      attr:data-editor-auto-created={props.editor.getAutoCreated() ? "" : null}
+      attr:data-editor-refresh={props.editor.getRefresh() ? "" : null}
+      attr:data-editor-unsaved={props.editor.getUnsaved() ? "" : null}
       onmousedown={event => {
         if (document.activeElement === null) return;
         if (event.button !== 0 || document.activeElement.matches("[data-editor-rename]")) return;
   
         event.preventDefault();
-        if (event.currentTarget !== query(activeEditor())?.tab){
-          open(props.identifier);
+        if (event.currentTarget !== activeEditor()?.tab){
+          open(props.editor);
         }
       }}
       onkeydown={event => {
@@ -41,8 +36,8 @@ export default function EditorTab(props: EditorTabProps) {
         // Add a check to this to only apply this key handling if the Editor isn't currently being renamed in the Editor tab.
         if (event.key === " " || event.key === "Enter"){
           event.preventDefault();
-          if (event.currentTarget !== query(activeEditor())?.tab){
-            open(props.identifier);
+          if (event.currentTarget !== activeEditor()?.tab){
+            open(props.editor);
           }
         }
       }}
@@ -69,16 +64,16 @@ export default function EditorTab(props: EditorTabProps) {
         if (event.dataTransfer !== null){
           event.dataTransfer.dropEffect = "copy";
         }
-        if (event.currentTarget !== query(activeEditor())?.tab){
-          open(props.identifier);
+        if (event.currentTarget !== activeEditor()?.tab){
+          open(props.editor);
         }
       }}>
       <Show when={getRenaming()}>
         <input
           type="text"
-          placeholder={props.getName()}
+          placeholder={props.editor.getName()}
           tabindex={-1}
-          value={props.getName()}
+          value={props.editor.getName()}
           data-editor-rename
           style={{
             "--editor-name-width": `${editorName!.offsetWidth}px`
@@ -97,7 +92,7 @@ export default function EditorTab(props: EditorTabProps) {
           onchange={event => {
             const { value: name } = event.currentTarget;
             if (event.currentTarget.value){
-              props.setName(name);
+              props.editor.setName(name);
             }
             event.currentTarget.blur();
           }}
@@ -109,9 +104,9 @@ export default function EditorTab(props: EditorTabProps) {
         />
       </Show>
       <span
-        attr:data-editor-name={props.getName()}
+        attr:data-editor-name={props.editor.getName()}
         ref={editorName!}>
-        {props.getName()}
+        {props.editor.getName()}
       </span>
       {<button
         class="option"
@@ -122,7 +117,7 @@ export default function EditorTab(props: EditorTabProps) {
         }}
         onclick={async event => {
           event.stopPropagation();
-          await close(props.identifier);
+          await close(props.editor);
         }}>
         <CloseIcon/>
       </button>}

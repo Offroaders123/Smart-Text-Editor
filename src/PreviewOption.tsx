@@ -1,10 +1,9 @@
 import { setPreviewSource } from "./Workspace.js";
 
-import type { Accessor } from "solid-js";
+import type { Editor } from "./Editor.js";
 
 export interface PreviewOptionProps {
-  identifier: string;
-  getName: Accessor<string>;
+  editor: Editor;
 }
 
 export default function PreviewOption(props: PreviewOptionProps) {
@@ -12,12 +11,12 @@ export default function PreviewOption(props: PreviewOptionProps) {
     <li
       part="option"
       class="option"
-      data-editor-identifier={props.identifier}
+      data-editor-identifier={props.editor.identifier}
       tabindex={-1}
       onclick={() => {
-        setPreviewSource(props.identifier);
+        setPreviewSource(props.editor);
       }}>
-      {props.getName()}
+      {props.editor.getName()}
     </li>
   );
 }

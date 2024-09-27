@@ -4,7 +4,7 @@ import { Main } from "./Main.js";
 import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings } from "./STE.js";
 import { closeCard, minimizeCard, openCard } from "./Card.js";
 import { insertTemplate } from "./Tools.js";
-import { close, createEditor, getNext, getPrevious, open, query, rename, setTabsVisibility } from "./Editor.js";
+import { close, createEditor, getNext, getPrevious, open, rename, setTabsVisibility } from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview } from "./Workspace.js";
 
 import type { Accessor, Setter } from "solid-js";
@@ -325,7 +325,7 @@ if (support.fileHandling && support.fileSystem){
       createEditor({ name, value, handle });
     }
     if (!environment.touchDevice){
-      query(activeEditor())?.ref.focus({ preventScroll: true });
+      activeEditor()?.ref.focus({ preventScroll: true });
     }
   });
 }

@@ -1,5 +1,5 @@
 import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, previewMenu, viewMenu } from "./STE.js";
-import { createEditor, query, rename, setTabsVisibility } from "./Editor.js";
+import { createEditor, rename, setTabsVisibility } from "./Editor.js";
 import WorkspaceTabs from "./WorkspaceTabs.js";
 import WorkspaceEditors from "./WorkspaceEditors.js";
 import { getElementStyle } from "./dom.js";
@@ -121,7 +121,7 @@ export async function setOrientation(orientationValue?: Orientation): Promise<vo
  * 
  * @see {@link previewEditor}
 */
-export async function setPreviewSource(previewEditorValue: string | null): Promise<void> {
+export async function setPreviewSource(previewEditorValue: Editor | null): Promise<void> {
   setPreviewEditor(previewEditorValue);
 
   if (previewEditorValue === null){
@@ -202,25 +202,25 @@ export async function openFiles(): Promise<void> {
 export async function saveFile(extension?: string): Promise<void> {
   if (extension || !support.fileSystem){
     // @ts-expect-error
-    if (!extension) extension = query(activeEditor())?.getExtension() satisfies string;
+    if (!extension) extension = activeEditor()?.getExtension() satisfies string;
     const anchor = document.createElement("a");
-    const link = window.URL.createObjectURL(new Blob([query(activeEditor())?.ref.editor.value ?? ""]));
+    const link = window.URL.createObjectURL(new Blob([activeEditor()?.ref.editor.value ?? ""]));
     anchor.href = link;
     anchor.download = `${
       // @ts-expect-error
-      query(activeEditor())?.getExtension() satisfies string
+      activeEditor()?.getExtension() satisfies string
     }.${extension}`;
     anchor.click();
     window.URL.revokeObjectURL(link);
   } else {
-    const identifier: Editor | null = query(activeEditor());
+    const identifier: Editor | null = activeEditor();
     let handle: void | FileSystemFileHandle;
     if (identifier === null) throw new Error("No editors are open, couldn't save anything!");
     if (!identifier.getHandle()){
       handle = await window.showSaveFilePicker({
         suggestedName:
           // @ts-expect-error
-          query(activeEditor())?.getName() satisfies string,
+          activeEditor()?.getName() satisfies string,
         startIn: (identifier.getHandle()) ? identifier.getHandle()! : "desktop"
       }).catch(error => {
         if (error.message.toLowerCase().includes("abort")) return;
@@ -231,27 +231,27 @@ export async function saveFile(extension?: string): Promise<void> {
     const stream = await identifier.getHandle()?.createWritable().catch(error => {
       alert(`"${
         // @ts-expect-error
-        query(activeEditor())?.getName() satisfies string
+        activeEditor()?.getName() satisfies string
       }" could not be saved.`);
       if (error.toString().toLowerCase().includes("not allowed")) return;
     });
     if (!stream) return;
     await stream.write(
       // @ts-expect-error
-      query(activeEditor())?.ref.editor.value satisfies string
+      activeEditor()?.ref.editor.value satisfies string
     );
     await stream.close();
     // @ts-expect-error
-    const currentName: string = query(activeEditor())?.getName();
+    const currentName: string = activeEditor()?.getName();
     const file = await handle.getFile();
     const newName = file.name;
-    if (currentName != newName) rename(identifier.identifier, newName);
+    if (currentName != newName) rename(identifier, newName);
   }
-  if (query(activeEditor())?.getAutoCreated()){
-    query(activeEditor()!)!.setAutoCreated(false);
+  if (activeEditor()?.getAutoCreated()){
+    activeEditor()!.setAutoCreated(false);
   }
-  if (query(activeEditor())?.getUnsaved()){
-    query(activeEditor()!)!.setUnsaved(false);
+  if (activeEditor()?.getUnsaved()){
+    activeEditor()!.setUnsaved(false);
   }
   await refreshPreview({ force: true });
 }
@@ -267,7 +267,7 @@ export function createDisplay(): void {
     features = (appearance.standalone || appearance.fullscreen) ? "popup" : "",
     baseURL = settings.previewBase;
   // @ts-expect-error
-  let source: string = query(activeEditor())?.ref.editor.value;
+  let source: string = activeEditor()?.ref.editor.value;
   if (baseURL) source = `<!DOCTYPE html>\n<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
   const link = window.URL.createObjectURL(new Blob([source],{ type: "text/html" })),
     win = window.open(link,"_blank",features);
@@ -281,7 +281,7 @@ export function createDisplay(): void {
     if (win === null) return;
     if (!win.document.title){
       // @ts-expect-error
-      win.document.title = query(activeEditor())?.getName();
+      win.document.title = activeEditor()?.getName();
     }
   },20);
 }
@@ -296,7 +296,7 @@ export interface RefreshPreviewOptions {
 export async function refreshPreview({ force = false }: RefreshPreviewOptions = {}): Promise<void> {
   if (view() === "code") return;
 
-  const editor: Editor | null = query(previewEditor() ?? activeEditor());
+  const editor: Editor | null = previewEditor() ?? activeEditor();
   if (editor === null) return;
   const change: boolean = editor.getRefresh() && !settings.automaticRefresh;
   if (!change && !force) return;

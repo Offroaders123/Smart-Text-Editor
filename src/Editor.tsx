@@ -38,7 +38,6 @@ export class Editor {
   readonly ref!: NumTextElement;
 
   constructor({ name = "Untitled.txt", value = "", handle, isOpen = true, autoCreated = false, autoReplace = true }: EditorOptions = {}) {
-    const { identifier } = this;
     const [getName, setName] = createSignal<string>(name);
     const [getValue, setValue] = createSignal<string>(value);
     const [getSyntaxLanguage, setSyntaxLanguage] = createSignal<string>("");
@@ -78,8 +77,8 @@ export class Editor {
     if (value) this.setRefresh(true);
 
     // this.ref = ref;
-    this.tab = EditorTab({ identifier, getName, setName: name => { this.setName(name); }, getAutoCreated, getRefresh, getUnsaved }) as HTMLButtonElement;
-    this.previewOption = PreviewOption({ identifier, getName }) as MenuDropOption;
+    this.tab = EditorTab({ editor: this }) as HTMLButtonElement;
+    this.previewOption = PreviewOption({ editor: this }) as MenuDropOption;
   }
 
   getBasename(): string {
@@ -135,11 +134,11 @@ export class Editor {
       this.setAutoCreated(false);
     }
 
-    if (this.tab === query(activeEditor())?.tab){
+    if (this.tab === activeEditor()?.tab){
       setTitle({ content: rename });
     }
 
-    if ((previewEditor() === null && activeEditor() === this.identifier) || previewEditor() === this.identifier){
+    if ((previewEditor() === null && activeEditor() === this) || previewEditor() === this){
       refreshPreview({ force: true });
     }
   }
@@ -171,7 +170,7 @@ export function createEditor(options: EditorOptions = {}): void {
   const autoCreated = state.getAutoCreated();
   const focusedOverride = state.getFocusedOverride();
   if (state.isOpen || activeEditor() === null){
-    open(state.identifier, { autoCreated, focusedOverride });
+    open(state, { autoCreated, focusedOverride });
     state.setFocusedOverride(false);
   }
 }
@@ -183,15 +182,14 @@ export function createEditor(options: EditorOptions = {}): void {
  * 
  * @param wrap Future feature: Add support to toggle the wrapping behavior.
 */
-export function getPrevious(identifier: string | null, _wrap: boolean = true): string | null {
-  const editor = query(identifier);
+export function getPrevious(editor: Editor | null, _wrap: boolean = true): Editor | null {
   if (editor === null) return null;
   const workspace_tabs: HTMLDivElement = workspaceTabs()!;
   const { tab } = editor;
   const editorTabs: HTMLButtonElement[] = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
   const previousTab: HTMLButtonElement | null = editorTabs[(editorTabs.indexOf(tab) || editorTabs.length) - 1] ?? null;
   const previousIdentifier: string | null = previousTab?.getAttribute("data-editor-identifier") ?? null;
-  return previousIdentifier;
+  return query(previousIdentifier);
 }
 
 /**
@@ -201,29 +199,27 @@ export function getPrevious(identifier: string | null, _wrap: boolean = true): s
  * 
  * @param wrap Future feature: Add support to toggle the wrapping behavior.
 */
-export function getNext(identifier: string | null, _wrap: boolean = true): string | null {
-  const editor = query(identifier);
+export function getNext(editor: Editor | null, _wrap: boolean = true): Editor | null {
   if (editor === null) return null;
   const workspace_tabs: HTMLDivElement = workspaceTabs()!;
   const { tab } = editor;
   const editorTabs: HTMLButtonElement[] = [...workspace_tabs.querySelectorAll<HTMLButtonElement>(".tab:not([data-editor-change])")];
   const nextTab: HTMLButtonElement | null = editorTabs[(editorTabs.indexOf(tab) !== editorTabs.length - 1) ? editorTabs.indexOf(tab) + 1 : 0] ?? null;
   const nextIdentifier: string | null = nextTab?.getAttribute("data-editor-identifier") ?? null;
-  return nextIdentifier;
+  return query(nextIdentifier);
 }
 
 /**
  * Opens the editor in the workspace.
 */
-export function open(identifier: string | null, { autoCreated = false, focusedOverride = false }: EditorOpenOptions = {}): void {
-  const editor = query(identifier);
+export function open(editor: Editor | null, { autoCreated = false, focusedOverride = false }: EditorOpenOptions = {}): void {
   if (editor === null) return;
 
   const focused = (document.activeElement === activeEditor()) || focusedOverride;
 
-  query(activeEditor())?.setActive(false);
-  query(activeEditor())?.tab.classList.remove("active");
-  query(activeEditor())?.ref.classList.remove("active");
+  activeEditor()?.setActive(false);
+  activeEditor()?.tab.classList.remove("active");
+  activeEditor()?.ref.classList.remove("active");
 
   editor.tab.classList.add("active");
   if (autoCreated){
@@ -231,7 +227,7 @@ export function open(identifier: string | null, { autoCreated = false, focusedOv
   }
   editor.ref.classList.add("active");
   editor.setActive(true);
-  setActiveEditor(editor.identifier);
+  setActiveEditor(editor);
 
   setTabsVisibility();
   setTitle({ content: editor.getName() });
@@ -248,8 +244,7 @@ export function open(identifier: string | null, { autoCreated = false, focusedOv
 /**
  * Closes the editor in the workspace.
 */
-export async function close(identifier: string | null): Promise<void> {
-  const editor = query(identifier);
+export async function close(editor: Editor | null): Promise<void> {
   if (editor === null) return;
 
   if (editor.getUnsaved()){
@@ -282,25 +277,25 @@ export async function close(identifier: string | null): Promise<void> {
     preview.src = "about:blank";
   }
 
-  if (previewEditor() === editor.identifier){
+  if (previewEditor() === editor){
     setPreviewSource(null);
   }
 
   if (editor.tab === editorTabs[0] && editorTabs[1] && editor.getActive()){
     const identifier = editorTabs[1].getAttribute("data-editor-identifier")!;
-    open(identifier);
+    open(query(identifier));
   }
   if (editor.tab === editorTabs[editorTabs.length - 1] && editor.tab !== editorTabs[0] && editor.getActive()){
     const identifier = editorTabs[editorTabs.length - 2]!.getAttribute("data-editor-identifier")!;
-    open(identifier);
+    open(query(identifier));
   }
   if (editor.tab !== editorTabs[0] && editor.getActive()){
     const identifier = editorTabs[editorTabs.indexOf(editor.tab) + 1]!.getAttribute("data-editor-identifier")!;
-    open(identifier);
+    open(query(identifier));
   }
 
-  if (focused && query(activeEditor())?.ref.editor !== undefined){
-    query(activeEditor())?.ref.focus({ preventScroll: true });
+  if (focused && activeEditor()?.ref.editor !== undefined){
+    activeEditor()?.ref.focus({ preventScroll: true });
   }
 
   editor.tab.setAttribute("data-editor-change","");
@@ -333,8 +328,7 @@ export async function close(identifier: string | null): Promise<void> {
  * 
  * @param name If a new name isn't provided, the user is prompted to provide one.
 */
-export function rename(identifier: string | null, name?: string): void {
-  const editor = query(identifier);
+export function rename(editor: Editor | null, name?: string): void {
   if (editor === null) return;
 
   const currentName = editor.getName();
@@ -363,9 +357,7 @@ export function rename(identifier: string | null, name?: string): void {
    * 
    * If the given identifier is already fully in view, no scrolling will happen.
   */
-  export function setTabsVisibility(identifier: string | null = activeEditor()): void {
-    if (!identifier) return;
-    const editor = query(identifier);
+  export function setTabsVisibility(editor: Editor | null = activeEditor()): void {
     if (editor === null) return;
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const { tab } = editor;
@@ -401,14 +393,14 @@ function EditorElement(self: Editor) {
     ref.setAttribute("data-editor-identifier",self.identifier);
     ref.setAttribute("value",self.getValue());
 
-    if (activeEditor() !== null && query(activeEditor()!)!.getAutoCreated()){
-      if (document.activeElement === query(activeEditor()!)!.ref){
+    if (activeEditor() !== null && activeEditor()!.getAutoCreated()){
+      if (document.activeElement === activeEditor()!.ref){
         self.setFocusedOverride(true);
       }
       if (self.autoReplace){
         close(activeEditor()!);
       } else {
-        query(activeEditor()!)!.setAutoCreated(false);
+        activeEditor()!.setAutoCreated(false);
       }
     }
 
