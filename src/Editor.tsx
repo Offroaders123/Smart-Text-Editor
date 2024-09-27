@@ -1,4 +1,4 @@
-import { createSignal, onMount } from "solid-js";
+import { createSignal } from "solid-js";
 import Prism from "./prism.js";
 import EditorTab from "./EditorTab.js";
 import PreviewOption from "./PreviewOption.js";
@@ -325,10 +325,7 @@ function EditorElement(self: Editor) {
     // super.value = value;
   }
 
-  let ref: NumTextElement;
-
-  onMount(async () => {
-    await new Promise<void>(queueMicrotask);
+  const ref: NumTextElement = document.createElement("num-text");
 
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const create_editor_button: HTMLButtonElement = createEditorButton()!;
@@ -395,7 +392,6 @@ function EditorElement(self: Editor) {
         document.body.removeAttribute("data-editor-change");
       }
     },transitionDuration);
-  });
 
   function _setName(this: _EditorLegacy, rename: string): void {
     const [ basename, extension ] = [this.self.getBasename(), this.self.getExtension()];
@@ -440,9 +436,5 @@ function EditorElement(self: Editor) {
     }
   }
 
-  return (
-    <num-text
-      ref={editor => ref = editor}
-    />
-  );
+  return ref;
 }
