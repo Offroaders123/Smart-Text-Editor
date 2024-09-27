@@ -221,6 +221,7 @@ export function open(identifier: string | null, { autoCreated = false, focusedOv
 
   const focused = (document.activeElement === activeEditor()) || focusedOverride;
 
+  query(activeEditor())?.setActive(false);
   query(activeEditor())?.tab.classList.remove("active");
   query(activeEditor())?.ref.classList.remove("active");
 
@@ -229,6 +230,7 @@ export function open(identifier: string | null, { autoCreated = false, focusedOv
     editor.setAutoCreated(true);
   }
   editor.ref.classList.add("active");
+  editor.setActive(true);
   setActiveEditor(editor.identifier);
 
   setTabsVisibility();
