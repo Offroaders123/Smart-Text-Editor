@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { createSignal, onMount } from "solid-js";
 import Prism from "./prism.js";
 import EditorTab from "./EditorTab.js";
 import PreviewOption from "./PreviewOption.js";
@@ -100,7 +100,7 @@ export interface EditorOpenOptions {
  * Creates a new Editor within the Workspace.
 */
 export function createEditor(options: EditorOptions = {}): void {
-  const editorElement = new EditorLegacy(options);
+  const editorElement = EditorElement(options);
   setEditors(editorElement.self.identifier, editorElement.self);
 
   const autoCreated = editorElement.self.getAutoCreated();
@@ -313,23 +313,24 @@ export function rename(identifier: string | null, name?: string): void {
     }
   }
 
-class EditorLegacy extends NumTextElement {
-  readonly self: Editor;
+interface _EditorLegacy extends NumTextElement {
+  self: Editor;
+}
 
-  private _setValue(value: string): void {
+function EditorElement(options: EditorOptions = {}) {
+  function _setValue(this: _EditorLegacy, value: string): void {
     this.self.setValue(value);
-    super.value = value;
+    // super.value = value;
   }
 
-  constructor(options: EditorOptions = {}) {
-    super();
+  let ref: NumTextElement;
+
+  onMount(() => {
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const create_editor_button: HTMLButtonElement = createEditorButton()!;
     const workspace_editors: HTMLDivElement = workspaceEditors()!;
 
-    const ref = this;
     const self = new Editor(ref, options);
-    this.self = self;
 
     // let focusedOverride: boolean | undefined;
     const changeIdentifier = Math.random().toString();
@@ -392,9 +393,9 @@ class EditorLegacy extends NumTextElement {
         document.body.removeAttribute("data-editor-change");
       }
     },transitionDuration);
-  }
+  });
 
-  private _setName(rename: string): void {
+  function _setName(this: _EditorLegacy, rename: string): void {
     const [ basename, extension ] = [this.self.getBasename(), this.self.getExtension()];
     console.log(basename, extension);
 
@@ -436,12 +437,10 @@ class EditorLegacy extends NumTextElement {
       refreshPreview({ force: true });
     }
   }
-}
 
-window.customElements.define("ste-editor",EditorLegacy);
-
-declare global {
-  interface HTMLElementTagNameMap {
-    "ste-editor": EditorLegacy;
-  }
+  return (
+    <num-text
+      ref={ref!}
+    />
+  );
 }
