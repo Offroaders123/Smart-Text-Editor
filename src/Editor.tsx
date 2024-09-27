@@ -82,6 +82,58 @@ export class Editor {
   }
 }
 
+  interface _EditorLegacy extends NumTextElement {
+    self: Editor;
+  }
+
+  function _setValue(this: _EditorLegacy, value: string): void {
+    this.self.setValue(value);
+    // super.value = value;
+  }
+
+  function _setName(this: _EditorLegacy, rename: string): void {
+    const [ basename, extension ] = [this.self.getBasename(), this.self.getExtension()];
+    console.log(basename, extension);
+
+    if (!rename.includes(".")){
+      rename = `${rename}.${extension}`;
+    } else if (rename.startsWith(".")){
+      rename = `${basename}${rename}`;
+    }
+
+    // this.editorName.innerText = rename;
+    // this.previewOption.innerText = rename;
+
+    this.self.setName(rename);
+
+    const syntaxLanguage: string = this.self.getExtension();
+    const isLoadedLanguage: boolean = syntaxLanguage in Prism.languages;
+
+    if (isLoadedLanguage){
+      this.syntaxLanguage = syntaxLanguage;
+    }
+    if (settings.syntaxHighlighting === true && isLoadedLanguage){
+      this.syntaxHighlight.enable();
+    } else {
+      this.syntaxHighlight.disable();
+    }
+    if (syntaxLanguage !== this.syntaxLanguage){
+      this.syntaxLanguage = syntaxLanguage;
+    }
+
+    if (this.self.getAutoCreated()){
+      this.self.setAutoCreated(false);
+    }
+
+    if (this.self.tab === query(activeEditor())?.tab){
+      setTitle({ content: rename });
+    }
+
+    if ((previewEditor() === null && activeEditor() === this.self.identifier) || previewEditor() === this.self.identifier){
+      refreshPreview({ force: true });
+    }
+  }
+
 export interface EditorOptions {
   name?: string;
   value?: string;
@@ -315,16 +367,7 @@ export function rename(identifier: string | null, name?: string): void {
     }
   }
 
-interface _EditorLegacy extends NumTextElement {
-  self: Editor;
-}
-
 function EditorElement(self: Editor) {
-  function _setValue(this: _EditorLegacy, value: string): void {
-    this.self.setValue(value);
-    // super.value = value;
-  }
-
   const ref: NumTextElement = document.createElement("num-text");
 
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
@@ -392,49 +435,6 @@ function EditorElement(self: Editor) {
         document.body.removeAttribute("data-editor-change");
       }
     },transitionDuration);
-
-  function _setName(this: _EditorLegacy, rename: string): void {
-    const [ basename, extension ] = [this.self.getBasename(), this.self.getExtension()];
-    console.log(basename, extension);
-
-    if (!rename.includes(".")){
-      rename = `${rename}.${extension}`;
-    } else if (rename.startsWith(".")){
-      rename = `${basename}${rename}`;
-    }
-
-    // this.editorName.innerText = rename;
-    // this.previewOption.innerText = rename;
-
-    this.self.setName(rename);
-
-    const syntaxLanguage: string = this.self.getExtension();
-    const isLoadedLanguage: boolean = syntaxLanguage in Prism.languages;
-
-    if (isLoadedLanguage){
-      this.syntaxLanguage = syntaxLanguage;
-    }
-    if (settings.syntaxHighlighting === true && isLoadedLanguage){
-      this.syntaxHighlight.enable();
-    } else {
-      this.syntaxHighlight.disable();
-    }
-    if (syntaxLanguage !== this.syntaxLanguage){
-      this.syntaxLanguage = syntaxLanguage;
-    }
-
-    if (this.self.getAutoCreated()){
-      this.self.setAutoCreated(false);
-    }
-
-    if (this.self.tab === query(activeEditor())?.tab){
-      setTitle({ content: rename });
-    }
-
-    if ((previewEditor() === null && activeEditor() === this.self.identifier) || previewEditor() === this.self.identifier){
-      refreshPreview({ force: true });
-    }
-  }
 
   return ref;
 }
