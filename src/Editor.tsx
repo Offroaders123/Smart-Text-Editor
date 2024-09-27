@@ -90,16 +90,13 @@ export class Editor {
     const extension: string = name.split(".").pop()!;
     return extension;
   }
-}
 
-  type _EditorLegacy = Editor;
-
-  function _setValue(this: _EditorLegacy, value: string): void {
+  private _setValue(value: string): void {
     this.setValue(value);
     // super.value = value;
   }
 
-  function _setName(this: _EditorLegacy, rename: string): void {
+  private _setName(rename: string): void {
     const [ basename, extension ] = [this.getBasename(), this.getExtension()];
     console.log(basename, extension);
 
@@ -141,6 +138,7 @@ export class Editor {
       refreshPreview({ force: true });
     }
   }
+}
 
 export interface EditorOptions {
   name?: string;
