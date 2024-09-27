@@ -286,15 +286,15 @@ export async function close(identifier: string | null): Promise<void> {
     setPreviewSource(null);
   }
 
-  if (editor.tab === editorTabs[0] && editorTabs[1] && editor.tab.classList.contains("active")){
+  if (editor.tab === editorTabs[0] && editorTabs[1] && editor.getActive()){
     const identifier = editorTabs[1].getAttribute("data-editor-identifier")!;
     open(identifier);
   }
-  if (editor.tab === editorTabs[editorTabs.length - 1] && editor.tab !== editorTabs[0] && editor.tab.classList.contains("active")){
+  if (editor.tab === editorTabs[editorTabs.length - 1] && editor.tab !== editorTabs[0] && editor.getActive()){
     const identifier = editorTabs[editorTabs.length - 2]!.getAttribute("data-editor-identifier")!;
     open(identifier);
   }
-  if (editor.tab !== editorTabs[0] && editor.tab.classList.contains("active")){
+  if (editor.tab !== editorTabs[0] && editor.getActive()){
     const identifier = editorTabs[editorTabs.indexOf(editor.tab) + 1]!.getAttribute("data-editor-identifier")!;
     open(identifier);
   }
@@ -308,7 +308,9 @@ export async function close(identifier: string | null): Promise<void> {
     editor.tab.blur();
   }
   editor.tab.tabIndex = -1;
+  // not sure about the timing of setting `editor.setActive(false)`
   editor.tab.classList.remove("active");
+  editor.setActive(false);
 
   workspace_editors.removeChild(editor.ref);
   previewMenu()!.main.removeChild(editor.previewOption);
