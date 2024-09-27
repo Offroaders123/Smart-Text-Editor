@@ -24,6 +24,8 @@ export class Editor {
   getHandle: Accessor<FileSystemFileHandle | null>;
   setHandle: Setter<FileSystemFileHandle | null>;
   readonly isOpen: boolean;
+  getActive: Accessor<boolean>;
+  setActive: Setter<boolean>;
   getAutoCreated: Accessor<boolean>;
   setAutoCreated: Setter<boolean>;
   getFocusedOverride: Accessor<boolean>;
@@ -42,6 +44,7 @@ export class Editor {
     const [getSyntaxLanguage, setSyntaxLanguage] = createSignal<string>("");
     const [getSyntaxHighlight, setSyntaxHighlight] = createSignal<boolean>(false);
     const [getHandle, setHandle] = createSignal<FileSystemFileHandle | null>(handle ?? null);
+    const [getActive, setActive] = createSignal<boolean>(false);
     const [getAutoCreated, setAutoCreated] = createSignal<boolean>(autoCreated);
     const [getRefresh, setRefresh] = createSignal<boolean>(false);
     const [getUnsaved, setUnsaved] = createSignal<boolean>(false);
@@ -60,6 +63,8 @@ export class Editor {
     this.getHandle = getHandle;
     this.setHandle = setHandle;
     this.isOpen = isOpen;
+    this.getActive = getActive;
+    this.setActive = setActive;
     this.getAutoCreated = getAutoCreated;
     this.setAutoCreated = setAutoCreated;
     this.getRefresh = getRefresh;
