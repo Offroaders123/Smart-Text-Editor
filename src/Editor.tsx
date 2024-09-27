@@ -327,7 +327,8 @@ class EditorLegacy extends NumTextElement {
     const create_editor_button: HTMLButtonElement = createEditorButton()!;
     const workspace_editors: HTMLDivElement = workspaceEditors()!;
 
-    const self = new Editor(this, options);
+    const ref = this;
+    const self = new Editor(ref, options);
     this.self = self;
 
     // let focusedOverride: boolean | undefined;
@@ -338,9 +339,9 @@ class EditorLegacy extends NumTextElement {
 
     if (self.getValue()) self.setRefresh(true);
 
-    this.classList.add("Editor");
-    this.setAttribute("data-editor-identifier",self.identifier);
-    this.setAttribute("value",self.getValue());
+    ref.classList.add("Editor");
+    ref.setAttribute("data-editor-identifier",self.identifier);
+    ref.setAttribute("value",self.getValue());
 
     if (activeEditor() !== null && query(activeEditor()!)!.getAutoCreated()){
       if (document.activeElement === query(activeEditor()!)!.ref){
@@ -355,10 +356,10 @@ class EditorLegacy extends NumTextElement {
 
     // this.tab.append(this.editorName,this.editorClose);
     workspace_tabs.insertBefore(self.tab,create_editor_button);
-    workspace_editors.append(this);
+    workspace_editors.append(ref);
 
-    this.editor.addEventListener("input",() => {
-      self.setValue(this.editor.value);
+    ref.editor.addEventListener("input",() => {
+      self.setValue(ref.editor.value);
       if (self.getAutoCreated()){
         self.setAutoCreated(false);
       }
@@ -373,7 +374,7 @@ class EditorLegacy extends NumTextElement {
 
     previewMenu()!.main.append(self.previewOption);
 
-    applyEditingBehavior(this);
+    applyEditingBehavior(ref);
     // setEditors(this.identifier, this);
     // this.handle = handle ?? null;
 
@@ -381,9 +382,9 @@ class EditorLegacy extends NumTextElement {
     //   open(this, { autoCreated, focusedOverride });
     // }
 
-    this.syntaxLanguage = self.getExtension();
-    if ((settings.syntaxHighlighting === true) && (this.syntaxLanguage in Prism.languages)){
-      this.syntaxHighlight.enable();
+    ref.syntaxLanguage = self.getExtension();
+    if ((settings.syntaxHighlighting === true) && (ref.syntaxLanguage in Prism.languages)){
+      ref.syntaxHighlight.enable();
     }
 
     setTimeout(() => {
