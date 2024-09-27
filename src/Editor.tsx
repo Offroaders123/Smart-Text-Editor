@@ -29,9 +29,9 @@ export class Editor {
   getUnsaved: Accessor<boolean>;
   setUnsaved: Setter<boolean>;
   readonly autoReplace: boolean;
-  readonly ref: NumTextElement;
+  readonly ref!: NumTextElement;
 
-  constructor(ref: NumTextElement, { name = "Untitled.txt", value = "", handle, isOpen = true, autoCreated = false, autoReplace = true }: EditorOptions = {}) {
+  constructor({ name = "Untitled.txt", value = "", handle, isOpen = true, autoCreated = false, autoReplace = true }: EditorOptions = {}) {
     const { identifier } = this;
     const [getName, setName] = createSignal<string>(name);
     const [getValue, setValue] = createSignal<string>(value);
@@ -62,7 +62,7 @@ export class Editor {
 
     if (value) this.setRefresh(true);
 
-    this.ref = ref;
+    // this.ref = ref;
     this.tab = EditorTab({ identifier, getName, setName: name => { this.setName(name); }, getAutoCreated, getRefresh, getUnsaved }) as HTMLButtonElement;
     this.previewOption = PreviewOption({ identifier, getName }) as MenuDropOption;
   }
@@ -100,14 +100,16 @@ export interface EditorOpenOptions {
  * Creates a new Editor within the Workspace.
 */
 export function createEditor(options: EditorOptions = {}): void {
-  const editorElement = EditorElement(options);
-  setEditors(editorElement.self.identifier, editorElement.self);
+  const state = new Editor(options);
+  const editorElement = EditorElement(state);
+  state.ref = editorElement;
+  setEditors(state.identifier, state);
 
-  const autoCreated = editorElement.self.getAutoCreated();
-  const focusedOverride = editorElement.self.getFocusedOverride();
-  if (editorElement.self.isOpen || activeEditor() === null){
-    open(editorElement.self.identifier, { autoCreated, focusedOverride });
-    editorElement.self.setFocusedOverride(false);
+  const autoCreated = state.getAutoCreated();
+  const focusedOverride = state.getFocusedOverride();
+  if (state.isOpen || activeEditor() === null){
+    open(state.identifier, { autoCreated, focusedOverride });
+    state.setFocusedOverride(false);
   }
 }
 
@@ -317,7 +319,7 @@ interface _EditorLegacy extends NumTextElement {
   self: Editor;
 }
 
-function EditorElement(options: EditorOptions = {}) {
+function EditorElement(self: Editor) {
   function _setValue(this: _EditorLegacy, value: string): void {
     this.self.setValue(value);
     // super.value = value;
@@ -329,8 +331,6 @@ function EditorElement(options: EditorOptions = {}) {
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const create_editor_button: HTMLButtonElement = createEditorButton()!;
     const workspace_editors: HTMLDivElement = workspaceEditors()!;
-
-    const self = new Editor(ref, options);
 
     // let focusedOverride: boolean | undefined;
     const changeIdentifier = Math.random().toString();
@@ -440,7 +440,7 @@ function EditorElement(options: EditorOptions = {}) {
 
   return (
     <num-text
-      ref={ref!}
+      ref={editor => ref = editor}
     />
   );
 }
