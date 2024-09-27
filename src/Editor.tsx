@@ -316,6 +316,11 @@ export function rename(identifier: string | null, name?: string): void {
 class EditorLegacy extends NumTextElement {
   readonly self: Editor;
 
+  private _setValue(value: string): void {
+    this.self.setValue(value);
+    super.value = value;
+  }
+
   constructor(options: EditorOptions = {}) {
     super();
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
