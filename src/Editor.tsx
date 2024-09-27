@@ -31,7 +31,7 @@ export class Editor {
   readonly autoReplace: boolean;
   readonly ref: NumTextElement;
 
-  constructor({ name = "Untitled.txt", value = "", handle, isOpen = true, autoCreated = false, autoReplace = true }: EditorOptions = {}) {
+  constructor(ref: NumTextElement, { name = "Untitled.txt", value = "", handle, isOpen = true, autoCreated = false, autoReplace = true }: EditorOptions = {}) {
     const { identifier } = this;
     const [getName, setName] = createSignal<string>(name);
     const [getValue, setValue] = createSignal<string>(value);
@@ -62,6 +62,7 @@ export class Editor {
 
     if (value) this.setRefresh(true);
 
+    this.ref = ref;
     this.tab = EditorTab({ identifier, getName, setName: name => { this.setName(name); }, getAutoCreated, getRefresh, getUnsaved }) as HTMLButtonElement;
     this.previewOption = PreviewOption({ identifier, getName }) as MenuDropOption;
   }
@@ -307,7 +308,7 @@ class EditorLegacy extends NumTextElement {
     const create_editor_button: HTMLButtonElement = createEditorButton()!;
     const workspace_editors: HTMLDivElement = workspaceEditors()!;
 
-    const self = new Editor(options);
+    const self = new Editor(this, options);
     this.self = self;
 
     // let focusedOverride: boolean | undefined;
