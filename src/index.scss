@@ -15,13 +15,6 @@
   --titlebar-area-inset-width-right: calc(100vw - env(titlebar-area-width,100vw) - var(--titlebar-area-inset-width-left));
   --titlebar-area-inset-height: env(titlebar-area-height,0px);
 
-  @media not (display-mode: window-controls-overlay) {
-    --titlebar-area-inset-top: 0px;
-    --titlebar-area-inset-width-left: 0px;
-    --titlebar-area-inset-width-right: 0px;
-    --titlebar-area-inset-height: 0px;
-  }
-
   --font-family-interface: -apple-system, BlinkMacSystemFont, "Rubik", sans-serif;
   --font-family-code: ui-monospace, "Noto Sans Mono", "Cousine", monospace;
   --line-height-code: 1.4;
@@ -35,6 +28,13 @@
   --scrollbar-width: 16px;
   --scrollbar-height: 16px;
   --scrollbar-border-width: 4px;
+
+  @media not (display-mode: window-controls-overlay) {
+    --titlebar-area-inset-top: 0px;
+    --titlebar-area-inset-width-left: 0px;
+    --titlebar-area-inset-width-right: 0px;
+    --titlebar-area-inset-height: 0px;
+  }
 
   &:-moz-window-inactive {
     --selection-background: var(--selection-background-inactive);
