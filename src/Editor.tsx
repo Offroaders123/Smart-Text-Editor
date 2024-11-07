@@ -1,4 +1,4 @@
-import { createEffect, createSignal } from "solid-js";
+import { createSignal } from "solid-js";
 import Prism from "./prism.js";
 import EditorTab from "./EditorTab.js";
 import PreviewOption from "./PreviewOption.js";
@@ -40,7 +40,6 @@ export class Editor {
   readonly ref: NumTextElement;
 
   constructor({ name = "Untitled.txt", value = "", handle, isOpen = true, autoCreated = false, autoReplace = true, ref }: EditorOptions & { ref: NumTextElement; }) {
-    console.log(autoCreated, "hi mom!");
     const [getName, setName] = createSignal<string>(name);
     const [getValue, setValue] = createSignal<string>(value);
     const [getSyntaxLanguage, setSyntaxLanguage] = createSignal<string>("");
@@ -48,7 +47,6 @@ export class Editor {
     const [getHandle, setHandle] = createSignal<FileSystemFileHandle | null>(handle ?? null);
     const [getActive, setActive] = createSignal<boolean>(false);
     const [getAutoCreated, setAutoCreated] = createSignal<boolean>(autoCreated);
-    console.log(getAutoCreated(), "constructo");
     const [getRefresh, setRefresh] = createSignal<boolean>(false);
     const [getUnsaved, setUnsaved] = createSignal<boolean>(false);
     const [getFocusedOverride, setFocusedOverride] = createSignal<boolean>(false);
@@ -76,10 +74,6 @@ export class Editor {
     this.getFocusedOverride = getFocusedOverride;
     this.setFocusedOverride = setFocusedOverride;
     this.ref = ref;
-
-    createEffect(() => {
-      console.log(getAutoCreated(), "CHANGED!!");
-    });
 
     this.setNameSetter((!name.includes(".")) ? `${name}.txt` : name);
     this.setValue(value);
@@ -175,13 +169,11 @@ export interface EditorOpenOptions {
  * Creates a new Editor within the Workspace.
 */
 export function createEditor(options: EditorOptions = {}): void {
-  console.log(options.autoCreated);
   const editorElement = EditorElement(options);
   const { state } = editorElement;
   setEditors(state.identifier, state);
 
   const autoCreated = state.getAutoCreated();
-  console.log(autoCreated, "what");
   const focusedOverride = state.getFocusedOverride();
   if (state.isOpen || activeEditor() === null){
     open(state, { autoCreated, focusedOverride });
@@ -229,9 +221,7 @@ export function getNext(editor: Editor | null, _wrap: boolean = true): Editor | 
 export function open(editor: Editor | null, { autoCreated = false, focusedOverride = false }: EditorOpenOptions = {}): void {
   if (editor === null) return;
 
-  console.log(activeDialog());
   const focused = (document.activeElement === activeEditor()?.ref) || focusedOverride;
-  console.log({ focused, autoCreated, focusedOverride });
 
   activeEditor()?.setActive(false);
   activeEditor()?.tab.classList.remove("active");
@@ -248,9 +238,7 @@ export function open(editor: Editor | null, { autoCreated = false, focusedOverri
   setTabsVisibility();
   setTitle({ content: editor.getName() });
 
-  console.log("focuss", focused);
   if ((((document.activeElement === document.body && activeDialog() === null) || autoCreated) && !environment.touchDevice && appearance.parentWindow) || focused){
-    console.log("FOCUS POCUS!!");
     editor.ref.focus({ preventScroll: true });
   }
 

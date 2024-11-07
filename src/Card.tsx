@@ -181,7 +181,6 @@ export default function Card(props: CardProps) {
       document.body.removeEventListener("keydown",catchCardNavigation);
       setCardBackdropShown(false);
       setActiveDialog(null);
-      console.log("prev", dialogPrevious());
       if (dialogPrevious()){
         const hidden = (getElementStyle({ element: dialogPrevious()!, property: "visibility" }) == "hidden");
         (!workspace_editors.contains(dialogPrevious()!) && !hidden) ? dialogPrevious()!.focus({ preventScroll: true }) : activeEditor()?.ref.focus({ preventScroll: true });
