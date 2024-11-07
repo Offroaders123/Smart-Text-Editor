@@ -12,9 +12,11 @@ import type { Accessor, Setter } from "solid-js";
 export class Editor {
   readonly identifier: string = Math.random().toString();
   getName: Accessor<string>;
-  setName: Setter<string>;
+  // setName: Setter<string>;
+  private setNameSetter: Setter<string>;
   getValue: Accessor<string>;
-  setValue: Setter<string>;
+  // setValue: Setter<string>;
+  private setValueSetter: Setter<string>;
   getSyntaxLanguage: Accessor<string>;
   setSyntaxLanguage: Setter<string>;
   getSyntaxHighlight: Accessor<boolean>;
@@ -50,11 +52,9 @@ export class Editor {
     const [getFocusedOverride, setFocusedOverride] = createSignal<boolean>(false);
 
     this.getName = getName;
-    this.setName = setName;
-    this.setName((!name.includes(".")) ? `${name}.txt` : name);
+    this.setNameSetter = setName;
     this.getValue = getValue;
-    this.setValue = setValue;
-    this.setValue(value);
+    this.setValueSetter = setValue;
     this.getSyntaxLanguage = getSyntaxLanguage;
     this.setSyntaxLanguage = setSyntaxLanguage;
     this.getSyntaxHighlight = getSyntaxHighlight;
@@ -73,6 +73,9 @@ export class Editor {
     this.autoReplace = autoReplace;
     this.getFocusedOverride = getFocusedOverride;
     this.setFocusedOverride = setFocusedOverride;
+
+    this.setName((!name.includes(".")) ? `${name}.txt` : name);
+    this.setValue(value);
 
     if (value) this.setRefresh(true);
 
@@ -95,12 +98,13 @@ export class Editor {
     return extension;
   }
 
-  private _setValue(value: string): void {
-    this.setValue(value);
+  setValue(value: string): string {
+    this.setValueSetter(value);
     // super.value = value;
+    return value;
   }
 
-  private _setName(rename: string): void {
+  setName(rename: string): string {
     const [ basename, extension ] = [this.getBasename(), this.getExtension()];
     console.log(basename, extension);
 
@@ -113,7 +117,7 @@ export class Editor {
     // this.editorName.innerText = rename;
     // this.previewOption.innerText = rename;
 
-    this.setName(rename);
+    this.setNameSetter(rename);
 
     const syntaxLanguage: string = this.getExtension();
     const isLoadedLanguage: boolean = syntaxLanguage in Prism.languages;
@@ -141,6 +145,8 @@ export class Editor {
     if ((previewEditor() === null && activeEditor() === this) || previewEditor() === this){
       refreshPreview({ force: true });
     }
+
+    return rename;
   }
 }
 
