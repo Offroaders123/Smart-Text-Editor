@@ -325,9 +325,9 @@ export const settings = {
 export const [activeDialog, setActiveDialog] = createSignal<string | null>(null);
 
 /**
- * The previously opened Dialog, if the active one has a back button.
+ * The previously-selected element before the current Dialog was opened.
 */
-export const [dialogPrevious, setDialogPrevious] = createSignal<string | null>(null);
+export const [dialogPrevious, setDialogPrevious] = createSignal<HTMLElement | null>(null);
 
 /**
  * The currently opened Widget.

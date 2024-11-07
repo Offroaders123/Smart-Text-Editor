@@ -116,7 +116,7 @@ export default function Card(props: CardProps) {
       document.body.addEventListener("keydown",catchCardNavigation);
       setCardBackdropShown(true);
       if (!activeDialog() && !dialogPrevious()){
-        setDialogPrevious(document.activeElement?.id ?? null);
+        setDialogPrevious(document.activeElement as HTMLElement);
       }
       document.querySelectorAll<MenuDropElement>("menu-drop[data-open]").forEach(menu => menu.close());
       const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 500}`);
@@ -183,8 +183,8 @@ export default function Card(props: CardProps) {
       setActiveDialog(null);
       console.log(dialogPrevious());
       if (dialogPrevious()){
-        const hidden = (getElementStyle({ element: document.getElementById(dialogPrevious()!)!, property: "visibility" }) == "hidden");
-        (!workspace_editors.contains(document.getElementById(dialogPrevious()!)!) && !hidden) ? document.getElementById(dialogPrevious()!)!.focus({ preventScroll: true }) : activeEditor()?.ref.focus({ preventScroll: true });
+        const hidden = (getElementStyle({ element: dialogPrevious()!, property: "visibility" }) == "hidden");
+        (!workspace_editors.contains(dialogPrevious()!) && !hidden) ? dialogPrevious()!.focus({ preventScroll: true }) : activeEditor()?.ref.focus({ preventScroll: true });
         setDialogPrevious(null);
       }
     }
