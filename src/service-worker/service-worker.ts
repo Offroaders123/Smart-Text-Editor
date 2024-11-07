@@ -1,9 +1,10 @@
+import { version as VERSION } from "../../package.json";
+
 declare var self: ServiceWorkerGlobalScope;
 declare const clients: Clients;
 
 const NAME = "Smart Text Editor";
-const VERSION = "v4.27.5";
-const CACHE_NAME = `${NAME} ${VERSION}`;
+const CACHE_NAME = `${NAME} v${VERSION}` as const;
 
 const SHARE_FILES: File[] = [];
 
@@ -96,5 +97,3 @@ async function messageClients(message: any, options: StructuredSerializeOptions 
     client.postMessage(message,options);
   }
 }
-
-export {};

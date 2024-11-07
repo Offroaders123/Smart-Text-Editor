@@ -1,9 +1,10 @@
 {
   "name": "smart-text-editor",
+  "version": "4.27.5",
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc; vite build",
+    "build": "tsc && tsc --project ./src/service-worker/tsconfig.json && vite build",
     "dev": "vite",
     "preview": "vite preview"
   },
