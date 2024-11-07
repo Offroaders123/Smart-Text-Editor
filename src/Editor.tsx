@@ -229,6 +229,7 @@ export function getNext(editor: Editor | null, _wrap: boolean = true): Editor | 
 export function open(editor: Editor | null, { autoCreated = false, focusedOverride = false }: EditorOpenOptions = {}): void {
   if (editor === null) return;
 
+  console.log(activeDialog());
   const focused = (document.activeElement === activeEditor()?.ref) || focusedOverride;
   console.log({ focused, autoCreated, focusedOverride });
 
@@ -247,6 +248,7 @@ export function open(editor: Editor | null, { autoCreated = false, focusedOverri
   setTabsVisibility();
   setTitle({ content: editor.getName() });
 
+  console.log("focuss", focused);
   if ((((document.activeElement === document.body && activeDialog() !== null) || autoCreated) && !environment.touchDevice && appearance.parentWindow) || focused){
     console.log("FOCUS POCUS!!");
     editor.ref.focus({ preventScroll: true });
