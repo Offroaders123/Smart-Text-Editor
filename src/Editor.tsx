@@ -248,6 +248,7 @@ export function open(editor: Editor | null, { autoCreated = false, focusedOverri
   setTitle({ content: editor.getName() });
 
   if ((((document.activeElement === document.body && activeDialog() !== null) || autoCreated) && !environment.touchDevice && appearance.parentWindow) || focused){
+    console.log("FOCUS POCUS!!");
     editor.ref.focus({ preventScroll: true });
   }
 
