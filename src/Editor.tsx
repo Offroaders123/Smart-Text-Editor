@@ -81,7 +81,7 @@ export class Editor {
       console.log(getAutoCreated(), "CHANGED!!");
     });
 
-    this.setName((!name.includes(".")) ? `${name}.txt` : name);
+    this.setNameSetter((!name.includes(".")) ? `${name}.txt` : name);
     this.setValue(value);
 
     if (value) this.setRefresh(true);
