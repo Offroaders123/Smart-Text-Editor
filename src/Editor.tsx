@@ -101,7 +101,8 @@ export class Editor {
 
   setValue(value: string): string {
     this.setValueSetter(value);
-    // super.value = value;
+    this.ref.editor.value = value;
+    this.ref.refreshLineNumbers();
     return value;
   }
 
