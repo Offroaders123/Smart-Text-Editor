@@ -37,9 +37,9 @@ export class Editor {
   getUnsaved: Accessor<boolean>;
   setUnsaved: Setter<boolean>;
   readonly autoReplace: boolean;
-  readonly ref!: NumTextElement;
+  readonly ref: NumTextElement;
 
-  constructor({ name = "Untitled.txt", value = "", handle, isOpen = true, autoCreated = false, autoReplace = true }: EditorOptions = {}) {
+  constructor({ name = "Untitled.txt", value = "", handle, isOpen = true, autoCreated = false, autoReplace = true, ref }: EditorOptions & { ref: NumTextElement; }) {
     const [getName, setName] = createSignal<string>(name);
     const [getValue, setValue] = createSignal<string>(value);
     const [getSyntaxLanguage, setSyntaxLanguage] = createSignal<string>("");
@@ -73,6 +73,7 @@ export class Editor {
     this.autoReplace = autoReplace;
     this.getFocusedOverride = getFocusedOverride;
     this.setFocusedOverride = setFocusedOverride;
+    this.ref = ref;
 
     this.setName((!name.includes(".")) ? `${name}.txt` : name);
     this.setValue(value);
@@ -168,9 +169,8 @@ export interface EditorOpenOptions {
  * Creates a new Editor within the Workspace.
 */
 export function createEditor(options: EditorOptions = {}): void {
-  const state = new Editor(options);
-  const editorElement = EditorElement(state);
-  state.ref = editorElement;
+  const editorElement = EditorElement(options);
+  const { state } = editorElement;
   setEditors(state.identifier, state);
 
   const autoCreated = state.getAutoCreated();
@@ -380,8 +380,11 @@ export function rename(editor: Editor | null, name?: string): void {
     }
   }
 
-function EditorElement(self: Editor) {
-  const ref: NumTextElement = document.createElement("num-text");
+function EditorElement(options: EditorOptions): NumTextElement & { state: Editor; } {
+  const element: NumTextElement = document.createElement("num-text");
+  const state = new Editor({ ...options, ref: element });
+  const ref: NumTextElement & { state: Editor; } = Object.assign(element, { state });
+  const self: Editor = state;
 
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const create_editor_button: HTMLButtonElement = createEditorButton()!;
