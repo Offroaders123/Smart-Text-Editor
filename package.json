@@ -1,6 +1,6 @@
 {
   "name": "smart-text-editor",
-  "version": "4.27.5",
+  "version": "5.0.0",
   "private": true,
   "type": "module",
   "scripts": {

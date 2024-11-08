@@ -108,7 +108,6 @@ export class Editor {
 
   setName(rename: string): string {
     const [ basename, extension ] = [this.getBasename(), this.getExtension()];
-    console.log(basename, extension);
 
     if (!rename.includes(".")){
       rename = `${rename}.${extension}`;
