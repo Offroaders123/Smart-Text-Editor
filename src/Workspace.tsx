@@ -299,6 +299,7 @@ export async function refreshPreview({ force = false }: RefreshPreviewOptions = 
   const editor: Editor | null = previewEditor() ?? activeEditor();
   if (editor === null) return;
   const change: boolean = editor.getRefresh() && !settings.automaticRefresh;
+  console.log(settings.automaticRefresh, change, force);
   if (!change && !force) return;
   
   const preview: HTMLIFrameElement = getPreview()!;
@@ -313,6 +314,8 @@ export async function refreshPreview({ force = false }: RefreshPreviewOptions = 
     preview.addEventListener("error",() => reject(),{ once: true });
     preview.src = "about:blank";
   });
+
+  console.log("SHOULDNT BE HERE");
 
   preview.contentDocument?.open();
   preview.contentDocument?.write(source);
