@@ -298,7 +298,7 @@ export async function refreshPreview({ force = false }: RefreshPreviewOptions = 
 
   const editor: Editor | null = previewEditor() ?? activeEditor();
   if (editor === null) return;
-  const change: boolean = editor.getRefresh() && !settings.automaticRefresh;
+  const change: boolean = editor.getRefresh() && settings.automaticRefresh === true;
   console.log(settings.automaticRefresh, change, force);
   if (!change && !force) return;
   
