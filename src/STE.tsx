@@ -268,9 +268,7 @@ export const settings = {
   get automaticRefresh(): boolean | null {
     const value = localStorage.getItem("automaticRefresh");
     if (value === null) return value;
-    const val = JSON.parse(value) === true;
-    console.log(val);
-    return val;
+    return JSON.parse(value) === true;
   },
 
   set automaticRefresh(value) {

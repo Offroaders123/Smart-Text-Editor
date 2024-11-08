@@ -3,7 +3,7 @@ import Prism from "./prism.js";
 import EditorTab from "./EditorTab.js";
 import PreviewOption from "./PreviewOption.js";
 import { activeEditor, settings, setActiveEditor, activeDialog, environment, appearance, previewEditor, preview as getPreview, workspaceEditors, workspaceTabs, createEditorButton, editors, setEditors, previewMenu } from "./STE.js";
-import { setPreviewSource, refreshPreview, setView } from "./Workspace.js";
+import { setPreviewSource, refreshPreview } from "./Workspace.js";
 import { getElementStyle, applyEditingBehavior, setTitle } from "./dom.js";
 import "./Editor.scss";
 
@@ -178,10 +178,6 @@ export function createEditor(options: EditorOptions = {}): void {
   const focusedOverride = state.getFocusedOverride();
   if (state.isOpen || activeEditor() === null){
     open(state, { autoCreated, focusedOverride });
-    if (autoCreated) {
-      setView("split");
-      state.ref.value = "xcvxcvxc";
-    }
     state.setFocusedOverride(false);
   }
 }
