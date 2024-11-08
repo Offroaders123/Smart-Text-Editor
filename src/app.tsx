@@ -69,6 +69,7 @@ window.addEventListener("beforeinstallprompt",event => {
 
 window.addEventListener("beforeunload",event => {
   if (unsavedWork()) return;
+  if (import.meta.env.DEV) return;
   event.preventDefault();
   event.returnValue = "";
 });
