@@ -114,7 +114,10 @@ num-text, .Editor {
   --selection-background-inactive: inherit;
   background: var(--background);
   --background: #2d2d2d;
-  scrollbar-color: #808080 var(--background);
+
+  @supports not selector(::-webkit-scrollbar) {
+    scrollbar-color: #808080 var(--background);
+  }
 
   &::part(container) {
     border-radius: inherit;
