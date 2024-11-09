@@ -298,7 +298,7 @@ export async function refreshPreview({ force = false }: RefreshPreviewOptions = 
 
   const editor: Editor | null = previewEditor() ?? activeEditor();
   if (editor === null) return;
-  const change: boolean = editor.getRefresh() && settings.automaticRefresh === true;
+  const change: boolean = editor.getRefresh() && settings.automaticRefresh !== false;
   if (!change && !force) return;
   
   const preview: HTMLIFrameElement = getPreview()!;
