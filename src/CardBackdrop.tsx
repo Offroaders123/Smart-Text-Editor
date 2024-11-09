@@ -1,15 +1,11 @@
-import { activeDialog, cardBackdropShown } from "./app.js";
-import { closeCard } from "./Card.js";
+import { cardBackdropShown, setActiveDialog } from "./app.js";
 import "./CardBackdrop.scss";
 
 export default function CardBackdrop() {
   return (
     <div
       classList={{ "card-backdrop": true, active: cardBackdropShown() }}
-      onclick={() => {
-        if (activeDialog() === null) return;
-        closeCard(activeDialog()!);
-      }}
+      onclick={() => setActiveDialog(null)}
     />
   );
 }

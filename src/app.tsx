@@ -2,7 +2,7 @@ import { createEffect } from "solid-js";
 import { Header } from "./Header.js";
 import { Main } from "./Main.js";
 // import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings } from "./app.js";
-import { closeCard, minimizeCard, openCard } from "./Card.js";
+// import { closeCard, minimizeCard, openCard } from "./Card.js";
 import { insertTemplate } from "./Tools.js";
 import { close, createEditor, getNext, getPrevious, open, rename, setTabsVisibility } from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview } from "./Workspace.js";
@@ -496,7 +496,7 @@ document.body.addEventListener("keydown",event => {
   if (pressed("Escape")){
     event.preventDefault();
     if (event.repeat) return;
-    if (activeDialog() && !document.activeElement?.matches("menu-drop[data-open]")) closeCard(activeDialog()!);
+    if (activeDialog() && !document.activeElement?.matches("menu-drop[data-open]")) setActiveDialog(activeDialog()!);
   }
   if (((control || command) && !shift && pressed("n")) || ((controlShift || shiftCommand) && pressed("x"))){
     event.preventDefault();
@@ -573,32 +573,32 @@ document.body.addEventListener("keydown",event => {
   if ((controlShift || shiftCommand) && pressed("B")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard("preview_base_card");
+    setActiveDialog("preview_base_card");
   }
   if ((controlShift || shiftCommand) && pressed("f")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard("replace_text_card");
+    setActiveWidget("replace_text_card");
   }/*
   if ((controlShift || shiftCommand) && pressed("k")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard("color_picker_card");
+    setActiveWidget("color_picker_card");
   }*/
   if ((controlShift || shiftCommand) && pressed("g")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard("json_formatter_card");
+    setActiveWidget("json_formatter_card");
   }
   if ((controlShift || shiftCommand) && pressed("y")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard("uri_encoder_card");
+    setActiveWidget("uri_encoder_card");
   }
   if ((controlShift || shiftCommand) && pressed("o")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard("uuid_generator_card");
+    setActiveWidget("uuid_generator_card");
   }
   if ((controlShift || shiftCommand) && pressed("h")){
     event.preventDefault();
@@ -615,7 +615,7 @@ document.body.addEventListener("keydown",event => {
   if ((control || command) && (pressed(",") || pressed("<"))){
     event.preventDefault();
     if (event.repeat) return;
-    openCard("settings_card");
+    setActiveDialog("settings_card");
   }
 },{ capture: true });
 
@@ -722,7 +722,7 @@ if (queryParameters.get("template")){
 }
 
 if (queryParameters.get("settings")){
-  openCard("settings_card");
+  setActiveDialog("settings_card");
   removeQueryParameters(["settings"]);
 }
 

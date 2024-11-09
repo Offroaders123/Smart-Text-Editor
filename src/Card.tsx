@@ -9,7 +9,7 @@ import { setTabsVisibility } from "./Editor.js";
 import { getElementStyle } from "./dom.js";
 import "./Card.scss";
 
-import type { JSX } from "solid-js";
+import type { Accessor, JSX } from "solid-js";
 import type { CardID, DialogID, WidgetID } from "./app.js";
 
 export type CardType = "alert" | "widget" | "dialog";
@@ -22,7 +22,7 @@ export interface CardControls {
 export interface CardProps {
   id: CardID;
   type: CardType;
-  active?: boolean;
+  active: Accessor<boolean>;
   parent?: string;
   heading: string;
   icon?: string;
@@ -42,6 +42,7 @@ export default function Card(props: CardProps) {
       id={props.id}
       class="Card"
       data-type={props.type}
+      data-active={props.active() ? "" : null}
       ref={card!}
       onkeydown={event => {
         if (card.getAttribute("data-type") != "dialog" || event.key != "Tab") return;
@@ -55,7 +56,7 @@ export default function Card(props: CardProps) {
           navigable[navigable.length - 1]?.focus();
         }
       }}>
-      <div class="header" data-card-parent={props.type === "dialog" && props.parent} ref={header!}>
+      <div class="header" data-card-parent={props.type === "dialog" ? props.parent : null} ref={header!}>
         <Show when={props.type === "alert"}>
           <DecorativeImage class="icon" src={props.icon!} alt=""/>
         </Show>
@@ -87,9 +88,8 @@ export default function Card(props: CardProps) {
       </div>
     </div>
   );
-}
 
-  export function openCard(id: CardID, previous?: string): void {
+  function openCardz(id: CardID, previous?: string): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
     if (self.matches("[data-active]") && !self.hasAttribute("data-alert-timeout")) return closeCard(id);
@@ -130,7 +130,7 @@ export default function Card(props: CardProps) {
     if (getCardType(self) == "widget") setActiveWidget(self.id as WidgetID);
   }
 
-  export function minimizeCard(id: CardID): void {
+  function minimizeCardz(id: CardID): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
@@ -169,7 +169,7 @@ export default function Card(props: CardProps) {
     },transitionDuration);
   }
 
-  export function closeCard(id: CardID): void {
+  function closeCardz(id: CardID): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
     self.removeAttribute("data-active");
@@ -190,6 +190,7 @@ export default function Card(props: CardProps) {
     }
     if (getCardType(self) == "widget") setActiveWidget(null);
   }
+}
 
   /**
    * Gets all navigable elements within a given parent element.

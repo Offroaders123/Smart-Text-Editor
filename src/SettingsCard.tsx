@@ -1,11 +1,10 @@
 import ArrowIcon from "./ArrowIcon.js";
 import InstallIcon from "./InstallIcon.js";
 import Dialog from "./Dialog.js";
-import { openCard } from "./Card.js";
 import CardItem from "./CardItem.js";
 import CardOptions from "./CardOptions.js";
 import Checkbox from "./Checkbox.js";
-import { appearance, settings } from "./app.js";
+import { appearance, setActiveDialog, settings } from "./app.js";
 import { clearSiteCaches, showInstallPrompt } from "./dom.js";
 
 export default function SettingsCard() {
@@ -58,7 +57,7 @@ export default function SettingsCard() {
           </button>
           <button
             id="theme_button"
-            onclick={() => openCard("theme_card")}
+            onclick={() => setActiveDialog("theme_card")}
             data-card-previous="theme_card">
             Customize Theme
             <ArrowIcon/>
