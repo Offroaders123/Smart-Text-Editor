@@ -2,9 +2,10 @@ import Card from "./Card.js";
 import "./Widget.scss";
 
 import type { JSX } from "solid-js";
+import type { WidgetID } from "./app.js";
 
 export interface WidgetProps {
-  id: string;
+  id: WidgetID;
   heading: string;
   main: JSX.Element;
   options: JSX.Element;

@@ -36,7 +36,7 @@ declare global {
   // var scaler: HTMLDivElement;
   // var preview: HTMLIFrameElement;
 
-  var settings_card: HTMLDivElement;
+  // var settings_card: HTMLDivElement; // getElementById only
   var default_orientation_setting: MenuDropElement;
   var syntax_highlighting_setting: HTMLInputElement;
   var automatic_refresh_setting: HTMLInputElement;
@@ -44,30 +44,30 @@ declare global {
   var theme_button: HTMLButtonElement;
   var clear_site_caches_button: HTMLButtonElement;
 
-  var theme_card: HTMLDivElement;
+  // var theme_card: HTMLDivElement; // getElementById only
   var theme_setting: NumTextElement;
 
-  var preview_base_card: HTMLDivElement;
+  // var preview_base_card: HTMLDivElement; // getElementById only
 
-  var reset_settings_card: HTMLDivElement;
-  var cleared_cache_card: HTMLDivElement;
+  // var reset_settings_card: HTMLDivElement; // getElementById only
+  // var cleared_cache_card: HTMLDivElement; // getElementById only
 
-  var replace_text_card: HTMLDivElement;
+  // var replace_text_card: HTMLDivElement; // getElementById only
 
-  var color_picker_card: HTMLDivElement;
+  // var color_picker_card: HTMLDivElement; // getElementById only
   var picker_preview: HTMLDivElement;
   var picker_input: HTMLInputElement;
   var red_channel: HTMLInputElement;
   var green_channel: HTMLInputElement;
   var blue_channel: HTMLInputElement;
 
-  var json_formatter_card: HTMLDivElement;
+  // var json_formatter_card: HTMLDivElement; // getElementById only
 
-  var uri_encoder_card: HTMLDivElement;
+  // var uri_encoder_card: HTMLDivElement; // getElementById only
   var encoder_input: NumTextElement;
   var encoder_type: HTMLInputElement;
 
-  var uuid_generator_card: HTMLDivElement;
+  // var uuid_generator_card: HTMLDivElement; // getElementById only
 }
 
 declare module "solid-js" {

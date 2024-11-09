@@ -325,15 +325,23 @@ export const settings = {
     this.previewBase = null;
     setPreviewBase(null);
 
-    if (showPrompt) openCard(reset_settings_card.id);
+    if (showPrompt) openCard("reset_settings_card");
     return true;
   }
 }
 
+export type CardID = DialogID | AlertID | WidgetID;
+
+export type DialogID = "settings_card" | "theme_card" | "preview_base_card";
+
+export type AlertID = "reset_settings_card" | "cleared_cache_card";
+
+export type WidgetID = "replace_text_card" | "color_picker_card" | "json_formatter_card" | "uri_encoder_card" | "uuid_generator_card";
+
 /**
  * The currently opened Dialog.
 */
-export const [activeDialog, setActiveDialog] = createSignal<string | null>(null);
+export const [activeDialog, setActiveDialog] = createSignal<DialogID | null>(null);
 
 /**
  * The previously-selected element before the current Dialog was opened.
@@ -343,7 +351,7 @@ export const [dialogPrevious, setDialogPrevious] = createSignal<HTMLElement | nu
 /**
  * The currently opened Widget.
 */
-export const [activeWidget, setActiveWidget] = createSignal<string | null>(null);
+export const [activeWidget, setActiveWidget] = createSignal<WidgetID | null>(null);
 
 export const [previewBase, setPreviewBase] = createSignal<string | null>(settings.previewBase);
 
@@ -417,7 +425,7 @@ const queryParameters = new URLSearchParams(window.location.search);
 
   navigator.serviceWorker.addEventListener("message",async event => {
     switch (event.data.action){
-      case "clear-site-caches-complete": openCard(cleared_cache_card.id); break;
+      case "clear-site-caches-complete": openCard("cleared_cache_card"); break;
       case "share-target": {
         for (const file of event.data.files as File[]){
           const { name } = file;
@@ -565,32 +573,32 @@ document.body.addEventListener("keydown",event => {
   if ((controlShift || shiftCommand) && pressed("B")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard(preview_base_card.id);
+    openCard("preview_base_card");
   }
   if ((controlShift || shiftCommand) && pressed("f")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard(replace_text_card.id);
+    openCard("replace_text_card");
   }/*
   if ((controlShift || shiftCommand) && pressed("k")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard(color_picker_card.id);
+    openCard("color_picker_card");
   }*/
   if ((controlShift || shiftCommand) && pressed("g")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard(json_formatter_card.id);
+    openCard("json_formatter_card");
   }
   if ((controlShift || shiftCommand) && pressed("y")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard(uri_encoder_card.id);
+    openCard("uri_encoder_card");
   }
   if ((controlShift || shiftCommand) && pressed("o")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard(uuid_generator_card.id);
+    openCard("uuid_generator_card");
   }
   if ((controlShift || shiftCommand) && pressed("h")){
     event.preventDefault();
@@ -607,7 +615,7 @@ document.body.addEventListener("keydown",event => {
   if ((control || command) && (pressed(",") || pressed("<"))){
     event.preventDefault();
     if (event.repeat) return;
-    openCard(settings_card.id);
+    openCard("settings_card");
   }
 },{ capture: true });
 
@@ -714,7 +722,7 @@ if (queryParameters.get("template")){
 }
 
 if (queryParameters.get("settings")){
-  openCard(settings_card.id);
+  openCard("settings_card");
   removeQueryParameters(["settings"]);
 }
 

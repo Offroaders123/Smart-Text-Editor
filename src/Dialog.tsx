@@ -2,9 +2,10 @@ import Card from "./Card.js";
 import "./Dialog.scss";
 
 import type { JSX } from "solid-js";
+import type { DialogID } from "./app.js";
 
 export interface DialogProps {
-  id: string;
+  id: DialogID;
   parent?: string;
   heading: string;
   main: JSX.Element;

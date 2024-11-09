@@ -10,6 +10,7 @@ import { getElementStyle } from "./dom.js";
 import "./Card.scss";
 
 import type { JSX } from "solid-js";
+import type { CardID, DialogID, WidgetID } from "./app.js";
 
 export type CardType = "alert" | "widget" | "dialog";
 
@@ -19,7 +20,7 @@ export interface CardControls {
 }
 
 export interface CardProps {
-  id: string;
+  id: CardID;
   type: CardType;
   active?: boolean;
   parent?: string;
@@ -33,7 +34,7 @@ export interface CardProps {
  * The base component for the Alert, Dialog, and Widget card types.
 */
 export default function Card(props: CardProps) {
-  let card: HTMLDivElement;
+  let card: HTMLDivElement & { id: CardID; };
   let header: HTMLDivElement;
 
   return (
@@ -59,7 +60,7 @@ export default function Card(props: CardProps) {
           <DecorativeImage class="icon" src={props.icon!} alt=""/>
         </Show>
         <Show when={props.type === "dialog"}>
-          <button class="card-back" onclick={() => openCard(header.getAttribute("data-card-parent")!, card.id)}>
+          <button class="card-back" onclick={() => openCard(header.getAttribute("data-card-parent")! as CardID, card.id)}>
             <BackIcon/>
           </button>
         </Show>
@@ -88,17 +89,17 @@ export default function Card(props: CardProps) {
   );
 }
 
-  export function openCard(id: string, previous?: string): void {
+  export function openCard(id: CardID, previous?: string): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
     if (self.matches("[data-active]") && !self.hasAttribute("data-alert-timeout")) return closeCard(id);
     if (getCardType(self) != "alert"){
       document.querySelectorAll<HTMLDivElement>(`.Card[data-active]`).forEach(card => {
         if (getCardType(card) != "dialog" && getCardType(card) != getCardType(self)) return;
-        closeCard(card.id);
+        closeCard(card.id as CardID);
         if (!card.matches(".minimize")) return;
         const transitionDuration = parseInt(`${Number(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
-        window.setTimeout(() => minimizeCard(card.id),transitionDuration);
+        window.setTimeout(() => minimizeCard(card.id as CardID),transitionDuration);
       });
     }
     self.setAttribute("data-active","");
@@ -124,12 +125,12 @@ export default function Card(props: CardProps) {
         if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
         if (previous) self.querySelector<HTMLElement>(`[data-card-previous="${previous}"]`)!.focus();
       },transitionDuration);
-      setActiveDialog(self.id);
+      setActiveDialog(self.id as DialogID);
     }
-    if (getCardType(self) == "widget") setActiveWidget(self.id);
+    if (getCardType(self) == "widget") setActiveWidget(self.id as WidgetID);
   }
 
-  export function minimizeCard(id: string): void {
+  export function minimizeCard(id: CardID): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
@@ -168,7 +169,7 @@ export default function Card(props: CardProps) {
     },transitionDuration);
   }
 
-  export function closeCard(id: string): void {
+  export function closeCard(id: CardID): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
     self.removeAttribute("data-active");
