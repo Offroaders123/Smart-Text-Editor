@@ -1,4 +1,4 @@
-import { installPrompt } from "./STE.js";
+import { installPrompt } from "./app.js";
 
 export interface GetElementStyleOptions {
   element: Element;

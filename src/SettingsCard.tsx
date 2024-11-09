@@ -5,7 +5,7 @@ import { openCard } from "./Card.js";
 import CardItem from "./CardItem.js";
 import CardOptions from "./CardOptions.js";
 import Checkbox from "./Checkbox.js";
-import { appearance, settings } from "./STE.js";
+import { appearance, settings } from "./app.js";
 import { clearSiteCaches, showInstallPrompt } from "./dom.js";
 
 export default function SettingsCard() {

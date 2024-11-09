@@ -1,7 +1,7 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
 import App from "./app.js";
-import { setHeader, setViewMenu, setPreviewMenu, setWorkspace, setWorkspaceTabs, setCreateEditorButton, setWorkspaceEditors, setScaler, setPreview, previewBase, setPreviewBase } from "./STE.js";
+import { setHeader, setViewMenu, setPreviewMenu, setWorkspace, setWorkspaceTabs, setCreateEditorButton, setWorkspaceEditors, setScaler, setPreview, previewBase, setPreviewBase } from "./app.js";
 import "./index.scss";
 
 const root: HTMLDivElement = document.querySelector("#root")!;

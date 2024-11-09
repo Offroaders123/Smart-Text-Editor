@@ -1,4 +1,4 @@
-import { view } from "./STE.js";
+import { view } from "./app.js";
 import { createEditor } from "./Editor.js";
 import { setView } from "./Workspace.js";
 import { generate } from "./UUIDGeneratorCard.js";

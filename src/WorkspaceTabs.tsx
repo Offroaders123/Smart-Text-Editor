@@ -1,6 +1,6 @@
 import CloseIcon from "./CloseIcon.js";
 import { createEditor, getNext, getPrevious, query } from "./Editor.js";
-import { workspaceTabs } from "./STE.js";
+import { workspaceTabs } from "./app.js";
 import "./WorkspaceTabs.scss";
 
 import type { Setter } from "solid-js";

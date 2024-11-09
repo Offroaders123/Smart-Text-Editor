@@ -2,7 +2,7 @@ import { createSignal, Show } from "solid-js";
 import CloseIcon from "./CloseIcon.js";
 import { applyEditingBehavior } from "./dom.js";
 import { open, close } from "./Editor.js";
-import { activeEditor } from "./STE.js";
+import { activeEditor } from "./app.js";
 
 import type { Editor } from "./Editor.js";
 
