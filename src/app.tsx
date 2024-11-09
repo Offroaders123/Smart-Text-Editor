@@ -325,7 +325,7 @@ export const settings = {
     this.previewBase = null;
     setPreviewBase(null);
 
-    if (showPrompt) openCard(reset_settings_card.id);
+    if (showPrompt) openCard(reset_settings_card.id, null, { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs });
     return true;
   }
 }
@@ -417,7 +417,7 @@ const queryParameters = new URLSearchParams(window.location.search);
 
   navigator.serviceWorker.addEventListener("message",async event => {
     switch (event.data.action){
-      case "clear-site-caches-complete": openCard(cleared_cache_card.id); break;
+      case "clear-site-caches-complete": openCard(cleared_cache_card.id, null, { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs }); break;
       case "share-target": {
         for (const file of event.data.files as File[]){
           const { name } = file;
@@ -488,7 +488,7 @@ document.body.addEventListener("keydown",event => {
   if (pressed("Escape")){
     event.preventDefault();
     if (event.repeat) return;
-    if (activeDialog() && !document.activeElement?.matches("menu-drop[data-open]")) closeCard(activeDialog()!);
+    if (activeDialog() && !document.activeElement?.matches("menu-drop[data-open]")) closeCard(activeDialog()!, { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, setCardBackdropShown, workspaceEditors, workspaceTabs });
   }
   if (((control || command) && !shift && pressed("n")) || ((controlShift || shiftCommand) && pressed("x"))){
     event.preventDefault();
@@ -565,32 +565,32 @@ document.body.addEventListener("keydown",event => {
   if ((controlShift || shiftCommand) && pressed("B")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard(preview_base_card.id);
+    openCard(preview_base_card.id, null, { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs });
   }
   if ((controlShift || shiftCommand) && pressed("f")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard(replace_text_card.id);
+    openCard(replace_text_card.id, null, { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs });
   }/*
   if ((controlShift || shiftCommand) && pressed("k")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard(color_picker_card.id);
+    openCard(color_picker_card.id, null, { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs });
   }*/
   if ((controlShift || shiftCommand) && pressed("g")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard(json_formatter_card.id);
+    openCard(json_formatter_card.id, null, { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs });
   }
   if ((controlShift || shiftCommand) && pressed("y")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard(uri_encoder_card.id);
+    openCard(uri_encoder_card.id, null, { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs });
   }
   if ((controlShift || shiftCommand) && pressed("o")){
     event.preventDefault();
     if (event.repeat) return;
-    openCard(uuid_generator_card.id);
+    openCard(uuid_generator_card.id, null, { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs });
   }
   if ((controlShift || shiftCommand) && pressed("h")){
     event.preventDefault();
@@ -601,13 +601,13 @@ document.body.addEventListener("keydown",event => {
     event.preventDefault();
     if (event.repeat || !activeWidget()) return;
     if (activeWidget()){
-      minimizeCard(activeWidget()!);
+      minimizeCard(activeWidget()!, { workspaceTabs });
     }
   }
   if ((control || command) && (pressed(",") || pressed("<"))){
     event.preventDefault();
     if (event.repeat) return;
-    openCard(settings_card.id);
+    openCard(settings_card.id, null, { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs });
   }
 },{ capture: true });
 
@@ -714,7 +714,7 @@ if (queryParameters.get("template")){
 }
 
 if (queryParameters.get("settings")){
-  openCard(settings_card.id);
+  openCard(settings_card.id, null, { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs });
   removeQueryParameters(["settings"]);
 }
 

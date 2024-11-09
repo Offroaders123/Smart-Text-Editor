@@ -1,5 +1,5 @@
 import { Show } from "solid-js";
-import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs } from "./app.js";
+import type { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs } from "./app.js";
 import DecorativeImage from "./DecorativeImage.js";
 import ArrowIcon from "./ArrowIcon.js";
 import BackIcon from "./BackIcon.js";
@@ -18,7 +18,7 @@ export interface CardControls {
   readonly close: HTMLButtonElement;
 }
 
-export interface CardProps {
+export interface CardProps extends AppProps {
   id: string;
   type: CardType;
   active?: boolean;
@@ -29,12 +29,27 @@ export interface CardProps {
   options?: JSX.Element;
 }
 
+interface AppProps {
+  activeDialog: typeof activeDialog;
+  dialogPrevious: typeof dialogPrevious;
+  setDialogPrevious: typeof setDialogPrevious;
+  setActiveDialog: typeof setActiveDialog;
+  setActiveWidget: typeof setActiveWidget;
+  activeEditor: typeof activeEditor;
+  cardBackdropShown: typeof cardBackdropShown;
+  setCardBackdropShown: typeof setCardBackdropShown;
+  workspaceEditors: typeof workspaceEditors;
+  workspaceTabs: typeof workspaceTabs;
+}
+
 /**
  * The base component for the Alert, Dialog, and Widget card types.
 */
 export default function Card(props: CardProps) {
   let card: HTMLDivElement;
   let header: HTMLDivElement;
+
+  const { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs } = props;
 
   return (
     <div
@@ -59,7 +74,7 @@ export default function Card(props: CardProps) {
           <DecorativeImage class="icon" src={props.icon!} alt=""/>
         </Show>
         <Show when={props.type === "dialog"}>
-          <button class="card-back" onclick={() => openCard(header.getAttribute("data-card-parent")!, card.id)}>
+          <button class="card-back" onclick={() => openCard(header.getAttribute("data-card-parent")!, card.id, { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs })}>
             <BackIcon/>
           </button>
         </Show>
@@ -70,10 +85,10 @@ export default function Card(props: CardProps) {
             event.preventDefault();
             if (event.repeat) return;
             event.currentTarget.click();
-          }} onclick={() => minimizeCard(card.id)}>
+          }} onclick={() => minimizeCard(card.id, { workspaceTabs })}>
             <MinimizeIcon/>
           </button>
-          <button class="control" data-control="close" onclick={() => closeCard(card.id)}>
+          <button class="control" data-control="close" onclick={() => closeCard(card.id, { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, setCardBackdropShown, workspaceEditors, workspaceTabs })}>
             <CloseIcon/>
           </button>
         </div>
@@ -88,17 +103,17 @@ export default function Card(props: CardProps) {
   );
 }
 
-  export function openCard(id: string, previous?: string): void {
+  export function openCard(id: string, previous: string | null, { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs }: AppProps): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
-    if (self.matches("[data-active]") && !self.hasAttribute("data-alert-timeout")) return closeCard(id);
+    if (self.matches("[data-active]") && !self.hasAttribute("data-alert-timeout")) return closeCard(id, { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, setCardBackdropShown, workspaceEditors, workspaceTabs });
     if (getCardType(self) != "alert"){
       document.querySelectorAll<HTMLDivElement>(`.Card[data-active]`).forEach(card => {
         if (getCardType(card) != "dialog" && getCardType(card) != getCardType(self)) return;
-        closeCard(card.id);
+        closeCard(card.id, { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, setCardBackdropShown, workspaceEditors, workspaceTabs });
         if (!card.matches(".minimize")) return;
         const transitionDuration = parseInt(`${Number(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
-        window.setTimeout(() => minimizeCard(card.id),transitionDuration);
+        window.setTimeout(() => minimizeCard(card.id, { workspaceTabs }),transitionDuration);
       });
     }
     self.setAttribute("data-active","");
@@ -109,11 +124,11 @@ export default function Card(props: CardProps) {
       window.setTimeout(() => {
         if (self.getAttribute("data-alert-timeout") != timeoutIdentifier) return;
         self.removeAttribute("data-alert-timeout");
-        closeCard(id);
+        closeCard(id, { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, setCardBackdropShown, workspaceEditors, workspaceTabs });
       },4000);
     }
     if (getCardType(self) == "dialog"){
-      document.body.addEventListener("keydown",catchCardNavigation);
+      document.body.addEventListener("keydown",event => catchCardNavigation(event, { activeDialog }));
       setCardBackdropShown(true);
       if (!activeDialog() && !dialogPrevious()){
         setDialogPrevious(document.activeElement as HTMLElement);
@@ -129,7 +144,7 @@ export default function Card(props: CardProps) {
     if (getCardType(self) == "widget") setActiveWidget(self.id);
   }
 
-  export function minimizeCard(id: string): void {
+  export function minimizeCard(id: string, { workspaceTabs }: Pick<AppProps, "workspaceTabs">): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
@@ -168,17 +183,17 @@ export default function Card(props: CardProps) {
     },transitionDuration);
   }
 
-  export function closeCard(id: string): void {
+  export function closeCard(id: string, { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, setCardBackdropShown, workspaceEditors, workspaceTabs }: Pick<AppProps, "activeDialog" | "dialogPrevious" | "setDialogPrevious" | "setActiveDialog" | "setActiveWidget" | "activeEditor" | "setCardBackdropShown" | "workspaceEditors" | "workspaceTabs">): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
     self.removeAttribute("data-active");
     if (self.matches(".minimize")){
       const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
-      window.setTimeout(() => minimizeCard(id),transitionDuration);
+      window.setTimeout(() => minimizeCard(id, { workspaceTabs }),transitionDuration);
     }
     if (getCardType(self) == "dialog"){
       const workspace_editors: HTMLDivElement = workspaceEditors()!;
-      document.body.removeEventListener("keydown",catchCardNavigation);
+      document.body.removeEventListener("keydown",event => catchCardNavigation(event, { activeDialog }));
       setCardBackdropShown(false);
       setActiveDialog(null);
       if (dialogPrevious()){
@@ -201,7 +216,7 @@ export default function Card(props: CardProps) {
     return Array.from(navigable).filter(element => (getElementStyle({ element, property: "display" }) != "none"));
   }
 
-  function catchCardNavigation(event: KeyboardEvent): void {
+  function catchCardNavigation(event: KeyboardEvent, { activeDialog }: Pick<AppProps, "activeDialog">): void {
     if (!activeDialog() || event.key != "Tab" || document.activeElement != document.body) return;
     const navigable = getNavigableElements({ container: document.getElementById(activeDialog()!)!, scope: true });
     event.preventDefault();
