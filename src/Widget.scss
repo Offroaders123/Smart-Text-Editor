@@ -15,7 +15,7 @@
   transition-property: margin-right, margin-top, border-top-right-radius, border-bottom-right-radius, box-shadow, visibility, opacity, transform;
 }
 
-.Card[data-type="widget"].minimize {
+.Card[data-type="widget"][data-minimize] {
   margin-right: calc(var(--card-border-width) * -1);
   margin-top: 3px;
   --card-border-radius: 10px;
@@ -30,7 +30,7 @@
   transition-property: margin-bottom, border-color;
 }
 
-.Card[data-type="widget"].minimize .header {
+.Card[data-type="widget"][data-minimize] .header {
   margin-bottom: calc(var(--card-header-border-width) * -1);
   border-color: transparent;
 }
@@ -41,21 +41,21 @@
   transition-property: visibility, opacity, transform;
 }
 
-.Card[data-type="widget"].minimize .header .heading {
+.Card[data-type="widget"][data-minimize] .header .heading {
   visibility: hidden;
   opacity: 0;
   transform: scale(0);
 }
 
-.Card[data-type="widget"].minimize .header .card-controls .control {
+.Card[data-type="widget"][data-minimize] .header .card-controls .control {
   --control-padding: 6px;
 }
 
-.Card[data-type="widget"].minimize .header .card-controls .control[data-control="minimize"] {
+.Card[data-type="widget"][data-minimize] .header .card-controls .control[data-control="minimize"] {
   border-radius: calc(var(--card-border-radius) - var(--card-border-width));
 }
 
-.Card[data-type="widget"].minimize .header .card-controls .control[data-control="close"] {
+.Card[data-type="widget"][data-minimize] .header .card-controls .control[data-control="close"] {
   margin-left: var(--card-header-padding-right);
   margin-right: calc(var(--card-minimize-width) * -1);
   visibility: hidden;
@@ -75,7 +75,7 @@
   transition-property: margin-left, margin-right, padding, visibility, opacity;
 }
 
-.Card[data-type="widget"].minimize .header .card-controls .control[data-control="minimize"] svg {
+.Card[data-type="widget"][data-minimize] .header .card-controls .control[data-control="minimize"] svg {
   transform: rotateY(180deg);
 }
 
@@ -83,7 +83,7 @@
   transition: transform var(--card-transition-duration);
 }
 
-.Card[data-type="widget"].minimize .header .card-controls .control[data-control="close"] svg {
+.Card[data-type="widget"][data-minimize] .header .card-controls .control[data-control="close"] svg {
   transform: scale(0);
 }
 
@@ -98,7 +98,7 @@
   transition-property: margin-left, margin-bottom, visibility, opacity, transform;
 }
 
-.Card[data-type="widget"].minimize .main {
+.Card[data-type="widget"][data-minimize] .main {
   margin-left: calc(calc(var(--card-main-width) - var(--card-header-padding-right)) * -1 + var(--card-minimize-width));
   margin-bottom: calc(var(--card-main-height) * -1);
   visibility: hidden;

@@ -97,7 +97,7 @@ export default function Card(props: CardProps) {
       document.querySelectorAll<HTMLDivElement>(`.Card[data-active]`).forEach(card => {
         if (getCardType(card) != "dialog" && getCardType(card) != getCardType(self)) return;
         closeCard(card.id as CardID);
-        if (!card.matches(".minimize")) return;
+        if (!card.matches("[data-minimize]")) return;
         const transitionDuration = parseInt(`${Number(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
         window.setTimeout(() => minimizeCard(card.id as CardID),transitionDuration);
       });
@@ -141,8 +141,8 @@ export default function Card(props: CardProps) {
     self.setAttribute("data-minimize-change",changeIdentifier);
     workspace_tabs.setAttribute("data-minimize-change",changeIdentifier);
     const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
-    if (!self.matches(".minimize")){
-      self.classList.add("minimize");
+    if (!self.matches("[data-minimize]")){
+      self.setAttribute("data-minimize", "");
       if (getCardControls(self) === undefined) return;
       self.style.setProperty("--card-minimize-width",`${getCardControls(self).minimize.querySelector("svg")!.clientWidth + parseInt(getElementStyle({ element: getCardControls(self).minimize, property: "--control-padding" }),10) * 2}px`);
       self.style.setProperty("--card-main-width",`${main.clientWidth}px`);
@@ -154,7 +154,7 @@ export default function Card(props: CardProps) {
       },transitionDuration);
       if (self.contains(document.activeElement) && document.activeElement != getCardControls(self).minimize) getCardControls(self).minimize.focus();
     } else {
-      self.classList.remove("minimize");
+      self.removeAttribute("data-minimize");
       window.setTimeout(() => {
         if (self.getAttribute("data-minimize-change") == changeIdentifier) self.style.removeProperty("--card-minimize-width");
       },transitionDuration);
@@ -173,7 +173,7 @@ export default function Card(props: CardProps) {
     const self = document.getElementById(id)! as HTMLDivElement;
 
     self.removeAttribute("data-active");
-    if (self.matches(".minimize")){
+    if (self.matches("[data-minimize]")){
       const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
       window.setTimeout(() => minimizeCard(id),transitionDuration);
     }
