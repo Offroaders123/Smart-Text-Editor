@@ -1,5 +1,5 @@
 import { Show } from "solid-js";
-import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs } from "./app.js";
+import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, workspaceEditors, workspaceTabs } from "./app.js";
 import DecorativeImage from "./DecorativeImage.js";
 import ArrowIcon from "./ArrowIcon.js";
 import BackIcon from "./BackIcon.js";
@@ -107,7 +107,7 @@ export default function Card(props: CardProps) {
       });
     }
     self.setAttribute("data-active","");
-    if (getCardType(self) == "widget" && cardBackdropShown()) setCardBackdropShown(false);
+    // if (getCardType(self) == "widget" && cardBackdropShown()) setCardBackdropShown(false);
     if (getCardType(self) == "alert"){
       const timeoutIdentifier = Math.random().toString();
       self.setAttribute("data-alert-timeout",timeoutIdentifier);
@@ -119,7 +119,7 @@ export default function Card(props: CardProps) {
     }
     if (getCardType(self) == "dialog"){
       document.body.addEventListener("keydown",catchCardNavigation);
-      setCardBackdropShown(true);
+      // setCardBackdropShown(true);
       if (!activeDialog() && !dialogPrevious()){
         setDialogPrevious(document.activeElement as HTMLElement);
       }
@@ -184,7 +184,7 @@ export default function Card(props: CardProps) {
     if (getCardType(self) == "dialog"){
       const workspace_editors: HTMLDivElement = workspaceEditors()!;
       document.body.removeEventListener("keydown",catchCardNavigation);
-      setCardBackdropShown(false);
+      // setCardBackdropShown(false);
       setActiveDialog(null);
       if (dialogPrevious()){
         const hidden = (getElementStyle({ element: dialogPrevious()!, property: "visibility" }) == "hidden");

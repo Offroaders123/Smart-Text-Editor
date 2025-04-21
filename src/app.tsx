@@ -1,4 +1,4 @@
-import { createEffect } from "solid-js";
+import { createEffect, createMemo } from "solid-js";
 import { Header } from "./Header.js";
 import { Main } from "./Main.js";
 // import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings } from "./app.js";
@@ -377,7 +377,7 @@ export const [pickerColor, setPickerColor] = createSignal<string | null>(null);
 */
 export const [installPrompt, setInstallPrompt] = createSignal<BeforeInstallPromptEvent | null>(null);
 
-export const [cardBackdropShown, setCardBackdropShown] = createSignal<boolean>(false);
+export const cardBackdropShown = createMemo<boolean>(() => activeDialog() !== null);
 
 export const [header, setHeader] = createSignal<HTMLElement | null>(null);
 
