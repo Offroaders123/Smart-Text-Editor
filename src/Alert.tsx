@@ -1,7 +1,7 @@
 import Card from "./Card.js";
 import "./Alert.scss";
 
-import type { JSX } from "solid-js";
+import type { Accessor, JSX } from "solid-js";
 import type { AlertID } from "./app.js";
 
 export interface AlertProps {
@@ -9,6 +9,12 @@ export interface AlertProps {
   heading: string;
   icon: string;
   main: JSX.Element;
+  /**
+   * (Shim?)
+   * This should probably be data-driven with a single `Set<AlertID>` somehow.
+   * @deprecated
+   */
+  getActiveAlert: Accessor<boolean>;
 }
 
 export default function Alert(props: AlertProps) {
@@ -16,6 +22,7 @@ export default function Alert(props: AlertProps) {
     <Card
       id={props.id}
       type="alert"
+      active={props.getActiveAlert}
       heading={props.heading}
       icon={props.icon}
       main={props.main}

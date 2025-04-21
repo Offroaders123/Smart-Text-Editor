@@ -325,7 +325,7 @@ export const settings = {
     this.previewBase = null;
     setPreviewBase(null);
 
-    if (showPrompt) openCard("reset_settings_card");
+    if (showPrompt) setActiveResetSettingsAlert(true);
     return true;
   }
 }
@@ -352,6 +352,18 @@ export const [dialogPrevious, setDialogPrevious] = createSignal<HTMLElement | nu
  * The currently opened Widget.
 */
 export const [activeWidget, setActiveWidget] = createSignal<WidgetID | null>(null);
+
+/**
+ * (Shim?)
+ * This should probably be data-driven with a single `Set<AlertID>` somehow.
+ */
+export const [activeResetSettingsAlert, setActiveResetSettingsAlert] = createSignal<boolean>(false);
+
+/**
+ * (Shim?)
+ * This should probably be data-driven with a single `Set<AlertID>` somehow.
+ */
+export const [activeClearedCacheAlert, setActiveClearedCacheAlert] = createSignal<boolean>(false);
 
 export const [previewBase, setPreviewBase] = createSignal<string | null>(settings.previewBase);
 
@@ -425,7 +437,7 @@ const queryParameters = new URLSearchParams(window.location.search);
 
   navigator.serviceWorker.addEventListener("message",async event => {
     switch (event.data.action){
-      case "clear-site-caches-complete": openCard("cleared_cache_card"); break;
+      case "clear-site-caches-complete": setActiveClearedCacheAlert(true); break;
       case "share-target": {
         for (const file of event.data.files as File[]){
           const { name } = file;
