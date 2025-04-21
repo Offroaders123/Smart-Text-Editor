@@ -49,8 +49,8 @@ export default function Card(props: CardProps) {
       data-active={props.active() ? "" : null}
       ref={card!}
       onkeydown={event => {
-        if (card.getAttribute("data-type") != "dialog" || event.key != "Tab") return;
-        const navigable = getNavigableElements({ container: card, scope: true });
+        if (card!.getAttribute("data-type") != "dialog" || event.key != "Tab") return;
+        const navigable = getNavigableElements({ container: card!, scope: true });
         if (!event.shiftKey){
           if (document.activeElement != navigable[navigable.length - 1]) return;
           event.preventDefault();
@@ -65,7 +65,7 @@ export default function Card(props: CardProps) {
           <DecorativeImage class="icon" src={props.icon!} alt=""/>
         </Show>
         <Show when={props.type === "dialog"}>
-          <button class="card-back" onclick={() => openCard(props.parent!, card.id)}>
+          <button class="card-back" onclick={() => openCard(props.parent!, card!.id)}>
             <BackIcon/>
           </button>
         </Show>
@@ -76,10 +76,10 @@ export default function Card(props: CardProps) {
             event.preventDefault();
             if (event.repeat) return;
             event.currentTarget.click();
-          }} onclick={() => minimizeCard(card.id)}>
+          }} onclick={() => minimizeCard(card!.id)}>
             <MinimizeIcon/>
           </button>
-          <button class="control" data-control="close" onclick={() => closeCard(card.id)}>
+          <button class="control" data-control="close" onclick={() => closeCard(card!.id)}>
             <CloseIcon/>
           </button>
         </div>

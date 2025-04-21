@@ -15,15 +15,15 @@ export default function Checkbox(props: FlowProps<CheckboxProps, string>) {
   return (
     <div
       class="checkbox"
-      onclick={() => input.click()}
+      onclick={() => input!.click()}
       onkeydown={event => {
         if (!event.repeat && event.key == "Enter") {
-          input.click();
+          input!.click();
         }
       }}
       onkeyup={event => {
         if (event.key == " ") {
-          input.click();
+          input!.click();
         }
       }}
       tabindex={0}
