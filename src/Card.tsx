@@ -12,6 +12,10 @@ import "./Card.scss";
 import type { Accessor, JSX } from "solid-js";
 import type { CardID, DialogID, WidgetID } from "./app.js";
 
+export interface CardElement extends HTMLDivElement {
+  id: CardID;
+}
+
 export type CardType = "alert" | "widget" | "dialog";
 
 export interface CardControls {
@@ -34,7 +38,7 @@ export interface CardProps {
  * The base component for the Alert, Dialog, and Widget card types.
 */
 export default function Card(props: CardProps) {
-  let card: HTMLDivElement & { id: CardID; };
+  let card: CardElement;
   let header: HTMLDivElement;
 
   return (
@@ -61,7 +65,7 @@ export default function Card(props: CardProps) {
           <DecorativeImage class="icon" src={props.icon!} alt=""/>
         </Show>
         <Show when={props.type === "dialog"}>
-          <button class="card-back" onclick={() => openCard(header.getAttribute("data-card-parent")! as CardID, card.id)}>
+          <button class="card-back" onclick={() => openCard(props.parent!, card.id)}>
             <BackIcon/>
           </button>
         </Show>
@@ -89,7 +93,7 @@ export default function Card(props: CardProps) {
     </div>
   );
 
-  function openCardz(id: CardID, previous?: string): void {
+  function openCard(id: CardID, previous?: string): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
     if (self.matches("[data-active]") && !self.hasAttribute("data-alert-timeout")) return closeCard(id);
@@ -130,7 +134,7 @@ export default function Card(props: CardProps) {
     if (getCardType(self) == "widget") setActiveWidget(self.id as WidgetID);
   }
 
-  function minimizeCardz(id: CardID): void {
+  function minimizeCard(id: CardID): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
@@ -169,7 +173,7 @@ export default function Card(props: CardProps) {
     },transitionDuration);
   }
 
-  function closeCardz(id: CardID): void {
+  function closeCard(id: CardID): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
     self.removeAttribute("data-active");
