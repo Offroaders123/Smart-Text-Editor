@@ -27,6 +27,7 @@ export interface CardProps {
   id: CardID;
   type: CardType;
   active: Accessor<boolean>;
+  minimize: Accessor<boolean> | null;
   parent?: string;
   heading: string;
   icon?: string;

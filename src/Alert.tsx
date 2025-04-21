@@ -23,6 +23,7 @@ export default function Alert(props: AlertProps) {
       id={props.id}
       type="alert"
       active={props.getActiveAlert}
+      minimize={null}
       heading={props.heading}
       icon={props.icon}
       main={props.main}

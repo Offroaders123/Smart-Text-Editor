@@ -2,7 +2,7 @@ import Widget from "./Widget.js";
 import CardItem from "./CardItem.js";
 import CardOptions from "./CardOptions.js";
 import Checkbox from "./Checkbox.js";
-import { activeWidget } from "./app.js";
+import { activeWidget, minimizeWidget } from "./app.js";
 import { applyEditingBehavior } from "./dom.js";
 
 export default function URIEncoderCard() {
@@ -47,6 +47,7 @@ export default function URIEncoderCard() {
         </>
       }
       getActiveWidget={activeWidget}
+      getMinimizeWidget={minimizeWidget}
     />
   );
 }

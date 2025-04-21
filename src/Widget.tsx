@@ -10,6 +10,7 @@ export interface WidgetProps {
   main: JSX.Element;
   options: JSX.Element;
   getActiveWidget: Accessor<WidgetID | null>;
+  getMinimizeWidget: Accessor<WidgetID | null>;
 }
 
 export default function Widget(props: WidgetProps) {
@@ -18,6 +19,7 @@ export default function Widget(props: WidgetProps) {
       id={props.id}
       type="widget"
       active={() => props.getActiveWidget() === props.id}
+      minimize={() => props.getMinimizeWidget() === props.id}
       heading={props.heading}
       main={props.main}
       options={props.options}

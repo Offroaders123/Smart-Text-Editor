@@ -354,6 +354,14 @@ export const [dialogPrevious, setDialogPrevious] = createSignal<HTMLElement | nu
 export const [activeWidget, setActiveWidget] = createSignal<WidgetID | null>(null);
 
 /**
+ * The currently minimized Widget.
+ * 
+ * Should this be a derived effect somehow? Maybe it can solely just get handled by the (now internal) `openCard()` function.
+ * I solely don't want it to dissasociate with that of which card is currently opened. That bug has been around for a while in general.
+*/
+export const [minimizeWidget, setMinimizeWidget] = createSignal<WidgetID | null>(null);
+
+/**
  * (Shim?)
  * This should probably be data-driven with a single `Set<AlertID>` somehow.
  */
