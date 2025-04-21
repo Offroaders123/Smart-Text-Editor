@@ -2,7 +2,7 @@ import { createSignal } from "solid-js";
 import Widget from "./Widget.js";
 import CardItem from "./CardItem.js";
 import CardOptions from "./CardOptions.js";
-import { activeEditor } from "./app.js";
+import { activeEditor, activeWidget } from "./app.js";
 import { applyEditingBehavior } from "./dom.js";
 
 export default function ReplaceTextCard() {
@@ -55,6 +55,7 @@ export default function ReplaceTextCard() {
           <button onclick={() => clear()}>Clear</button>
         </CardOptions>
       }
+      getActiveWidget={activeWidget}
     />
   );
 }

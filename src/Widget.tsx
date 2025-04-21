@@ -9,7 +9,7 @@ export interface WidgetProps {
   heading: string;
   main: JSX.Element;
   options: JSX.Element;
-  getActiveWidget: Accessor<WidgetID>;
+  getActiveWidget: Accessor<WidgetID | null>;
 }
 
 export default function Widget(props: WidgetProps) {
