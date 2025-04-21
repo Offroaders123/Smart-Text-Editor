@@ -1,7 +1,7 @@
 import Card from "./Card.js";
 import "./Dialog.scss";
 
-import type { JSX } from "solid-js";
+import type { Accessor, JSX } from "solid-js";
 import type { DialogID } from "./app.js";
 
 export interface DialogProps {
@@ -10,6 +10,7 @@ export interface DialogProps {
   heading: string;
   main: JSX.Element;
   options?: JSX.Element;
+  getActiveDialog: Accessor<DialogID | null>;
 }
 
 export default function Dialog(props: DialogProps) {
@@ -17,6 +18,7 @@ export default function Dialog(props: DialogProps) {
     <Card
       id={props.id}
       type="dialog"
+      active={() => props.getActiveDialog() === props.id}
       parent={props.parent}
       heading={props.heading}
       main={props.main}

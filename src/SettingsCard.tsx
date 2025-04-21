@@ -4,7 +4,7 @@ import Dialog from "./Dialog.js";
 import CardItem from "./CardItem.js";
 import CardOptions from "./CardOptions.js";
 import Checkbox from "./Checkbox.js";
-import { appearance, setActiveDialog, settings } from "./app.js";
+import { activeDialog, appearance, setActiveDialog, settings } from "./app.js";
 import { clearSiteCaches, showInstallPrompt } from "./dom.js";
 
 export default function SettingsCard() {
@@ -78,6 +78,7 @@ export default function SettingsCard() {
         </CardOptions>
         </>
       }
+      getActiveDialog={activeDialog}
     />
   );
 }
