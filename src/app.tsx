@@ -343,6 +343,10 @@ export type WidgetID = "replace_text_card" | "color_picker_card" | "json_formatt
 */
 export const [activeDialog, setActiveDialog] = createSignal<DialogID | null>(null);
 
+export function toggleActiveDialog<T extends DialogID>(id: T): T | null {
+  return setActiveDialog(() => activeDialog() !== id ? id : null);
+}
+
 /**
  * The previously-selected element before the current Dialog was opened.
 */
@@ -352,6 +356,10 @@ export const [dialogPrevious, setDialogPrevious] = createSignal<HTMLElement | nu
  * The currently opened Widget.
 */
 export const [activeWidget, setActiveWidget] = createSignal<WidgetID | null>(null);
+
+export function toggleActiveWidget<T extends WidgetID>(id: T): T | null {
+  return setActiveWidget(() => activeWidget() !== id ? id : null);
+}
 
 /**
  * The currently minimized Widget.
@@ -516,7 +524,7 @@ document.body.addEventListener("keydown",event => {
   if (pressed("Escape")){
     event.preventDefault();
     if (event.repeat) return;
-    if (activeDialog() && !document.activeElement?.matches("menu-drop[data-open]")) setActiveDialog(activeDialog()!);
+    if (activeDialog() && !document.activeElement?.matches("menu-drop[data-open]")) setActiveDialog(null);
   }
   if (((control || command) && !shift && pressed("n")) || ((controlShift || shiftCommand) && pressed("x"))){
     event.preventDefault();
@@ -593,32 +601,32 @@ document.body.addEventListener("keydown",event => {
   if ((controlShift || shiftCommand) && pressed("B")){
     event.preventDefault();
     if (event.repeat) return;
-    setActiveDialog("preview_base_card");
+    toggleActiveDialog("preview_base_card");
   }
   if ((controlShift || shiftCommand) && pressed("f")){
     event.preventDefault();
     if (event.repeat) return;
-    setActiveWidget("replace_text_card");
+    toggleActiveWidget("replace_text_card");
   }/*
   if ((controlShift || shiftCommand) && pressed("k")){
     event.preventDefault();
     if (event.repeat) return;
-    setActiveWidget("color_picker_card");
+    toggleActiveWidget("color_picker_card");
   }*/
   if ((controlShift || shiftCommand) && pressed("g")){
     event.preventDefault();
     if (event.repeat) return;
-    setActiveWidget("json_formatter_card");
+    toggleActiveWidget("json_formatter_card");
   }
   if ((controlShift || shiftCommand) && pressed("y")){
     event.preventDefault();
     if (event.repeat) return;
-    setActiveWidget("uri_encoder_card");
+    toggleActiveWidget("uri_encoder_card");
   }
   if ((controlShift || shiftCommand) && pressed("o")){
     event.preventDefault();
     if (event.repeat) return;
-    setActiveWidget("uuid_generator_card");
+    toggleActiveWidget("uuid_generator_card");
   }
   if ((controlShift || shiftCommand) && pressed("h")){
     event.preventDefault();
@@ -635,7 +643,7 @@ document.body.addEventListener("keydown",event => {
   if ((control || command) && (pressed(",") || pressed("<"))){
     event.preventDefault();
     if (event.repeat) return;
-    setActiveDialog("settings_card");
+    toggleActiveDialog("settings_card");
   }
 },{ capture: true });
 

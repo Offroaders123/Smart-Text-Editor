@@ -1,7 +1,7 @@
 import { createEffect } from "solid-js";
 import DecorativeImage from "./DecorativeImage.js";
 import { createEditor, rename } from "./Editor.js";
-import { activeEditor, setActiveDialog, setActiveWidget, settings } from "./app.js";
+import { activeEditor, toggleActiveDialog, toggleActiveWidget, settings } from "./app.js";
 import { insertTemplate } from "./Tools.js";
 import { createDisplay, createWindow, openFiles, refreshPreview, saveFile, setOrientation, setPreviewSource, setView } from "./Workspace.js";
 import { clearSiteCaches, showInstallPrompt } from "./dom.js";
@@ -87,7 +87,7 @@ export default function Menubar(props: MenubarProps) {
         <button>Preview</button>
         <ul>
           <li onclick={() => refreshPreview({ force: true })} data-shortcuts='{ "default": "Ctrl+Shift+Enter", "macOS": "Ctrl+Cmd+Return" }' data-no-select>Refresh</li>
-          <li onclick={() => setActiveDialog("preview_base_card")} data-shortcuts='{ "default": "Ctrl+Shift+B", "macOS": "Ctrl+Cmd+B" }' data-no-select>Base URL</li>
+          <li onclick={() => toggleActiveDialog("preview_base_card")} data-shortcuts='{ "default": "Ctrl+Shift+B", "macOS": "Ctrl+Cmd+B" }' data-no-select>Base URL</li>
           <li><hr/></li>
           <li data-value="active-editor" data-selected onclick={() => setPreviewSource(null)}>Active Editor</li>
         </ul>
@@ -95,11 +95,11 @@ export default function Menubar(props: MenubarProps) {
       <menu-drop>
         <button>Tools</button>
         <ul>
-          <li onclick={() => setActiveWidget("replace_text_card")} data-shortcuts='{ "default": "Ctrl+Shift+F", "macOS": "Shift+Cmd+F" }'>Replace Text</li>
-          {/* <li onclick={() => setActiveWidget("color_picker_card")} data-shortcuts='{ "default": "Ctrl+Shift+K", "macOS": "Shift+Cmd+K" }'>Color Picker</li> */}
-          <li onclick={() => setActiveWidget("json_formatter_card")} data-shortcuts='{ "default": "Ctrl+Shift+G", "macOS": "Shift+Cmd+G" }'>JSON Formatter</li>
-          <li onclick={() => setActiveWidget("uri_encoder_card")} data-shortcuts='{ "default": "Ctrl+Shift+Y", "macOS": "Shift+Cmd+Y" }'>URI Encoder</li>
-          <li onclick={() => setActiveWidget("uuid_generator_card")} data-shortcuts='{ "default": "Ctrl+Shift+O", "macOS": "Shift+Cmd+O" }'>UUID Generator</li>
+          <li onclick={() => toggleActiveWidget("replace_text_card")} data-shortcuts='{ "default": "Ctrl+Shift+F", "macOS": "Shift+Cmd+F" }'>Replace Text</li>
+          {/* <li onclick={() => toggleActiveWidget("color_picker_card")} data-shortcuts='{ "default": "Ctrl+Shift+K", "macOS": "Shift+Cmd+K" }'>Color Picker</li> */}
+          <li onclick={() => toggleActiveWidget("json_formatter_card")} data-shortcuts='{ "default": "Ctrl+Shift+G", "macOS": "Shift+Cmd+G" }'>JSON Formatter</li>
+          <li onclick={() => toggleActiveWidget("uri_encoder_card")} data-shortcuts='{ "default": "Ctrl+Shift+Y", "macOS": "Shift+Cmd+Y" }'>URI Encoder</li>
+          <li onclick={() => toggleActiveWidget("uuid_generator_card")} data-shortcuts='{ "default": "Ctrl+Shift+O", "macOS": "Shift+Cmd+O" }'>UUID Generator</li>
           <li>Insert Templates...
             <ul>
               <li onclick={() => insertTemplate('html')} data-shortcuts='{ "default": "Ctrl+Shift+H", "macOS": "Shift+Cmd+H" }'>HTML</li>
@@ -122,10 +122,10 @@ export default function Menubar(props: MenubarProps) {
         </ul>
       </menu-drop>
       <menu-drop id="settings_menu" data-alternate>
-        <button onclick={() => setActiveDialog("settings_card")}>Settings</button>
+        <button onclick={() => toggleActiveDialog("settings_card")}>Settings</button>
         <ul data-show-icons>
           <li part="install-option" onclick={() => showInstallPrompt()}><DecorativeImage src={Install} alt=""/>Install</li>
-          <li onclick={() => setActiveDialog("theme_card")}><DecorativeImage src={Template} alt=""/>Theme Settings</li>
+          <li onclick={() => toggleActiveDialog("theme_card")}><DecorativeImage src={Template} alt=""/>Theme Settings</li>
           <li part="clear-site-caches-option" onclick={() => clearSiteCaches()}><DecorativeImage src={Settings} alt=""/>Clear Cache</li>
           <li onclick={() => settings.reset({ confirm: true })}><DecorativeImage src={Settings} alt=""/>Reset Settings</li>
         </ul>
