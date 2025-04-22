@@ -1,4 +1,4 @@
-import { createSignal, Show } from "solid-js";
+import { createEffect, createSignal, Show } from "solid-js";
 import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, workspaceEditors, workspaceTabs } from "./app.js";
 import DecorativeImage from "./DecorativeImage.js";
 import ArrowIcon from "./ArrowIcon.js";
@@ -44,6 +44,42 @@ export default function Card(props: CardProps) {
   let card: CardElement;
   let header: HTMLDivElement;
   const [getAlertTimeout, setAlertTimeout] = createSignal<string | null>(null);
+
+  createEffect(() => {
+    if (!props.active()) return;
+
+    switch (props.type) {
+      case "alert": {
+        const timeoutIdentifier = Math.random().toString();
+        setAlertTimeout(timeoutIdentifier);
+        window.setTimeout(() => {
+          if (getAlertTimeout() != timeoutIdentifier) return;
+          setAlertTimeout(null);
+          closeCard(props.id);
+        },4000);
+        break;
+      };
+      case "dialog": {
+        document.body.addEventListener("keydown",catchCardNavigation);
+        // setCardBackdropShown(true);
+        if (!activeDialog() && !dialogPrevious()){
+          setDialogPrevious(document.activeElement as HTMLElement);
+        }
+        document.querySelectorAll<MenuDropElement>("menu-drop[data-open]").forEach(menu => menu.close());
+        const transitionDuration = parseInt(`${Number(getElementStyle({ element: card!, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 500}`);
+        window.setTimeout(() => {
+          if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+          if (previous) card!.querySelector<HTMLElement>(`[data-card-previous="${previous}"]`)!.focus();
+        },transitionDuration);
+        setActiveDialog(props.id as DialogID);
+        break;
+      };
+      case "widget": {
+        setActiveWidget(props.id as WidgetID);
+        break;
+      };
+    }
+  });
 
   return (
     <div
@@ -97,7 +133,7 @@ export default function Card(props: CardProps) {
     </div>
   );
 
-  function openCard(id: CardID, previous?: string): void {
+  function openCardz(id: CardID, previous?: string): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
     if (self.matches("[data-active]") && !getAlertTimeout()) return closeCard(id);
@@ -139,7 +175,7 @@ export default function Card(props: CardProps) {
     if (getCardType(self) == "widget") setActiveWidget(self.id as WidgetID);
   }
 
-  function minimizeCard(id: CardID): void {
+  function minimizeCardz(id: CardID): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
@@ -180,7 +216,7 @@ export default function Card(props: CardProps) {
     },transitionDuration);
   }
 
-  function closeCard(id: CardID): void {
+  function closeCardz(id: CardID): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
     props.setActive(false);
