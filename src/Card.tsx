@@ -56,6 +56,19 @@ export default function Card(props: CardProps) {
 
   createEffect(() => {
     if (!props.active()) return;
+    if (props.type !== "widget") return;
+
+    if (props.minimize!()) {
+      const transitionDuration = parseInt(`${Number(getElementStyle({ element: card!, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
+      window.setTimeout(() => {
+        if (props.minimize!()) return;
+        minimizeCard(props.id);
+      },transitionDuration);
+    }
+  });
+
+  createEffect(() => {
+    if (!props.active()) return;
 
     switch (props.type) {
       case "alert": {
