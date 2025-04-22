@@ -9,7 +9,7 @@ import { setTabsVisibility } from "./Editor.js";
 import { getElementStyle } from "./dom.js";
 import "./Card.scss";
 
-import type { Accessor, JSX } from "solid-js";
+import type { Accessor, JSX, Setter } from "solid-js";
 import type { CardID, DialogID, WidgetID } from "./app.js";
 
 export interface CardElement extends HTMLDivElement {
@@ -27,7 +27,9 @@ export interface CardProps {
   id: CardID;
   type: CardType;
   active: Accessor<boolean>;
+  setActive: Setter<boolean>;
   minimize: Accessor<boolean> | null;
+  setMinimize: Setter<boolean> | null;
   parent?: string;
   heading: string;
   icon?: string;
@@ -107,6 +109,7 @@ export default function Card(props: CardProps) {
         window.setTimeout(() => minimizeCard(card.id as CardID),transitionDuration);
       });
     }
+    props.setActive(true);
     self.setAttribute("data-active","");
     // if (getCardType(self) == "widget" && cardBackdropShown()) setCardBackdropShown(false);
     if (getCardType(self) == "alert"){
@@ -147,6 +150,7 @@ export default function Card(props: CardProps) {
     workspace_tabs.setAttribute("data-minimize-change",changeIdentifier);
     const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
     if (!self.matches("[data-minimize]")){
+      props.setMinimize!(true);
       self.setAttribute("data-minimize", "");
       if (getCardControls(self) === undefined) return;
       self.style.setProperty("--card-minimize-width",`${getCardControls(self).minimize.querySelector("svg")!.clientWidth + parseInt(getElementStyle({ element: getCardControls(self).minimize, property: "--control-padding" }),10) * 2}px`);
@@ -159,6 +163,7 @@ export default function Card(props: CardProps) {
       },transitionDuration);
       if (self.contains(document.activeElement) && document.activeElement != getCardControls(self).minimize) getCardControls(self).minimize.focus();
     } else {
+      props.setMinimize!(false);
       self.removeAttribute("data-minimize");
       window.setTimeout(() => {
         if (self.getAttribute("data-minimize-change") == changeIdentifier) self.style.removeProperty("--card-minimize-width");
@@ -177,6 +182,7 @@ export default function Card(props: CardProps) {
   function closeCard(id: CardID): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
+    props.setActive(false);
     self.removeAttribute("data-active");
     if (self.matches("[data-minimize]")){
       const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);

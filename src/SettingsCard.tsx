@@ -79,6 +79,7 @@ export default function SettingsCard() {
         </>
       }
       getActiveDialog={activeDialog}
+      setActiveDialog={setActiveDialog}
     />
   );
 }

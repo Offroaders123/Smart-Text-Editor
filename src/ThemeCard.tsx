@@ -1,6 +1,6 @@
 import Dialog from "./Dialog.js";
 import CardItem from "./CardItem.js";
-import { activeDialog } from "./app.js";
+import { activeDialog, setActiveDialog } from "./app.js";
 
 export default function ThemeCard() {
   return (
@@ -29,6 +29,7 @@ export default function ThemeCard() {
       //   </CardOptions>
       // }
       getActiveDialog={activeDialog}
+      setActiveDialog={setActiveDialog}
     />
   );
 }

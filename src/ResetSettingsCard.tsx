@@ -1,6 +1,6 @@
 import Alert from "./Alert.js";
 import CardItem from "./CardItem.js";
-import { activeResetSettingsAlert } from "./app.js";
+import { activeResetSettingsAlert, setActiveResetSettingsAlert } from "./app.js";
 import Settings from "./img/settings.svg";
 
 export default function ResetSettingsCard() {
@@ -13,6 +13,7 @@ export default function ResetSettingsCard() {
         <CardItem>Your settings have been reset!</CardItem>
       }
       getActiveAlert={activeResetSettingsAlert}
+      setActiveAlert={setActiveResetSettingsAlert}
     />
   );
 }

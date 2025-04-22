@@ -1,6 +1,6 @@
 import Alert from "./Alert.js";
 import CardItem from "./CardItem.js";
-import { activeClearedCacheAlert } from "./app.js";
+import { activeClearedCacheAlert, setActiveClearedCacheAlert } from "./app.js";
 import Template from "./img/template.svg";
 
 export default function ClearedCacheCard() {
@@ -13,6 +13,7 @@ export default function ClearedCacheCard() {
         <CardItem>Successfully cleared offline cache!</CardItem>
       }
       getActiveAlert={activeClearedCacheAlert}
+      setActiveAlert={setActiveClearedCacheAlert}
     />
   );
 }
