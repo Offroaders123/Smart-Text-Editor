@@ -1,3 +1,4 @@
+import { createEffect } from "solid-js";
 import Card from "./Card.js";
 import "./Widget.scss";
 
@@ -16,6 +17,10 @@ export interface WidgetProps {
 }
 
 export default function Widget(props: WidgetProps) {
+  createEffect(() => {
+    console.log(props.getActiveWidget(), props.getMinimizeWidget());
+  });
+
   return (
     <Card
       id={props.id}
