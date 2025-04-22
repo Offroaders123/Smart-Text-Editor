@@ -1,5 +1,5 @@
 import { createEffect, createSignal, Show } from "solid-js";
-import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, workspaceEditors, workspaceTabs } from "./app.js";
+import { activeDialog, activeWidget, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, workspaceEditors, workspaceTabs } from "./app.js";
 import DecorativeImage from "./DecorativeImage.js";
 import ArrowIcon from "./ArrowIcon.js";
 import BackIcon from "./BackIcon.js";
@@ -44,6 +44,15 @@ export default function Card(props: CardProps) {
   let card: CardElement;
   let header: HTMLDivElement;
   const [getAlertTimeout, setAlertTimeout] = createSignal<string | null>(null);
+
+  createEffect(() => {
+    if (!props.active()) return;
+    if (props.type !== "dialog") return;
+
+    if (activeWidget() !== null) {
+      props.setActive(false);
+    }
+  });
 
   createEffect(() => {
     if (!props.active()) return;
