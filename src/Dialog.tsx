@@ -20,7 +20,7 @@ export default function Dialog(props: DialogProps) {
       id={props.id}
       type="dialog"
       active={() => props.getActiveDialog() === props.id}
-      setActive={() => props.setActiveDialog(props.id)}
+      setActive={isActive => props.setActiveDialog(isActive ? props.id : null)}
       minimize={null}
       setMinimize={null}
       parent={props.parent}

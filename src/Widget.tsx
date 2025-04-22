@@ -21,9 +21,9 @@ export default function Widget(props: WidgetProps) {
       id={props.id}
       type="widget"
       active={() => props.getActiveWidget() === props.id}
-      setActive={() => props.setActiveWidget(props.id)}
+      setActive={isActive => props.setActiveWidget(isActive ? props.id : null)}
       minimize={() => props.getMinimizeWidget() === props.id}
-      setMinimize={() => props.setMinimizeWidget(props.id)}
+      setMinimize={isMinimize => props.setMinimizeWidget(isMinimize ? props.id : null)}
       heading={props.heading}
       main={props.main}
       options={props.options}
