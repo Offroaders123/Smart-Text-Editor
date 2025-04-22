@@ -637,9 +637,9 @@ document.body.addEventListener("keydown",event => {
     event.preventDefault();
     if (event.repeat || !activeWidget()) return;
     if (activeWidget()){
-      // Needs to call the line below this one as an effect instead
-      // setMinimizeWidget(activeWidget());
-      minimizeCard(activeWidget()!);
+      setMinimizeWidget(activeWidget());
+      // Needs to call this line as an effect instead
+      // minimizeCard(activeWidget()!);
     }
   }
   if ((control || command) && (pressed(",") || pressed("<"))){
