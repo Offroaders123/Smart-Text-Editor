@@ -1,4 +1,4 @@
-import { Show } from "solid-js";
+import { createSignal, Show } from "solid-js";
 import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, workspaceEditors, workspaceTabs } from "./app.js";
 import DecorativeImage from "./DecorativeImage.js";
 import ArrowIcon from "./ArrowIcon.js";
@@ -43,6 +43,7 @@ export interface CardProps {
 export default function Card(props: CardProps) {
   let card: CardElement;
   let header: HTMLDivElement;
+  const [getAlertTimeout, setAlertTimeout] = createSignal<string | null>(null);
 
   return (
     <div
@@ -99,7 +100,7 @@ export default function Card(props: CardProps) {
   function openCard(id: CardID, previous?: string): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
-    if (self.matches("[data-active]") && !self.hasAttribute("data-alert-timeout")) return closeCard(id);
+    if (self.matches("[data-active]") && !getAlertTimeout()) return closeCard(id);
     if (getCardType(self) != "alert"){
       document.querySelectorAll<HTMLDivElement>(`.Card[data-active]`).forEach(card => {
         if (getCardType(card) != "dialog" && getCardType(card) != getCardType(self)) return;
@@ -114,10 +115,10 @@ export default function Card(props: CardProps) {
     // if (getCardType(self) == "widget" && cardBackdropShown()) setCardBackdropShown(false);
     if (getCardType(self) == "alert"){
       const timeoutIdentifier = Math.random().toString();
-      self.setAttribute("data-alert-timeout",timeoutIdentifier);
+      setAlertTimeout(timeoutIdentifier);
       window.setTimeout(() => {
-        if (self.getAttribute("data-alert-timeout") != timeoutIdentifier) return;
-        self.removeAttribute("data-alert-timeout");
+        if (getAlertTimeout() != timeoutIdentifier) return;
+        setAlertTimeout(null);
         closeCard(id);
       },4000);
     }
