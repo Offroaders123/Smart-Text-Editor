@@ -30,7 +30,7 @@ export interface CardProps {
   setActive: Setter<boolean>;
   minimize: Accessor<boolean> | null;
   setMinimize: Setter<boolean> | null;
-  parent?: string;
+  parent?: DialogID;
   heading: string;
   icon?: string;
   main: JSX.Element;

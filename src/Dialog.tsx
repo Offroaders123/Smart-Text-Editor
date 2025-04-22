@@ -6,7 +6,7 @@ import type { DialogID } from "./app.js";
 
 export interface DialogProps {
   id: DialogID;
-  parent?: string;
+  parent?: DialogID;
   heading: string;
   main: JSX.Element;
   options?: JSX.Element;
