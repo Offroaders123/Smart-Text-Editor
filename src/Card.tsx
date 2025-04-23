@@ -28,8 +28,6 @@ export interface CardProps {
   type: CardType;
   active: Accessor<boolean>;
   setActive: Setter<boolean>;
-  minimize: Accessor<boolean> | null;
-  setMinimize: Setter<boolean> | null;
   parent?: DialogID;
   heading: string;
   icon?: string;
@@ -43,6 +41,7 @@ export interface CardProps {
 export default function Card(props: CardProps) {
   let card: CardElement;
   let header: HTMLDivElement;
+  const [minimize, setMinimize] = props.type === "widget" ? createSignal<boolean>(false) : [null, null];
   const [getAlertTimeout, setAlertTimeout] = createSignal<string | null>(null);
 
   createEffect(() => {
@@ -58,10 +57,10 @@ export default function Card(props: CardProps) {
     if (!props.active()) return;
     if (props.type !== "widget") return;
 
-    if (props.minimize!()) {
+    if (minimize!()) {
       const transitionDuration = parseInt(`${Number(getElementStyle({ element: card!, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
       window.setTimeout(() => {
-        if (props.minimize!()) return;
+        if (minimize!()) return;
         minimizeCard(props.id);
       },transitionDuration);
     }
@@ -209,7 +208,7 @@ export default function Card(props: CardProps) {
     workspace_tabs.setAttribute("data-minimize-change",changeIdentifier);
     const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
     if (!self.matches("[data-minimize]")){
-      props.setMinimize!(true);
+      setMinimize!(true);
       self.setAttribute("data-minimize", "");
       if (getCardControls(self) === undefined) return;
       self.style.setProperty("--card-minimize-width",`${getCardControls(self).minimize.querySelector("svg")!.clientWidth + parseInt(getElementStyle({ element: getCardControls(self).minimize, property: "--control-padding" }),10) * 2}px`);
@@ -222,7 +221,7 @@ export default function Card(props: CardProps) {
       },transitionDuration);
       if (self.contains(document.activeElement) && document.activeElement != getCardControls(self).minimize) getCardControls(self).minimize.focus();
     } else {
-      props.setMinimize!(false);
+      setMinimize!(false);
       self.removeAttribute("data-minimize");
       window.setTimeout(() => {
         if (self.getAttribute("data-minimize-change") == changeIdentifier) self.style.removeProperty("--card-minimize-width");
