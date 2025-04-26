@@ -60,8 +60,9 @@ export default function Card(props: CardProps) {
     if (minimize!()) {
       const transitionDuration = parseInt(`${Number(getElementStyle({ element: card!, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
       window.setTimeout(() => {
-        if (minimize!()) return;
-        minimizeCard(props.id);
+        setMinimize!(!minimize!());
+        // if (minimize!()) return;
+        // minimizeCard(props.id);
       },transitionDuration);
     }
   });
@@ -76,7 +77,8 @@ export default function Card(props: CardProps) {
         window.setTimeout(() => {
           if (getAlertTimeout() != timeoutIdentifier) return;
           setAlertTimeout(null);
-          closeCard(props.id);
+          props.setActive(false);
+          // closeCard(props.id);
         },4000);
         break;
       };
@@ -101,6 +103,22 @@ export default function Card(props: CardProps) {
       };
     }
   });
+
+  createEffect(() => {
+    const active: boolean = props.active();
+    if (active) {
+      openCard(props.id);
+    } else {
+      closeCard(props.id);
+    }
+  });
+
+  if (minimize !== null) {
+    createEffect(() => {
+      void minimize(); // Only called because it is an accessor for the effect computation.
+      minimizeCard(props.id);
+    });
+  }
 
   return (
     <div
@@ -137,10 +155,10 @@ export default function Card(props: CardProps) {
             event.preventDefault();
             if (event.repeat) return;
             event.currentTarget.click();
-          }} onclick={() => minimizeCard(card!.id)}>
+          }} onclick={() => setMinimize!(!minimize!())}>
             <MinimizeIcon/>
           </button>
-          <button class="control" data-control="close" onclick={() => closeCard(card!.id)}>
+          <button class="control" data-control="close" onclick={() => props.setActive(false)}>
             <CloseIcon/>
           </button>
         </div>
@@ -154,20 +172,20 @@ export default function Card(props: CardProps) {
     </div>
   );
 
-  function openCardz(id: CardID, previous?: string): void {
+  function openCard(id: CardID, previous?: string): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
-    if (self.matches("[data-active]") && !getAlertTimeout()) return closeCard(id);
-    if (getCardType(self) != "alert"){
-      document.querySelectorAll<HTMLDivElement>(`.Card[data-active]`).forEach(card => {
-        if (getCardType(card) != "dialog" && getCardType(card) != getCardType(self)) return;
-        closeCard(card.id as CardID);
-        if (!card.matches("[data-minimize]")) return;
-        const transitionDuration = parseInt(`${Number(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
-        window.setTimeout(() => minimizeCard(card.id as CardID),transitionDuration);
-      });
-    }
-    props.setActive(true);
+    if (self.matches("[data-active]") && !getAlertTimeout()) return void props.setActive(false);
+    // if (getCardType(self) != "alert"){
+    //   document.querySelectorAll<HTMLDivElement>(`.Card[data-active]`).forEach(card => {
+    //     if (getCardType(card) != "dialog" && getCardType(card) != getCardType(self)) return;
+    //     closeCard(card.id as CardID);
+    //     if (!card.matches("[data-minimize]")) return;
+    //     const transitionDuration = parseInt(`${Number(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
+    //     window.setTimeout(() => minimizeCard(card.id as CardID),transitionDuration);
+    //   });
+    // }
+    // props.setActive(true);
     self.setAttribute("data-active","");
     // if (getCardType(self) == "widget" && cardBackdropShown()) setCardBackdropShown(false);
     if (getCardType(self) == "alert"){
@@ -176,7 +194,8 @@ export default function Card(props: CardProps) {
       window.setTimeout(() => {
         if (getAlertTimeout() != timeoutIdentifier) return;
         setAlertTimeout(null);
-        closeCard(id);
+        props.setActive(false);
+        // closeCard(id);
       },4000);
     }
     if (getCardType(self) == "dialog"){
@@ -196,7 +215,7 @@ export default function Card(props: CardProps) {
     if (getCardType(self) == "widget") setActiveWidget(self.id as WidgetID);
   }
 
-  function minimizeCardz(id: CardID): void {
+  function minimizeCard(id: CardID): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
@@ -208,7 +227,7 @@ export default function Card(props: CardProps) {
     workspace_tabs.setAttribute("data-minimize-change",changeIdentifier);
     const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
     if (!self.matches("[data-minimize]")){
-      setMinimize!(true);
+      // setMinimize!(true);
       self.setAttribute("data-minimize", "");
       if (getCardControls(self) === undefined) return;
       self.style.setProperty("--card-minimize-width",`${getCardControls(self).minimize.querySelector("svg")!.clientWidth + parseInt(getElementStyle({ element: getCardControls(self).minimize, property: "--control-padding" }),10) * 2}px`);
@@ -221,7 +240,7 @@ export default function Card(props: CardProps) {
       },transitionDuration);
       if (self.contains(document.activeElement) && document.activeElement != getCardControls(self).minimize) getCardControls(self).minimize.focus();
     } else {
-      setMinimize!(false);
+      // setMinimize!(false);
       self.removeAttribute("data-minimize");
       window.setTimeout(() => {
         if (self.getAttribute("data-minimize-change") == changeIdentifier) self.style.removeProperty("--card-minimize-width");
@@ -237,15 +256,15 @@ export default function Card(props: CardProps) {
     },transitionDuration);
   }
 
-  function closeCardz(id: CardID): void {
+  function closeCard(id: CardID): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
-    props.setActive(false);
+    // props.setActive(false);
     self.removeAttribute("data-active");
-    if (self.matches("[data-minimize]")){
-      const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
-      window.setTimeout(() => minimizeCard(id),transitionDuration);
-    }
+    // if (self.matches("[data-minimize]")){
+    //   const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
+    //   window.setTimeout(() => minimizeCard(id),transitionDuration);
+    // }
     if (getCardType(self) == "dialog"){
       const workspace_editors: HTMLDivElement = workspaceEditors()!;
       document.body.removeEventListener("keydown",catchCardNavigation);
