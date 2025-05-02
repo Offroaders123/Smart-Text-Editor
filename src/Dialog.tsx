@@ -1,3 +1,4 @@
+import { createMemo } from "solid-js";
 import Card from "./Card.js";
 import "./Dialog.scss";
 
@@ -15,12 +16,15 @@ export interface DialogProps {
 }
 
 export default function Dialog(props: DialogProps) {
+  const active = createMemo<boolean>(() => props.getActiveDialog() === props.id);
+  const setActive = createMemo<DialogID | null>(isActive => props.setActiveDialog(isActive ? props.id : null));
+
   return (
     <Card
       id={props.id}
       type="dialog"
-      active={() => props.getActiveDialog() === props.id}
-      setActive={isActive => props.setActiveDialog(isActive ? props.id : null)}
+      active={active}
+      setActive={setActive}
       parent={props.parent}
       heading={props.heading}
       main={props.main}

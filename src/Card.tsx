@@ -126,7 +126,7 @@ export default function Card(props: CardProps) {
       id={props.id}
       class="Card"
       data-type={props.type}
-      data-active={props.active() ? "" : null}
+      data-active={() => props.active() ? "" : null}
       data-minimize-change={minimizeChange}
       ref={card!}
       onkeydown={event => {
@@ -141,7 +141,7 @@ export default function Card(props: CardProps) {
           navigable[navigable.length - 1]?.focus();
         }
       }}>
-      <div class="header" data-card-parent={props.type === "dialog" ? props.parent : null} ref={header!}>
+      <div class="header" data-card-parent={() => props.type === "dialog" ? props.parent : null} ref={header!}>
         <Show when={props.type === "alert"}>
           <DecorativeImage class="icon" src={props.icon!} alt=""/>
         </Show>
