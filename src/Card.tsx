@@ -144,7 +144,16 @@ export default function Card(props: CardProps) {
           <DecorativeImage class="icon" src={props.icon!} alt=""/>
         </Show>
         <Show when={props.type === "dialog"}>
-          <button class="card-back" onclick={() => openCard(props.parent!, card!.id)}>
+          <button class="card-back" onclick={() => {
+            openCard(props.parent!);
+
+            const previous: string = card!.id;
+            const transitionDuration = parseInt(`${Number(getElementStyle({ element: card!, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 500}`);
+            window.setTimeout(() => {
+              if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+              if (previous) card!.querySelector<HTMLElement>(`[data-card-previous="${previous}"]`)!.focus();
+            },transitionDuration);
+                }}>
             <BackIcon/>
           </button>
         </Show>
@@ -205,11 +214,11 @@ export default function Card(props: CardProps) {
         setDialogPrevious(document.activeElement as HTMLElement);
       }
       document.querySelectorAll<MenuDropElement>("menu-drop[data-open]").forEach(menu => menu.close());
-      const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 500}`);
-      window.setTimeout(() => {
-        if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
-        if (previous) self.querySelector<HTMLElement>(`[data-card-previous="${previous}"]`)!.focus();
-      },transitionDuration);
+      // const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 500}`);
+      // window.setTimeout(() => {
+      //   if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+      //   if (previous) self.querySelector<HTMLElement>(`[data-card-previous="${previous}"]`)!.focus();
+      // },transitionDuration);
       setActiveDialog(self.id as DialogID);
     }
     if (getCardType(self) == "widget") setActiveWidget(self.id as WidgetID);
