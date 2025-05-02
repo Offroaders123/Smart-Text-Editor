@@ -405,6 +405,8 @@ export const [workspace, setWorkspace] = createSignal<HTMLDivElement | null>(nul
 
 export const [workspaceTabs, setWorkspaceTabs] = createSignal<HTMLDivElement | null>(null);
 
+export const [minimizeChangeGLOBAL, setMinimizeChangeGLOBAL] = createSignal<string | null>(null);
+
 export const [createEditorButton, setCreateEditorButton] = createSignal<HTMLButtonElement | null>(null);
 
 export const [workspaceEditors, setWorkspaceEditors] = createSignal<HTMLDivElement | null>(null);

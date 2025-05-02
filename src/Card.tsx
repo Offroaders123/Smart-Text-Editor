@@ -1,5 +1,5 @@
 import { createEffect, createSignal, Show } from "solid-js";
-import { activeDialog, activeWidget, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, workspaceEditors, workspaceTabs } from "./app.js";
+import { activeDialog, activeWidget, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, workspaceEditors, workspaceTabs, setMinimizeChangeGLOBAL, minimizeChangeGLOBAL } from "./app.js";
 import DecorativeImage from "./DecorativeImage.js";
 import ArrowIcon from "./ArrowIcon.js";
 import BackIcon from "./BackIcon.js";
@@ -42,6 +42,7 @@ export default function Card(props: CardProps) {
   let card: CardElement;
   let header: HTMLDivElement;
   const [minimize, setMinimize] = props.type === "widget" ? createSignal<boolean>(false) : [null, null];
+  const [minimizeChange, setMinimizeChange] = createSignal<string | null>(null);
   const [getAlertTimeout, setAlertTimeout] = createSignal<string | null>(null);
 
   createEffect(() => {
@@ -126,6 +127,7 @@ export default function Card(props: CardProps) {
       class="Card"
       data-type={props.type}
       data-active={props.active() ? "" : null}
+      data-minimize-change={minimizeChange}
       ref={card!}
       onkeydown={event => {
         if (card!.getAttribute("data-type") != "dialog" || event.key != "Tab") return;
@@ -232,8 +234,8 @@ export default function Card(props: CardProps) {
     const main = self.querySelector<HTMLDivElement>(".main")!;
     const changeIdentifier = Math.random().toString();
 
-    self.setAttribute("data-minimize-change",changeIdentifier);
-    workspace_tabs.setAttribute("data-minimize-change",changeIdentifier);
+    setMinimizeChange(changeIdentifier);
+    setMinimizeChangeGLOBAL(changeIdentifier);
     const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
     if (!self.matches("[data-minimize]")){
       // setMinimize!(true);
@@ -252,7 +254,7 @@ export default function Card(props: CardProps) {
       // setMinimize!(false);
       self.removeAttribute("data-minimize");
       window.setTimeout(() => {
-        if (self.getAttribute("data-minimize-change") == changeIdentifier) self.style.removeProperty("--card-minimize-width");
+        if (minimizeChange() == changeIdentifier) self.style.removeProperty("--card-minimize-width");
       },transitionDuration);
       self.style.removeProperty("--card-main-width");
       self.style.removeProperty("--card-main-height");
@@ -260,8 +262,8 @@ export default function Card(props: CardProps) {
       workspace_tabs.style.removeProperty("--minimize-tab-width");
     }
     window.setTimeout(() => {
-      if (self.getAttribute("data-minimize-change") == changeIdentifier) self.removeAttribute("data-minimize-change");
-      if (workspace_tabs.getAttribute("data-minimize-change") == changeIdentifier) workspace_tabs.removeAttribute("data-minimize-change");
+      if (minimizeChange() == changeIdentifier) setMinimizeChange(null);
+      if (minimizeChangeGLOBAL() == changeIdentifier) setMinimizeChangeGLOBAL(null);
     },transitionDuration);
   }
 
