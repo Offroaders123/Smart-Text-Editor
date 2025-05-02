@@ -89,11 +89,11 @@ export default function Card(props: CardProps) {
           setDialogPrevious(document.activeElement as HTMLElement);
         }
         document.querySelectorAll<MenuDropElement>("menu-drop[data-open]").forEach(menu => menu.close());
-        const transitionDuration = parseInt(`${Number(getElementStyle({ element: card!, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 500}`);
-        window.setTimeout(() => {
-          if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
-          if (previous) card!.querySelector<HTMLElement>(`[data-card-previous="${previous}"]`)!.focus();
-        },transitionDuration);
+        // const transitionDuration = parseInt(`${Number(getElementStyle({ element: card!, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 500}`);
+        // window.setTimeout(() => {
+        //   if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+        //   if (previous) card!.querySelector<HTMLElement>(`[data-card-previous="${previous}"]`)!.focus();
+        // },transitionDuration);
         setActiveDialog(props.id as DialogID);
         break;
       };
@@ -181,7 +181,7 @@ export default function Card(props: CardProps) {
     </div>
   );
 
-  function openCard(id: CardID, previous?: string): void {
+  function openCard(id: CardID): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
     if (props.active() && !getAlertTimeout()) return void props.setActive(false);
