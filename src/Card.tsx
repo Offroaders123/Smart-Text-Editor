@@ -184,7 +184,7 @@ export default function Card(props: CardProps) {
   function openCard(id: CardID, previous?: string): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
-    if (self.matches("[data-active]") && !getAlertTimeout()) return void props.setActive(false);
+    if (props.active() && !getAlertTimeout()) return void props.setActive(false);
     // if (getCardType(self) != "alert"){
     //   document.querySelectorAll<HTMLDivElement>(`.Card[data-active]`).forEach(card => {
     //     if (getCardType(card) != "dialog" && getCardType(card) != getCardType(self)) return;
@@ -195,7 +195,7 @@ export default function Card(props: CardProps) {
     //   });
     // }
     // props.setActive(true);
-    self.setAttribute("data-active","");
+    // self.setAttribute("data-active","");
     // if (getCardType(self) == "widget" && cardBackdropShown()) setCardBackdropShown(false);
     if (getCardType(self) == "alert"){
       const timeoutIdentifier = Math.random().toString();
@@ -269,7 +269,7 @@ export default function Card(props: CardProps) {
     const self = document.getElementById(id)! as HTMLDivElement;
 
     // props.setActive(false);
-    self.removeAttribute("data-active");
+    // self.removeAttribute("data-active");
     // if (self.matches("[data-minimize]")){
     //   const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
     //   window.setTimeout(() => minimizeCard(id),transitionDuration);
