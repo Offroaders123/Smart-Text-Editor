@@ -127,7 +127,8 @@ export default function Card(props: CardProps) {
       class="Card"
       data-type={props.type}
       data-active={props.active() ? "" : null}
-      data-minimize-change={minimizeChange}
+      data-minimize={minimize?.()}
+      data-minimize-change={minimizeChange()}
       ref={card!}
       onkeydown={event => {
         if (card!.getAttribute("data-type") != "dialog" || event.key != "Tab") return;
@@ -239,7 +240,7 @@ export default function Card(props: CardProps) {
     const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
     if (!self.matches("[data-minimize]")){
       // setMinimize!(true);
-      self.setAttribute("data-minimize", "");
+      // self.setAttribute("data-minimize", "");
       if (getCardControls(self) === undefined) return;
       self.style.setProperty("--card-minimize-width",`${getCardControls(self).minimize.querySelector("svg")!.clientWidth + parseInt(getElementStyle({ element: getCardControls(self).minimize, property: "--control-padding" }),10) * 2}px`);
       self.style.setProperty("--card-main-width",`${main.clientWidth}px`);
@@ -252,7 +253,7 @@ export default function Card(props: CardProps) {
       if (self.contains(document.activeElement) && document.activeElement != getCardControls(self).minimize) getCardControls(self).minimize.focus();
     } else {
       // setMinimize!(false);
-      self.removeAttribute("data-minimize");
+      // self.removeAttribute("data-minimize");
       window.setTimeout(() => {
         if (minimizeChange() == changeIdentifier) self.style.removeProperty("--card-minimize-width");
       },transitionDuration);
