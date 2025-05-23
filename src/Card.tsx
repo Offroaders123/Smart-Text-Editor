@@ -9,7 +9,7 @@ import { setTabsVisibility } from "./Editor.js";
 import { getElementStyle } from "./dom.js";
 import "./Card.scss";
 
-import type { Accessor, JSX } from "solid-js";
+import type { Accessor, JSX, Setter } from "solid-js";
 import type { CardID, DialogID, WidgetID } from "./app.js";
 
 export interface CardElement extends HTMLDivElement {
@@ -27,7 +27,7 @@ export interface CardProps {
   id: CardID;
   type: CardType;
   active: Accessor<boolean>;
-  setActive: (previous: boolean) => boolean;
+  setActive: Setter<boolean>;
   parent?: DialogID;
   heading: string;
   icon?: string;

@@ -1,4 +1,4 @@
-import { createMemo } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 import Card from "./Card.js";
 import "./Dialog.scss";
 
@@ -16,8 +16,15 @@ export interface DialogProps {
 }
 
 export default function Dialog(props: DialogProps) {
-  const active = createMemo<boolean>(() => props.getActiveDialog() === props.id);
-  const setActive = (isActive: boolean): boolean => (props.setActiveDialog(isActive ? props.id : null), isActive);
+  const [active, setActive] = createSignal<boolean>(props.getActiveDialog() === props.id);
+
+  createEffect(() => {
+    if (active()) {
+      props.setActiveDialog(props.id);
+    } else {
+      props.setActiveDialog(null);
+    }
+  });
 
   return (
     <Card
