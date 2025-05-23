@@ -18,24 +18,23 @@ export interface DialogProps {
 export default function Dialog(props: DialogProps) {
   const [active, setActive] = createSignal<boolean>(props.getActiveDialog() === props.id);
 
-  // Keep `active()` in sync when parent changes `getActiveDialog`
   createEffect(() => {
-    const isActive: boolean = props.getActiveDialog() === props.id;
-    if (active() !== isActive) {
-      setActive(isActive);
-    }
-  });
+    const external: DialogID | null = props.getActiveDialog();
+    const internal: boolean = active();
 
-  // Keep parent in sync when `active()` changes locally
-  createEffect(() => {
-    if (active()) {
-      if (props.getActiveDialog() !== props.id) {
-        props.setActiveDialog(props.id);
-      }
-    } else {
-      if (props.getActiveDialog() === props.id) {
-        props.setActiveDialog(null);
-      }
+    // If external changed and internal is wrong, update internal
+    if (external === props.id && !internal) {
+      setActive(true);
+    } else if (external !== props.id && internal) {
+      setActive(false);
+    }
+
+    // If internal changed and external is wrong, update external
+    // This part only runs if `setActive()` was called first
+    if (internal && external !== props.id) {
+      props.setActiveDialog(props.id);
+    } else if (!internal && external === props.id) {
+      props.setActiveDialog(null);
     }
   });
 
