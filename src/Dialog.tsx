@@ -17,7 +17,7 @@ export interface DialogProps {
 
 export default function Dialog(props: DialogProps) {
   const active = createMemo<boolean>(() => props.getActiveDialog() === props.id);
-  const setActive = createMemo<DialogID | null>(isActive => props.setActiveDialog(isActive ? props.id : null));
+  const setActive = (isActive: boolean): boolean => (props.setActiveDialog(isActive ? props.id : null), isActive);
 
   return (
     <Card

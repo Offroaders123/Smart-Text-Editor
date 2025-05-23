@@ -22,7 +22,7 @@ export default function Widget(props: WidgetProps) {
   });
 
   const active = createMemo<boolean>(() => props.getActiveWidget() === props.id);
-  const setActive = createMemo<string | null>(isActive => props.setActiveWidget(isActive ? props.id : null));
+  const setActive = (isActive: boolean): boolean => (props.setActiveWidget(isActive ? props.id : null), isActive);
 
   return (
     <Card
