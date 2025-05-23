@@ -1,4 +1,4 @@
-import { createEffect, createSignal, Show } from "solid-js";
+import { createEffect, createMemo, createSignal, Show } from "solid-js";
 import { activeDialog, activeWidget, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, workspaceEditors, workspaceTabs, setMinimizeChangeGLOBAL, minimizeChangeGLOBAL } from "./app.js";
 import DecorativeImage from "./DecorativeImage.js";
 import ArrowIcon from "./ArrowIcon.js";
@@ -44,6 +44,7 @@ export default function Card(props: CardProps) {
   const [minimize, setMinimize] = props.type === "widget" ? createSignal<boolean>(false) : [null, null];
   const [minimizeChange, setMinimizeChange] = createSignal<string | null>(null);
   const [getAlertTimeout, setAlertTimeout] = createSignal<string | null>(null);
+  const getActive = createMemo<string | null>(() => props.active() ? "" : null);
 
   createEffect(() => {
     if (!props.active()) return;
@@ -126,7 +127,7 @@ export default function Card(props: CardProps) {
       id={props.id}
       class="Card"
       data-type={props.type}
-      data-active={props.active() ? "" : null}
+      data-active={getActive()}
       data-minimize={minimize?.()}
       data-minimize-change={minimizeChange()}
       ref={card!}
