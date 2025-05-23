@@ -1,4 +1,4 @@
-import { createEffect, createSignal } from "solid-js";
+import { createEffect, createMemo, createSignal } from "solid-js";
 import Card from "./Card.js";
 import "./Widget.scss";
 
@@ -21,10 +21,11 @@ export default function Widget(props: WidgetProps) {
     console.log(props.getActiveWidget(), props.getMinimizeWidget());
   });
 
-  const [active, setActive] = createSignal<boolean>(props.getActiveWidget() === props.id);
+  const active = createMemo<boolean>(() => props.getActiveWidget() === props.id);
+  const [active_, setActive] = createSignal<boolean>(props.getActiveWidget() === props.id);
 
   createEffect(() => {
-    if (active()) {
+    if (active_()) {
       props.setActiveWidget(props.id);
     } else {
       props.setActiveWidget(null);
