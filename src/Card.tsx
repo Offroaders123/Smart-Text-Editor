@@ -23,11 +23,11 @@ export interface CardControls {
   readonly close: HTMLButtonElement;
 }
 
-export interface CardProps {
-  id: CardID;
+export interface CardProps<T extends CardID> {
+  id: T;
   type: CardType;
-  active: Accessor<CardID | null>;
-  setActive: Setter<CardID | null>;
+  active: Accessor<T | null>;
+  setActive: Setter<T | null>;
   parent?: DialogID;
   heading: string;
   icon?: string;
@@ -38,13 +38,13 @@ export interface CardProps {
 /**
  * The base component for the Alert, Dialog, and Widget card types.
 */
-export default function Card(props: CardProps) {
+export default function Card<T extends CardID>(props: CardProps<T>) {
   let card: CardElement;
   let header: HTMLDivElement;
   const [minimize, setMinimize] = props.type === "widget" ? createSignal<boolean>(false) : [null, null];
   const [minimizeChange, setMinimizeChange] = createSignal<string | null>(null);
   const [getAlertTimeout, setAlertTimeout] = createSignal<string | null>(null);
-  const getActive = createMemo<string | null>(() => props.active() ? "" : null);
+  const getActive = createMemo<string | null>(() => props.active() === props.id ? "" : null);
   const getMinimize = createMemo<string | null>(() => minimize?.() ? "" : null);
 
   createEffect(() => {

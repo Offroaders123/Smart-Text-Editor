@@ -25,7 +25,7 @@ export interface AlertProps {
 
 export default function Alert(props: AlertProps) {
   return (
-    <Card
+    <Card<AlertID>
       id={props.id}
       type="alert"
       active={props.getActiveAlert}

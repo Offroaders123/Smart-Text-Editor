@@ -16,7 +16,7 @@ export interface DialogProps {
 
 export default function Dialog(props: DialogProps) {
   return (
-    <Card
+    <Card<DialogID>
       id={props.id}
       type="dialog"
       active={props.getActiveDialog}

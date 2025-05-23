@@ -22,7 +22,7 @@ export default function Widget(props: WidgetProps) {
   });
 
   return (
-    <Card
+    <Card<WidgetID>
       id={props.id}
       type="widget"
       active={props.getActiveWidget}
