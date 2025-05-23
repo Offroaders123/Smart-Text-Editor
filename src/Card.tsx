@@ -26,8 +26,8 @@ export interface CardControls {
 export interface CardProps {
   id: CardID;
   type: CardType;
-  active: Accessor<boolean>;
-  setActive: Setter<boolean>;
+  active: Accessor<CardID | null>;
+  setActive: Setter<CardID | null>;
   parent?: DialogID;
   heading: string;
   icon?: string;
@@ -52,7 +52,7 @@ export default function Card(props: CardProps) {
     if (props.type !== "dialog") return;
 
     if (activeWidget() !== null) {
-      props.setActive(false);
+      props.setActive(null);
     }
   });
 
@@ -80,7 +80,7 @@ export default function Card(props: CardProps) {
         window.setTimeout(() => {
           if (getAlertTimeout() != timeoutIdentifier) return;
           setAlertTimeout(null);
-          props.setActive(false);
+          props.setActive(null);
           // closeCard(props.id);
         },4000);
         break;
@@ -108,7 +108,7 @@ export default function Card(props: CardProps) {
   });
 
   createEffect(() => {
-    const active: boolean = props.active();
+    const active: CardID | null = props.active();
     console.log(active);
     if (active) {
       openCard(props.id);
@@ -173,7 +173,7 @@ export default function Card(props: CardProps) {
           }} onclick={() => setMinimize!(!minimize!())}>
             <MinimizeIcon/>
           </button>
-          <button class="control" data-control="close" onclick={() => props.setActive(false)}>
+          <button class="control" data-control="close" onclick={() => props.setActive(null)}>
             <CloseIcon/>
           </button>
         </div>
@@ -190,7 +190,7 @@ export default function Card(props: CardProps) {
   function openCard(id: CardID): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
-    if (props.active() && !getAlertTimeout()) return void props.setActive(false);
+    if (props.active() && !getAlertTimeout()) return void props.setActive(null);
     // if (getCardType(self) != "alert"){
     //   document.querySelectorAll<HTMLDivElement>(`.Card[data-active]`).forEach(card => {
     //     if (getCardType(card) != "dialog" && getCardType(card) != getCardType(self)) return;
@@ -209,7 +209,7 @@ export default function Card(props: CardProps) {
       window.setTimeout(() => {
         if (getAlertTimeout() != timeoutIdentifier) return;
         setAlertTimeout(null);
-        props.setActive(false);
+        props.setActive(null);
         // closeCard(id);
       },4000);
     }
