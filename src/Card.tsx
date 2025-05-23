@@ -108,6 +108,7 @@ export default function Card(props: CardProps) {
 
   createEffect(() => {
     const active: boolean = props.active();
+    console.log(active);
     if (active) {
       openCard(props.id);
     } else {
