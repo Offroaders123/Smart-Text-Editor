@@ -45,6 +45,7 @@ export default function Card(props: CardProps) {
   const [minimizeChange, setMinimizeChange] = createSignal<string | null>(null);
   const [getAlertTimeout, setAlertTimeout] = createSignal<string | null>(null);
   const getActive = createMemo<string | null>(() => props.active() ? "" : null);
+  const getMinimize = createMemo<string | null>(() => minimize?.() ? "" : null);
 
   createEffect(() => {
     if (!props.active()) return;
@@ -129,7 +130,7 @@ export default function Card(props: CardProps) {
       class="Card"
       data-type={props.type}
       data-active={getActive()}
-      data-minimize={minimize?.()}
+      data-minimize={getMinimize()}
       data-minimize-change={minimizeChange()}
       ref={card!}
       onkeydown={event => {
