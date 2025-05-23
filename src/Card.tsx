@@ -233,6 +233,8 @@ export default function Card(props: CardProps) {
   function minimizeCard(id: CardID): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
+    console.log("minimize called!", minimize!());
+
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const icon = getCardControls(self).minimize.querySelector("svg")!;
     const main = self.querySelector<HTMLDivElement>(".main")!;
@@ -241,7 +243,8 @@ export default function Card(props: CardProps) {
     setMinimizeChange(changeIdentifier);
     setMinimizeChangeGLOBAL(changeIdentifier);
     const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
-    if (!self.matches("[data-minimize]")){
+    // something is wrong here, I think this needs to be inverted?
+    if (minimize!()){
       // setMinimize!(true);
       // self.setAttribute("data-minimize", "");
       if (getCardControls(self) === undefined) return;
