@@ -23,13 +23,17 @@ export default function Widget(props: WidgetProps) {
   let header: HTMLDivElement;
   const active = createMemo<"" | null>(() => props.getActiveWidget() === props.id ? "" : null);
   const [minimize, setMinimize] = createSignal<boolean>(false);
+  const [minimizeChange, setMinimizeChange] = createSignal<string | null>(null);
+  const getMinimize = createMemo<"" | null>(() => minimize() ? "" : null);
 
   return (
     <div
       id={props.id}
       class="Card"
       data-type="widget"
-      data-active={active()}>
+      data-active={active()}
+      data-minimize={getMinimize()}
+      data-minimize-change={minimizeChange()}>
       <div class="header" ref={header!}>
         <span class="heading">{props.heading}</span>
         <div class="card-controls">
