@@ -3,6 +3,7 @@ import { createMemo } from "solid-js";
 import BackIcon from "./BackIcon.js";
 import CloseIcon from "./CloseIcon.js";
 import { getElementStyle } from "./dom.js";
+import { getNavigableElements } from "./dialog-navigation.js";
 import "./Card.scss";
 import "./Dialog.scss";
 
