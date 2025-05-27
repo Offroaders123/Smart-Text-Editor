@@ -56,13 +56,13 @@ export default function Dialog(props: DialogProps) {
       }}>
       <div class="header" data-card-parent={props.parent} ref={header!}>
         <button class="card-back" onclick={() => {
-          openCard(props.parent!);
+          props.setActiveDialog(props.parent!);
 
           const previous: string = card!.id;
           const transitionDuration = parseInt(`${Number(getElementStyle({ element: card!, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 500}`);
           window.setTimeout(() => {
             if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
-            if (previous) card!.querySelector<HTMLElement>(`[data-card-previous="${previous}"]`)!.focus();
+            if (previous) document.querySelector<HTMLElement>(`#${props.parent!} [data-card-previous="${previous}"]`)!.focus();
           },transitionDuration);
         }}>
           <BackIcon/>
