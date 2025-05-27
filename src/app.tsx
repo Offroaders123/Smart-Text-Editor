@@ -479,6 +479,7 @@ window.addEventListener("beforeinstallprompt",event => {
   event.preventDefault();
   setInstallPrompt(event);
   document.documentElement.classList.add("install-prompt-available");
+  if (typeof theme_button === "undefined") return console.warn("Theme button not found");
   theme_button.childNodes[0]!.textContent = "Theme";
 });
 

@@ -1,4 +1,6 @@
-import Card from "./Card.js";
+import { createMemo } from "solid-js";
+// import Card from "./Card.js";
+import "./Card.scss";
 import "./Alert.scss";
 
 import type { Accessor, JSX, Setter } from "solid-js";
@@ -24,15 +26,13 @@ export interface AlertProps {
 }
 
 export default function Alert(props: AlertProps) {
+  const active = createMemo<"" | null>(() => props.getActiveAlert() ? "" : null);
+
   return (
-    <Card<AlertID>
+    <div
       id={props.id}
-      type="alert"
-      active={props.getActiveAlert}
-      setActive={props.setActiveAlert}
-      heading={props.heading}
-      icon={props.icon}
-      main={props.main}
+      data-type="alert"
+      data-active={active()}
     />
   );
 }

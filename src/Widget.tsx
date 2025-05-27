@@ -1,35 +1,31 @@
-import { createEffect } from "solid-js";
-import Card from "./Card.js";
+import { createMemo } from "solid-js";
+// import Card from "./Card.js";
+import "./Card.scss";
 import "./Widget.scss";
 
-import type { Accessor, JSX, Setter } from "solid-js";
-import type { WidgetID } from "./app.js";
+import type { JSX } from "solid-js";
+import type { activeWidget, minimizeWidget, setActiveWidget, setMinimizeWidget, WidgetID } from "./app.js";
 
 export interface WidgetProps {
   id: WidgetID;
   heading: string;
   main: JSX.Element;
   options: JSX.Element;
-  getActiveWidget: Accessor<WidgetID | null>;
-  setActiveWidget: Setter<WidgetID | null>;
-  getMinimizeWidget: Accessor<WidgetID | null>;
-  setMinimizeWidget: Setter<WidgetID | null>;
+  getActiveWidget: typeof activeWidget;
+  setActiveWidget: typeof setActiveWidget;
+  getMinimizeWidget: typeof minimizeWidget;
+  setMinimizeWidget: typeof setMinimizeWidget;
 }
 
 export default function Widget(props: WidgetProps) {
-  createEffect(() => {
-    console.log(props.getActiveWidget(), props.getMinimizeWidget());
-  });
+  const active = createMemo<"" | null>(() => props.getActiveWidget() === props.id ? "" : null);
 
   return (
-    <Card<WidgetID>
+    <div
       id={props.id}
-      type="widget"
-      active={props.getActiveWidget}
-      setActive={props.setActiveWidget}
-      heading={props.heading}
-      main={props.main}
-      options={props.options}
+      class="Card"
+      data-type="widget"
+      data-active={active()}
     />
   );
 }
