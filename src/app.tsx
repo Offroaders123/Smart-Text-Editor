@@ -363,11 +363,20 @@ export function toggleActiveWidget<T extends WidgetID>(id: T): T | null {
 
 /**
  * The currently minimized Widget.
- * 
- * Should this be a derived effect somehow? Maybe it can solely just get handled by the (now internal) `openCard()` function.
- * I solely don't want it to dissasociate with that of which card is currently opened. That bug has been around for a while in general.
 */
-export const [minimizeWidget, setMinimizeWidget] = createSignal<WidgetID | null>(null);
+export let minimizeWidget: Accessor<boolean> | null;
+
+export let setMinimizeWidget: Setter<boolean> | null;
+
+export interface MinimizeHandler {
+  minimizeWidget: typeof minimizeWidget;
+  setMinimizeWidget: typeof setMinimizeWidget;
+}
+
+export function setMinimizeHandler(handler: MinimizeHandler): void {
+  minimizeWidget = handler.minimizeWidget;
+  setMinimizeWidget = handler.setMinimizeWidget;
+}
 
 /**
  * (Shim?)
@@ -639,11 +648,7 @@ document.body.addEventListener("keydown",event => {
   if ((controlShift || shiftCommand) && pressed("m")){
     event.preventDefault();
     if (event.repeat || !activeWidget()) return;
-    if (activeWidget()){
-      setMinimizeWidget(activeWidget());
-      // Needs to call this line as an effect instead
-      // minimizeCard(activeWidget()!);
-    }
+    setMinimizeWidget!(minimizeWidget!());
   }
   if ((control || command) && (pressed(",") || pressed("<"))){
     event.preventDefault();
