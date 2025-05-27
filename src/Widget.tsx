@@ -1,5 +1,7 @@
-import { createMemo } from "solid-js";
+import { createMemo, createSignal } from "solid-js";
 // import Card from "./Card.js";
+import MinimizeIcon from "./MinimizeIcon.js";
+import CloseIcon from "./CloseIcon.js";
 import "./Card.scss";
 import "./Widget.scss";
 
@@ -18,14 +20,38 @@ export interface WidgetProps {
 }
 
 export default function Widget(props: WidgetProps) {
+  let header: HTMLDivElement;
   const active = createMemo<"" | null>(() => props.getActiveWidget() === props.id ? "" : null);
+  const [minimize, setMinimize] = createSignal<boolean>(false);
 
   return (
     <div
       id={props.id}
       class="Card"
       data-type="widget"
-      data-active={active()}
-    />
+      data-active={active()}>
+      <div class="header" ref={header!}>
+        <span class="heading">{props.heading}</span>
+        <div class="card-controls">
+          <button class="control" data-control="minimize" onkeydown={event => {
+            if (event.key != "Enter") return;
+            event.preventDefault();
+            if (event.repeat) return;
+            event.currentTarget.click();
+          }} onclick={() => setMinimize!(!minimize!())}>
+            <MinimizeIcon/>
+          </button>
+          <button class="control" data-control="close" onclick={() => props.setActiveWidget(null)}>
+            <CloseIcon/>
+          </button>
+        </div>
+      </div>
+      <div class="main">
+        <div class="content">
+          {props.main}
+        </div>
+        {props.options}
+      </div>
+    </div>
   );
 }
