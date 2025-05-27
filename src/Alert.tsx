@@ -1,5 +1,6 @@
 import { createMemo } from "solid-js";
 // import Card from "./Card.js";
+import DecorativeImage from "./DecorativeImage.js";
 import "./Card.scss";
 import "./Alert.scss";
 
@@ -31,8 +32,18 @@ export default function Alert(props: AlertProps) {
   return (
     <div
       id={props.id}
+      class="Card"
       data-type="alert"
-      data-active={active()}
-    />
+      data-active={active()}>
+      <div class="header">
+        <DecorativeImage class="icon" src={props.icon!} alt=""/>
+        <span class="heading">{props.heading}</span>
+      </div>
+      <div class="main">
+        <div class="content">
+          {props.main}
+        </div>
+      </div>
+    </div>
   );
 }
