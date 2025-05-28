@@ -523,7 +523,6 @@ window.addEventListener("blur",() => {
 });
 
 document.body.addEventListener("keydown",event => {
-  console.log(minimizeWidget, setMinimizeWidget);
   const control = (event.ctrlKey && !environment.appleDevice);
   const command = (event.metaKey && environment.appleDevice);
   const shift = (event.shiftKey || ((event.key.toUpperCase() === event.key) && (event.key + event.key === String(Number(event.key) * 2))));
@@ -649,8 +648,9 @@ document.body.addEventListener("keydown",event => {
   }
   if ((controlShift || shiftCommand) && pressed("m")){
     event.preventDefault();
+    console.log(minimizeWidget, setMinimizeWidget);
     if (event.repeat || !activeWidget()) return;
-    setMinimizeWidget!(minimizeWidget!());
+    setMinimizeWidget!(!minimizeWidget!());
   }
   if ((control || command) && (pressed(",") || pressed("<"))){
     event.preventDefault();
