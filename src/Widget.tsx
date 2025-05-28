@@ -1,7 +1,8 @@
-import { createMemo, createSignal } from "solid-js";
+import { createEffect, createMemo, createSignal } from "solid-js";
 // import Card from "./Card.js";
 import MinimizeIcon from "./MinimizeIcon.js";
 import CloseIcon from "./CloseIcon.js";
+import { setMinimizeHandler } from "./app.js";
 import "./Card.scss";
 import "./Widget.scss";
 
@@ -25,6 +26,20 @@ export default function Widget(props: WidgetProps) {
   const [minimize, setMinimize] = createSignal<boolean>(false);
   const [minimizeChange, setMinimizeChange] = createSignal<string | null>(null);
   const getMinimize = createMemo<"" | null>(() => minimize() ? "" : null);
+
+  createEffect(() => {
+    if (active()) {
+      setMinimizeHandler({
+        minimizeWidget: minimize,
+        setMinimizeWidget: setMinimize
+      });
+    } else {
+      setMinimizeHandler({
+        minimizeWidget: null,
+        setMinimizeWidget: null
+      });
+    }
+  });
 
   return (
     <div

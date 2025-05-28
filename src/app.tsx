@@ -364,9 +364,9 @@ export function toggleActiveWidget<T extends WidgetID>(id: T): T | null {
 /**
  * The currently minimized Widget.
 */
-export let minimizeWidget: Accessor<boolean> | null;
+export let minimizeWidget = null as Accessor<boolean> | null;
 
-export let setMinimizeWidget: Setter<boolean> | null;
+export let setMinimizeWidget = null as Setter<boolean> | null;
 
 export interface MinimizeHandler {
   minimizeWidget: typeof minimizeWidget;
@@ -376,6 +376,7 @@ export interface MinimizeHandler {
 export function setMinimizeHandler(handler: MinimizeHandler): void {
   minimizeWidget = handler.minimizeWidget;
   setMinimizeWidget = handler.setMinimizeWidget;
+  console.log("updating!", minimizeWidget, setMinimizeWidget);
 }
 
 /**
@@ -522,6 +523,7 @@ window.addEventListener("blur",() => {
 });
 
 document.body.addEventListener("keydown",event => {
+  console.log(minimizeWidget, setMinimizeWidget);
   const control = (event.ctrlKey && !environment.appleDevice);
   const command = (event.metaKey && environment.appleDevice);
   const shift = (event.shiftKey || ((event.key.toUpperCase() === event.key) && (event.key + event.key === String(Number(event.key) * 2))));
