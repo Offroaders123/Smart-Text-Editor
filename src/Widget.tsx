@@ -2,7 +2,7 @@ import { createEffect, createMemo, createSignal } from "solid-js";
 // import Card from "./Card.js";
 import MinimizeIcon from "./MinimizeIcon.js";
 import CloseIcon from "./CloseIcon.js";
-import { setMinimizeHandler } from "./app.js";
+import { setMinimizeChangeGLOBAL, setMinimizeHandler } from "./app.js";
 import { getElementStyle } from "./dom.js";
 import "./Card.scss";
 import "./Widget.scss";
@@ -43,6 +43,20 @@ export default function Widget(props: WidgetProps) {
 
     return props.getActiveWidget();
   }, props.getActiveWidget());
+
+  createEffect(() => {
+    const changeIdentifier = Math.random().toString();
+
+    setMinimizeChange(changeIdentifier);
+    setMinimizeChangeGLOBAL(changeIdentifier);
+    const transitionDuration = parseInt(`${Number(getElementStyle({ element: self!, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
+
+    if (minimize()) {
+      console.log(`${props.id}: MINIED`);
+    } else {
+      console.log(`${props.id}: maxed`);
+    }
+  });
 
   createEffect(() => {
     if (active() !== null || !minimize()) return;
