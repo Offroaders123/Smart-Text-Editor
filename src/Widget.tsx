@@ -33,10 +33,10 @@ export default function Widget(props: WidgetProps) {
         minimize,
         setMinimize
       ]);
-      console.log("set handler:", props.id);
+      console.log(`set handler: ${props.id}\nprevious: ${previous}`);
     } else if (previous === props.id) {
       setMinimizeHandler(null);
-      console.log("unset handler:", props.id);
+      console.log(`unset handler: ${props.id}\nprevious: ${previous}`);
     }
 
     return props.getActiveWidget();
