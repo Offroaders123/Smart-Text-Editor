@@ -7,7 +7,7 @@ import { insertTemplate } from "./Tools.js";
 import { close, createEditor, getNext, getPrevious, open, rename, setTabsVisibility } from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview } from "./Workspace.js";
 
-import type { Accessor, Setter } from "solid-js";
+import type { Accessor, Setter, Signal } from "solid-js";
 
 import { createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
@@ -364,19 +364,15 @@ export function toggleActiveWidget<T extends WidgetID>(id: T): T | null {
 /**
  * The currently minimized Widget.
 */
-export let minimizeWidget = null as Accessor<boolean> | null;
+const [minimizeWidgetS, setMinimizeWidgetS] = createSignal<MinimizeHandler>([null, null]);
 
-export let setMinimizeWidget = null as Setter<boolean> | null;
+export { minimizeWidgetS as minimizeWidget, setMinimizeWidgetS as setMinimizeWidget };
 
-export interface MinimizeHandler {
-  minimizeWidget: typeof minimizeWidget;
-  setMinimizeWidget: typeof setMinimizeWidget;
-}
+export type MinimizeHandler = Signal<boolean> | [get: null, set: null];
 
 export function setMinimizeHandler(handler: MinimizeHandler): void {
-  minimizeWidget = handler.minimizeWidget;
-  setMinimizeWidget = handler.setMinimizeWidget;
-  console.log("updating!", minimizeWidget, setMinimizeWidget);
+  setMinimizeWidgetS(handler);
+  console.log("updating!", handler);
 }
 
 /**
@@ -648,6 +644,7 @@ document.body.addEventListener("keydown",event => {
   }
   if ((controlShift || shiftCommand) && pressed("m")){
     event.preventDefault();
+    const [minimizeWidget, setMinimizeWidget] = minimizeWidgetS();
     console.log(minimizeWidget, setMinimizeWidget);
     if (event.repeat || !activeWidget()) return;
     setMinimizeWidget!(!minimizeWidget!());

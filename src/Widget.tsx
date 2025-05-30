@@ -30,15 +30,15 @@ export default function Widget(props: WidgetProps) {
   createEffect(() => {
     console.log("handler update!");
     if (active() === "") {
-      setMinimizeHandler({
-        minimizeWidget: minimize,
-        setMinimizeWidget: setMinimize
-      });
+      setMinimizeHandler([
+        minimize,
+        setMinimize
+      ]);
     } else {
-      setMinimizeHandler({
-        minimizeWidget: null,
-        setMinimizeWidget: null
-      });
+      setMinimizeHandler([
+        null,
+        null
+      ]);
     }
   });
 
