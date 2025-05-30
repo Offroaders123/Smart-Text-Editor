@@ -70,6 +70,14 @@ export default function Widget(props: WidgetProps) {
       if (self!.contains(document.activeElement) && document.activeElement != getCardControls(self!).minimize) getCardControls(self!).minimize.focus();
     } else {
       console.log(`${props.id}: maxed`);
+
+      setTimeout(() => {
+        if (minimizeChange() == changeIdentifier) self!.style.removeProperty("--card-minimize-width");
+      }, transitionDuration);
+      self!.style.removeProperty("--card-main-width");
+      self!.style.removeProperty("--card-main-height");
+      icon.replaceWith(MinimizeIcon() as Element);
+      workspace_tabs.style.removeProperty("--minimize-tab-width");
     }
   });
 
