@@ -7,7 +7,7 @@ import "./Card.scss";
 import "./Widget.scss";
 
 import type { JSX } from "solid-js";
-import type { activeWidget, minimizeWidget, setActiveWidget, setMinimizeWidget, WidgetID } from "./app.js";
+import type { activeWidget, minimizeHandler, setActiveWidget, WidgetID } from "./app.js";
 
 export interface WidgetProps {
   id: WidgetID;
@@ -16,8 +16,8 @@ export interface WidgetProps {
   options: JSX.Element;
   getActiveWidget: typeof activeWidget;
   setActiveWidget: typeof setActiveWidget;
-  getMinimizeWidget: typeof minimizeWidget;
-  setMinimizeWidget: typeof setMinimizeWidget;
+  getMinimizeHandler: typeof minimizeHandler;
+  setMinimizeHandler: typeof setMinimizeHandler;
 }
 
 export default function Widget(props: WidgetProps) {

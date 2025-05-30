@@ -2,7 +2,7 @@ import { createSignal } from "solid-js";
 import Widget from "./Widget.js";
 import CardItem from "./CardItem.js";
 import CardOptions from "./CardOptions.js";
-import { activeWidget, minimizeWidget, setActiveWidget, setMinimizeWidget } from "./app.js";
+import { activeWidget, minimizeHandler, setActiveWidget, setMinimizeHandler } from "./app.js";
 import { applyEditingBehavior } from "./dom.js";
 
 export default function UUIDGeneratorCard() {
@@ -35,8 +35,8 @@ export default function UUIDGeneratorCard() {
       }
       getActiveWidget={activeWidget}
       setActiveWidget={setActiveWidget}
-      getMinimizeWidget={minimizeWidget}
-      setMinimizeWidget={setMinimizeWidget}
+      getMinimizeHandler={minimizeHandler}
+      setMinimizeHandler={setMinimizeHandler}
     />
   );
 }

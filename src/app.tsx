@@ -366,10 +366,6 @@ export function toggleActiveWidget<T extends WidgetID>(id: T): T | null {
 */
 export const [minimizeHandler, setMinimizeHandler] = createSignal<MinimizeHandler>([null, null]);
 
-// Alias for reformatting, temporary
-// Just to omit reformatting each widget right now.
-export { minimizeHandler as minimizeWidget, setMinimizeHandler as setMinimizeWidget };
-
 export type MinimizeHandler = Signal<boolean> | [get: null, set: null];
 
 /**

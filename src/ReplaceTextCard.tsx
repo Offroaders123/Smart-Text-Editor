@@ -2,7 +2,7 @@ import { createSignal } from "solid-js";
 import Widget from "./Widget.js";
 import CardItem from "./CardItem.js";
 import CardOptions from "./CardOptions.js";
-import { activeEditor, activeWidget, minimizeWidget, setActiveWidget, setMinimizeWidget } from "./app.js";
+import { activeEditor, activeWidget, minimizeHandler, setActiveWidget, setMinimizeHandler } from "./app.js";
 import { applyEditingBehavior } from "./dom.js";
 
 export default function ReplaceTextCard() {
@@ -57,8 +57,8 @@ export default function ReplaceTextCard() {
       }
       getActiveWidget={activeWidget}
       setActiveWidget={setActiveWidget}
-      getMinimizeWidget={minimizeWidget}
-      setMinimizeWidget={setMinimizeWidget}
+      getMinimizeHandler={minimizeHandler}
+      setMinimizeHandler={setMinimizeHandler}
     />
   );
 }
