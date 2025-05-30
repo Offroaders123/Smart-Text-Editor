@@ -364,16 +364,13 @@ export function toggleActiveWidget<T extends WidgetID>(id: T): T | null {
 /**
  * The currently minimized Widget.
 */
-const [minimizeWidgetS, setMinimizeWidgetS] = createSignal<MinimizeHandler>([null, null]);
+export const [minimizeHandler, setMinimizeHandler] = createSignal<MinimizeHandler>([null, null]);
 
-export { minimizeWidgetS as minimizeWidget, setMinimizeWidgetS as setMinimizeWidget };
+// Alias for reformatting, temporary
+// Just to omit reformatting each widget right now.
+export { minimizeHandler as minimizeWidget, setMinimizeHandler as setMinimizeWidget };
 
 export type MinimizeHandler = Signal<boolean> | [get: null, set: null];
-
-export function setMinimizeHandler(handler: MinimizeHandler): void {
-  setMinimizeWidgetS(handler);
-  console.log("updating!", handler);
-}
 
 /**
  * (Shim?)
@@ -644,7 +641,7 @@ document.body.addEventListener("keydown",event => {
   }
   if ((controlShift || shiftCommand) && pressed("m")){
     event.preventDefault();
-    const [minimizeWidget, setMinimizeWidget] = minimizeWidgetS();
+    const [minimizeWidget, setMinimizeWidget] = minimizeHandler();
     console.log(minimizeWidget, setMinimizeWidget);
     if (event.repeat || !activeWidget()) return;
     setMinimizeWidget!(!minimizeWidget!());
