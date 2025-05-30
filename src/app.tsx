@@ -638,7 +638,7 @@ document.body.addEventListener("keydown",event => {
   if ((controlShift || shiftCommand) && pressed("m")){
     event.preventDefault();
     const [minimizeWidget, setMinimizeWidget] = minimizeHandler() ?? [null, null];
-    console.log(minimizeWidget, setMinimizeWidget);
+    console.log(`signal type: "${typeof minimizeWidget === "function" ? "signal" : "null"}"`);
     if (event.repeat || !activeWidget()) return;
     setMinimizeWidget!(!minimizeWidget!());
   }
