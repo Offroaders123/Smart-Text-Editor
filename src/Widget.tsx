@@ -4,7 +4,7 @@ import ArrowIcon from "./ArrowIcon.js";
 import MinimizeIcon from "./MinimizeIcon.js";
 import CloseIcon from "./CloseIcon.js";
 import { setTabsVisibility } from "./Editor.js";
-import { setMinimizeChangeGLOBAL, setMinimizeHandler, workspaceTabs } from "./app.js";
+import { minimizeChangeGLOBAL, setMinimizeChangeGLOBAL, setMinimizeHandler, workspaceTabs } from "./app.js";
 import { getElementStyle } from "./dom.js";
 import "./Card.scss";
 import "./Widget.scss";
@@ -79,6 +79,11 @@ export default function Widget(props: WidgetProps) {
       icon.replaceWith(MinimizeIcon() as Element);
       workspace_tabs.style.removeProperty("--minimize-tab-width");
     }
+    setTimeout(() => {
+      console.log("FULL UNSET MINIMIZE");
+      if (minimizeChange() == changeIdentifier) setMinimizeChange(null);
+      if (minimizeChangeGLOBAL() == changeIdentifier) setMinimizeChangeGLOBAL(null);
+    }, transitionDuration);
   });
 
   createEffect(() => {
