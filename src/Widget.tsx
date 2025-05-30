@@ -35,10 +35,7 @@ export default function Widget(props: WidgetProps) {
         setMinimize
       ]);
     } else {
-      setMinimizeHandler([
-        null,
-        null
-      ]);
+      setMinimizeHandler(null);
     }
   });
 

@@ -364,9 +364,9 @@ export function toggleActiveWidget<T extends WidgetID>(id: T): T | null {
 /**
  * The currently minimized Widget.
 */
-export const [minimizeHandler, setMinimizeHandler] = createSignal<MinimizeHandler>([null, null]);
+export const [minimizeHandler, setMinimizeHandler] = createSignal<MinimizeHandler>(null);
 
-export type MinimizeHandler = Signal<boolean> | [get: null, set: null];
+export type MinimizeHandler = Signal<boolean> | null;
 
 /**
  * (Shim?)
@@ -637,7 +637,7 @@ document.body.addEventListener("keydown",event => {
   }
   if ((controlShift || shiftCommand) && pressed("m")){
     event.preventDefault();
-    const [minimizeWidget, setMinimizeWidget] = minimizeHandler();
+    const [minimizeWidget, setMinimizeWidget] = minimizeHandler() ?? [null, null];
     console.log(minimizeWidget, setMinimizeWidget);
     if (event.repeat || !activeWidget()) return;
     setMinimizeWidget!(!minimizeWidget!());
