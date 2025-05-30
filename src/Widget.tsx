@@ -40,7 +40,7 @@ export default function Widget(props: WidgetProps) {
     }
 
     return props.getActiveWidget();
-  }, null);
+  }, props.getActiveWidget());
 
   return (
     <div
