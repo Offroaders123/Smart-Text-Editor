@@ -47,7 +47,7 @@ export default function Widget(props: WidgetProps) {
   }, props.getActiveWidget());
 
   createEffect(() => {
-    console.log(`minimize change: ${props.id}`);
+    // console.log(`minimize change: ${props.id}`);
 
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const icon = getCardControls(self!).minimize.querySelector("svg")!;
@@ -81,11 +81,11 @@ export default function Widget(props: WidgetProps) {
       icon.replaceWith(MinimizeIcon() as Element);
       workspace_tabs.style.removeProperty("--minimize-tab-width");
     }
-    setTimeout(() => {
-      console.log("FULL UNSET MINIMIZE");
-      if (minimizeChange() == changeIdentifier) setMinimizeChange(null);
-      if (minimizeChangeGLOBAL() == changeIdentifier) setMinimizeChangeGLOBAL(null);
-    }, transitionDuration);
+    // setTimeout(() => {
+    //   console.log("FULL UNSET MINIMIZE");
+    //   if (minimizeChange() == changeIdentifier) setMinimizeChange(null);
+    //   if (minimizeChangeGLOBAL() == changeIdentifier) setMinimizeChangeGLOBAL(null);
+    // }, transitionDuration);
   });
 
   createEffect(() => {
