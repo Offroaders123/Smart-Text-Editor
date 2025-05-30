@@ -1,4 +1,4 @@
-import { createMemo } from "solid-js";
+import { createEffect, createMemo } from "solid-js";
 // import Card from "./Card.js";
 import BackIcon from "./BackIcon.js";
 import CloseIcon from "./CloseIcon.js";
@@ -35,6 +35,13 @@ export default function Dialog(props: DialogProps) {
   let card: CardElement;
   let header: HTMLDivElement;
   const active = createMemo<"" | null>(() => props.getActiveDialog() === props.id ? "" : null);
+
+  createEffect(() => {
+    if (active() === null) return;
+    for (const menu of document.querySelectorAll<MenuDropElement>("menu-drop[data-open]")) {
+      menu.close();
+    }
+  });
 
   return (
     <div
