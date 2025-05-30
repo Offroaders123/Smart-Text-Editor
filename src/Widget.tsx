@@ -27,7 +27,9 @@ export default function Widget(props: WidgetProps) {
   const [minimizeChange, setMinimizeChange] = createSignal<string | null>(null);
   const getMinimize = createMemo<"" | null>(() => minimize() ? "" : null);
 
-  createEffect(() => {
+  createEffect(previous => {
+    if (previous === props.id) console.log("previous:", previous);
+
     if (active() === "") {
       setMinimizeHandler([
         minimize,
@@ -38,6 +40,8 @@ export default function Widget(props: WidgetProps) {
       setMinimizeHandler(null);
       console.log("unset handler:", props.id);
     }
+
+    return props.getActiveWidget();
   });
 
   return (
