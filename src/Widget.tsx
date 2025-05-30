@@ -28,7 +28,7 @@ export default function Widget(props: WidgetProps) {
   const getMinimize = createMemo<"" | null>(() => minimize() ? "" : null);
 
   createEffect(() => {
-    console.log("handler update!");
+    console.log("handler update!:", props.id);
     if (active() === "") {
       setMinimizeHandler([
         minimize,
