@@ -47,6 +47,8 @@ export default function Widget(props: WidgetProps) {
   }, props.getActiveWidget());
 
   createEffect(() => {
+    console.log(`minimize change: ${props.id}`);
+
     const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const icon = getCardControls(self!).minimize.querySelector("svg")!;
     const main = self!.querySelector<HTMLDivElement>(".main")!;
