@@ -28,14 +28,15 @@ export default function Widget(props: WidgetProps) {
   const getMinimize = createMemo<"" | null>(() => minimize() ? "" : null);
 
   createEffect(() => {
-    console.log("handler update!:", props.id);
     if (active() === "") {
       setMinimizeHandler([
         minimize,
         setMinimize
       ]);
+      console.log("set handler:", props.id);
     } else {
       setMinimizeHandler(null);
+      console.log("unset handler:", props.id);
     }
   });
 
