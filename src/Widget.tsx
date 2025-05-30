@@ -3,6 +3,7 @@ import { createEffect, createMemo, createSignal } from "solid-js";
 import MinimizeIcon from "./MinimizeIcon.js";
 import CloseIcon from "./CloseIcon.js";
 import { setMinimizeHandler } from "./app.js";
+import { getElementStyle } from "./dom.js";
 import "./Card.scss";
 import "./Widget.scss";
 
@@ -21,6 +22,7 @@ export interface WidgetProps {
 }
 
 export default function Widget(props: WidgetProps) {
+  let self: HTMLDivElement;
   let header: HTMLDivElement;
   const active = createMemo<"" | null>(() => props.getActiveWidget() === props.id ? "" : null);
   const [minimize, setMinimize] = createSignal<boolean>(false);
@@ -42,6 +44,15 @@ export default function Widget(props: WidgetProps) {
     return props.getActiveWidget();
   }, props.getActiveWidget());
 
+  createEffect(() => {
+    if (active() !== null || !minimize()) return;
+    const transitionDuration = parseInt(`${Number(getElementStyle({ element: self!, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
+    setTimeout(() => {
+      setMinimize(false);
+      console.log("maximized automatically!");
+    }, transitionDuration);
+  });
+
   return (
     <div
       id={props.id}
@@ -49,7 +60,8 @@ export default function Widget(props: WidgetProps) {
       data-type="widget"
       data-active={active()}
       data-minimize={getMinimize()}
-      data-minimize-change={minimizeChange()}>
+      data-minimize-change={minimizeChange()}
+      ref={self!}>
       <div class="header" ref={header!}>
         <span class="heading">{props.heading}</span>
         <div class="card-controls">
