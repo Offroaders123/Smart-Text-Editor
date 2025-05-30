@@ -27,22 +27,20 @@ export default function Widget(props: WidgetProps) {
   const [minimizeChange, setMinimizeChange] = createSignal<string | null>(null);
   const getMinimize = createMemo<"" | null>(() => minimize() ? "" : null);
 
-  createEffect(previous => {
-    if (previous === props.id) console.log("previous:", previous);
-
+  createEffect<WidgetID | null>(previous => {
     if (active() === "") {
       setMinimizeHandler([
         minimize,
         setMinimize
       ]);
       console.log("set handler:", props.id);
-    } else if (props.getActiveWidget() === props.id || props.getActiveWidget() === null) {
+    } else if (previous === props.id) {
       setMinimizeHandler(null);
       console.log("unset handler:", props.id);
     }
 
     return props.getActiveWidget();
-  });
+  }, null);
 
   return (
     <div
