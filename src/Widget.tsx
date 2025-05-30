@@ -34,7 +34,7 @@ export default function Widget(props: WidgetProps) {
         setMinimize
       ]);
       console.log(`set handler: ${props.id}\nprevious: ${previous}`);
-    } else if (previous === props.id) {
+    } else if (previous === props.id && props.getActiveWidget() === null) {
       setMinimizeHandler(null);
       console.log(`unset handler: ${props.id}\nprevious: ${previous}`);
     }
