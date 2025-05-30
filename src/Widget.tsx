@@ -1,8 +1,10 @@
 import { createEffect, createMemo, createSignal } from "solid-js";
 // import Card from "./Card.js";
+import ArrowIcon from "./ArrowIcon.js";
 import MinimizeIcon from "./MinimizeIcon.js";
 import CloseIcon from "./CloseIcon.js";
-import { setMinimizeChangeGLOBAL, setMinimizeHandler } from "./app.js";
+import { setTabsVisibility } from "./Editor.js";
+import { setMinimizeChangeGLOBAL, setMinimizeHandler, workspaceTabs } from "./app.js";
 import { getElementStyle } from "./dom.js";
 import "./Card.scss";
 import "./Widget.scss";
@@ -45,6 +47,9 @@ export default function Widget(props: WidgetProps) {
   }, props.getActiveWidget());
 
   createEffect(() => {
+    const workspace_tabs: HTMLDivElement = workspaceTabs()!;
+    const icon = getCardControls(self!).minimize.querySelector("svg")!;
+    const main = self!.querySelector<HTMLDivElement>(".main")!;
     const changeIdentifier = Math.random().toString();
 
     setMinimizeChange(changeIdentifier);
@@ -53,6 +58,16 @@ export default function Widget(props: WidgetProps) {
 
     if (minimize()) {
       console.log(`${props.id}: MINIED`);
+
+      self!.style.setProperty("--card-minimize-width", `${getCardControls(self!).minimize.querySelector("svg")!.clientWidth + parseInt(getElementStyle({ element: getCardControls(self!).minimize, property: "--control-padding" }), 10) * 2}px`);
+      self!.style.setProperty("--card-main-width", `${main.clientWidth}px`);
+      self!.style.setProperty("--card-main-height", `${main.clientHeight}px`);
+      icon.replaceWith(ArrowIcon() as Element);
+      setTimeout(() => {
+        workspace_tabs.style.setProperty("--minimize-tab-width", getElementStyle({ element: self!, property: "width" }));
+        setTabsVisibility();
+      }, transitionDuration);
+      if (self!.contains(document.activeElement) && document.activeElement != getCardControls(self!).minimize) getCardControls(self!).minimize.focus();
     } else {
       console.log(`${props.id}: maxed`);
     }
@@ -100,4 +115,15 @@ export default function Widget(props: WidgetProps) {
       </div>
     </div>
   );
+}
+
+interface CardControls {
+  readonly minimize: HTMLButtonElement;
+  readonly close: HTMLButtonElement;
+}
+
+function getCardControls(self: HTMLDivElement): CardControls {
+  const controls: HTMLButtonElement[] = [...self.querySelectorAll<HTMLButtonElement>(".card-controls .control")];
+  const [minimize, close] = controls as [HTMLButtonElement, HTMLButtonElement];
+  return { minimize, close };
 }
