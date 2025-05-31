@@ -15,7 +15,7 @@ export default function WorkspaceTabs(props: WorkspaceTabsProps) {
     <div
       ref={props.setWorkspaceTabs}
       class="workspace-tabs"
-      data-minimize-change={minimizeChangeGLOBAL}
+      data-minimize-change={minimizeChangeGLOBAL()}
       onkeydown={event => {
         if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
         if (!workspaceTabs()!.contains(document.activeElement) || !(document.activeElement instanceof HTMLElement)) return;
