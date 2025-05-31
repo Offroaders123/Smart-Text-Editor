@@ -4,7 +4,7 @@ import ArrowIcon from "./ArrowIcon.js";
 import MinimizeIcon from "./MinimizeIcon.js";
 import CloseIcon from "./CloseIcon.js";
 import { setTabsVisibility } from "./Editor.js";
-import { minimizeChangeGLOBAL, setMinimizeChangeGLOBAL, setMinimizeHandler, workspaceTabs } from "./app.js";
+import { minimizeChangeGLOBAL, setMinimizeChangeGLOBAL, setMinimizeHandler, setMinimizeTabWidth } from "./app.js";
 import { getElementStyle } from "./dom.js";
 import "./Card.scss";
 import "./Widget.scss";
@@ -49,7 +49,6 @@ export default function Widget(props: WidgetProps) {
   createEffect(() => {
     // console.log(`minimize change: ${props.id}`);
 
-    const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const icon = getCardControls(self!).minimize.querySelector("svg")!;
     const main = self!.querySelector<HTMLDivElement>(".main")!;
     const changeIdentifier = Math.random().toString();
@@ -66,7 +65,8 @@ export default function Widget(props: WidgetProps) {
       self!.style.setProperty("--card-main-height", `${main.clientHeight}px`);
       icon.replaceWith(ArrowIcon() as Element);
       setTimeout(() => {
-        workspace_tabs.style.setProperty("--minimize-tab-width", getElementStyle({ element: self!, property: "width" }));
+        const minimizeTabWidth = getElementStyle({ element: self!, property: "width" });
+        setMinimizeTabWidth(minimizeTabWidth);
         setTabsVisibility();
       }, transitionDuration);
       if (self!.contains(document.activeElement) && document.activeElement != getCardControls(self!).minimize) getCardControls(self!).minimize.focus();
@@ -79,7 +79,7 @@ export default function Widget(props: WidgetProps) {
       self!.style.removeProperty("--card-main-width");
       self!.style.removeProperty("--card-main-height");
       icon.replaceWith(MinimizeIcon() as Element);
-      workspace_tabs.style.removeProperty("--minimize-tab-width");
+      setMinimizeTabWidth(undefined);
     }
     // setTimeout(() => {
     //   console.log("FULL UNSET MINIMIZE");

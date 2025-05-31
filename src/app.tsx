@@ -404,6 +404,8 @@ export const [workspace, setWorkspace] = createSignal<HTMLDivElement | null>(nul
 
 export const [workspaceTabs, setWorkspaceTabs] = createSignal<HTMLDivElement | null>(null);
 
+export const [minimizeTabWidth, setMinimizeTabWidth] = createSignal<string | undefined>(undefined);
+
 export const [minimizeChangeGLOBAL, setMinimizeChangeGLOBAL] = createSignal<string | null>(null);
 
 export const [createEditorButton, setCreateEditorButton] = createSignal<HTMLButtonElement | null>(null);

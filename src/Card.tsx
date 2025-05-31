@@ -1,5 +1,5 @@
 import { createEffect, createMemo, createSignal, Show } from "solid-js";
-import { activeDialog, activeWidget, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, workspaceEditors, workspaceTabs, setMinimizeChangeGLOBAL, minimizeChangeGLOBAL } from "./app.js";
+import { activeDialog, activeWidget, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, workspaceEditors, setMinimizeTabWidth, setMinimizeChangeGLOBAL, minimizeChangeGLOBAL } from "./app.js";
 import DecorativeImage from "./DecorativeImage.js";
 import ArrowIcon from "./ArrowIcon.js";
 import BackIcon from "./BackIcon.js";
@@ -235,7 +235,6 @@ export default function Card<T extends CardID>(props: CardProps<T>) {
 
     console.log("minimize called!", minimize!());
 
-    const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const icon = getCardControls(self).minimize.querySelector("svg")!;
     const main = self.querySelector<HTMLDivElement>(".main")!;
     const changeIdentifier = Math.random().toString();
@@ -253,7 +252,8 @@ export default function Card<T extends CardID>(props: CardProps<T>) {
       self.style.setProperty("--card-main-height",`${main.clientHeight}px`);
       icon.replaceWith(ArrowIcon() as Element);
       window.setTimeout(() => {
-        workspace_tabs.style.setProperty("--minimize-tab-width",getElementStyle({ element: self, property: "width" }));
+        const minimizeTabWidth = getElementStyle({ element: self, property: "width" });
+        setMinimizeTabWidth(minimizeTabWidth);
         setTabsVisibility();
       },transitionDuration);
       if (self.contains(document.activeElement) && document.activeElement != getCardControls(self).minimize) getCardControls(self).minimize.focus();
@@ -266,7 +266,7 @@ export default function Card<T extends CardID>(props: CardProps<T>) {
       self.style.removeProperty("--card-main-width");
       self.style.removeProperty("--card-main-height");
       icon.replaceWith(MinimizeIcon() as Element);
-      workspace_tabs.style.removeProperty("--minimize-tab-width");
+      setMinimizeTabWidth(undefined);
     }
     window.setTimeout(() => {
       if (minimizeChange() == changeIdentifier) setMinimizeChange(null);

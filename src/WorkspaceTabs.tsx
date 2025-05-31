@@ -1,6 +1,6 @@
 import CloseIcon from "./CloseIcon.js";
 import { createEditor, getNext, getPrevious, query } from "./Editor.js";
-import { minimizeChangeGLOBAL, workspaceTabs } from "./app.js";
+import { minimizeChangeGLOBAL, minimizeTabWidth, workspaceTabs } from "./app.js";
 import "./WorkspaceTabs.scss";
 
 import type { Setter } from "solid-js";
@@ -16,6 +16,9 @@ export default function WorkspaceTabs(props: WorkspaceTabsProps) {
       ref={props.setWorkspaceTabs}
       class="workspace-tabs"
       data-minimize-change={minimizeChangeGLOBAL()}
+      style={{
+        "--minimize-tab-width": minimizeTabWidth()
+      }}
       onkeydown={event => {
         if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
         if (!workspaceTabs()!.contains(document.activeElement) || !(document.activeElement instanceof HTMLElement)) return;
