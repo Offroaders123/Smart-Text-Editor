@@ -3,7 +3,7 @@ import { createEffect, createMemo } from "solid-js";
 import BackIcon from "./BackIcon.js";
 import CloseIcon from "./CloseIcon.js";
 import { getElementStyle } from "./dom.js";
-import { getNavigableElements } from "./dialog-navigation.js";
+import { catchCardNavigation, getNavigableElements } from "./dialog-navigation.js";
 import "./Card.scss";
 import "./Dialog.scss";
 
@@ -37,9 +37,13 @@ export default function Dialog(props: DialogProps) {
   const active = createMemo<"" | null>(() => props.getActiveDialog() === props.id ? "" : null);
 
   createEffect(() => {
-    if (active() === null) return;
+    if (active() === "") {
+      document.body.addEventListener("keydown", catchCardNavigation);
     for (const menu of document.querySelectorAll<MenuDropElement>("menu-drop[data-open]")) {
       menu.close();
+    }
+    } else {
+      document.body.removeEventListener("keydown", catchCardNavigation);
     }
   });
 
