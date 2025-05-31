@@ -1,4 +1,4 @@
-import { createMemo } from "solid-js";
+import { createEffect, createMemo, createSignal } from "solid-js";
 // import Card from "./Card.js";
 import DecorativeImage from "./DecorativeImage.js";
 import "./Card.scss";
@@ -27,7 +27,20 @@ export interface AlertProps {
 }
 
 export default function Alert(props: AlertProps) {
+  const [getAlertTimeout, setAlertTimeout] = createSignal<string | null>(null);
   const active = createMemo<"" | null>(() => props.getActiveAlert() ? "" : null);
+
+  createEffect(() => {
+    if (active() === null) return;
+    const timeoutIdentifier = Math.random().toString();
+    setAlertTimeout(timeoutIdentifier);
+    setTimeout(() => {
+      if (getAlertTimeout() != timeoutIdentifier) return;
+      setAlertTimeout(null);
+      props.setActiveAlert(false);
+      console.log("closed!", timeoutIdentifier);
+    }, 4000);
+  });
 
   return (
     <div
