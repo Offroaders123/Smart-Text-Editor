@@ -2,9 +2,9 @@ import { createEffect, createMemo } from "solid-js";
 import Dialog from "./Dialog.js";
 import CardItem from "./CardItem.js";
 import CardOptions from "./CardOptions.js";
-import { settings } from "./app.js";
-import { refreshPreview } from "./Workspace.js";
-import { applyEditingBehavior } from "./dom.js";
+import { settings } from "../app.js";
+import { refreshPreview } from "../Workspace.js";
+import { applyEditingBehavior } from "../dom.js";
 
 import type { Accessor, Setter } from "solid-js";
 

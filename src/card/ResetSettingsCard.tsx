@@ -1,6 +1,6 @@
 import Alert from "./Alert.js";
 import CardItem from "./CardItem.js";
-import Settings from "./img/settings.svg";
+import Settings from "../img/settings.svg";
 
 export default function ResetSettingsCard() {
   return (

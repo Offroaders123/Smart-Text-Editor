@@ -2,7 +2,7 @@ import { createEffect } from "solid-js";
 import { Header } from "./Header.js";
 import { Main } from "./Main.js";
 // import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings } from "./app.js";
-import { closeCard, minimizeCard, openCard } from "./Card.js";
+import { closeCard, minimizeCard, openCard } from "./card/Card.js";
 import { insertTemplate } from "./Tools.js";
 import { close, createEditor, getNext, getPrevious, open, rename, setTabsVisibility } from "./Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview } from "./Workspace.js";

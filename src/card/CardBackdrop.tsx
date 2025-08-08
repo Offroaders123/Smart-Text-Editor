@@ -1,4 +1,4 @@
-import { activeDialog, cardBackdropShown } from "./app.js";
+import { activeDialog, cardBackdropShown } from "../app.js";
 import { closeCard } from "./Card.js";
 import "./CardBackdrop.scss";
 

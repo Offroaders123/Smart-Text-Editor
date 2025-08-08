@@ -1,16 +1,16 @@
-import CardBackdrop from "./CardBackdrop.js";
-import ClearedCacheCard from "./ClearedCacheCard.js";
-import ColorPickerCard from "./ColorPickerCard.js";
-import JSONFormatterCard from "./JSONFormatterCard.js";
+import CardBackdrop from "./card/CardBackdrop.js";
+import ClearedCacheCard from "./card/ClearedCacheCard.js";
+import ColorPickerCard from "./card/ColorPickerCard.js";
+import JSONFormatterCard from "./card/JSONFormatterCard.js";
 import Preview from "./Preview.js";
-import PreviewBaseCard from "./PreviewBaseCard.js";
-import ReplaceTextCard from "./ReplaceTextCard.js";
-import ResetSettingsCard from "./ResetSettingsCard.js";
+import PreviewBaseCard from "./card/PreviewBaseCard.js";
+import ReplaceTextCard from "./card/ReplaceTextCard.js";
+import ResetSettingsCard from "./card/ResetSettingsCard.js";
 import Scaler from "./Scaler.js";
-import SettingsCard from "./SettingsCard.js";
-import ThemeCard from "./ThemeCard.js";
-import URIEncoderCard from "./URIEncoderCard.js";
-import UUIDGeneratorCard from "./UUIDGeneratorCard.js";
+import SettingsCard from "./card/SettingsCard.js";
+import ThemeCard from "./card/ThemeCard.js";
+import URIEncoderCard from "./card/URIEncoderCard.js";
+import UUIDGeneratorCard from "./card/UUIDGeneratorCard.js";
 import Workspace from "./Workspace.js";
 import "./Main.scss";
 

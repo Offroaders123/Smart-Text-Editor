@@ -1,8 +1,8 @@
 import Widget from "./Widget.js";
 import CardItem from "./CardItem.js";
 import CardOptions from "./CardOptions.js";
-import Checkbox from "./Checkbox.js";
-import { applyEditingBehavior } from "./dom.js";
+import Checkbox from "../Checkbox.js";
+import { applyEditingBehavior } from "../dom.js";
 
 export default function URIEncoderCard() {
   function encode(): void {

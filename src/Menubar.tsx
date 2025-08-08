@@ -5,7 +5,7 @@ import { activeEditor, settings } from "./app.js";
 import { insertTemplate } from "./Tools.js";
 import { createDisplay, createWindow, openFiles, refreshPreview, saveFile, setOrientation, setPreviewSource, setView } from "./Workspace.js";
 import { clearSiteCaches, showInstallPrompt } from "./dom.js";
-import { openCard } from "./Card.js";
+import { openCard } from "./card/Card.js";
 import WebFormatter from "./img/web-formatter.svg";
 import Sharedrop from "./img/sharedrop.svg";
 import Diffchecker from "./img/diffchecker.svg";

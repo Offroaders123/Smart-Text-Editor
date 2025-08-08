@@ -1,12 +1,12 @@
-import ArrowIcon from "./icon/ArrowIcon.js";
-import InstallIcon from "./icon/InstallIcon.js";
+import ArrowIcon from "../icon/ArrowIcon.js";
+import InstallIcon from "../icon/InstallIcon.js";
 import Dialog from "./Dialog.js";
 import { openCard } from "./Card.js";
 import CardItem from "./CardItem.js";
 import CardOptions from "./CardOptions.js";
-import Checkbox from "./Checkbox.js";
-import { appearance, settings } from "./app.js";
-import { clearSiteCaches, showInstallPrompt } from "./dom.js";
+import Checkbox from "../Checkbox.js";
+import { appearance, settings } from "../app.js";
+import { clearSiteCaches, showInstallPrompt } from "../dom.js";
 
 export default function SettingsCard() {
   return (

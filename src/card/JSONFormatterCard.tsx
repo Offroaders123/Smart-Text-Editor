@@ -2,7 +2,7 @@ import { createSignal } from "solid-js";
 import Widget from "./Widget.js";
 import CardItem from "./CardItem.js";
 import CardOptions from "./CardOptions.js";
-import { applyEditingBehavior } from "./dom.js";
+import { applyEditingBehavior } from "../dom.js";
 
 export default function JSONFormatterCard() {
   const [value, setValue] = createSignal<string>("");

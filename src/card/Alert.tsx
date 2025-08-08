@@ -2,7 +2,7 @@ import Card from "./Card.js";
 import "./Alert.scss";
 
 import type { JSX } from "solid-js";
-import type { AlertID } from "./app.js";
+import type { AlertID } from "../app.js";
 
 export interface AlertProps {
   id: AlertID;

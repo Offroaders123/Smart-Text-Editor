@@ -1,16 +1,16 @@
 import { Show } from "solid-js";
-import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs } from "./app.js";
-import DecorativeImage from "./icon/DecorativeImage.js";
-import ArrowIcon from "./icon/ArrowIcon.js";
-import BackIcon from "./icon/BackIcon.js";
-import MinimizeIcon from "./icon/MinimizeIcon.js";
-import CloseIcon from "./icon/CloseIcon.js";
-import { setTabsVisibility } from "./Editor.js";
-import { getElementStyle } from "./dom.js";
+import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs } from "../app.js";
+import DecorativeImage from "../icon/DecorativeImage.js";
+import ArrowIcon from "../icon/ArrowIcon.js";
+import BackIcon from "../icon/BackIcon.js";
+import MinimizeIcon from "../icon/MinimizeIcon.js";
+import CloseIcon from "../icon/CloseIcon.js";
+import { setTabsVisibility } from "../Editor.js";
+import { getElementStyle } from "../dom.js";
 import "./Card.scss";
 
 import type { JSX } from "solid-js";
-import type { CardID, DialogID, WidgetID } from "./app.js";
+import type { CardID, DialogID, WidgetID } from "../app.js";
 
 export type CardType = "alert" | "widget" | "dialog";
 

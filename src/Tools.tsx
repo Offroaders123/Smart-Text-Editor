@@ -1,7 +1,7 @@
 import { view } from "./app.js";
 import { createEditor } from "./Editor.js";
 import { setView } from "./Workspace.js";
-import { generate } from "./UUIDGeneratorCard.js";
+import { generate } from "./card/UUIDGeneratorCard.js";
 
 export type TemplateType = "html" | "pack-manifest-bedrock";
 
