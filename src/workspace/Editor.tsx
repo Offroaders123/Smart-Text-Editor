@@ -1,10 +1,10 @@
 import { createSignal } from "solid-js";
-import Prism from "./prism.js";
+import Prism from "../prism.js";
 import EditorTab from "./EditorTab.js";
-import PreviewOption from "./PreviewOption.js";
-import { activeEditor, settings, setActiveEditor, activeDialog, environment, appearance, previewEditor, preview as getPreview, workspaceEditors, workspaceTabs, createEditorButton, editors, setEditors, previewMenu } from "./app.js";
+import PreviewOption from "../PreviewOption.js";
+import { activeEditor, settings, setActiveEditor, activeDialog, environment, appearance, previewEditor, preview as getPreview, workspaceEditors, workspaceTabs, createEditorButton, editors, setEditors, previewMenu } from "../app.js";
 import { setPreviewSource, refreshPreview } from "./Workspace.js";
-import { getElementStyle, applyEditingBehavior, setTitle } from "./dom.js";
+import { getElementStyle, applyEditingBehavior, setTitle } from "../dom.js";
 import "./Editor.scss";
 
 import type { Accessor, Setter } from "solid-js";

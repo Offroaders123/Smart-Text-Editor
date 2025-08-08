@@ -3,7 +3,7 @@ import InstallIcon from "./icon/InstallIcon.js";
 import RefreshIcon from "./icon/RefreshIcon.js";
 import GitHubIcon from "./icon/GitHubIcon.js";
 import Menubar from "./Menubar.js";
-import { refreshPreview } from "./Workspace.js";
+import { refreshPreview } from "./workspace/Workspace.js";
 import { showInstallPrompt } from "./dom.js";
 import Icon from "/img/icon.svg";
 import "./Header.scss";

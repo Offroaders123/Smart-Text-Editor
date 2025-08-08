@@ -5,7 +5,7 @@ import ArrowIcon from "../icon/ArrowIcon.js";
 import BackIcon from "../icon/BackIcon.js";
 import MinimizeIcon from "../icon/MinimizeIcon.js";
 import CloseIcon from "../icon/CloseIcon.js";
-import { setTabsVisibility } from "../Editor.js";
+import { setTabsVisibility } from "../workspace/Editor.js";
 import { getElementStyle } from "../dom.js";
 import "./Card.scss";
 

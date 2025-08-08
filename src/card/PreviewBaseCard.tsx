@@ -3,7 +3,7 @@ import Dialog from "./Dialog.js";
 import CardItem from "./CardItem.js";
 import CardOptions from "./CardOptions.js";
 import { settings } from "../app.js";
-import { refreshPreview } from "../Workspace.js";
+import { refreshPreview } from "../workspace/Workspace.js";
 import { applyEditingBehavior } from "../dom.js";
 
 import type { Accessor, Setter } from "solid-js";

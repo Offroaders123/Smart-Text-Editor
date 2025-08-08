@@ -3,9 +3,9 @@ import { Header } from "./Header.js";
 import { Main } from "./Main.js";
 // import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings } from "./app.js";
 import { closeCard, minimizeCard, openCard } from "./card/Card.js";
-import { insertTemplate } from "./Tools.js";
-import { close, createEditor, getNext, getPrevious, open, rename, setTabsVisibility } from "./Editor.js";
-import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview } from "./Workspace.js";
+import { insertTemplate } from "./workspace/Tools.js";
+import { close, createEditor, getNext, getPrevious, open, rename, setTabsVisibility } from "./workspace/Editor.js";
+import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview } from "./workspace/Workspace.js";
 
 import type { Accessor, Setter } from "solid-js";
 
@@ -14,9 +14,9 @@ import { createStore } from "solid-js/store";
 import Prism from "./prism.js";
 // import { openCard } from "./Card.js";
 
-import type { Editor } from "./Editor.js";
-import type { View } from "./Workspace.js";
-import type { Orientation } from "./Workspace.js";
+import type { Editor } from "./workspace/Editor.js";
+import type { View } from "./workspace/Workspace.js";
+import type { Orientation } from "./workspace/Workspace.js";
 
 export interface SafeAreaInsets {
   left: number;

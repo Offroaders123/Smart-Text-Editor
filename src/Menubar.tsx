@@ -1,9 +1,9 @@
 import { createEffect } from "solid-js";
 import DecorativeImage from "./icon/DecorativeImage.js";
-import { createEditor, rename } from "./Editor.js";
+import { createEditor, rename } from "./workspace/Editor.js";
 import { activeEditor, settings } from "./app.js";
-import { insertTemplate } from "./Tools.js";
-import { createDisplay, createWindow, openFiles, refreshPreview, saveFile, setOrientation, setPreviewSource, setView } from "./Workspace.js";
+import { insertTemplate } from "./workspace/Tools.js";
+import { createDisplay, createWindow, openFiles, refreshPreview, saveFile, setOrientation, setPreviewSource, setView } from "./workspace/Workspace.js";
 import { clearSiteCaches, showInstallPrompt } from "./dom.js";
 import { openCard } from "./card/Card.js";
 import WebFormatter from "./img/web-formatter.svg";
