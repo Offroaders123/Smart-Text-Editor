@@ -30,12 +30,12 @@ export default function Menubar(props: MenubarProps) {
   let appMenubar: HTMLDivElement;
 
   createEffect(() => {
-    for (const menu of appMenubar.querySelectorAll("menu-drop")){
+    for (const menu of appMenubar!.querySelectorAll("menu-drop")){
       menu.addEventListener("pointerenter",event => {
         if (event.pointerType !== "mouse") return;
-        if (appMenubar.querySelectorAll("menu-drop:not([data-alternate])[data-open]").length === 0 || menu.matches("[data-alternate]") || menu.matches("[data-open]")) return;
+        if (appMenubar!.querySelectorAll("menu-drop:not([data-alternate])[data-open]").length === 0 || menu.matches("[data-alternate]") || menu.matches("[data-open]")) return;
         menu.opener.focus();
-        for (const menu of appMenubar.querySelectorAll<MenuDropElement>("menu-drop[data-open]")){
+        for (const menu of appMenubar!.querySelectorAll<MenuDropElement>("menu-drop[data-open]")){
           menu.close();
         }
         menu.open();
