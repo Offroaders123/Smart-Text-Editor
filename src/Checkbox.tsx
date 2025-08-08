@@ -1,4 +1,4 @@
-import CheckIcon from "./CheckIcon.js";
+import CheckIcon from "./icon/CheckIcon.js";
 import "./Checkbox.scss";
 
 import type { JSX, FlowProps } from "solid-js";

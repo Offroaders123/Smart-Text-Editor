@@ -1,10 +1,10 @@
 import { Show } from "solid-js";
 import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs } from "./app.js";
-import DecorativeImage from "./DecorativeImage.js";
-import ArrowIcon from "./ArrowIcon.js";
-import BackIcon from "./BackIcon.js";
-import MinimizeIcon from "./MinimizeIcon.js";
-import CloseIcon from "./CloseIcon.js";
+import DecorativeImage from "./icon/DecorativeImage.js";
+import ArrowIcon from "./icon/ArrowIcon.js";
+import BackIcon from "./icon/BackIcon.js";
+import MinimizeIcon from "./icon/MinimizeIcon.js";
+import CloseIcon from "./icon/CloseIcon.js";
 import { setTabsVisibility } from "./Editor.js";
 import { getElementStyle } from "./dom.js";
 import "./Card.scss";

@@ -1,5 +1,5 @@
-import ArrowIcon from "./ArrowIcon.js";
-import InstallIcon from "./InstallIcon.js";
+import ArrowIcon from "./icon/ArrowIcon.js";
+import InstallIcon from "./icon/InstallIcon.js";
 import Dialog from "./Dialog.js";
 import { openCard } from "./Card.js";
 import CardItem from "./CardItem.js";

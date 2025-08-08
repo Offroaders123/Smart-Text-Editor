@@ -1,5 +1,5 @@
 import { createEffect } from "solid-js";
-import DecorativeImage from "./DecorativeImage.js";
+import DecorativeImage from "./icon/DecorativeImage.js";
 import { createEditor, rename } from "./Editor.js";
 import { activeEditor, settings } from "./app.js";
 import { insertTemplate } from "./Tools.js";

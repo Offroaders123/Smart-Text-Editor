@@ -1,7 +1,7 @@
-import DecorativeImage from "./DecorativeImage.js";
-import InstallIcon from "./InstallIcon.js";
-import RefreshIcon from "./RefreshIcon.js";
-import GitHubIcon from "./GitHubIcon.js";
+import DecorativeImage from "./icon/DecorativeImage.js";
+import InstallIcon from "./icon/InstallIcon.js";
+import RefreshIcon from "./icon/RefreshIcon.js";
+import GitHubIcon from "./icon/GitHubIcon.js";
 import Menubar from "./Menubar.js";
 import { refreshPreview } from "./Workspace.js";
 import { showInstallPrompt } from "./dom.js";
