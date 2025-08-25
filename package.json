@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@stedit/menu-drop": "^1.0.1",
+    "@stedit/menu-drop": "^1.1.0",
     "@stedit/num-text": "^1.0.1",
     "prismjs": "1.29.0"
   },
