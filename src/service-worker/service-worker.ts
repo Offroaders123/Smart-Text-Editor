@@ -1,10 +1,10 @@
-import { version as VERSION } from "../../package.json";
+import app from "../../package.json" with { type: "json" };
 
 declare var self: ServiceWorkerGlobalScope;
 declare const clients: Clients;
 
 const NAME = "Smart Text Editor";
-const CACHE_NAME = `${NAME} v${VERSION}` as const;
+const CACHE_NAME = `${NAME} v${app.version}` as const;
 
 const SHARE_FILES: File[] = [];
 
