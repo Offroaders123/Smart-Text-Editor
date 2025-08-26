@@ -177,7 +177,7 @@ export const support = {
 const [view_, setView_] = createSignal<View>("code");
 
 export function view(): View {
-  return document.body.getAttribute("data-view") as View | null ?? "code";
+  return view_();
 }
 
 /**
@@ -197,7 +197,7 @@ export function viewChange(): boolean {
 const [orientation_, setOrientation_] = createSignal<Orientation>("horizontal");
 
 export function orientation(): Orientation {
-  return document.body.getAttribute("data-orientation") as Orientation | null ?? "horizontal";
+  return orientation_();
 }
 
 /**

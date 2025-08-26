@@ -49,7 +49,6 @@ export async function setView(type: View, { force = false }: SetViewOptions = {}
 
   const transitionDuration: number = parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
   document.body.classList.remove(view());
-  document.body.setAttribute("data-view",type);
   document.body.classList.add(view());
   removeScaling();
   viewMenu()!.select(view());
@@ -99,7 +98,6 @@ export async function setOrientation(orientationValue?: Orientation): Promise<vo
   scaler.style.transitionDuration = "0s";
   preview.style.transitionDuration = "0s";
   document.body.classList.remove(orientation());
-  document.body.setAttribute("data-orientation",orientationValue!);
   document.body.classList.add(orientation());
   workspace.offsetHeight;
   scaler.offsetHeight;
