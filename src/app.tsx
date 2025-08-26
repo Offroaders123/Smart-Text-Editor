@@ -212,13 +212,18 @@ export function orientationChange(): boolean {
 }
 
 /**
- * Gets the state of whether the Workspace is being resized with the Scaler handle.
+ * Gets the state of whether the Workspace is currently being resized with the Scaler handle.
 */
 const [scalingChange_, setScalingChange_] = createSignal<boolean>(false);
 
 export function scalingChange(): boolean {
   return document.body.hasAttribute("data-scaling-change");
 }
+
+/**
+ * Whether a custom scaling is currently applied.
+ */
+export const [scalingActive_, setScalingActive_] = createSignal<boolean>(false);
 
 /**
  * Checks if any Editors haven't been saved since their last edits.
@@ -479,7 +484,7 @@ window.addEventListener("resize",() => {
   if (view() !== "preview"){
     setTabsVisibility();
   }
-  if (view() === "split" && document.body.hasAttribute("data-scaling-active")){
+  if (view() === "split" && scalingActive_()){
     setView("split");
   }
 });

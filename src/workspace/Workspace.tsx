@@ -1,4 +1,4 @@
-import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, previewMenu, viewMenu } from "../app.js";
+import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, previewMenu, viewMenu, scalingActive_, setScalingActive_ } from "../app.js";
 import { createEditor, rename, setTabsVisibility } from "./Editor.js";
 import WorkspaceTabs from "./WorkspaceTabs.js";
 import WorkspaceEditors from "./WorkspaceEditors.js";
@@ -323,10 +323,11 @@ export async function refreshPreview({ force = false }: RefreshPreviewOptions = 
  * Resets the Split mode scaling offsets, making the Workspace responsive again.
 */
 function removeScaling(): void {
-  if (!document.body.hasAttribute("data-scaling-active")) return;
+  if (!scalingActive_()) return;
   const workspace: HTMLDivElement = getWorkspace()!;
   const scaler: HTMLDivElement = getScaler()!;
   const preview: HTMLIFrameElement = getPreview()!;
+  setScalingActive_(false); // eventually remove line below
   document.body.removeAttribute("data-scaling-active");
   workspace.style.removeProperty("--scaling-offset");
   scaler.style.removeProperty("--scaling-offset");

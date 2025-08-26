@@ -1,5 +1,5 @@
 import { createEffect } from "solid-js";
-import { appearance, environment, header as getHeader, orientation, preview as getPreview, scaler as getScaler, view, workspace as getWorkspace, workspaceTabs } from "../app.js";
+import { appearance, environment, header as getHeader, orientation, preview as getPreview, scaler as getScaler, view, workspace as getWorkspace, workspaceTabs, setScalingActive_ } from "../app.js";
 import "./Scaler.scss";
 
 import type { Setter } from "solid-js";
@@ -57,6 +57,7 @@ function setScaling(event: MouseEvent | TouchEvent): void {
   if (orientation() == "vertical") scalingOffset = (!touchEvent(event)) ? event.pageY - header.offsetHeight : event.touches[0]!.pageY - header.offsetHeight;
   if (scalingOffset < scalingRange.minimum) scalingOffset = scalingRange.minimum;
   if (scalingOffset > scalingRange.maximum) scalingOffset = scalingRange.maximum;
+  setScalingActive_(true); // eventually remove line below
   document.body.setAttribute("data-scaling-active","");
   workspace.style.setProperty("--scaling-offset",`${scalingOffset}px`);
   scaler.style.setProperty("--scaling-offset",`${scalingOffset}px`);
