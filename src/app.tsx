@@ -214,10 +214,10 @@ export function orientationChange(): boolean {
 /**
  * Gets the state of whether the Workspace is currently being resized with the Scaler handle.
 */
-const [scalingChange_, setScalingChange_] = createSignal<boolean>(false);
+export const [scalingChange_, setScalingChange_] = createSignal<boolean>(false);
 
 export function scalingChange(): boolean {
-  return document.body.hasAttribute("data-scaling-change");
+  return scalingChange_();
 }
 
 /**

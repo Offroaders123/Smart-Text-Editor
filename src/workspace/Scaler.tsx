@@ -1,5 +1,5 @@
 import { createEffect } from "solid-js";
-import { appearance, environment, header as getHeader, orientation, preview as getPreview, scaler as getScaler, view, workspace as getWorkspace, workspaceTabs, setScalingActive_ } from "../app.js";
+import { appearance, environment, header as getHeader, orientation, preview as getPreview, scaler as getScaler, view, workspace as getWorkspace, workspaceTabs, setScalingActive_, setScalingChange_ } from "../app.js";
 import "./Scaler.scss";
 
 import type { Setter } from "solid-js";
@@ -14,6 +14,7 @@ export default function Scaler(props: ScalerProps) {
   createEffect(() => {
     ref.addEventListener("touchstart",event => {
       if (view() !== "split" || event.touches.length !== 1) return;
+      setScalingChange_(true); // eventually remove line below
       document.body.setAttribute("data-scaling-change","");
       document.addEventListener("touchmove",setScaling,{ passive: true });
       document.addEventListener("touchend",disableScaling,{ passive: true });
@@ -28,6 +29,7 @@ export default function Scaler(props: ScalerProps) {
         if (event.button !== 0) return;
         if (view() !== "split") return;
         event.preventDefault();
+        setScalingChange_(true); // eventually remove line below
         document.body.setAttribute("data-scaling-change","");
         document.addEventListener("mousemove",setScaling);
         document.addEventListener("mouseup",disableScaling);
@@ -71,5 +73,6 @@ function disableScaling(event: MouseEvent | TouchEvent): void {
   const touchEvent = (environment.touchDevice && event instanceof TouchEvent);
   document.removeEventListener((!touchEvent) ? "mousemove" : "touchmove",setScaling);
   document.removeEventListener((!touchEvent) ? "mouseup" : "touchend",disableScaling);
+  setScalingChange_(false); // eventually remove line below
   document.body.removeAttribute("data-scaling-change");
 }
