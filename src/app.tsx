@@ -185,10 +185,10 @@ export function view(): View {
  * 
  * This has to do with the View layout transition.
 */
-const [viewChange_, setViewChange_] = createSignal<string | null>(null);
+export const [viewChange_, setViewChange_] = createSignal<string | null>(null);
 
-export function viewChange(): boolean {
-  return document.body.hasAttribute("data-view-change");
+export function viewChange(): string | null {
+  return viewChange_();
 }
 
 /**

@@ -1,4 +1,4 @@
-import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, previewMenu, viewMenu, scalingActive_, setScalingActive_, setOrientationChange_ } from "../app.js";
+import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, previewMenu, viewMenu, scalingActive_, setScalingActive_, setOrientationChange_, setViewChange_, viewChange_ } from "../app.js";
 import { createEditor, rename, setTabsVisibility } from "./Editor.js";
 import WorkspaceTabs from "./WorkspaceTabs.js";
 import WorkspaceEditors from "./WorkspaceEditors.js";
@@ -45,6 +45,7 @@ export async function setView(type: View, { force = false }: SetViewOptions = {}
 
   const workspace: HTMLDivElement = getWorkspace()!;
   const changeIdentifier: string = Math.random().toString();
+  setViewChange_(changeIdentifier); // eventually remove line below
   document.body.setAttribute("data-view-change",changeIdentifier);
 
   const transitionDuration: number = parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
@@ -60,7 +61,8 @@ export async function setView(type: View, { force = false }: SetViewOptions = {}
   if (type !== "preview"){
     setTabsVisibility();
   }
-  if (document.body.getAttribute("data-view-change") === changeIdentifier){
+  if (viewChange_() === changeIdentifier){
+    setViewChange_(null); // eventually remove line below
     document.body.removeAttribute("data-view-change");
   }
 }
