@@ -205,10 +205,10 @@ export function orientation(): Orientation {
  * 
  * This has to do with the Orientation layout transition.
 */
-const [orientationChange_, setOrientationChange_] = createSignal<string | null>(null);
+export const [orientationChange_, setOrientationChange_] = createSignal<boolean>(false);
 
 export function orientationChange(): boolean {
-  return document.body.hasAttribute("data-orientation-change");
+  return orientationChange_();
 }
 
 /**

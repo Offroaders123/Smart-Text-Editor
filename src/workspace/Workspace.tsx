@@ -1,4 +1,4 @@
-import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, previewMenu, viewMenu, scalingActive_, setScalingActive_ } from "../app.js";
+import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, previewMenu, viewMenu, scalingActive_, setScalingActive_, setOrientationChange_ } from "../app.js";
 import { createEditor, rename, setTabsVisibility } from "./Editor.js";
 import WorkspaceTabs from "./WorkspaceTabs.js";
 import WorkspaceEditors from "./WorkspaceEditors.js";
@@ -78,6 +78,7 @@ export async function setOrientation(orientationValue?: Orientation): Promise<vo
   const scaler: HTMLDivElement = getScaler()!;
   const preview: HTMLIFrameElement = getPreview()!;
 
+  setOrientationChange_(true); // eventually remove line below
   document.body.setAttribute("data-orientation-change","");
   const param: boolean = orientationValue !== undefined;
   const transitionDuration: number = ((view() != "split") ? 0 : parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`));
@@ -111,6 +112,7 @@ export async function setOrientation(orientationValue?: Orientation): Promise<vo
 
   await new Promise(resolve => setTimeout(resolve,transitionDuration));
 
+  setOrientationChange_(false); // eventually remove line below
   document.body.removeAttribute("data-orientation-change");
 }
 
