@@ -174,6 +174,8 @@ export const support = {
 /**
  * Gets the current View layout.
 */
+const [view_, setView_] = createSignal<View>("code");
+
 export function view(): View {
   return document.body.getAttribute("data-view") as View | null ?? "code";
 }
@@ -183,6 +185,8 @@ export function view(): View {
  * 
  * This has to do with the View layout transition.
 */
+const [viewChange_, setViewChange_] = createSignal<string | null>(null);
+
 export function viewChange(): boolean {
   return document.body.hasAttribute("data-view-change");
 }
@@ -190,6 +194,8 @@ export function viewChange(): boolean {
 /**
  * Gets the current Orientation layout.
 */
+const [orientation_, setOrientation_] = createSignal<Orientation>("horizontal");
+
 export function orientation(): Orientation {
   return document.body.getAttribute("data-orientation") as Orientation | null ?? "horizontal";
 }
@@ -199,6 +205,8 @@ export function orientation(): Orientation {
  * 
  * This has to do with the Orientation layout transition.
 */
+const [orientationChange_, setOrientationChange_] = createSignal<string | null>(null);
+
 export function orientationChange(): boolean {
   return document.body.hasAttribute("data-orientation-change");
 }
@@ -206,6 +214,8 @@ export function orientationChange(): boolean {
 /**
  * Gets the state of whether the Workspace is being resized with the Scaler handle.
 */
+const [scalingChange_, setScalingChange_] = createSignal<boolean>(false);
+
 export function scalingChange(): boolean {
   return document.body.hasAttribute("data-scaling-change");
 }
