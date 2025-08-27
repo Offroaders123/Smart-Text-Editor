@@ -174,7 +174,7 @@ export const support = {
 /**
  * Gets the current View layout.
 */
-const [view_, setView_] = createSignal<View>("code");
+export const [view_, setView_] = createSignal<View>("code");
 
 export function view(): View {
   return view_();
@@ -194,7 +194,7 @@ export function viewChange(): string | null {
 /**
  * Gets the current Orientation layout.
 */
-const [orientation_, setOrientation_] = createSignal<Orientation>("horizontal");
+export const [orientation_, setOrientation_] = createSignal<Orientation>("horizontal");
 
 export function orientation(): Orientation {
   return orientation_();

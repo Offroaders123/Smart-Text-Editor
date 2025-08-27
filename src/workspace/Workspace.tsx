@@ -1,4 +1,4 @@
-import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, previewMenu, viewMenu, scalingActive_, setScalingActive_, setOrientationChange_, setViewChange_, viewChange_ } from "../app.js";
+import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, previewMenu, viewMenu, scalingActive_, setScalingActive_, setOrientationChange_, setViewChange_, viewChange_, setView_, setOrientation_ } from "../app.js";
 import { createEditor, rename, setTabsVisibility } from "./Editor.js";
 import WorkspaceTabs from "./WorkspaceTabs.js";
 import WorkspaceEditors from "./WorkspaceEditors.js";
@@ -50,6 +50,7 @@ export async function setView(type: View, { force = false }: SetViewOptions = {}
 
   const transitionDuration: number = parseInt(`${Number(getElementStyle({ element: workspace, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
   document.body.classList.remove(view());
+  setView_(type);
   document.body.classList.add(view());
   removeScaling();
   viewMenu()!.select(view());
@@ -101,6 +102,7 @@ export async function setOrientation(orientationValue?: Orientation): Promise<vo
   scaler.style.transitionDuration = "0s";
   preview.style.transitionDuration = "0s";
   document.body.classList.remove(orientation());
+  setOrientation_(orientationValue!);
   document.body.classList.add(orientation());
   workspace.offsetHeight;
   scaler.offsetHeight;
