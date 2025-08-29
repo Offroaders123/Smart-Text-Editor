@@ -9,7 +9,7 @@ import { Main } from "./Main.js";
 import { closeCard, minimizeCard, openCard } from "./card/Card.js";
 import { insertTemplate } from "./workspace/Tools.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview } from "./workspace/Workspace.js";
-import { EditorID } from "./workspace/Editor.js";
+import { Editor, EditorID } from "./workspace/Editor.js";
 
 import type { Accessor, Setter } from "solid-js";
 
@@ -167,15 +167,41 @@ export interface EditorList {
 
 export const [editors, setEditors] = createStore<EditorList>({});
 
-export function createEditor(): void {
-  const i: number = Object.keys(editors).length + 1;
-  const id: EditorID = `editor_${i}`;
+export interface EditorOptions {
+  name?: string;
+  value?: string;
+  handle?: FileSystemFileHandle | null;
+  isOpen?: boolean;
+  autoCreated?: boolean;
+  autoReplace?: boolean;
+}
 
-  setEditors(id, {
-    id,
-    name: `Untitled${i}.txt`,
-    value: "Hello world!"
-  });
+export function createEditor({
+  name = "Untitled.txt",
+  value = "",
+  handle = null,
+  isOpen = true,
+  autoCreated = false,
+  autoReplace = true
+}: EditorOptions = {}): void {
+  const identifier: EditorID = `editor_${Math.random()}`;
+  const editor: Editor = {
+    identifier,
+    name,
+    value,
+    syntaxLanguage: "",
+    syntaxHighlight: false,
+    handle,
+    isOpen,
+    active: false,
+    autoCreated,
+    refresh: false,
+    unsaved: false,
+    autoReplace,
+    focusedOverride: false
+  };
+
+  setEditors(identifier, editor);
 }
 
 export function closeEditor(id: EditorID): void {
