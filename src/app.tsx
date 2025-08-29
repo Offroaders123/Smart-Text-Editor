@@ -8,7 +8,6 @@ import { Main } from "./Main.js";
 // import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings } from "./app.js";
 import { closeCard, minimizeCard, openCard } from "./card/Card.js";
 import { insertTemplate } from "./workspace/Tools.js";
-import { close, createEditor, getNext, getPrevious, open, rename, setTabsVisibility } from "./workspace/Editor.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview } from "./workspace/Workspace.js";
 
 import type { Accessor, Setter } from "solid-js";
@@ -17,7 +16,6 @@ import { createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 // import { openCard } from "./Card.js";
 
-import type { Editor } from "./workspace/Editor.js";
 import type { View } from "./workspace/Workspace.js";
 import type { Orientation } from "./workspace/Workspace.js";
 

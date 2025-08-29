@@ -1,6 +1,5 @@
 import { createEffect } from "solid-js";
 import DecorativeImage from "./icon/DecorativeImage.js";
-import { createEditor, rename } from "./workspace/Editor.js";
 import { activeEditor } from "./app.js";
 import { insertTemplate } from "./workspace/Tools.js";
 import { createDisplay, createWindow, openFiles, refreshPreview, saveFile, setOrientation, setPreviewSource, setView } from "./workspace/Workspace.js";

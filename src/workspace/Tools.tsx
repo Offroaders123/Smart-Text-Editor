@@ -1,5 +1,4 @@
 import { view } from "../app.js";
-import { createEditor } from "./Editor.js";
 import { setView } from "./Workspace.js";
 import { generate } from "../card/UUIDGeneratorCard.js";
 

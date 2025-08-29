@@ -1,5 +1,4 @@
 import CloseIcon from "../icon/CloseIcon.js";
-import { createEditor, getNext, getPrevious, query } from "./Editor.js";
 import { workspaceTabs } from "../app.js";
 import "./WorkspaceTabs.scss";
 

@@ -1,7 +1,5 @@
 import { setPreviewSource } from "./workspace/Workspace.js";
 
-import type { Editor } from "./workspace/Editor.js";
-
 export interface PreviewOptionProps {
   editor: Editor;
 }
