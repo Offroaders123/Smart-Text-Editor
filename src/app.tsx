@@ -9,6 +9,7 @@ import { Main } from "./Main.js";
 import { closeCard, minimizeCard, openCard } from "./card/Card.js";
 import { insertTemplate } from "./workspace/Tools.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview } from "./workspace/Workspace.js";
+import { EditorID } from "./workspace/Editor.js";
 
 import type { Accessor, Setter } from "solid-js";
 
@@ -160,7 +161,26 @@ export const [scaler, setScaler] = createSignal<HTMLDivElement | null>(null);
 
 export const [preview, setPreview] = createSignal<HTMLIFrameElement | null>(null);
 
-export const [editors, setEditors] = createStore<{ [identifier: string]: Editor | undefined; }>({});
+export interface EditorList {
+  [id: EditorID]: Editor;
+}
+
+export const [editors, setEditors] = createStore<EditorList>({});
+
+export function createEditor(): void {
+  const i: number = Object.keys(editors).length + 1;
+  const id: EditorID = `editor_${i}`;
+
+  setEditors(id, {
+    id,
+    name: `Untitled${i}.txt`,
+    value: "Hello world!"
+  });
+}
+
+export function closeEditor(id: EditorID): void {
+  setEditors(id, undefined!);
+}
 
 // if (appearance.parentWindow) document.documentElement.classList.add("startup-fade");
 if (appearance.appleHomeScreen) document.documentElement.classList.add("apple-home-screen");
