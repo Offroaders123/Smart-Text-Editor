@@ -2,25 +2,41 @@ import { type Accessor, For, createMemo, createEffect } from "solid-js";
 import { type SetStoreFunction, createStore } from "solid-js/store";
 import { render } from "solid-js/web";
 
+type EditorID = `editor_${number}`;
+
 interface Editor {
-  id: `editor_${number}`;
+  id: EditorID;
   name: string;
   value: string;
 }
 
 interface EditorList {
-  [id: `editor_${number}`]: Editor;
+  [id: EditorID]: Editor;
+}
+
+interface CreateEditorProps {
+  createEditor: () => void;
+}
+
+function CreateEditor(props: CreateEditorProps) {
+  return (
+    <button onClick={() => props.createEditor()}>
+      Create Editor
+    </button>
+  );
 }
 
 interface EditorRenderProps {
   editor: Editor;
   setEditors: SetStoreFunction<EditorList>;
+  closeEditor: (id: EditorID) => void;
 }
 
 function EditorRender(props: EditorRenderProps) {
   return (
-    <div class="EditorRender">
+    <div class="EditorRender" style={{ display: "flex" }}>
       <button>{props.editor.name}</button>
+      <button onClick={() => props.closeEditor(props.editor.id)}>X</button>
       <textarea
         value={props.editor.value}
         onInput={event => props.setEditors(
@@ -68,6 +84,21 @@ export function App() {
     }
   });
 
+  function createEditor(): void {
+    const i: number = Object.keys(editors).length + 1;
+    const id: EditorID = `editor_${i}`;
+
+    setEditors(id, {
+      id,
+      name: `Untitled${i}.txt`,
+      value: "Hello world!"
+    });
+  }
+
+  function closeEditor(id: EditorID): void {
+    setEditors(id, undefined!);
+  }
+
   const values: Accessor<Editor[]> = createMemo(() =>
     (Object.keys(editors) as Editor["id"][]).map(id => editors[id])
   );
@@ -78,11 +109,13 @@ export function App() {
 
   return (
     <>
+      <CreateEditor createEditor={createEditor}/>
       <For
         each={values()}>
         {editor => <EditorRender
           editor={editor}
           setEditors={setEditors}
+          closeEditor={closeEditor}
         />}
       </For>
       <JSONRender editors={values}/>
