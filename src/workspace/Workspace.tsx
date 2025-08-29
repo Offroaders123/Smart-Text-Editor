@@ -1,7 +1,10 @@
-import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, appearance, support, activeEditor, settings, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, previewMenu, viewMenu, scalingActive_, setScalingActive_, setOrientationChange_, setViewChange_, viewChange_, setView_, setOrientation_ } from "../app.js";
+import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, activeEditor, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, previewMenu, viewMenu, scalingActive_, setScalingActive_, setOrientationChange_, setViewChange_, viewChange_, setView_, setOrientation_ } from "../app.js";
 import { createEditor, rename, setTabsVisibility } from "./Editor.js";
 import WorkspaceTabs from "./WorkspaceTabs.js";
 import WorkspaceEditors from "./WorkspaceEditors.js";
+import { appearance } from "../appearance.js";
+import { settings } from "../settings.js";
+import { support } from "../support.js";
 import { getElementStyle } from "../dom.js";
 import "./Workspace.scss";
 

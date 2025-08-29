@@ -1,5 +1,7 @@
 import { createEffect } from "solid-js";
-import { appearance, environment, header as getHeader, orientation, preview as getPreview, scaler as getScaler, view, workspace as getWorkspace, workspaceTabs, setScalingActive_, setScalingChange_ } from "../app.js";
+import { header as getHeader, orientation, preview as getPreview, scaler as getScaler, view, workspace as getWorkspace, workspaceTabs, setScalingActive_, setScalingChange_ } from "../app.js";
+import { appearance } from "../appearance.js";
+import { environment } from "../environment.js";
 import "./Scaler.scss";
 
 import type { Setter } from "solid-js";
