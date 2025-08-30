@@ -204,13 +204,11 @@ export function createEditor({
   setEditors(identifier, editor);
 }
 
-export function closeEditor(id: EditorID): void {
-  setEditors(id, undefined!);
+export function closeEditor(editor: Editor): void {
+  setEditors(editor.identifier, undefined!);
 }
 
-export function rename(id: EditorID | null, name?: string): void {
-  const editor: Editor | null = id ? editors[id] ?? null : null;
-
+export function rename(editor: Editor | null, name?: string): void {
   if (editor === null) return;
 
   const currentName: string = editor.name;
@@ -221,7 +219,7 @@ export function rename(id: EditorID | null, name?: string): void {
     name = result;
   }
 
-  setEditors(id!, "name", name);
+  setEditors(editor.identifier, "name", name);
 }
 
 // if (appearance.parentWindow) document.documentElement.classList.add("startup-fade");
