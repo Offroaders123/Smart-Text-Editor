@@ -204,7 +204,8 @@ export function createEditor({
   setEditors(identifier, editor);
 }
 
-export function closeEditor(editor: Editor): void {
+export function close(editor: Editor | null): void {
+  if (editor === null) return;
   setEditors(editor.identifier, undefined!);
 }
 
