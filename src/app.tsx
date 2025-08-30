@@ -208,6 +208,22 @@ export function closeEditor(id: EditorID): void {
   setEditors(id, undefined!);
 }
 
+export function rename(id: EditorID | null, name?: string): void {
+  const editor: Editor | null = id ? editors[id] ?? null : null;
+
+  if (editor === null) return;
+
+  const currentName: string = editor.name;
+
+  if (name === undefined) {
+    const result: string | null = prompt(`Enter a new file name for "${currentName}".`, currentName);
+    if (result === null) return;
+    name = result;
+  }
+
+  setEditors(id!, "name", name);
+}
+
 // if (appearance.parentWindow) document.documentElement.classList.add("startup-fade");
 if (appearance.appleHomeScreen) document.documentElement.classList.add("apple-home-screen");
 if (environment.touchDevice) document.documentElement.classList.add("touch-device");
