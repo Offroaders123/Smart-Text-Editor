@@ -5,7 +5,7 @@ main .workspace .Editor {
   --background: var(--workspace-background);
   border: solid transparent;
   border-width: 0 var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
-  visibility: hidden;
+  // visibility: hidden; // temp, because of 'active editors' from old multi-editor setup
   --scrollbar-width: 18px;
   --scrollbar-height: 18px;
   --scrollbar-border-width: 5px;
