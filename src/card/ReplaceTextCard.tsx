@@ -3,6 +3,7 @@ import Widget from "./Widget.js";
 import CardItem from "./CardItem.js";
 import CardOptions from "./CardOptions.js";
 import { applyEditingBehavior } from "../dom.js";
+import { editorValue, setEditorValue } from "../app.js";
 
 export default function ReplaceTextCard() {
   const [findValue, setFindValue] = createSignal<string>("");

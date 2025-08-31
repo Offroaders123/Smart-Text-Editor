@@ -142,6 +142,22 @@ export const [scaler, setScaler] = createSignal<HTMLDivElement | null>(null);
 
 export const [preview, setPreview] = createSignal<HTMLIFrameElement | null>(null);
 
+export const [editorName, setEditorName] = createSignal<string>("");
+
+export const [editorValue, setEditorValue] = createSignal<string>("");
+
+export const [handle, setHandle] = createSignal<FileSystemFileHandle | null>(null);
+
+export const [editorRefresh, setEditorRefresh] = createSignal<boolean>(false);
+
+export const [editorUnsaved, setEditorUnsaved] = createSignal<boolean>(false);
+
+export const [editorRef, setEditorRef] = createSignal<NumTextElement | null>(null);
+
+export async function openFile(): Promise<void> {}
+
+export async function saveFile(extension?: string): Promise<void> {}
+
 // if (appearance.parentWindow) document.documentElement.classList.add("startup-fade");
 if (appearance.appleHomeScreen) document.documentElement.classList.add("apple-home-screen");
 if (environment.touchDevice) document.documentElement.classList.add("touch-device");
@@ -183,6 +199,7 @@ const queryParameters = new URLSearchParams(window.location.search);
         for (const file of event.data.files as File[]){
           const { name } = file;
           const value = await file.text();
+          setEditorName(name);
           setEditorValue(value);
         }
         break;
@@ -373,6 +390,7 @@ document.body.addEventListener("drop",event => {
           if (file === null) break;
           const { name } = file;
           const value = await file.text();
+          setEditorName(name);
           setEditorValue(value);
         } else {
           const handle = await item.getAsFileSystemHandle();
@@ -380,6 +398,7 @@ document.body.addEventListener("drop",event => {
           const file = await handle.getFile();
           const { name } = file;
           const value = await file.text();
+          setEditorName(name);
           setEditorValue(value);
           setHandle(handle);
         }
@@ -428,10 +447,12 @@ if (support.fileHandling && support.fileSystem){
       const file = await handle.getFile();
       const { name } = file;
       const value = await file.text();
-      createEditor({ name, value, handle });
+      setEditorName(name);
+      setEditorValue(value);
+      setHandle(handle);
     }
     if (!environment.touchDevice){
-      activeEditor()?.ref.focus({ preventScroll: true });
+      editorRef()?.focus({ preventScroll: true });
     }
   });
 }

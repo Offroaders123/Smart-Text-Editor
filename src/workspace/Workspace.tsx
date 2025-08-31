@@ -1,4 +1,4 @@
-import { orientationChange, scalingChange, view, orientation, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, viewMenu, scalingActive_, setScalingActive_, setOrientationChange_, setViewChange_, viewChange_, setView_, setOrientation_ } from "../app.js";
+import { orientationChange, scalingChange, view, orientation, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, viewMenu, scalingActive_, setScalingActive_, setOrientationChange_, setViewChange_, viewChange_, setView_, setOrientation_, editorRef, editorName, editorValue, editorRefresh, setEditorRefresh } from "../app.js";
 import WorkspaceEditors from "./WorkspaceEditors.js";
 import { appearance } from "../appearance.js";
 import { settings } from "../settings.js";
@@ -138,7 +138,7 @@ export function createDisplay(): void {
     features = (appearance.standalone || appearance.fullscreen) ? "popup" : "",
     baseURL = settings.previewBase;
   //// @ts-expect-error
-  let source: string = editorRef().editor.value;
+  let source: string = editorValue();
   if (baseURL) source = `<!DOCTYPE html>\n<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
   const link = window.URL.createObjectURL(new Blob([source],{ type: "text/html" })),
     win = window.open(link,"_blank",features);
@@ -167,7 +167,7 @@ export interface RefreshPreviewOptions {
 export async function refreshPreview({ force = false }: RefreshPreviewOptions = {}): Promise<void> {
   if (view() === "code") return;
 
-  const editor: NumTextElement = editorRef();
+  const editor: NumTextElement | null = editorRef();
   if (editor === null) return;
   const change: boolean = editorRefresh() && settings.automaticRefresh !== false;
   if (!change && !force) return;

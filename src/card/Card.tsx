@@ -1,5 +1,5 @@
 import { Show } from "solid-js";
-import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, cardBackdropShown, setCardBackdropShown, workspaceEditors } from "../app.js";
+import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, cardBackdropShown, setCardBackdropShown, workspaceEditors, editorRef } from "../app.js";
 import DecorativeImage from "../icon/DecorativeImage.js";
 import ArrowIcon from "../icon/ArrowIcon.js";
 import BackIcon from "../icon/BackIcon.js";
@@ -175,7 +175,7 @@ export default function Card(props: CardProps) {
       setActiveDialog(null);
       if (dialogPrevious()){
         const hidden = (getElementStyle({ element: dialogPrevious()!, property: "visibility" }) == "hidden");
-        (!workspace_editors.contains(dialogPrevious()!) && !hidden) ? dialogPrevious()!.focus({ preventScroll: true }) : editorRef().focus({ preventScroll: true });
+        (!workspace_editors.contains(dialogPrevious()!) && !hidden) ? dialogPrevious()!.focus({ preventScroll: true }) : editorRef()?.focus({ preventScroll: true });
         setDialogPrevious(null);
       }
     }

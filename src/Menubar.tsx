@@ -3,6 +3,7 @@ import DecorativeImage from "./icon/DecorativeImage.js";
 import { insertTemplate } from "./workspace/Tools.js";
 import { createDisplay, createWindow, setOrientation, setView } from "./workspace/Workspace.js";
 import { clearSiteCaches, showInstallPrompt } from "./dom.js";
+import { openFile, saveFile } from "./app.js";
 import { settings } from "./settings.js";
 import { openCard } from "./card/Card.js";
 import WebFormatter from "./img/web-formatter.svg";
