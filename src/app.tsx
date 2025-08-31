@@ -9,7 +9,6 @@ import { Main } from "./Main.js";
 import { closeCard, minimizeCard, openCard } from "./card/Card.js";
 import { insertTemplate } from "./workspace/Tools.js";
 import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview } from "./workspace/Workspace.js";
-import { Editor, EditorID } from "./workspace/Editor.js";
 
 import type { Accessor, Setter } from "solid-js";
 
@@ -161,67 +160,7 @@ export const [scaler, setScaler] = createSignal<HTMLDivElement | null>(null);
 
 export const [preview, setPreview] = createSignal<HTMLIFrameElement | null>(null);
 
-export interface EditorList {
-  [id: EditorID]: Editor;
-}
-
-export const [editors, setEditors] = createStore<EditorList>({});
-
-export interface EditorOptions {
-  name?: string;
-  value?: string;
-  handle?: FileSystemFileHandle | null;
-  isOpen?: boolean;
-  autoCreated?: boolean;
-  autoReplace?: boolean;
-}
-
-export function createEditor({
-  name = "Untitled.txt",
-  value = "",
-  handle = null,
-  isOpen = true,
-  autoCreated = false,
-  autoReplace = true
-}: EditorOptions = {}): void {
-  const identifier: EditorID = `editor_${Math.random()}`;
-  const editor: Editor = {
-    identifier,
-    name,
-    value,
-    syntaxLanguage: "",
-    syntaxHighlight: false,
-    handle,
-    isOpen,
-    active: false,
-    autoCreated,
-    refresh: false,
-    unsaved: false,
-    autoReplace,
-    focusedOverride: false
-  };
-
-  setEditors(identifier, editor);
-}
-
-export function close(editor: Editor | null): void {
-  if (editor === null) return;
-  setEditors(editor.identifier, undefined!);
-}
-
-export function rename(editor: Editor | null, name?: string): void {
-  if (editor === null) return;
-
-  const currentName: string = editor.name;
-
-  if (name === undefined) {
-    const result: string | null = prompt(`Enter a new file name for "${currentName}".`, currentName);
-    if (result === null) return;
-    name = result;
-  }
-
-  setEditors(editor.identifier, "name", name);
-}
+export const [editors, setEditors] = createStore<{ [identifier: string]: Editor | undefined; }>({});
 
 // if (appearance.parentWindow) document.documentElement.classList.add("startup-fade");
 if (appearance.appleHomeScreen) document.documentElement.classList.add("apple-home-screen");
