@@ -1,5 +1,5 @@
 import { createEffect } from "solid-js";
-import { header as getHeader, orientation, preview as getPreview, scaler as getScaler, view, workspace as getWorkspace, workspaceTabs, setScalingActive_, setScalingChange_ } from "../app.js";
+import { header as getHeader, orientation, preview as getPreview, scaler as getScaler, view, workspace as getWorkspace, setScalingActive_, setScalingChange_ } from "../app.js";
 import { appearance } from "../appearance.js";
 import { environment } from "../environment.js";
 import "./Scaler.scss";
@@ -46,13 +46,12 @@ export default function Scaler(props: ScalerProps) {
 function setScaling(event: MouseEvent | TouchEvent): void {
   const header: HTMLElement = getHeader()!;
   const workspace: HTMLDivElement = getWorkspace()!;
-  const workspace_tabs: HTMLDivElement = workspaceTabs()!;
   const scaler: HTMLDivElement = getScaler()!;
   const preview: HTMLIFrameElement = getPreview()!;
   const { safeAreaInsets } = appearance;
   let scalingOffset = 0;
   const scalingRange = {
-    minimum: ((orientation() == "vertical") ? workspace_tabs.offsetHeight : safeAreaInsets.left) + 80,
+    minimum: ((orientation() == "vertical") ? 0 : safeAreaInsets.left) + 80,
     maximum: ((orientation() == "horizontal") ? window.innerWidth - safeAreaInsets.right : (orientation() == "vertical") ? (window.innerHeight - header.offsetHeight - safeAreaInsets.bottom) : 0) - 80
   };
   const touchEvent = ((event: MouseEvent | TouchEvent): event is TouchEvent => environment.touchDevice && event instanceof TouchEvent);

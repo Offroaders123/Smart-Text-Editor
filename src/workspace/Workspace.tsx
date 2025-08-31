@@ -1,9 +1,7 @@
-import { orientationChange, scalingChange, view, orientation, previewEditor, setPreviewEditor, activeEditor, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, previewMenu, viewMenu, scalingActive_, setScalingActive_, setOrientationChange_, setViewChange_, viewChange_, setView_, setOrientation_ } from "../app.js";
-import WorkspaceTabs from "./WorkspaceTabs.js";
+import { orientationChange, scalingChange, view, orientation, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, viewMenu, scalingActive_, setScalingActive_, setOrientationChange_, setViewChange_, viewChange_, setView_, setOrientation_ } from "../app.js";
 import WorkspaceEditors from "./WorkspaceEditors.js";
 import { appearance } from "../appearance.js";
 import { settings } from "../settings.js";
-import { support } from "../support.js";
 import { getElementStyle } from "../dom.js";
 import "./Workspace.scss";
 
@@ -11,8 +9,6 @@ import type { Setter } from "solid-js";
 
 export interface WorkspaceProps {
   setWorkspace: Setter<HTMLDivElement | null>;
-  setWorkspaceTabs: Setter<HTMLDivElement | null>;
-  setCreateEditorButton: Setter<HTMLButtonElement | null>;
   setWorkspaceEditors: Setter<HTMLDivElement | null>;
 }
 
@@ -21,10 +17,6 @@ export default function Workspace(props: WorkspaceProps) {
     <div
       ref={props.setWorkspace}
       class="workspace">
-      <WorkspaceTabs
-        setWorkspaceTabs={props.setWorkspaceTabs}
-        setCreateEditorButton={props.setCreateEditorButton}
-      />
       <WorkspaceEditors
         setWorkspaceEditors={props.setWorkspaceEditors}
       />
@@ -60,9 +52,6 @@ export async function setView(type: View, { force = false }: SetViewOptions = {}
 
   await new Promise<void>(resolve => setTimeout(resolve,transitionDuration));
 
-  if (type !== "preview"){
-    setTabsVisibility();
-  }
   if (viewChange_() === changeIdentifier){
     setViewChange_(null); // eventually remove line below
     document.body.removeAttribute("data-view-change");
@@ -122,21 +111,6 @@ export async function setOrientation(orientationValue?: Orientation): Promise<vo
 }
 
 /**
- * Sets the source for the Preview to a given Editor.
- * 
- * @see {@link previewEditor}
-*/
-export async function setPreviewSource(previewEditorValue: Editor | null): Promise<void> {
-  setPreviewEditor(previewEditorValue);
-
-  if (previewEditorValue === null){
-    previewMenu()!.select("active-editor");
-  }
-
-  await refreshPreview({ force: true });
-}
-
-/**
  * Creates a new Smart Text Editor window.
 */
 export function createWindow(): void {
@@ -154,114 +128,6 @@ export function createWindow(): void {
 }
 
 /**
- * Creates new Editors in the Workspace from files chosen by the user through a file system file picker.
- * 
- * If the File System Access API is supported in the user's browser, it will use that. If not, it will fall back to using an `<input type="file">` element.
-*/
-export async function openFiles(): Promise<void> {
-  if (!support.fileSystem){
-    const input = document.createElement("input");
-    input.type = "file";
-    input.multiple = true;
-
-    await new Promise(resolve => {
-      input.addEventListener("change",resolve,{ once: true });
-      input.click();
-    });
-
-    if (input.files === null) return;
-
-    const results: PromiseSettledResult<EditorOptions>[] = await Promise.allSettled([...input.files].map(async file => {
-      const { name } = file;
-      const value = await file.text();
-      return { name, value };
-    }));
-
-    const files: EditorOptions[] = results
-      .filter(
-        (result): result is PromiseFulfilledResult<EditorOptions> => result.status === "fulfilled")
-      .map(result => result.value);
-
-    for (const file of files){
-      createEditor(file);
-    }
-  } else {
-    const handles = await window.showOpenFilePicker({ multiple: true }).catch(error => {
-      if (error.message.toLowerCase().includes("abort")) return;
-    });
-    if (!handles) return;
-    handles.forEach(async handle => {
-      const file = await handle.getFile();
-      createEditor({ name: file.name, value: await file.text(), handle });
-    });
-  }
-}
-
-/**
- * Saves an Editor as a file back to the user's file system.
- * 
- * If the File System Access API is supported in the user's browser, the Editor's current value will be rewritten directly to the file system.
- * 
- * If the File System Access API is not supported, or if a custom file extension is provided for the current file, a Save As dialog will be shown using an `<a download href="blob:">` element.
-*/
-export async function saveFile(extension?: string): Promise<void> {
-  if (extension || !support.fileSystem){
-    // @ts-expect-error
-    if (!extension) extension = activeEditor()?.getExtension() satisfies string;
-    const anchor = document.createElement("a");
-    const link = window.URL.createObjectURL(new Blob([activeEditor()?.ref.editor.value ?? ""]));
-    anchor.href = link;
-    anchor.download = `${
-      // @ts-expect-error
-      activeEditor()?.getExtension() satisfies string
-    }.${extension}`;
-    anchor.click();
-    window.URL.revokeObjectURL(link);
-  } else {
-    const identifier: Editor | null = activeEditor();
-    let handle: void | FileSystemFileHandle;
-    if (identifier === null) throw new Error("No editors are open, couldn't save anything!");
-    if (!identifier.getHandle()){
-      handle = await window.showSaveFilePicker({
-        suggestedName:
-          // @ts-expect-error
-          activeEditor()?.getName() satisfies string,
-        startIn: (identifier.getHandle()) ? identifier.getHandle()! : "desktop"
-      }).catch(error => {
-        if (error.message.toLowerCase().includes("abort")) return;
-      });
-      if (!handle) return;
-      identifier.setHandle(handle);
-    } else handle = identifier.getHandle()!;
-    const stream = await identifier.getHandle()?.createWritable().catch(error => {
-      alert(`"${
-        // @ts-expect-error
-        activeEditor()?.getName() satisfies string
-      }" could not be saved.`);
-      if (error.toString().toLowerCase().includes("not allowed")) return;
-    });
-    if (!stream) return;
-    await stream.write(
-      // @ts-expect-error
-      activeEditor()?.ref.editor.value satisfies string
-    );
-    await stream.close();
-    // @ts-expect-error
-    const currentName: string = activeEditor()?.getName();
-    const file = await handle.getFile();
-    const newName = file.name;
-    if (currentName != newName) rename(identifier, newName);
-  }
-  if (activeEditor()?.getAutoCreated()){
-    activeEditor()!.setAutoCreated(false);
-  }
-  if (activeEditor()?.getUnsaved()){
-    activeEditor()!.setUnsaved(false);
-  }
-  await refreshPreview({ force: true });
-}
-
-/**
  * Creates a new Display window for the active Editor.
 */
 export function createDisplay(): void {
@@ -271,8 +137,8 @@ export function createDisplay(): void {
     top = window.screen.availHeight / 2 + window.screen.availTop - height / 2,
     features = (appearance.standalone || appearance.fullscreen) ? "popup" : "",
     baseURL = settings.previewBase;
-  // @ts-expect-error
-  let source: string = activeEditor()?.ref.editor.value;
+  //// @ts-expect-error
+  let source: string = editorRef().editor.value;
   if (baseURL) source = `<!DOCTYPE html>\n<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
   const link = window.URL.createObjectURL(new Blob([source],{ type: "text/html" })),
     win = window.open(link,"_blank",features);
@@ -285,8 +151,8 @@ export function createDisplay(): void {
   window.setTimeout(() => {
     if (win === null) return;
     if (!win.document.title){
-      // @ts-expect-error
-      win.document.title = activeEditor()?.getName();
+      //// @ts-expect-error
+      win.document.title = editorName();
     }
   },20);
 }
@@ -301,14 +167,14 @@ export interface RefreshPreviewOptions {
 export async function refreshPreview({ force = false }: RefreshPreviewOptions = {}): Promise<void> {
   if (view() === "code") return;
 
-  const editor: Editor | null = previewEditor() ?? activeEditor();
+  const editor: NumTextElement = editorRef();
   if (editor === null) return;
-  const change: boolean = editor.getRefresh() && settings.automaticRefresh !== false;
+  const change: boolean = editorRefresh() && settings.automaticRefresh !== false;
   if (!change && !force) return;
   
   const preview: HTMLIFrameElement = getPreview()!;
   const baseURL: string | null = settings.previewBase;
-  let source: string = editor.ref.editor.value;
+  let source: string = editorValue();
   if (baseURL !== null){
     source = `<!DOCTYPE html>\n<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
   }
@@ -323,7 +189,7 @@ export async function refreshPreview({ force = false }: RefreshPreviewOptions = 
   preview.contentDocument?.write(source);
   preview.contentDocument?.close();
 
-  if (change) editor.setRefresh(false);
+  if (change) setEditorRefresh(false);
 }
 
 /**

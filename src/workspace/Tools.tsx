@@ -31,7 +31,7 @@ export function insertTemplate(type: TemplateType): void {
 
   if (value === undefined) return;
 
-  createEditor({ name, value });
+  setEditorValue(value);
   if (view() === "preview"){
     setView("split");
   }

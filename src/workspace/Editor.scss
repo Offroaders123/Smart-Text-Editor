@@ -40,11 +40,3 @@ body.split.vertical main .workspace .Editor {
 body.preview.vertical main .workspace .Editor {
   border-bottom-width: 0;
 }
-
-main .workspace .Editor:not(.active) {
-  z-index: -1;
-}
-
-main .workspace .Editor.active {
-  visibility: visible;
-}

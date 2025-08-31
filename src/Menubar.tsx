@@ -1,8 +1,7 @@
 import { createEffect } from "solid-js";
 import DecorativeImage from "./icon/DecorativeImage.js";
-import { activeEditor } from "./app.js";
 import { insertTemplate } from "./workspace/Tools.js";
-import { createDisplay, createWindow, openFiles, refreshPreview, saveFile, setOrientation, setPreviewSource, setView } from "./workspace/Workspace.js";
+import { createDisplay, createWindow, setOrientation, setView } from "./workspace/Workspace.js";
 import { clearSiteCaches, showInstallPrompt } from "./dom.js";
 import { settings } from "./settings.js";
 import { openCard } from "./card/Card.js";
@@ -48,10 +47,8 @@ export default function Menubar(props: MenubarProps) {
       <menu-drop id="file_menu">
         <button>File</button>
         <ul>
-          <li onclick={() => createEditor({ autoReplace: false })} data-shortcuts='{ "default": "Ctrl+Shift+X", "macOS": "Shift+Cmd+X" }'>New Editor</li>
           <li part="create-window-option" onclick={() => createWindow()} data-shortcuts='{ "default": "Ctrl+Shift+C", "macOS": "Shift+Cmd+C" }'>New Window</li>
-          <li onclick={() => openFiles()} data-shortcuts='{ "default": "Ctrl+O", "macOS": "Cmd+O" }'>Open</li>
-          <li onclick={() => rename(activeEditor())} data-shortcuts='{ "default": "Ctrl+Shift+R", "macOS": "Shift+Cmd+R" }'>Rename</li>
+          <li onclick={() => openFile()} data-shortcuts='{ "default": "Ctrl+O", "macOS": "Cmd+O" }'>Open</li>
           <li onclick={() => saveFile()} data-shortcuts='{ "default": "Ctrl+S", "macOS": "Cmd+S" }'>Save</li>
           <li>Save As...
             <ul>
@@ -82,15 +79,6 @@ export default function Menubar(props: MenubarProps) {
           <li><hr/></li>
           <li onclick={() => setOrientation()} data-shortcuts='{ "default": "Ctrl+Shift+4", "macOS": "Ctrl+Cmd+4" }' data-no-select>Orientation</li>
           <li onclick={() => createDisplay()} data-shortcuts='{ "default": "Ctrl+Shift+5", "macOS": "Ctrl+Cmd+5" }' data-no-select>Display</li>
-        </ul>
-      </menu-drop>
-      <menu-drop ref={props.setPreviewMenu} data-select="no-appearance">
-        <button>Preview</button>
-        <ul>
-          <li onclick={() => refreshPreview({ force: true })} data-shortcuts='{ "default": "Ctrl+Shift+Enter", "macOS": "Ctrl+Cmd+Return" }' data-no-select>Refresh</li>
-          <li onclick={() => openCard("preview_base_card")} data-shortcuts='{ "default": "Ctrl+Shift+B", "macOS": "Ctrl+Cmd+B" }' data-no-select>Base URL</li>
-          <li><hr/></li>
-          <li data-value="active-editor" data-selected onclick={() => setPreviewSource(null)}>Active Editor</li>
         </ul>
       </menu-drop>
       <menu-drop>

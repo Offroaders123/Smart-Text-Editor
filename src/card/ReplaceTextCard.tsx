@@ -2,7 +2,6 @@ import { createSignal } from "solid-js";
 import Widget from "./Widget.js";
 import CardItem from "./CardItem.js";
 import CardOptions from "./CardOptions.js";
-import { activeEditor } from "../app.js";
 import { applyEditingBehavior } from "../dom.js";
 
 export default function ReplaceTextCard() {
@@ -10,10 +9,8 @@ export default function ReplaceTextCard() {
   const [replaceValue, setReplaceValue] = createSignal<string>("");
 
   function replace(): void {
-    const editor = activeEditor();
-    if (!editor) return;
-    const replaced = editor.getValue().split(findValue()).join(replaceValue());
-    if (replaced != editor.getValue()) editor.setValue(replaced);
+    const replaced = editorValue().split(findValue()).join(replaceValue());
+    if (replaced != editorValue()) setEditorValue(replaced);
   }
 
   function flip(): void {

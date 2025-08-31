@@ -1,5 +1,5 @@
 import { Show } from "solid-js";
-import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, activeEditor, cardBackdropShown, setCardBackdropShown, workspaceEditors, workspaceTabs } from "../app.js";
+import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, cardBackdropShown, setCardBackdropShown, workspaceEditors } from "../app.js";
 import DecorativeImage from "../icon/DecorativeImage.js";
 import ArrowIcon from "../icon/ArrowIcon.js";
 import BackIcon from "../icon/BackIcon.js";
@@ -132,13 +132,11 @@ export default function Card(props: CardProps) {
   export function minimizeCard(id: CardID): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
-    const workspace_tabs: HTMLDivElement = workspaceTabs()!;
     const icon = getCardControls(self).minimize.querySelector("svg")!;
     const main = self.querySelector<HTMLDivElement>(".main")!;
     const changeIdentifier = Math.random().toString();
 
     self.setAttribute("data-minimize-change",changeIdentifier);
-    workspace_tabs.setAttribute("data-minimize-change",changeIdentifier);
     const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
     if (!self.matches(".minimize")){
       self.classList.add("minimize");
@@ -147,10 +145,6 @@ export default function Card(props: CardProps) {
       self.style.setProperty("--card-main-width",`${main.clientWidth}px`);
       self.style.setProperty("--card-main-height",`${main.clientHeight}px`);
       icon.replaceWith(ArrowIcon() as Element);
-      window.setTimeout(() => {
-        workspace_tabs.style.setProperty("--minimize-tab-width",getElementStyle({ element: self, property: "width" }));
-        setTabsVisibility();
-      },transitionDuration);
       if (self.contains(document.activeElement) && document.activeElement != getCardControls(self).minimize) getCardControls(self).minimize.focus();
     } else {
       self.classList.remove("minimize");
@@ -160,11 +154,9 @@ export default function Card(props: CardProps) {
       self.style.removeProperty("--card-main-width");
       self.style.removeProperty("--card-main-height");
       icon.replaceWith(MinimizeIcon() as Element);
-      workspace_tabs.style.removeProperty("--minimize-tab-width");
     }
     window.setTimeout(() => {
       if (self.getAttribute("data-minimize-change") == changeIdentifier) self.removeAttribute("data-minimize-change");
-      if (workspace_tabs.getAttribute("data-minimize-change") == changeIdentifier) workspace_tabs.removeAttribute("data-minimize-change");
     },transitionDuration);
   }
 
@@ -183,7 +175,7 @@ export default function Card(props: CardProps) {
       setActiveDialog(null);
       if (dialogPrevious()){
         const hidden = (getElementStyle({ element: dialogPrevious()!, property: "visibility" }) == "hidden");
-        (!workspace_editors.contains(dialogPrevious()!) && !hidden) ? dialogPrevious()!.focus({ preventScroll: true }) : activeEditor()?.ref.focus({ preventScroll: true });
+        (!workspace_editors.contains(dialogPrevious()!) && !hidden) ? dialogPrevious()!.focus({ preventScroll: true }) : editorRef().focus({ preventScroll: true });
         setDialogPrevious(null);
       }
     }

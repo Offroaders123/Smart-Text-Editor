@@ -166,43 +166,6 @@ input[type="url"]:valid:not(:placeholder-shown):focus {
   background: var(--selection-background-inactive);
 }
 
-.tab {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: none;
-  border: var(--tab-border-width) solid transparent;
-  --tab-border-width: 1px;
-  border-radius: calc(6px + var(--tab-border-width));
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.tab .option {
-  margin: calc(var(--option-border-width) * -1);
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  background: none;
-  background-clip: padding-box;
-  border: var(--option-border-width) solid transparent;
-  --option-border-width: 4px;
-  border-radius: calc(4px + var(--option-border-width));
-  outline: none;
-}
-
-.tab .option:where(:hover,:active,:focus-visible) {
-  color: #ffffff;
-  background-color: #ffffff24;
-}
-
-.tab .option svg {
-  width: 8px;
-  height: 8px;
-  /* aspect-ratio: 1 / 1; */
-  fill: currentColor;
-}
-
 menu-drop {
   color: inherit;
   font: inherit;

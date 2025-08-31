@@ -8,12 +8,11 @@ import { Main } from "./Main.js";
 // import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings } from "./app.js";
 import { closeCard, minimizeCard, openCard } from "./card/Card.js";
 import { insertTemplate } from "./workspace/Tools.js";
-import { setView, setOrientation, createWindow, openFiles, saveFile, createDisplay, refreshPreview } from "./workspace/Workspace.js";
+import { setView, setOrientation, createWindow, createDisplay, refreshPreview } from "./workspace/Workspace.js";
 
 import type { Accessor, Setter } from "solid-js";
 
 import { createSignal } from "solid-js";
-import { createStore } from "solid-js/store";
 // import { openCard } from "./Card.js";
 
 import type { View } from "./workspace/Workspace.js";
@@ -77,26 +76,13 @@ export const [scalingActive_, setScalingActive_] = createSignal<boolean>(false);
  * Checks if any Editors haven't been saved since their last edits.
 */
 export function unsavedWork(): boolean {
-  const workspace_tabs: HTMLDivElement = workspaceTabs()!;
-  return (!appearance.parentWindow || (workspace_tabs.querySelectorAll(".tab:not([data-editor-change])[data-editor-unsaved]").length == 0));
+  return (!appearance.parentWindow || editorUnsaved());
 }
 
 /**
  * A list of known extensions that can be opened with Smart Text Editor.
 */
 export const preapprovedExtensions = ["txt","html","css","js","php","json","webmanifest","bbmodel","xml","yaml","yml","dist","config","ini","md","markdown","mcmeta","lang","properties","uidx","material","h","fragment","vertex","fxh","hlsl","ihlsl","svg"] as const;
-
-/**
- * The identifier of the currently opened Editor.
-*/
-export const [activeEditor, setActiveEditor] = createSignal<Editor | null>(null);
-
-/**
- * The identifier of the Editor to be used within the Preview.
- * 
- * When set to `null`, internally the value of `previewEditor` will be pointed to `activeEditor` when used.
-*/
-export const [previewEditor, setPreviewEditor] = createSignal<Editor | null>(null);
 
 /**
  * An array of all windows opened during the current session.
@@ -150,17 +136,11 @@ export const [previewMenu, setPreviewMenu] = createSignal<MenuDropElement | null
 
 export const [workspace, setWorkspace] = createSignal<HTMLDivElement | null>(null);
 
-export const [workspaceTabs, setWorkspaceTabs] = createSignal<HTMLDivElement | null>(null);
-
-export const [createEditorButton, setCreateEditorButton] = createSignal<HTMLButtonElement | null>(null);
-
 export const [workspaceEditors, setWorkspaceEditors] = createSignal<HTMLDivElement | null>(null);
 
 export const [scaler, setScaler] = createSignal<HTMLDivElement | null>(null);
 
 export const [preview, setPreview] = createSignal<HTMLIFrameElement | null>(null);
-
-export const [editors, setEditors] = createStore<{ [identifier: string]: Editor | undefined; }>({});
 
 // if (appearance.parentWindow) document.documentElement.classList.add("startup-fade");
 if (appearance.appleHomeScreen) document.documentElement.classList.add("apple-home-screen");
@@ -174,8 +154,6 @@ export interface AppProps {
   setViewMenu: Setter<MenuDropElement | null>;
   setPreviewMenu: Setter<MenuDropElement | null>;
   setWorkspace: Setter<HTMLDivElement | null>;
-  setWorkspaceTabs: Setter<HTMLDivElement | null>;
-  setCreateEditorButton: Setter<HTMLButtonElement | null>;
   setWorkspaceEditors: Setter<HTMLDivElement | null>;
   setScaler: Setter<HTMLDivElement | null>;
   setPreview: Setter<HTMLIFrameElement | null>;
@@ -205,7 +183,7 @@ const queryParameters = new URLSearchParams(window.location.search);
         for (const file of event.data.files as File[]){
           const { name } = file;
           const value = await file.text();
-          createEditor({ name, value });
+          setEditorValue(value);
         }
         break;
       }
@@ -241,9 +219,6 @@ window.addEventListener("unload",() => {
 });
 
 window.addEventListener("resize",() => {
-  if (view() !== "preview"){
-    setTabsVisibility();
-  }
   if (view() === "split" && scalingActive_()){
     setView("split");
   }
@@ -273,28 +248,6 @@ document.body.addEventListener("keydown",event => {
     if (event.repeat) return;
     if (activeDialog() && !document.activeElement?.matches("menu-drop[data-open]")) closeCard(activeDialog()!);
   }
-  if (((control || command) && !shift && pressed("n")) || ((controlShift || shiftCommand) && pressed("x"))){
-    event.preventDefault();
-    if (event.repeat) return;
-    createEditor({ autoReplace: false });
-  }
-  if (((control || command) && pressed("w")) || ((controlShift || shiftCommand) && pressed("d"))){
-    if (shift && pressed("w")) return window.close();
-    event.preventDefault();
-    if (event.repeat) return;
-    /* Future feature: If an editor tab is focused, close that editor instead of only the active editor */
-    close(activeEditor());
-  }
-  if (((controlShift || (event.ctrlKey && shift && !command && environment.appleDevice)) && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("[") || pressed("{")))){
-    event.preventDefault();
-    if (event.repeat) return;
-    open(getPrevious(activeEditor()));
-  }
-  if (((control || (event.ctrlKey && !command && environment.appleDevice)) && !shift && pressed("Tab")) || ((controlShift || controlCommand) && (pressed("]") || pressed("}")))){
-    event.preventDefault();
-    if (event.repeat) return;
-    open(getNext(activeEditor()));
-  }
   if (((controlShift || shiftCommand) && pressed("n")) || ((controlShift || shiftCommand) && pressed("c"))){
     event.preventDefault();
     if (event.repeat) return;
@@ -303,12 +256,7 @@ document.body.addEventListener("keydown",event => {
   if ((control || command) && !shift && pressed("o")){
     event.preventDefault();
     if (event.repeat) return;
-    openFiles();
-  }
-  if ((controlShift || shiftCommand) && pressed("r")){
-    event.preventDefault();
-    if (event.repeat) return;
-    rename(activeEditor());
+    openFile();
   }
   if ((control || command) && !shift && pressed("s")){
     event.preventDefault();
@@ -425,14 +373,15 @@ document.body.addEventListener("drop",event => {
           if (file === null) break;
           const { name } = file;
           const value = await file.text();
-          createEditor({ name, value });
+          setEditorValue(value);
         } else {
           const handle = await item.getAsFileSystemHandle();
           if (!(handle instanceof FileSystemFileHandle)) break;
           const file = await handle.getFile();
           const { name } = file;
           const value = await file.text();
-          createEditor({ name, value, handle });
+          setEditorValue(value);
+          setHandle(handle);
         }
         break;
       }
@@ -440,15 +389,11 @@ document.body.addEventListener("drop",event => {
         if (index !== 0) break;
         const value = event.dataTransfer?.getData("text");
         if (value !== "") break;
-        createEditor({ value });
+        setEditorValue(value);
         break;
       }
     }
   });
-});
-
-window.requestAnimationFrame(() => {
-  createEditor({ autoCreated: true });
 });
 
 if (appearance.parentWindow){
@@ -532,8 +477,6 @@ function changeQueryParameters(parameters: URLSearchParams): void {
       />
       <Main
         setWorkspace={props.setWorkspace}
-        setWorkspaceTabs={props.setWorkspaceTabs}
-        setCreateEditorButton={props.setCreateEditorButton}
         setWorkspaceEditors={props.setWorkspaceEditors}
         setScaler={props.setScaler}
         setPreview={props.setPreview}
