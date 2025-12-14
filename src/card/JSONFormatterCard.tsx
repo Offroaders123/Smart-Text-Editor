@@ -52,7 +52,6 @@ export default function JSONFormatterCard() {
               ref.editor.onchange = () => setValue(ref.value);
             }}
             class="expand"
-            syntax-language="json"
             placeholder="JSON data to format..."
             value={value()}
           />

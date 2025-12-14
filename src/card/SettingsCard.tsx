@@ -5,7 +5,6 @@ import { openCard } from "./Card.js";
 import CardItem from "./CardItem.js";
 import CardOptions from "./CardOptions.js";
 import Checkbox from "../Checkbox.js";
-import { appearance } from "../appearance.js";
 import { settings } from "../settings.js";
 import { clearSiteCaches, showInstallPrompt } from "../dom.js";
 
@@ -35,11 +34,6 @@ export default function SettingsCard() {
               </ul>
             </menu-drop>
           </div>
-          <Checkbox
-            id="syntax_highlighting_setting"
-            oninput={event => appearance.setSyntaxHighlighting(event.currentTarget.checked)}>
-            Syntax Highlighting (Beta)
-          </Checkbox>
           <Checkbox
             id="automatic_refresh_setting"
             oninput={event => settings.automaticRefresh = event.currentTarget.checked}

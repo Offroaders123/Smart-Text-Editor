@@ -38,7 +38,6 @@ declare global {
 
   // var settings_card: HTMLDivElement; // getElementById only
   var default_orientation_setting: MenuDropElement;
-  var syntax_highlighting_setting: HTMLInputElement;
   var automatic_refresh_setting: HTMLInputElement;
   var install_button: HTMLButtonElement;
   var theme_button: HTMLButtonElement;

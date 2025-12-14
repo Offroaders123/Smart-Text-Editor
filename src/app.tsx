@@ -423,11 +423,6 @@ if (appearance.parentWindow){
     });
     setOrientation(value);
   }
-  if (settings.syntaxHighlighting !== null){
-    const state: boolean = settings.syntaxHighlighting;
-    appearance.setSyntaxHighlighting(state);
-    syntax_highlighting_setting.checked = state;
-  }
   if (settings.automaticRefresh !== null){
     automatic_refresh_setting.checked = settings.automaticRefresh;
   }

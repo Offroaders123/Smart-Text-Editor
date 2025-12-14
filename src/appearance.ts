@@ -1,6 +1,3 @@
-import { settings } from "./settings.js";
-import Prism from "./prism.js";
-
 export interface SafeAreaInsets {
   left: number;
   right: number;
@@ -68,15 +65,4 @@ export const appearance = {
       bottom: getSafeAreaInset("bottom"),
     };
   },
-
-  /**
-   * Enables or disables syntax highlighting for all Num Text elements.
-  */
-  setSyntaxHighlighting(state: boolean): void {
-    for (const editor of document.querySelectorAll<NumTextElement>(".Editor, num-text")){
-      if (!(editor.syntaxLanguage in Prism.languages)) continue;
-      (state) ? editor.syntaxHighlight.enable() : editor.syntaxHighlight.disable();
-    }
-    settings.syntaxHighlighting = state;
-  }
 }

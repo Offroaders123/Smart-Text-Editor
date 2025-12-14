@@ -1,4 +1,3 @@
-import { appearance } from "./appearance.js";
 import { setPreviewBase } from "./app.js";
 import { openCard } from "./card/Card.js";
 
@@ -22,20 +21,6 @@ export const settings = {
       return;
     }
     localStorage.setItem("defaultOrientation",value);
-  },
-
-  get syntaxHighlighting(): boolean | null {
-    const value = localStorage.getItem("syntaxHighlighting");
-    if (value === null) return value;
-    return JSON.parse(value) === true;
-  },
-
-  set syntaxHighlighting(value) {
-    if (value === null){
-      localStorage.removeItem("syntaxHighlighting");
-      return;
-    }
-    localStorage.setItem("syntaxHighlighting",`${value}`);
   },
 
   get automaticRefresh(): boolean | null {
@@ -76,10 +61,6 @@ export const settings = {
 
     this.defaultOrientation = null;
     default_orientation_setting.select("horizontal");
-    appearance.setSyntaxHighlighting(false);
-
-    this.syntaxHighlighting = null;
-    syntax_highlighting_setting.checked = false;
 
     this.automaticRefresh = null;
     automatic_refresh_setting.checked = true;
