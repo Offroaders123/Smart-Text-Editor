@@ -11,9 +11,7 @@ declare global {
     readonly availTop: number;
   }
 
-  var theme_color: HTMLMetaElement; // unused, style feature
   var scrollbar_styles: HTMLStyleElement;
-  var theme_styles: HTMLStyleElement; // unused, style feature
 
   // var header: HTMLElement;
 
@@ -22,7 +20,6 @@ declare global {
   // var view_menu: MenuDropElement;
   // var preview_menu: MenuDropElement;
   // var tools_menu: MenuDropElement;
-  var settings_menu: MenuDropElement; // styles only
 
   // var app_omnibox: HTMLDivElement;
   var install_option: HTMLButtonElement;
@@ -35,21 +32,6 @@ declare global {
   // var workspace_editors: HTMLDivElement;
   // var scaler: HTMLDivElement;
   // var preview: HTMLIFrameElement;
-
-  // var settings_card: HTMLDivElement; // getElementById only
-  var default_orientation_setting: MenuDropElement;
-  var automatic_refresh_setting: HTMLInputElement;
-  var install_button: HTMLButtonElement;
-  var theme_button: HTMLButtonElement;
-  var clear_site_caches_button: HTMLButtonElement;
-
-  // var theme_card: HTMLDivElement; // getElementById only
-  var theme_setting: NumTextElement;
-
-  // var preview_base_card: HTMLDivElement; // getElementById only
-
-  // var reset_settings_card: HTMLDivElement; // getElementById only
-  // var cleared_cache_card: HTMLDivElement; // getElementById only
 
   // var replace_text_card: HTMLDivElement; // getElementById only
 

@@ -2,9 +2,7 @@ import { createEffect } from "solid-js";
 import DecorativeImage from "./icon/DecorativeImage.js";
 import { insertTemplate } from "./workspace/Tools.js";
 import { createDisplay, createWindow, setOrientation, setView } from "./workspace/Workspace.js";
-import { clearSiteCaches, showInstallPrompt } from "./dom.js";
 import { openFile, saveFile } from "./app.js";
-import { settings } from "./settings.js";
 import { openCard } from "./card/Card.js";
 import WebFormatter from "./img/web-formatter.svg";
 import Sharedrop from "./img/sharedrop.svg";
@@ -15,15 +13,11 @@ import RealFaviconGenerator from "./img/real-favicon-generator.svg";
 import Appscope from "./img/appscope.svg";
 import SVGMinify from "./img/svgminify.svg";
 import Cryptii from "./img/cryptii.svg";
-import Install from "./img/install.svg";
-import Template from "./img/template.svg";
-import Settings from "./img/settings.svg";
 
 import type { Setter } from "solid-js";
 
 export interface MenubarProps {
   setViewMenu: Setter<MenuDropElement | null>;
-  setPreviewMenu: Setter<MenuDropElement | null>;
 }
 
 export default function Menubar(props: MenubarProps) {
@@ -109,15 +103,6 @@ export default function Menubar(props: MenubarProps) {
               <li><a href="https://cryptii.com/"><DecorativeImage src={Cryptii} alt=""/>Text Encryptor</a></li>
             </ul>
           </li>
-        </ul>
-      </menu-drop>
-      <menu-drop id="settings_menu" data-alternate>
-        <button onclick={() => openCard("settings_card")}>Settings</button>
-        <ul data-show-icons>
-          <li part="install-option" onclick={() => showInstallPrompt()}><DecorativeImage src={Install} alt=""/>Install</li>
-          <li onclick={() => openCard("theme_card")}><DecorativeImage src={Template} alt=""/>Theme Settings</li>
-          <li part="clear-site-caches-option" onclick={() => clearSiteCaches()}><DecorativeImage src={Settings} alt=""/>Clear Cache</li>
-          <li onclick={() => settings.reset({ confirm: true })}><DecorativeImage src={Settings} alt=""/>Reset Settings</li>
         </ul>
       </menu-drop>
     </div>

@@ -13,7 +13,6 @@ import type { JSX, Setter } from "solid-js";
 export interface HeaderProps {
   setHeader: Setter<HTMLElement | null>;
   setViewMenu: Setter<MenuDropElement | null>;
-  setPreviewMenu: Setter<MenuDropElement | null>;
 }
 
 export function Header(props: HeaderProps) {
@@ -28,7 +27,6 @@ export function Header(props: HeaderProps) {
       </div>
       <Menubar
         setViewMenu={props.setViewMenu}
-        setPreviewMenu={props.setPreviewMenu}
       />
       <Omnibox/>
     </header>

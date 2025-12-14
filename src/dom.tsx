@@ -74,7 +74,6 @@ export async function showInstallPrompt(): Promise<void> {
   const result = await installPrompt()!.userChoice;
   if (result.outcome !== "accepted") return;
   document.documentElement.classList.remove("install-prompt-available");
-  theme_button.childNodes[0]!.textContent = "Customize Theme";
 }
 
 /**

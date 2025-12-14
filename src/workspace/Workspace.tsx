@@ -1,7 +1,6 @@
 import { orientationChange, scalingChange, view, orientation, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, viewMenu, scalingActive_, setScalingActive_, setOrientationChange_, setViewChange_, viewChange_, setView_, setOrientation_, editorRef, editorName, editorValue, editorRefresh, setEditorRefresh } from "../app.js";
 import WorkspaceEditors from "./WorkspaceEditors.js";
 import { appearance } from "../appearance.js";
-import { settings } from "../settings.js";
 import { getElementStyle } from "../dom.js";
 import "./Workspace.scss";
 
@@ -135,11 +134,9 @@ export function createDisplay(): void {
     height = window.screen.availHeight * 2/3,
     left = window.screen.availWidth / 2 + window.screen.availLeft - width / 2,
     top = window.screen.availHeight / 2 + window.screen.availTop - height / 2,
-    features = (appearance.standalone || appearance.fullscreen) ? "popup" : "",
-    baseURL = settings.previewBase;
+    features = (appearance.standalone || appearance.fullscreen) ? "popup" : "";
   //// @ts-expect-error
   let source: string = editorValue();
-  if (baseURL) source = `<!DOCTYPE html>\n<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
   const link = window.URL.createObjectURL(new Blob([source],{ type: "text/html" })),
     win = window.open(link,"_blank",features);
 
@@ -169,15 +166,11 @@ export async function refreshPreview({ force = false }: RefreshPreviewOptions = 
 
   const editor: NumTextElement | null = editorRef();
   if (editor === null) return;
-  const change: boolean = editorRefresh() && settings.automaticRefresh !== false;
+  const change: boolean = editorRefresh();
   if (!change && !force) return;
   
   const preview: HTMLIFrameElement = getPreview()!;
-  const baseURL: string | null = settings.previewBase;
   let source: string = editorValue();
-  if (baseURL !== null){
-    source = `<!DOCTYPE html>\n<!-- Document Base URL appended by Smart Text Editor -->\n<base href="${baseURL}">\n\n${source}`;
-  }
 
   await new Promise<void>((resolve,reject) => {
     preview.addEventListener("load",() => resolve(),{ once: true });

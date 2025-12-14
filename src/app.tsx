@@ -2,15 +2,14 @@ import { createEffect } from "solid-js";
 import { appearance } from "./appearance.js";
 import { environment } from "./environment.js";
 import { support } from "./support.js";
-import { settings } from "./settings.js";
 import { Header } from "./Header.js";
 import { Main } from "./Main.js";
 // import { appearance, setInstallPrompt, unsavedWork, childWindows, view, environment, activeDialog, activeEditor, activeWidget, support, settings } from "./app.js";
-import { closeCard, minimizeCard, openCard } from "./card/Card.js";
+import { minimizeCard, openCard } from "./card/Card.js";
 import { insertTemplate } from "./workspace/Tools.js";
 import { setView, setOrientation, createWindow, createDisplay, refreshPreview } from "./workspace/Workspace.js";
 
-import type { Accessor, Setter } from "solid-js";
+import type { Setter } from "solid-js";
 
 import { createSignal } from "solid-js";
 // import { openCard } from "./Card.js";
@@ -91,30 +90,14 @@ export const preapprovedExtensions = ["txt","html","css","js","php","json","webm
 */
 export const childWindows: Window[] = [];
 
-export type CardID = DialogID | AlertID | WidgetID;
-
-export type DialogID = "settings_card" | "theme_card" | "preview_base_card";
-
-export type AlertID = "reset_settings_card" | "cleared_cache_card";
+export type CardID = WidgetID;
 
 export type WidgetID = "replace_text_card" | "color_picker_card" | "json_formatter_card" | "uri_encoder_card" | "uuid_generator_card";
-
-/**
- * The currently opened Dialog.
-*/
-export const [activeDialog, setActiveDialog] = createSignal<DialogID | null>(null);
-
-/**
- * The previously-selected element before the current Dialog was opened.
-*/
-export const [dialogPrevious, setDialogPrevious] = createSignal<HTMLElement | null>(null);
 
 /**
  * The currently opened Widget.
 */
 export const [activeWidget, setActiveWidget] = createSignal<WidgetID | null>(null);
-
-export const [previewBase, setPreviewBase] = createSignal<string | null>(settings.previewBase);
 
 /**
  * The color the Color Picker Widget is currently set to.
@@ -126,13 +109,9 @@ export const [pickerColor, setPickerColor] = createSignal<string | null>(null);
 */
 export const [installPrompt, setInstallPrompt] = createSignal<BeforeInstallPromptEvent | null>(null);
 
-export const [cardBackdropShown, setCardBackdropShown] = createSignal<boolean>(false);
-
 export const [header, setHeader] = createSignal<HTMLElement | null>(null);
 
 export const [viewMenu, setViewMenu] = createSignal<MenuDropElement | null>(null);
-
-export const [previewMenu, setPreviewMenu] = createSignal<MenuDropElement | null>(null);
 
 export const [workspace, setWorkspace] = createSignal<HTMLDivElement | null>(null);
 
@@ -168,13 +147,10 @@ if (support.webSharing) document.documentElement.classList.add("web-sharing");
 export interface AppProps {
   setHeader: Setter<HTMLElement | null>;
   setViewMenu: Setter<MenuDropElement | null>;
-  setPreviewMenu: Setter<MenuDropElement | null>;
   setWorkspace: Setter<HTMLDivElement | null>;
   setWorkspaceEditors: Setter<HTMLDivElement | null>;
   setScaler: Setter<HTMLDivElement | null>;
   setPreview: Setter<HTMLIFrameElement | null>;
-  previewBase: Accessor<string | null>;
-  setPreviewBase: Setter<string | null>;
 }
 
 export default function App(props: AppProps) {
@@ -194,7 +170,6 @@ const queryParameters = new URLSearchParams(window.location.search);
 
   navigator.serviceWorker.addEventListener("message",async event => {
     switch (event.data.action){
-      case "clear-site-caches-complete": openCard("cleared_cache_card"); break;
       case "share-target": {
         for (const file of event.data.files as File[]){
           const { name } = file;
@@ -219,7 +194,6 @@ window.addEventListener("beforeinstallprompt",event => {
   event.preventDefault();
   setInstallPrompt(event);
   document.documentElement.classList.add("install-prompt-available");
-  theme_button.childNodes[0]!.textContent = "Theme";
 });
 
 window.addEventListener("beforeunload",event => {
@@ -263,7 +237,6 @@ document.body.addEventListener("keydown",event => {
   if (pressed("Escape")){
     event.preventDefault();
     if (event.repeat) return;
-    if (activeDialog() && !document.activeElement?.matches("menu-drop[data-open]")) closeCard(activeDialog()!);
   }
   if (((controlShift || shiftCommand) && pressed("n")) || ((controlShift || shiftCommand) && pressed("c"))){
     event.preventDefault();
@@ -310,11 +283,6 @@ document.body.addEventListener("keydown",event => {
     if (event.repeat) return;
     refreshPreview({ force: true });
   }
-  if ((controlShift || shiftCommand) && pressed("B")){
-    event.preventDefault();
-    if (event.repeat) return;
-    openCard("preview_base_card");
-  }
   if ((controlShift || shiftCommand) && pressed("f")){
     event.preventDefault();
     if (event.repeat) return;
@@ -351,11 +319,6 @@ document.body.addEventListener("keydown",event => {
     if (activeWidget()){
       minimizeCard(activeWidget()!);
     }
-  }
-  if ((control || command) && (pressed(",") || pressed("<"))){
-    event.preventDefault();
-    if (event.repeat) return;
-    openCard("settings_card");
   }
 },{ capture: true });
 
@@ -416,16 +379,6 @@ document.body.addEventListener("drop",event => {
 });
 
 if (appearance.parentWindow){
-  if (settings.defaultOrientation !== null){
-    const value = settings.defaultOrientation;
-    window.requestAnimationFrame(() => {
-      default_orientation_setting.select(value);
-    });
-    setOrientation(value);
-  }
-  if (settings.automaticRefresh !== null){
-    automatic_refresh_setting.checked = settings.automaticRefresh;
-  }
   // window.setTimeout(() => {
   //   document.documentElement.classList.remove("startup-fade");
   // },50);
@@ -457,11 +410,6 @@ if (queryParameters.get("template")){
   removeQueryParameters(["template"]);
 }
 
-if (queryParameters.get("settings")){
-  openCard("settings_card");
-  removeQueryParameters(["settings"]);
-}
-
 /**
  * Removes query parameters from the app's URL.
 */
@@ -489,15 +437,12 @@ function changeQueryParameters(parameters: URLSearchParams): void {
       <Header
         setHeader={props.setHeader}
         setViewMenu={props.setViewMenu}
-        setPreviewMenu={props.setPreviewMenu}
       />
       <Main
         setWorkspace={props.setWorkspace}
         setWorkspaceEditors={props.setWorkspaceEditors}
         setScaler={props.setScaler}
         setPreview={props.setPreview}
-        previewBase={props.previewBase}
-        setPreviewBase={props.setPreviewBase}
       />
     </>
   );

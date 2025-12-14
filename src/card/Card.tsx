@@ -1,17 +1,14 @@
-import { Show } from "solid-js";
-import { activeDialog, dialogPrevious, setDialogPrevious, setActiveDialog, setActiveWidget, cardBackdropShown, setCardBackdropShown, workspaceEditors, editorRef } from "../app.js";
-import DecorativeImage from "../icon/DecorativeImage.js";
+import { setActiveWidget } from "../app.js";
 import ArrowIcon from "../icon/ArrowIcon.js";
-import BackIcon from "../icon/BackIcon.js";
 import MinimizeIcon from "../icon/MinimizeIcon.js";
 import CloseIcon from "../icon/CloseIcon.js";
 import { getElementStyle } from "../dom.js";
 import "./Card.scss";
 
 import type { JSX } from "solid-js";
-import type { CardID, DialogID, WidgetID } from "../app.js";
+import type { CardID, WidgetID } from "../app.js";
 
-export type CardType = "alert" | "widget" | "dialog";
+export type CardType = "widget";
 
 export interface CardControls {
   readonly minimize: HTMLButtonElement;
@@ -22,7 +19,6 @@ export interface CardProps {
   id: CardID;
   type: CardType;
   active?: boolean;
-  parent?: string;
   heading: string;
   icon?: string;
   main: JSX.Element;
@@ -54,15 +50,7 @@ export default function Card(props: CardProps) {
           navigable[navigable.length - 1]?.focus();
         }
       }}>
-      <div class="header" data-card-parent={props.type === "dialog" && props.parent} ref={header!}>
-        <Show when={props.type === "alert"}>
-          <DecorativeImage class="icon" src={props.icon!} alt=""/>
-        </Show>
-        <Show when={props.type === "dialog"}>
-          <button class="card-back" onclick={() => openCard(header!.getAttribute("data-card-parent")! as CardID, card!.id)}>
-            <BackIcon/>
-          </button>
-        </Show>
+      <div class="header" ref={header!}>
         <span class="heading">{props.heading}</span>
         <div class="card-controls">
           <button class="control" data-control="minimize" onkeydown={event => {
@@ -88,45 +76,18 @@ export default function Card(props: CardProps) {
   );
 }
 
-  export function openCard(id: CardID, previous?: string): void {
+  export function openCard(id: CardID): void {
     const self = document.getElementById(id)! as HTMLDivElement;
 
     if (self.matches("[data-active]") && !self.hasAttribute("data-alert-timeout")) return closeCard(id);
-    if (getCardType(self) != "alert"){
       document.querySelectorAll<HTMLDivElement>(`.Card[data-active]`).forEach(card => {
-        if (getCardType(card) != "dialog" && getCardType(card) != getCardType(self)) return;
         closeCard(card.id as CardID);
         if (!card.matches(".minimize")) return;
         const transitionDuration = parseInt(`${Number(getElementStyle({ element: card, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
         window.setTimeout(() => minimizeCard(card.id as CardID),transitionDuration);
       });
-    }
     self.setAttribute("data-active","");
-    if (getCardType(self) == "widget" && cardBackdropShown()) setCardBackdropShown(false);
-    if (getCardType(self) == "alert"){
-      const timeoutIdentifier = Math.random().toString();
-      self.setAttribute("data-alert-timeout",timeoutIdentifier);
-      window.setTimeout(() => {
-        if (self.getAttribute("data-alert-timeout") != timeoutIdentifier) return;
-        self.removeAttribute("data-alert-timeout");
-        closeCard(id);
-      },4000);
-    }
-    if (getCardType(self) == "dialog"){
-      document.body.addEventListener("keydown",catchCardNavigation);
-      setCardBackdropShown(true);
-      if (!activeDialog() && !dialogPrevious()){
-        setDialogPrevious(document.activeElement as HTMLElement);
-      }
-      document.querySelectorAll<MenuDropElement>("menu-drop[data-open]").forEach(menu => menu.close());
-      const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 500}`);
-      window.setTimeout(() => {
-        if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
-        if (previous) self.querySelector<HTMLElement>(`[data-card-previous="${previous}"]`)!.focus();
-      },transitionDuration);
-      setActiveDialog(self.id as DialogID);
-    }
-    if (getCardType(self) == "widget") setActiveWidget(self.id as WidgetID);
+    setActiveWidget(self.id as WidgetID);
   }
 
   export function minimizeCard(id: CardID): void {
@@ -168,18 +129,7 @@ export default function Card(props: CardProps) {
       const transitionDuration = parseInt(`${Number(getElementStyle({ element: self, property: "transition-duration" }).split(",")[0]!.replace(/s/g,"")) * 1000}`);
       window.setTimeout(() => minimizeCard(id),transitionDuration);
     }
-    if (getCardType(self) == "dialog"){
-      const workspace_editors: HTMLDivElement = workspaceEditors()!;
-      document.body.removeEventListener("keydown",catchCardNavigation);
-      setCardBackdropShown(false);
-      setActiveDialog(null);
-      if (dialogPrevious()){
-        const hidden = (getElementStyle({ element: dialogPrevious()!, property: "visibility" }) == "hidden");
-        (!workspace_editors.contains(dialogPrevious()!) && !hidden) ? dialogPrevious()!.focus({ preventScroll: true }) : editorRef()?.focus({ preventScroll: true });
-        setDialogPrevious(null);
-      }
-    }
-    if (getCardType(self) == "widget") setActiveWidget(null);
+    setActiveWidget(null);
   }
 
   /**
@@ -191,17 +141,6 @@ export default function Card(props: CardProps) {
     scope = (scope) ? "" : ":scope > ";
     const navigable: NodeListOf<HTMLElement> = container.querySelectorAll(`${scope}button:not([disabled]), ${scope}textarea:not([disabled]), ${scope}input:not([disabled]), ${scope}select:not([disabled]), ${scope}a[href]:not([disabled]), ${scope}[tabindex]:not([tabindex="-1"])`);
     return Array.from(navigable).filter(element => (getElementStyle({ element, property: "display" }) != "none"));
-  }
-
-  function catchCardNavigation(event: KeyboardEvent): void {
-    if (!activeDialog() || event.key != "Tab" || document.activeElement != document.body) return;
-    const navigable = getNavigableElements({ container: document.getElementById(activeDialog()!)!, scope: true });
-    event.preventDefault();
-    navigable[((!event.shiftKey) ? 0 : navigable.length - 1)]?.focus();
-  }
-
-  function getCardType(self: HTMLDivElement): CardType {
-    return self.getAttribute("data-type")! as CardType;
   }
 
   function getCardControls(self: HTMLDivElement): CardControls {
