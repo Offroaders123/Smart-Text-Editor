@@ -81,7 +81,7 @@ export function unsavedWork(): boolean {
 /**
  * A list of known extensions that can be opened with Smart Text Editor.
 */
-export const preapprovedExtensions = ["txt","html","css","js","php","json","webmanifest","bbmodel","xml","yaml","yml","dist","config","ini","md","markdown","mcmeta","lang","properties","uidx","material","h","fragment","vertex","fxh","hlsl","ihlsl","svg"] as const;
+export const preapprovedExtensions = ["txt","html","css","js","json","xml","md","svg"] as const;
 
 /**
  * An array of all windows opened during the current session.

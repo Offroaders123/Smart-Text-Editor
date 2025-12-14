@@ -90,7 +90,7 @@
     {
       "action": "./",
       "accept": {
-        "text/*": [".txt",".html",".css",".js",".php",".json",".webmanifest",".bbmodel",".xml",".yaml",".yml",".dist",".config",".ini",".md",".markdown",".mcmeta",".lang",".properties",".uidx",".material",".h",".fragment",".vertex",".fxh",".hlsl",".ihlsl"],
+        "text/*": [".txt",".html",".css",".js",".json",".xml",".md"],
         "image/svg+xml": [".svg"]
       }
     }
@@ -104,7 +104,7 @@
       "files": [
         {
           "name": "file",
-          "accept": ["text/*",".txt",".html",".css",".js",".php",".json",".webmanifest",".bbmodel",".xml",".yaml",".yml",".dist",".config",".ini",".md",".markdown",".mcmeta",".lang",".properties",".uidx",".material",".h",".fragment",".vertex",".fxh",".hlsl",".ihlsl","image/svg+xml",".svg"]
+          "accept": ["text/*",".txt",".html",".css",".js",".json",".xml",".md","image/svg+xml",".svg"]
         }
       ]
     }
