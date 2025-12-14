@@ -87,7 +87,6 @@ export default function Menubar(props: MenubarProps) {
           <li>Insert Templates...
             <ul>
               <li onclick={() => insertTemplate('html')} data-shortcuts='{ "default": "Ctrl+Shift+H", "macOS": "Shift+Cmd+H" }'>HTML</li>
-              <li onclick={() => insertTemplate('pack-manifest-bedrock')}>Pack Manifest - Bedrock</li>
             </ul>
           </li>
           <li>Online Resources...
