@@ -113,20 +113,35 @@ const createSignal = value => {
 // app
 const [getName, setName] = createSignal("Untitled.txt");
 const [getValue, setValue, onValue] = createSignal("");
+const [getHandle, setHandle, onHandle] = createSignal(null);
+
+onHandle(async handle => {
+  if (handle === null) return;
+  const file = await handle.getFile();
+  const { name } = file;
+  const text = await file.text();
+  setName(name);
+  setValue(text);
+});
 
 // header
-openFile.addEventListener("click", () => {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.addEventListener("change", async event => {
-    if (event.currentTarget.files.length < 1) return;
-    const [file] = event.currentTarget.files;
-    const { name } = file;
-    const text = await file.text();
-    setName(name);
-    setValue(text);
-  }, { once: true });
-  input.click();
+openFile.addEventListener("click", async () => {
+  if ("showOpenFilePicker" in window) {
+    const [handle] = await showOpenFilePicker();
+    setHandle(handle);
+  } else {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.addEventListener("change", async event => {
+      if (event.currentTarget.files.length < 1) return;
+      const [file] = event.currentTarget.files;
+      const { name } = file;
+      const text = await file.text();
+      setName(name);
+      setValue(text);
+    }, { once: true });
+    input.click();
+  }
 });
 
 saveFile.addEventListener("click", () => {
