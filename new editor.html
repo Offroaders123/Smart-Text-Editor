@@ -127,7 +127,7 @@ onHandle(async handle => {
 // header
 openFile.addEventListener("click", async () => {
   if ("showOpenFilePicker" in window) {
-    const [handle] = await showOpenFilePicker();
+    const [handle] = await showOpenFilePicker().catch(() => [null]);
     setHandle(handle);
   } else {
     const input = document.createElement("input");
@@ -144,12 +144,28 @@ openFile.addEventListener("click", async () => {
   }
 });
 
-saveFile.addEventListener("click", () => {
-  const blob = new Blob([getValue()], { type: "text/plain" });
-  const anchor = document.createElement("a");
-  anchor.download = getName();
-  anchor.href = URL.createObjectURL(blob);
-  anchor.click();
+saveFile.addEventListener("click", async () => {
+  if ("showSaveFilePicker" in window) {
+    let handle = getHandle();
+    if (handle === null) {
+      handle = await showSaveFilePicker().catch(() => null);
+      if (handle === null) return;
+      const writable = await handle.createWritable();
+      await writable.write(getValue());
+      await writable.close();
+      setHandle(handle);
+    } else {
+      const writable = await handle.createWritable();
+      await writable.write(getValue());
+      await writable.close();
+    }
+  } else {
+    const blob = new Blob([getValue()], { type: "text/plain" });
+    const anchor = document.createElement("a");
+    anchor.download = getName();
+    anchor.href = URL.createObjectURL(blob);
+    anchor.click();
+  }
 });
 
 // userInput
