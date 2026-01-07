@@ -5,6 +5,8 @@ import Checkbox from "../Checkbox.js";
 import { applyEditingBehavior } from "../dom.js";
 
 export default function URIEncoderCard() {
+  let encoder_input: NumTextElement;
+
   function encode(): void {
     const encodingType = (!encoder_type.checked) ? encodeURI : encodeURIComponent;
     encoder_input.value = encodingType(encoder_input.value);
@@ -26,8 +28,10 @@ export default function URIEncoderCard() {
       main={
         <CardItem expand>
           <num-text
-            ref={ref => applyEditingBehavior(ref)}
-            id="encoder_input"
+            ref={ref => {
+              applyEditingBehavior(ref);
+              encoder_input = ref;
+            }}
             class="expand"
             placeholder="Text to encode..."
           />

@@ -45,7 +45,7 @@ declare global {
   // var json_formatter_card: HTMLDivElement; // getElementById only
 
   // var uri_encoder_card: HTMLDivElement; // getElementById only
-  var encoder_input: NumTextElement;
+  // var encoder_input: NumTextElement;
   var encoder_type: HTMLInputElement;
 
   // var uuid_generator_card: HTMLDivElement; // getElementById only
