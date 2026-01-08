@@ -9,8 +9,6 @@ import { minimizeCard, openCard } from "./card/Card.js";
 import { insertTemplate } from "./workspace/Tools.js";
 import { setView, setOrientation, createWindow, createDisplay, refreshPreview } from "./workspace/Workspace.js";
 
-import type { Setter } from "solid-js";
-
 import { createSignal } from "solid-js";
 // import { openCard } from "./Card.js";
 
@@ -109,18 +107,6 @@ export const [pickerColor, setPickerColor] = createSignal<string | null>(null);
 */
 export const [installPrompt, setInstallPrompt] = createSignal<BeforeInstallPromptEvent | null>(null);
 
-export const [header, setHeader] = createSignal<HTMLElement | null>(null);
-
-export const [viewMenu, setViewMenu] = createSignal<MenuDropElement | null>(null);
-
-export const [workspace, setWorkspace] = createSignal<HTMLDivElement | null>(null);
-
-export const [workspaceEditors, setWorkspaceEditors] = createSignal<HTMLDivElement | null>(null);
-
-export const [scaler, setScaler] = createSignal<HTMLDivElement | null>(null);
-
-export const [preview, setPreview] = createSignal<HTMLIFrameElement | null>(null);
-
 export const [editorName, setEditorName] = createSignal<string>("");
 
 export const [editorValue, setEditorValue] = createSignal<string>("");
@@ -144,16 +130,7 @@ if (environment.appleDevice) document.documentElement.classList.add("apple-devic
 if (environment.macOSDevice) document.documentElement.classList.add("macOS-device");
 if (support.webSharing) document.documentElement.classList.add("web-sharing");
 
-export interface AppProps {
-  setHeader: Setter<HTMLElement | null>;
-  setViewMenu: Setter<MenuDropElement | null>;
-  setWorkspace: Setter<HTMLDivElement | null>;
-  setWorkspaceEditors: Setter<HTMLDivElement | null>;
-  setScaler: Setter<HTMLDivElement | null>;
-  setPreview: Setter<HTMLIFrameElement | null>;
-}
-
-export default function App(props: AppProps) {
+export default function App() {
   createEffect(() => {
 const queryParameters = new URLSearchParams(window.location.search);
 
@@ -434,16 +411,8 @@ function changeQueryParameters(parameters: URLSearchParams): void {
 
   return (
     <>
-      <Header
-        setHeader={props.setHeader}
-        setViewMenu={props.setViewMenu}
-      />
-      <Main
-        setWorkspace={props.setWorkspace}
-        setWorkspaceEditors={props.setWorkspaceEditors}
-        setScaler={props.setScaler}
-        setPreview={props.setPreview}
-      />
+      <Header/>
+      <Main/>
     </>
   );
 }

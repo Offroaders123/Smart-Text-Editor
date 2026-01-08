@@ -1,24 +1,23 @@
-import { orientationChange, scalingChange, view, orientation, childWindows, preview as getPreview, scaler as getScaler, workspace as getWorkspace, viewMenu, scalingActive_, setScalingActive_, setOrientationChange_, setViewChange_, viewChange_, setView_, setOrientation_, editorRef, editorName, editorValue, editorRefresh, setEditorRefresh } from "../app.js";
+import { orientationChange, scalingChange, view, orientation, childWindows, scalingActive_, setScalingActive_, setOrientationChange_, setViewChange_, viewChange_, setView_, setOrientation_, editorRef, editorName, editorValue, editorRefresh, setEditorRefresh } from "../app.js";
 import WorkspaceEditors from "./WorkspaceEditors.js";
 import { appearance } from "../appearance.js";
 import { getElementStyle } from "../dom.js";
+import { createSignal } from "solid-js";
+import { getScaler } from "./Scaler.js";
+import { getPreview } from "./Preview.js";
+import { getViewMenu } from "../Menubar.js";
 import "./Workspace.scss";
 
-import type { Setter } from "solid-js";
+const [getWorkspace, setWorkspace] = createSignal<HTMLDivElement | null>(null);
 
-export interface WorkspaceProps {
-  setWorkspace: Setter<HTMLDivElement | null>;
-  setWorkspaceEditors: Setter<HTMLDivElement | null>;
-}
+export { getWorkspace };
 
-export default function Workspace(props: WorkspaceProps) {
+export default function Workspace() {
   return (
     <div
-      ref={props.setWorkspace}
+      ref={setWorkspace}
       class="workspace">
-      <WorkspaceEditors
-        setWorkspaceEditors={props.setWorkspaceEditors}
-      />
+      <WorkspaceEditors/>
     </div>
   );
 }
@@ -45,7 +44,7 @@ export async function setView(type: View, { force = false }: SetViewOptions = {}
   setView_(type);
   document.body.classList.add(view());
   removeScaling();
-  viewMenu()!.select(view());
+  getViewMenu()!.select(view());
 
   refreshPreview();
 

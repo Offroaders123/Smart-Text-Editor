@@ -1,16 +1,17 @@
-import { createEffect } from "solid-js";
-import { header as getHeader, orientation, preview as getPreview, scaler as getScaler, view, workspace as getWorkspace, setScalingActive_, setScalingChange_ } from "../app.js";
+import { createEffect, createSignal } from "solid-js";
+import { orientation, view, setScalingActive_, setScalingChange_ } from "../app.js";
 import { appearance } from "../appearance.js";
 import { environment } from "../environment.js";
+import { getHeader } from "../Header.js";
+import { getWorkspace } from "./Workspace.js";
+import { getPreview } from "./Preview.js";
 import "./Scaler.scss";
 
-import type { Setter } from "solid-js";
+const [getScaler, setScaler] = createSignal<HTMLDivElement | null>(null);
 
-export interface ScalerProps {
-  setScaler: Setter<HTMLDivElement | null>;
-}
+export { getScaler };
 
-export default function Scaler(props: ScalerProps) {
+export default function Scaler() {
   let ref: HTMLDivElement;
 
   createEffect(() => {
@@ -25,7 +26,7 @@ export default function Scaler(props: ScalerProps) {
 
   return (
     <div
-      ref={scaler => { ref = scaler; props.setScaler(scaler); }}
+      ref={scaler => { ref = scaler; setScaler(scaler); }}
       class="scaler"
       onmousedown={event => {
         if (event.button !== 0) return;

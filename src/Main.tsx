@@ -8,28 +8,12 @@ import UUIDGeneratorCard from "./card/UUIDGeneratorCard.js";
 import Workspace from "./workspace/Workspace.js";
 import "./Main.scss";
 
-import type { Setter } from "solid-js";
-
-export interface MainProps {
-  setWorkspace: Setter<HTMLDivElement | null>;
-  setWorkspaceEditors: Setter<HTMLDivElement | null>;
-  setScaler: Setter<HTMLDivElement | null>;
-  setPreview: Setter<HTMLIFrameElement | null>;
-}
-
-export function Main(props: MainProps) {
+export function Main() {
   return (
     <main>
-      <Workspace
-        setWorkspace={props.setWorkspace}
-        setWorkspaceEditors={props.setWorkspaceEditors}
-      />
-      <Scaler
-        setScaler={props.setScaler}
-      />
-      <Preview
-        setPreview={props.setPreview}
-      />
+      <Workspace/>
+      <Scaler/>
+      <Preview/>
       <ReplaceTextCard/>
       <ColorPickerCard/>
       <JSONFormatterCard/>

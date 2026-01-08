@@ -1,15 +1,14 @@
+import { createSignal } from "solid-js";
 import "./Preview.scss";
 
-import type { Setter } from "solid-js";
+const [getPreview, setPreview] = createSignal<HTMLIFrameElement | null>(null);
 
-export interface PreviewProps {
-  setPreview: Setter<HTMLIFrameElement | null>;
-}
+export { getPreview };
 
-export default function Preview(props: PreviewProps) {
+export default function Preview() {
   return (
     <iframe
-      ref={props.setPreview}
+      ref={setPreview}
       class="preview"
       src="about:blank"
     />

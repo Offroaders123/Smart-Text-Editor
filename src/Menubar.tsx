@@ -13,14 +13,13 @@ import RealFaviconGenerator from "./img/real-favicon-generator.svg";
 import Appscope from "./img/appscope.svg";
 import SVGMinify from "./img/svgminify.svg";
 import Cryptii from "./img/cryptii.svg";
+import { createSignal } from "solid-js";
 
-import type { Setter } from "solid-js";
+const [getViewMenu, setViewMenu] = createSignal<MenuDropElement | null>(null);
 
-export interface MenubarProps {
-  setViewMenu: Setter<MenuDropElement | null>;
-}
+export { getViewMenu };
 
-export default function Menubar(props: MenubarProps) {
+export default function Menubar() {
   let appMenubar: HTMLDivElement;
 
   createEffect(() => {
@@ -65,7 +64,7 @@ export default function Menubar(props: MenubarProps) {
           </li>
         </ul>
       </menu-drop>
-      <menu-drop ref={props.setViewMenu} data-select="no-appearance">
+      <menu-drop ref={setViewMenu} data-select="no-appearance">
         <button>View</button>
         <ul>
           <li data-selected onclick={() => setView('code')} data-shortcuts='{ "default": "Ctrl+Shift+1", "macOS": "Ctrl+Cmd+1" }' data-value="code">Code</li>

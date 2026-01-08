@@ -1,16 +1,15 @@
 import { Editor } from "./Editor.js";
+import { createSignal } from "solid-js";
 import "./WorkspaceEditors.scss";
 
-import type { Setter } from "solid-js";
+const [getWorkspaceEditors, setWorkspaceEditors] = createSignal<HTMLDivElement | null>(null);
 
-export interface WorkspaceEditorsProps {
-  setWorkspaceEditors: Setter<HTMLDivElement | null>;
-}
+export { getWorkspaceEditors };
 
-export default function WorkspaceEditors(props: WorkspaceEditorsProps) {
+export default function WorkspaceEditors() {
   return (
     <div
-      ref={props.setWorkspaceEditors}
+      ref={setWorkspaceEditors}
       class="workspace-editors">
       <Editor/>
     </div>

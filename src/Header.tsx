@@ -6,18 +6,18 @@ import Menubar from "./Menubar.js";
 import { refreshPreview } from "./workspace/Workspace.js";
 import { showInstallPrompt } from "./dom.js";
 import Icon from "/img/icon.svg";
+import { createSignal } from "solid-js";
 import "./Header.scss";
 
-import type { JSX, Setter } from "solid-js";
+import type { JSX } from "solid-js";
 
-export interface HeaderProps {
-  setHeader: Setter<HTMLElement | null>;
-  setViewMenu: Setter<MenuDropElement | null>;
-}
+const [getHeader, setHeader] = createSignal<HTMLElement | null>(null);
 
-export function Header(props: HeaderProps) {
+export { getHeader };
+
+export function Header() {
   return (
-    <header ref={props.setHeader}>
+    <header ref={setHeader}>
       <div class="app-region"/>
       <div class="app-icon">
         <DecorativeImage
@@ -25,9 +25,7 @@ export function Header(props: HeaderProps) {
           alt=""
         />
       </div>
-      <Menubar
-        setViewMenu={props.setViewMenu}
-      />
+      <Menubar/>
       <Omnibox/>
     </header>
   );
