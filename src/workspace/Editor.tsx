@@ -4,7 +4,7 @@ import { applyEditingBehavior } from "../dom.js";
 import "./Editor.scss";
 
 export function Editor() {
-  let ref: NumTextElement;
+  let ref: HTMLTextAreaElement;
 
   onMount(() => {
     setEditorRef(ref!);
@@ -12,14 +12,14 @@ export function Editor() {
   });
 
   createEffect(() => {
-    const editor: NumTextElement | null = editorRef();
+    const editor: HTMLTextAreaElement | null = editorRef();
     if (!editor) return;
-    editor.editor.value = editorValue();
+    editor.value = editorValue();
   });
 
   return (
-    <num-text
-      class="Editor"
+    <textarea
+      class="NumText Editor"
       ref={ref!}
     />
   );

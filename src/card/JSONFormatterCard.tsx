@@ -46,12 +46,12 @@ export default function JSONFormatterCard() {
       heading="JSON Formatter"
       main={
         <CardItem expand>
-          <num-text
+          <textarea
             ref={ref => {
               applyEditingBehavior(ref);
-              ref.editor.onchange = () => setValue(ref.value);
+              ref.onchange = () => setValue(ref.value);
             }}
-            class="expand"
+            class="NumText expand"
             placeholder="JSON data to format..."
             value={value()}
           />

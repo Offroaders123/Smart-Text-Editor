@@ -53,14 +53,14 @@ declare global {
 
 declare module "solid-js" {
   export namespace JSX {
-    interface NumTextHTMLAttributes<T> extends HTMLAttributes<T> {
-      placeholder?: string;
-      value?: string;
-    }
+    // interface NumTextHTMLAttributes<T> extends HTMLAttributes<T> {
+    //   placeholder?: string;
+    //   value?: string;
+    // }
 
     interface HTMLElementTags {
       "menu-drop": HTMLAttributes<MenuDropElement>;
-      "num-text": NumTextHTMLAttributes<NumTextElement>;
+      // "num-text": NumTextHTMLAttributes<NumTextElement>;
     }
   }
 }

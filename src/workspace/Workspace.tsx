@@ -164,7 +164,7 @@ export interface RefreshPreviewOptions {
 export async function refreshPreview({ force = false }: RefreshPreviewOptions = {}): Promise<void> {
   if (view() === "code") return;
 
-  const editor: NumTextElement | null = editorRef();
+  const editor: HTMLTextAreaElement | null = editorRef();
   if (editor === null) return;
   const change: boolean = editorRefresh();
   if (!change && !force) return;

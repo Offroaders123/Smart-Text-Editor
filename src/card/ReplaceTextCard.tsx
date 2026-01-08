@@ -32,13 +32,15 @@ export default function ReplaceTextCard() {
       heading="Replace Text"
       main={
         <CardItem list expand>
-          <num-text
+          <textarea
+            class="NumText"
             ref={ref => applyEditingBehavior(ref)}
             placeholder="Text to find..."
             value={findValue()}
             oninput={event => setFindValue(event.currentTarget.value)}
           />
-          <num-text
+          <textarea
+            class="NumText"
             ref={ref => applyEditingBehavior(ref)}
             placeholder="Replace with..."
             value={replaceValue()}

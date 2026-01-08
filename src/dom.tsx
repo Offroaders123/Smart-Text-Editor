@@ -14,9 +14,9 @@ export function getElementStyle({ element, property, pseudo }: GetElementStyleOp
 }
 
 /**
- * Applies the app's behavior defaults, like Drag and Drop handling, to `<input>` and `<num-text>` elements.
+ * Applies the app's behavior defaults, like Drag and Drop handling, to `<input>` and `<NumText>` elements.
 */
-export async function applyEditingBehavior(element: HTMLInputElement | NumTextElement): Promise<void> {
+export async function applyEditingBehavior(element: HTMLInputElement | HTMLTextAreaElement): Promise<void> {
   await new Promise<number>(resolve => requestAnimationFrame(resolve));
 
   (element as HTMLElement).addEventListener("dragover",event => {
@@ -41,13 +41,13 @@ export async function applyEditingBehavior(element: HTMLInputElement | NumTextEl
     element.setAttribute("autocorrect","off");
   }
 
-  if (element instanceof NumTextElement){
-    element.colorScheme.set("dark");
-    element.themes.remove("vanilla-appearance");
-    const scrollbarStyles = document.createElement("style");
-    scrollbarStyles.textContent = scrollbar_styles.textContent;
-    element.shadowRoot.insertBefore(scrollbarStyles,element.container);
-  }
+  // if (element instanceof NumTextElement){
+  //   element.colorScheme.set("dark");
+  //   element.themes.remove("vanilla-appearance");
+  //   const scrollbarStyles = document.createElement("style");
+  //   scrollbarStyles.textContent = scrollbar_styles.textContent;
+  //   element.shadowRoot.insertBefore(scrollbarStyles,element.container);
+  // }
 }
 
 export type SetTitleOptions =

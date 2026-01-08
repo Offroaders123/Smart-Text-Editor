@@ -203,18 +203,18 @@
   fill: currentColor;
 }
 
-.Card num-text {
+.Card .NumText {
   width: 32ch;
   height: 12ch;
   --background: #2d2d2d;
   border-radius: 6px;
 }
 
-.Card num-text.expand {
+.Card .NumText.expand {
   height: 20ch;
 }
 
-.Card num-text::part(container)::before {
+.Card .NumText::part(container)::before {
   content: "";
   position: absolute;
   width: 100%;

@@ -131,7 +131,7 @@ export const [editorRefresh, setEditorRefresh] = createSignal<boolean>(false);
 
 export const [editorUnsaved, setEditorUnsaved] = createSignal<boolean>(false);
 
-export const [editorRef, setEditorRef] = createSignal<NumTextElement | null>(null);
+export const [editorRef, setEditorRef] = createSignal<HTMLTextAreaElement | null>(null);
 
 export async function openFile(): Promise<void> {}
 
@@ -382,7 +382,7 @@ if (appearance.parentWindow){
   // window.setTimeout(() => {
   //   document.documentElement.classList.remove("startup-fade");
   // },50);
-  Promise.all(["menu-drop","num-text"].map(tag => window.customElements.whenDefined(tag)))
+  Promise.all(["menu-drop"].map(tag => window.customElements.whenDefined(tag)))
     .then(async () => {
       // await new Promise(resolve => setTimeout(resolve,50));
       document.documentElement.classList.remove("startup-fade");

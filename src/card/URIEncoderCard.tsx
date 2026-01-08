@@ -5,7 +5,7 @@ import Checkbox from "../Checkbox.js";
 import { applyEditingBehavior } from "../dom.js";
 
 export default function URIEncoderCard() {
-  let encoder_input: NumTextElement;
+  let encoder_input: HTMLTextAreaElement;
 
   function encode(): void {
     const encodingType = (!encoder_type.checked) ? encodeURI : encodeURIComponent;
@@ -27,12 +27,12 @@ export default function URIEncoderCard() {
       heading="URI Encoder"
       main={
         <CardItem expand>
-          <num-text
+          <textarea
             ref={ref => {
               applyEditingBehavior(ref);
               encoder_input = ref;
             }}
-            class="expand"
+            class="NumText expand"
             placeholder="Text to encode..."
           />
         </CardItem>
