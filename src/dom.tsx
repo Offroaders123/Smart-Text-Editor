@@ -16,7 +16,7 @@ export function getElementStyle({ element, property, pseudo }: GetElementStyleOp
 /**
  * Applies the app's behavior defaults, like Drag and Drop handling, to `<input>` and `<NumText>` elements.
 */
-export async function applyEditingBehavior(element: HTMLInputElement | HTMLTextAreaElement): Promise<void> {
+export async function applyEditingBehavior(element: HTMLInputElement | HTMLDivElement): Promise<void> {
   await new Promise<number>(resolve => requestAnimationFrame(resolve));
 
   (element as HTMLElement).addEventListener("dragover",event => {

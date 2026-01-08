@@ -3,15 +3,21 @@ import { basicSetup } from "codemirror";
 
 import type { Accessor, ComponentProps } from "solid-js";
 
-export interface NumTextProps extends Pick<ComponentProps<"textarea">, "ref" | "class" | "placeholder" | "oninput"> {
+export interface NumTextProps extends Pick<ComponentProps<"textarea">, "class" | "placeholder" | "oninput"> {
+  ref?: ComponentProps<"div">["ref"];
   value?: Accessor<string>;
 }
 
 export default function NumText(props: NumTextProps) {
-  const ref: HTMLElement = <div></div> as HTMLElement;
+  const ref: HTMLElement = (
+    <div
+      ref={props.ref}
+      class={`NumText ${props.class}`}
+    />
+  ) as HTMLElement;
 
   const view = new EditorView({
-    doc: "Template content, just to test real quick!",
+    doc: props.value?.(),
     parent: ref,
     extensions: [basicSetup]
   });
