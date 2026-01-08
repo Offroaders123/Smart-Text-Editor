@@ -3,6 +3,7 @@ import CardItem from "./CardItem.js";
 import CardOptions from "./CardOptions.js";
 import Checkbox from "../Checkbox.js";
 import { applyEditingBehavior } from "../dom.js";
+import NumText from "../NumText.js";
 
 export default function URIEncoderCard() {
   let encoder_input: HTMLTextAreaElement;
@@ -27,12 +28,12 @@ export default function URIEncoderCard() {
       heading="URI Encoder"
       main={
         <CardItem expand>
-          <textarea
+          <NumText
             ref={ref => {
               applyEditingBehavior(ref);
               encoder_input = ref;
             }}
-            class="NumText expand"
+            class="expand"
             placeholder="Text to encode..."
           />
         </CardItem>

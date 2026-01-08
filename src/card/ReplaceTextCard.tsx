@@ -4,6 +4,7 @@ import CardItem from "./CardItem.js";
 import CardOptions from "./CardOptions.js";
 import { applyEditingBehavior } from "../dom.js";
 import { editorValue, setEditorValue } from "../app.js";
+import NumText from "../NumText.js";
 
 export default function ReplaceTextCard() {
   const [findValue, setFindValue] = createSignal<string>("");
@@ -32,18 +33,16 @@ export default function ReplaceTextCard() {
       heading="Replace Text"
       main={
         <CardItem list expand>
-          <textarea
-            class="NumText"
+          <NumText
             ref={ref => applyEditingBehavior(ref)}
             placeholder="Text to find..."
-            value={findValue()}
+            value={findValue}
             oninput={event => setFindValue(event.currentTarget.value)}
           />
-          <textarea
-            class="NumText"
+          <NumText
             ref={ref => applyEditingBehavior(ref)}
             placeholder="Replace with..."
-            value={replaceValue()}
+            value={replaceValue}
             oninput={event => setReplaceValue(event.currentTarget.value)}
           />
         </CardItem>

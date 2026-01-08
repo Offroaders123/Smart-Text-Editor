@@ -3,6 +3,7 @@ import Widget from "./Widget.js";
 import CardItem from "./CardItem.js";
 import CardOptions from "./CardOptions.js";
 import { applyEditingBehavior } from "../dom.js";
+import NumText from "../NumText.js";
 
 export default function JSONFormatterCard() {
   const [value, setValue] = createSignal<string>("");
@@ -46,14 +47,14 @@ export default function JSONFormatterCard() {
       heading="JSON Formatter"
       main={
         <CardItem expand>
-          <textarea
+          <NumText
             ref={ref => {
               applyEditingBehavior(ref);
               ref.onchange = () => setValue(ref.value);
             }}
-            class="NumText expand"
+            class="expand"
             placeholder="JSON data to format..."
-            value={value()}
+            value={value}
           />
         </CardItem>
       }

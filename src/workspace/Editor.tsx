@@ -2,6 +2,7 @@ import { createEffect, onMount } from "solid-js";
 import { editorRef, editorRefresh, editorUnsaved, editorValue, setEditorRef, setEditorRefresh, setEditorUnsaved, setEditorValue } from "../app.js";
 import { applyEditingBehavior } from "../dom.js";
 import { refreshPreview } from "./Workspace.js";
+import NumText from "../NumText.js";
 import "./Editor.scss";
 
 export function Editor() {
@@ -19,10 +20,10 @@ export function Editor() {
   });
 
   return (
-    <textarea
-      class="NumText Editor"
+    <NumText
+      class="Editor"
       ref={ref!}
-      value={editorValue()}
+      value={editorValue}
       oninput={event => {
         setEditorValue(event.currentTarget.value);
         if (!editorRefresh()){
