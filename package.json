@@ -9,7 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@stedit/menu-drop": "^1.1.0"
+    "@codemirror/state": "^6.5.3",
+    "@codemirror/view": "^6.39.9",
+    "@stedit/menu-drop": "^1.1.0",
+    "codemirror": "^6.0.2"
   },
   "devDependencies": {
     "new-javascript": "^0.4.7",
