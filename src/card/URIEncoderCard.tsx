@@ -3,23 +3,28 @@ import CardItem from "./CardItem.js";
 import CardOptions from "./CardOptions.js";
 import Checkbox from "../Checkbox.js";
 import { applyEditingBehavior } from "../dom.js";
-import NumText from "../NumText.js";
+import NumText, { replaceEditorViewValue } from "../NumText.js";
+
+import type { EditorView } from "@codemirror/view";
 
 export default function URIEncoderCard() {
-  let encoder_input: HTMLTextAreaElement;
+  let encoder_input: EditorView;
 
   function encode(): void {
     const encodingType = (!encoder_type.checked) ? encodeURI : encodeURIComponent;
-    encoder_input.value = encodingType(encoder_input.value);
+    // encoder_input.value = encodingType(encoder_input.value);
+    replaceEditorViewValue(encoder_input, encodingType(encoder_input.state.doc.toString()));
   }
 
   function decode(): void {
     const decodingType = (!encoder_type.checked) ? decodeURI : decodeURIComponent;
-    encoder_input.value = decodingType(encoder_input.value);
+    // encoder_input.value = decodingType(encoder_input.value);
+    replaceEditorViewValue(encoder_input, decodingType(encoder_input.state.doc.toString()));
   }
 
   function clear(): void {
-    encoder_input.value = "";
+    // encoder_input.value = "";
+    replaceEditorViewValue(encoder_input, "");
   }
 
   return (
@@ -31,6 +36,8 @@ export default function URIEncoderCard() {
           <NumText
             ref={ref => {
               applyEditingBehavior(ref);
+            }}
+            view={ref => {
               encoder_input = ref;
             }}
             class="expand"

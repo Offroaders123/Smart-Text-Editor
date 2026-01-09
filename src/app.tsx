@@ -12,6 +12,7 @@ import { setView, setOrientation, createWindow, createDisplay, refreshPreview } 
 import { createSignal } from "solid-js";
 // import { openCard } from "./Card.js";
 
+import type { EditorView } from "@codemirror/view";
 import type { View } from "./workspace/Workspace.js";
 import type { Orientation } from "./workspace/Workspace.js";
 
@@ -117,7 +118,7 @@ export const [editorRefresh, setEditorRefresh] = createSignal<boolean>(false);
 
 export const [editorUnsaved, setEditorUnsaved] = createSignal<boolean>(false);
 
-export const [editorRef, setEditorRef] = createSignal<HTMLTextAreaElement | null>(null);
+export const [editorRef, setEditorRef] = createSignal<EditorView | null>(null);
 
 export async function openFile(): Promise<void> {}
 
@@ -377,7 +378,7 @@ if (support.fileHandling && support.fileSystem){
       setHandle(handle);
     }
     if (!environment.touchDevice){
-      editorRef()?.focus({ preventScroll: true });
+      editorRef()?.focus(); // { preventScroll: true });
     }
   });
 }

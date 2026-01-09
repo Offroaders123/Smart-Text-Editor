@@ -1,10 +1,12 @@
 import { EditorView } from "@codemirror/view";
 import { basicSetup } from "codemirror";
+import { createEffect } from "solid-js";
 
 import type { Accessor, ComponentProps } from "solid-js";
 
 export interface NumTextProps extends Pick<ComponentProps<"textarea">, "class" | "placeholder" | "oninput"> {
   ref?: ComponentProps<"div">["ref"];
+  view?: (view: EditorView) => void;
   value?: Accessor<string>;
 }
 
@@ -22,5 +24,26 @@ export default function NumText(props: NumTextProps) {
     extensions: [basicSetup]
   });
 
+  props.view?.(view);
+
+  createEffect(() => {
+    if (!props.value) return;
+    replaceEditorViewValue(view, props.value());
+  });
+
   return ref;
+}
+
+export function replaceEditorViewValue(view: EditorView, value: string): void {
+  if (view.state.doc.toString() === value) return;
+
+  view.dispatch({
+    changes: {
+      from: 0,
+      to: view.state.doc.length,
+      insert: value
+    },
+    selection: { anchor: 0 },
+    scrollIntoView: true
+  });
 }

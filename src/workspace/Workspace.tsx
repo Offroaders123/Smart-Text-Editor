@@ -8,6 +8,8 @@ import { getPreview } from "./Preview.js";
 import { getViewMenu } from "../Menubar.js";
 import "./Workspace.scss";
 
+import type { EditorView } from "@codemirror/view";
+
 const [getWorkspace, setWorkspace] = createSignal<HTMLDivElement | null>(null);
 
 export { getWorkspace };
@@ -163,7 +165,7 @@ export interface RefreshPreviewOptions {
 export async function refreshPreview({ force = false }: RefreshPreviewOptions = {}): Promise<void> {
   if (view() === "code") return;
 
-  const editor: HTMLTextAreaElement | null = editorRef();
+  const editor: EditorView | null = editorRef();
   if (editor === null) return;
   const change: boolean = editorRefresh();
   if (!change && !force) return;
