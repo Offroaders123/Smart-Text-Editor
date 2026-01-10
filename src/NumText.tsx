@@ -4,10 +4,11 @@ import { createEffect } from "solid-js";
 
 import type { Accessor, ComponentProps } from "solid-js";
 
-export interface NumTextProps extends Pick<ComponentProps<"textarea">, "class" | "placeholder" | "oninput"> {
+export interface NumTextProps extends Pick<ComponentProps<"textarea">, "class" | "placeholder"> {
   ref?: ComponentProps<"div">["ref"];
   view?: (view: EditorView) => void;
   value?: Accessor<string>;
+  setValue?: (value: string) => void;
 }
 
 export default function NumText(props: NumTextProps) {
@@ -21,7 +22,14 @@ export default function NumText(props: NumTextProps) {
   const view = new EditorView({
     doc: props.value?.(),
     parent: ref,
-    extensions: [basicSetup]
+    extensions: [
+      basicSetup,
+      EditorView.updateListener.of(update => {
+        if (update.docChanged) {
+          props.setValue?.(update.state.doc.toString());
+        }
+      })
+    ]
   });
 
   props.view?.(view);

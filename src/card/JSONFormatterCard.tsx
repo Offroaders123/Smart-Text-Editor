@@ -50,11 +50,11 @@ export default function JSONFormatterCard() {
           <NumText
             ref={ref => {
               applyEditingBehavior(ref);
-              ref.onchange = () => setValue(ref.value);
             }}
             class="expand"
             placeholder="JSON data to format..."
             value={value}
+            setValue={setValue}
           />
         </CardItem>
       }
