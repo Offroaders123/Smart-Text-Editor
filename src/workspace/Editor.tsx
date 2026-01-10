@@ -23,22 +23,31 @@ export function Editor() {
     replaceEditorViewValue(editor, editorValue());
   });
 
+  createEffect(() => {
+    // @ts-expect-error - for reactivity;
+    // this value should be passed to refreshPreview once that is stateless;
+    // only am realizing now how that makes a lot more sense than being
+    // hooked to state itself. Dependency injection!
+    // Gotta give this codebase more love than I remember to. It's come a
+    // long way, and I am learning more and more about why it was and wasn't
+    // working. Learning is great.
+    const value = editorValue();
+    if (!editorRefresh()){
+      setEditorRefresh(true);
+    }
+    if (!editorUnsaved()){
+      setEditorUnsaved(true);
+    }
+    refreshPreview();
+  });
+
   return (
     <NumText
       class="Editor"
       ref={ref!}
       view={rview => view = rview!}
       value={editorValue}
-      oninput={event => {
-        setEditorValue(event.currentTarget.value);
-        if (!editorRefresh()){
-          setEditorRefresh(true);
-        }
-        if (!editorUnsaved()){
-          setEditorUnsaved(true);
-        }
-        refreshPreview();
-      }}
+      setValue={setEditorValue}
     />
   );
 }

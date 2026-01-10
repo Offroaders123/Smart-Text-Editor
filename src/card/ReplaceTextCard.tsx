@@ -37,13 +37,13 @@ export default function ReplaceTextCard() {
             ref={ref => applyEditingBehavior(ref)}
             placeholder="Text to find..."
             value={findValue}
-            oninput={event => setFindValue(event.currentTarget.value)}
+            setValue={setFindValue}
           />
           <NumText
             ref={ref => applyEditingBehavior(ref)}
             placeholder="Replace with..."
             value={replaceValue}
-            oninput={event => setReplaceValue(event.currentTarget.value)}
+            setValue={setReplaceValue}
           />
         </CardItem>
       }
