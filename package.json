@@ -21,5 +21,10 @@
     "typescript": "^5.9.2",
     "vite": "^7.1.1",
     "vite-plugin-solid": "^2.11.8"
+  },
+  "allowScripts": {
+    "@parcel/watcher@2.5.0": true,
+    "esbuild@0.25.8": true,
+    "fsevents@2.3.3": true
   }
 }
