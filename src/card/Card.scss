@@ -190,6 +190,11 @@
   background: #b12f25;
 }
 
+.Card .main button.smiley {
+  min-width: unset;
+  max-height: 22.5px;
+}
+
 .Card .options button > img {
   width: 16px;
   height: 16px;

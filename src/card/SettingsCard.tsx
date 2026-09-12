@@ -76,6 +76,11 @@ export default function SettingsCard() {
             onclick={() => settings.reset({ confirm: true })}>
             Reset Settings
           </button>
+          <button
+            class="smiley"
+            onclick={() => settings.smiley()}>
+            😜
+          </button>
         </CardOptions>
         </>
       }

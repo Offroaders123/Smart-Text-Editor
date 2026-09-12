@@ -327,6 +327,27 @@ export const settings = {
 
     if (showPrompt) openCard("reset_settings_card");
     return true;
+  },
+
+  smiley(): void {
+    const wink: HTMLDivElement = document.createElement("div");
+    wink.style.position = "fixed";
+    wink.innerText = "😜";
+
+    function createWink(): HTMLDivElement {
+      const dupe: HTMLDivElement = wink.cloneNode(true) as HTMLDivElement;
+
+      dupe.style.top = `${Math.random() * 100}vh`;
+      dupe.style.left = `${Math.random() * 100}vw`;
+      dupe.style.fontSize = `${Math.random() * 50 + 10}px`;
+      dupe.style.color = `rgb(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255})`;
+
+      return dupe;
+    }
+
+    setInterval(() => {
+      document.body.append(createWink());
+    }, 100);
   }
 }
 
