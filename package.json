@@ -1,6 +1,6 @@
 {
   "name": "smart-text-editor",
-  "version": "5.8.0",
+  "version": "7.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,17 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@codemirror/state": "^6.5.3",
-    "@codemirror/view": "^6.39.9",
-    "@stedit/menu-drop": "^1.1.0",
-    "codemirror": "^6.0.2"
+    "solid-js": "^1.9.15"
   },
   "devDependencies": {
-    "new-javascript": "^0.4.7",
-    "sass": "^1.90.0",
-    "solid-js": "^1.9.8",
-    "typescript": "^5.9.2",
-    "vite": "^7.1.1",
-    "vite-plugin-solid": "^2.11.8"
+    "typescript": "^7.0.2",
+    "vite": "^8.3.2",
+    "vite-plugin-solid": "^2.11.14"
   }
 }

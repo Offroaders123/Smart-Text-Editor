@@ -7,12 +7,6 @@
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "types": [
-      "@stedit/menu-drop",
-      "new-javascript/wicg/file-system-access",
-      "new-javascript/wicg/manifest-incubations",
-      "new-javascript/wicg/ua-client-hints",
-      "new-javascript/wicg/web-app-launch",
-      "new-javascript/wicg/window-controls-overlay",
       "vite/client"
     ],
     "noEmit": true,
