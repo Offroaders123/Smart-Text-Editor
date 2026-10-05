@@ -6,7 +6,6 @@
       "WebWorker"
     ],
     "types": [
-      "new-javascript/wicg/ua-client-hints",
       "vite/client"
     ]
   },

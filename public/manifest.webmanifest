@@ -43,49 +43,6 @@
       "purpose": "maskable"
     }
   ],
-  "shortcuts": [
-    {
-      "name": "HTML Template",
-      "short_name": "HTML Template",
-      "description": "Create a new file with boilerplate HTML to start with",
-      "url": "./?template=true",
-      "icons": [
-        {
-          "src": "./img/template-192.png",
-          "type": "image/png",
-          "sizes": "192x192"
-        },
-        {
-          "src": "./img/template-512.png",
-          "type": "image/png",
-          "sizes": "512x512"
-        },
-        {
-          "src": "./img/template-1024.png",
-          "type": "image/png",
-          "sizes": "1024x1024"
-        },
-        {
-          "src": "./img/template-maskable-192.png",
-          "type": "image/png",
-          "sizes": "192x192",
-          "purpose": "maskable"
-        },
-        {
-          "src": "./img/template-maskable-512.png",
-          "type": "image/png",
-          "sizes": "512x512",
-          "purpose": "maskable"
-        },
-        {
-          "src": "./img/template-maskable-1024.png",
-          "type": "image/png",
-          "sizes": "1024x1024",
-          "purpose": "maskable"
-        }
-      ]
-    }
-  ],
   "file_handlers": [
     {
       "action": "./",
@@ -94,19 +51,5 @@
         "image/svg+xml": [".svg"]
       }
     }
-  ],
-  "share_target": {
-    "action": "./",
-    "method": "POST",
-    "enctype": "multipart/form-data",
-    "params": {
-      "url": "share-target",
-      "files": [
-        {
-          "name": "file",
-          "accept": ["text/*",".txt",".html",".css",".js",".json",".xml",".md","image/svg+xml",".svg"]
-        }
-      ]
-    }
-  }
+  ]
 }
