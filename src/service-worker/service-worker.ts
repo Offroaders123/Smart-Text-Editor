@@ -16,7 +16,7 @@ self.addEventListener("fetch", event => {
 
 /**
  * Clears out old versions of the app from Cache Storage.
-*/
+ */
 async function removeOutdatedVersions(): Promise<void> {
   const keys: string[] = await caches.keys();
 
@@ -35,7 +35,7 @@ async function removeOutdatedVersions(): Promise<void> {
  * Matches a network request with it's cached counterpart from Cache Storage.
  * 
  * If it hasn't been cached yet, it will fetch the network for a response, cache a clone, then return the response.
-*/
+ */
 async function matchRequest(request: Request): Promise<Response> {
   let response: Response | undefined = await caches.match(request);
   if (response !== undefined) return response;
@@ -48,7 +48,7 @@ async function matchRequest(request: Request): Promise<Response> {
 
 /**
  * Adds a network request and response to Cache Storage.
-*/
+ */
 async function cacheRequest(request: Request, response: Response): Promise<void> {
   const cache: Cache = await caches.open(CACHE_NAME);
   await cache.put(request, response.clone());
