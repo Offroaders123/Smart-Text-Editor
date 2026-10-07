@@ -1,5 +1,6 @@
 import { createSignal } from "solid-js";
 import { Editor } from "./Editor.tsx";
+import { Header } from "./Header.tsx";
 import { Preview } from "./Preview.tsx";
 
 export default function App() {
@@ -7,6 +8,7 @@ export default function App() {
 
   return (
     <>
+      <Header />
       <Editor
         getValue={getValue}
         setValue={setValue}
