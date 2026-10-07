@@ -1,5 +1,19 @@
+import { createSignal } from "solid-js";
+import { Editor } from "./Editor.tsx";
+import { Preview } from "./Preview.tsx";
+
 export default function App() {
+  const [getValue, setValue] = createSignal<string>("");
+
   return (
-    <>Hello world!</>
+    <>
+      <Editor
+        getValue={getValue}
+        setValue={setValue}
+      />
+      <Preview
+        getSrc={getValue}
+      />
+    </>
   );
 }
