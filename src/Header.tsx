@@ -1,8 +1,16 @@
 export function Header() {
   return (
     <header>
-      <button>File</button>
-      <button>View</button>
+      <div>
+        <button>File</button>
+        <ol>
+          <li>New File</li>
+          <li>Open...</li>
+          <li>Save</li>
+          <li>Save As...</li>
+          <li>Close Editor</li>
+        </ol>
+      </div>
     </header>
   );
 }
