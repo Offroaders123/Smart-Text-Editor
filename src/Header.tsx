@@ -1,4 +1,5 @@
 import { Match, Switch } from "solid-js";
+import { MenuItem } from "./MenuItem.tsx";
 
 export function Header(props: {
   hasEditor: () => boolean,
@@ -8,16 +9,16 @@ export function Header(props: {
       <div>
         <button>File</button>
         <ol>
-          <li accelerator="CmdOrCtrl+N">New File</li>
-          <li accelerator="CmdOrCtrl+O">Open...</li>
-          <li accelerator="CmdOrCtrl+S">Save</li>
-          <li accelerator="Shift+CmdOrCtrl+S">Save As...</li>
+          <MenuItem accelerator="CmdOrCtrl+N">New File</MenuItem>
+          <MenuItem accelerator="CmdOrCtrl+O">Open...</MenuItem>
+          <MenuItem accelerator="CmdOrCtrl+S">Save</MenuItem>
+          <MenuItem accelerator="Shift+CmdOrCtrl+S">Save As...</MenuItem>
           <Switch>
             <Match when={props.hasEditor()}>
-              <li accelerator="CmdOrCtrl+W">Close Editor</li>
+              <MenuItem accelerator="CmdOrCtrl+W">Close Editor</MenuItem>
             </Match>
             <Match when={props.hasEditor() === false}>
-              <li accelerator="CmdOrCtrl+W">Close Window</li>
+              <MenuItem accelerator="CmdOrCtrl+W">Close Window</MenuItem>
             </Match>
           </Switch>
         </ol>
