@@ -28,27 +28,6 @@ export function toAccelerator(event: KeyboardEvent): Accelerator {
   return accelerator;
 }
 
-export type ShortcutCallback = (event: KeyboardEvent) => void;
-
-export class Shortcut implements Disposable {
-  private readonly listener: ShortcutCallback = event => {
-    const accelerator: Accelerator = toAccelerator(event);
-    if (accelerator !== this.accelerator) return;
-    this.callback(event);
-  };
-
-  constructor(
-    private readonly accelerator: Accelerator,
-    private readonly callback: ShortcutCallback
-  ) {
-    document.addEventListener("keydown", this.listener, { once: true });
-  }
-
-  [Symbol.dispose](): void {
-    document.removeEventListener("keydown", this.listener);
-  }
-}
-
 declare global {
   interface Navigator {
     /** Not supported everywhere yet */
