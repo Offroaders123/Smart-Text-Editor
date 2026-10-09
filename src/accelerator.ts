@@ -1,5 +1,8 @@
-export const SuperKey = ["Super", "Cmd", "Ctrl"] as const;
-export type SuperKey = typeof SuperKey[number];
+export const MetaKey = "Meta";
+export type MetaKey = typeof MetaKey;
+
+export const CtrlKey = "Ctrl";
+export type CtrlKey = typeof CtrlKey;
 
 export const ShiftKey = "Shift";
 export type ShiftKey = typeof ShiftKey;
@@ -16,23 +19,38 @@ export type NumericKey = typeof NumericKey[number];
 export const FigureKey: FigureKey[] = [...AlphabeticKey, ...NumericKey];
 export type FigureKey = AlphabeticKey | NumericKey;
 
-export const SuperFigureKey = FigureKey.map(figure => SuperKey.map(Super => `${Super}+${figure}` as const)).flat(1).sort();
-export type SuperFigureKey = typeof SuperFigureKey[number];
+export const MetaFigureKey = FigureKey.map(figure => `${MetaKey}+${figure}` as const).sort();
+export type MetaFigureKey = typeof MetaFigureKey[number];
+
+export const CtrlFigureKey = FigureKey.map(figure => `${CtrlKey}+${figure}` as const).sort();
+export type CtrlFigureKey = typeof CtrlFigureKey[number];
 
 export const AltFigureKey = FigureKey.map(figure => `${AltKey}+${figure}` as const).sort();
 export type AltFigureKey = typeof AltFigureKey[number];
 
-export const SuperShiftKey = FigureKey.map(figure => SuperKey.map(Super => `${Super}+${ShiftKey}+${figure}` as const)).flat(1).sort();
-export type SuperShiftKey = typeof SuperShiftKey[number];
+export const MetaShiftKey = FigureKey.map(figure => `${MetaKey}+${ShiftKey}+${figure}` as const).sort();
+export type MetaShiftKey = typeof MetaShiftKey[number];
+
+export const CtrlShiftKey = FigureKey.map(figure => `${CtrlKey}+${ShiftKey}+${figure}` as const).sort();
+export type CtrlShiftKey = typeof CtrlShiftKey[number];
 
 export const AltShiftKey = FigureKey.map(figure => `${AltKey}+${ShiftKey}+${figure}` as const).sort();
 export type AltShiftKey = typeof AltShiftKey[number];
 
-export const SuperAltFigureKey = FigureKey.map(figure => SuperKey.map(Super => `${Super}+${AltKey}+${figure}` as const)).flat(1).sort();
-export type SuperAltFigureKey = typeof SuperAltFigureKey[number];
+export const MetaAltFigureKey = FigureKey.map(figure => `${MetaKey}+${AltKey}+${figure}` as const).sort();
+export type MetaAltFigureKey = typeof MetaAltFigureKey[number];
 
-export const SuperAltShiftFigureKey = FigureKey.map(figure => SuperKey.map(Super => `${Super}+${AltKey}+${ShiftKey}+${figure}` as const)).flat(1).sort();
-export type SuperAltShiftFigureKey = typeof SuperAltShiftFigureKey[number];
+export const CtrlAltFigureKey = FigureKey.map(figure => `${CtrlKey}+${AltKey}+${figure}` as const).sort();
+export type CtrlAltFigureKey = typeof CtrlAltFigureKey[number];
 
-export const Accelerator: Accelerator[] = [...SuperFigureKey, ...AltFigureKey, ...SuperShiftKey, ...AltShiftKey, ...SuperAltFigureKey, ...SuperAltShiftFigureKey].sort();
-export type Accelerator = SuperFigureKey | AltFigureKey | SuperShiftKey | AltShiftKey | SuperAltFigureKey | SuperAltShiftFigureKey;
+export const MetaAltShiftFigureKey = FigureKey.map(figure => `${MetaKey}+${AltKey}+${ShiftKey}+${figure}` as const).sort();
+export type MetaAltShiftFigureKey = typeof MetaAltShiftFigureKey[number];
+
+export const CtrlAltShiftFigureKey = FigureKey.map(figure => `${CtrlKey}+${AltKey}+${ShiftKey}+${figure}` as const).sort();
+export type CtrlAltShiftFigureKey = typeof CtrlAltShiftFigureKey[number];
+
+export const MetaCtrlAltShiftFigureKey = FigureKey.map(figure => `${MetaKey}+${CtrlKey}+${AltKey}+${ShiftKey}+${figure}` as const).sort();
+export type MetaCtrlAltShiftFigureKey = typeof MetaCtrlAltShiftFigureKey[number];
+
+export const Accelerator: Accelerator[] = [...MetaFigureKey, ...CtrlFigureKey, ...AltFigureKey, ...MetaShiftKey, ...CtrlShiftKey, ...AltShiftKey, ...MetaAltFigureKey, ...CtrlAltFigureKey, ...MetaAltShiftFigureKey, ...CtrlAltShiftFigureKey, ...MetaCtrlAltShiftFigureKey].sort();
+export type Accelerator = MetaFigureKey | CtrlFigureKey | AltFigureKey | MetaShiftKey | CtrlShiftKey | AltShiftKey | MetaAltFigureKey | CtrlAltFigureKey | MetaAltShiftFigureKey | CtrlAltShiftFigureKey | MetaCtrlAltShiftFigureKey;
