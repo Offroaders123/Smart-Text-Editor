@@ -8,7 +8,9 @@ export default function App() {
 
   return (
     <>
-      <Header />
+      <Header
+        hasEditor={() => true}
+      />
       <Editor
         getValue={getValue}
         setValue={setValue}
