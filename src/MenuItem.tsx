@@ -24,6 +24,6 @@ export function MenuItem(props: {
   }
 
   return (
-    <li accelerator={props.accelerator}>{props.children}</li>
+    <li>{props.children} <code>{props.accelerator}</code></li>
   );
 }
