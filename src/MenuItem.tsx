@@ -17,12 +17,10 @@ export function MenuItem(props: {
   });
 
   function handleKeyDown(event: KeyboardEvent): void {
-    try {
-      const accelerator: Accelerator = toAccelerator(event);
-      if (accelerator !== props.accelerator) return;
-      event.preventDefault();
-      console.log(accelerator);
-    } catch { }
+    const accelerator: Accelerator = toAccelerator(event);
+    if (accelerator !== props.accelerator) return;
+    event.preventDefault();
+    console.log(accelerator);
   }
 
   return (
