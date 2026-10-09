@@ -6,9 +6,7 @@ export function toAccelerator(event: KeyboardEvent): Accelerator {
   const { metaKey, ctrlKey, shiftKey, altKey } = event;
   const key: string = event.key.toUpperCase();
   const superKey: boolean = appleDevice ? metaKey : ctrlKey;
-  const figureKey: FigureKey = FigureKey.includes(key as FigureKey) ? key as FigureKey : (() => {
-    throw new TypeError(`Key '${key}' is not a valid figure key`);
-  })();
+  const figureKey: FigureKey = key as FigureKey;
   const modifiers: [boolean, string][] = [
     [superKey, SuperKey[0]],
     [altKey, AltKey],
@@ -21,9 +19,7 @@ export function toAccelerator(event: KeyboardEvent): Accelerator {
     .concat(figureKey);
 
   const maybeAccelerator: string = parts.join("+");
-  const accelerator: Accelerator = Accelerator.includes(maybeAccelerator as Accelerator) ? maybeAccelerator as Accelerator : (() => {
-    throw new TypeError(`Accelerator '${maybeAccelerator}' is not a valid accelerator`);
-  })();
+  const accelerator: Accelerator = maybeAccelerator as Accelerator;
 
   return accelerator;
 }
