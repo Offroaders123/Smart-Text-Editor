@@ -1,4 +1,4 @@
-export const SuperKey = ["CmdOrCtrl", "Cmd", "Ctrl"] as const;
+export const SuperKey = ["Super", "Cmd", "Ctrl"] as const;
 export type SuperKey = typeof SuperKey[number];
 
 export const ShiftKey = "Shift";

@@ -8,16 +8,16 @@ export function Header(props: {
   return (
     <header>
       <Menu title="File">
-        <MenuItem accelerator="CmdOrCtrl+N">New File</MenuItem>
-        <MenuItem accelerator="CmdOrCtrl+O">Open...</MenuItem>
-        <MenuItem accelerator="CmdOrCtrl+S">Save</MenuItem>
-        <MenuItem accelerator="CmdOrCtrl+Shift+S">Save As...</MenuItem>
+        <MenuItem accelerator="Super+N">New File</MenuItem>
+        <MenuItem accelerator="Super+O">Open...</MenuItem>
+        <MenuItem accelerator="Super+S">Save</MenuItem>
+        <MenuItem accelerator="Super+Shift+S">Save As...</MenuItem>
         <Switch>
           <Match when={props.hasEditor()}>
-            <MenuItem accelerator="CmdOrCtrl+W">Close Editor</MenuItem>
+            <MenuItem accelerator="Super+W">Close Editor</MenuItem>
           </Match>
           <Match when={props.hasEditor() === false}>
-            <MenuItem accelerator="CmdOrCtrl+W">Close Window</MenuItem>
+            <MenuItem accelerator="Super+W">Close Window</MenuItem>
           </Match>
         </Switch>
       </Menu>
