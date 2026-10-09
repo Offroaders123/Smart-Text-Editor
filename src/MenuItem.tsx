@@ -1,7 +1,8 @@
 import { onCleanup, onMount } from "solid-js";
+import { Accelerator } from "./accelerator.ts";
 
 export function MenuItem(props: {
-  accelerator: string,
+  accelerator: Accelerator,
   children: string,
 }) {
   onMount(() => {

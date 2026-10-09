@@ -11,7 +11,7 @@ export function Header(props: {
         <MenuItem accelerator="CmdOrCtrl+N">New File</MenuItem>
         <MenuItem accelerator="CmdOrCtrl+O">Open...</MenuItem>
         <MenuItem accelerator="CmdOrCtrl+S">Save</MenuItem>
-        <MenuItem accelerator="Shift+CmdOrCtrl+S">Save As...</MenuItem>
+        <MenuItem accelerator="CmdOrCtrl+Shift+S">Save As...</MenuItem>
         <Switch>
           <Match when={props.hasEditor()}>
             <MenuItem accelerator="CmdOrCtrl+W">Close Editor</MenuItem>
