@@ -1,4 +1,4 @@
-import { Accelerator, AltKey, CtrlKey, FigureKey, MetaKey, ShiftKey } from "./accelerator.ts";
+import { Accelerator, AltKey, CmdKey, CtrlKey, FigureKey, ShiftKey } from "./accelerator.ts";
 
 export const appleDevice: boolean = /(macOS|Mac|iPhone|iPad|iPod)/i.test(navigator.userAgentData?.platform ?? navigator.platform);
 
@@ -7,7 +7,7 @@ export function toAccelerator(event: KeyboardEvent): Accelerator {
   const key: string = event.key.toUpperCase();
   const figureKey: FigureKey = key as FigureKey;
   const modifiers: [boolean, string][] = [
-    [metaKey, MetaKey],
+    [metaKey && appleDevice, CmdKey],
     [ctrlKey, CtrlKey],
     [altKey, AltKey],
     [shiftKey, ShiftKey]
