@@ -4,6 +4,9 @@ export type CmdKey = typeof CmdKey;
 export const CtrlKey = "Ctrl";
 export type CtrlKey = typeof CtrlKey;
 
+export const CmdOrCtrlKey = "CmdOrCtrl";
+export type CmdOrCtrlKey = typeof CmdOrCtrlKey;
+
 export const ShiftKey = "Shift";
 export type ShiftKey = typeof ShiftKey;
 
@@ -25,6 +28,9 @@ export type CmdFigureKey = typeof CmdFigureKey[number];
 export const CtrlFigureKey = FigureKey.map(figure => `${CtrlKey}+${figure}` as const).sort();
 export type CtrlFigureKey = typeof CtrlFigureKey[number];
 
+export const CmdOrCtrlFigureKey = FigureKey.map(figure => `${CmdOrCtrlKey}+${figure}` as const).sort();
+export type CmdOrCtrlFigureKey = typeof CmdOrCtrlFigureKey[number];
+
 export const ShiftFigureKey = FigureKey.map(figure => `${ShiftKey}+${figure}` as const).sort();
 export type ShiftFigureKey = typeof ShiftFigureKey[number];
 
@@ -37,6 +43,9 @@ export type CmdShiftKey = typeof CmdShiftKey[number];
 export const CtrlShiftKey = FigureKey.map(figure => `${CtrlKey}+${ShiftKey}+${figure}` as const).sort();
 export type CtrlShiftKey = typeof CtrlShiftKey[number];
 
+export const CmdOrCtrlShiftKey = FigureKey.map(figure => `${CmdOrCtrlKey}+${ShiftKey}+${figure}` as const).sort();
+export type CmdOrCtrlShiftKey = typeof CmdOrCtrlShiftKey[number];
+
 export const AltShiftKey = FigureKey.map(figure => `${AltKey}+${ShiftKey}+${figure}` as const).sort();
 export type AltShiftKey = typeof AltShiftKey[number];
 
@@ -46,14 +55,20 @@ export type CmdAltFigureKey = typeof CmdAltFigureKey[number];
 export const CtrlAltFigureKey = FigureKey.map(figure => `${CtrlKey}+${AltKey}+${figure}` as const).sort();
 export type CtrlAltFigureKey = typeof CtrlAltFigureKey[number];
 
+export const CmdOrCtrlAltFigureKey = FigureKey.map(figure => `${CmdOrCtrlKey}+${AltKey}+${figure}` as const).sort();
+export type CmdOrCtrlAltFigureKey = typeof CmdOrCtrlAltFigureKey[number];
+
 export const CmdAltShiftFigureKey = FigureKey.map(figure => `${CmdKey}+${AltKey}+${ShiftKey}+${figure}` as const).sort();
 export type CmdAltShiftFigureKey = typeof CmdAltShiftFigureKey[number];
 
 export const CtrlAltShiftFigureKey = FigureKey.map(figure => `${CtrlKey}+${AltKey}+${ShiftKey}+${figure}` as const).sort();
 export type CtrlAltShiftFigureKey = typeof CtrlAltShiftFigureKey[number];
 
+export const CmdOrCtrlAltShiftFigureKey = FigureKey.map(figure => `${CmdOrCtrlKey}+${AltKey}+${ShiftKey}+${figure}` as const).sort();
+export type CmdOrCtrlAltShiftFigureKey = typeof CmdOrCtrlAltShiftFigureKey[number];
+
 export const CmdCtrlAltShiftFigureKey = FigureKey.map(figure => `${CmdKey}+${CtrlKey}+${AltKey}+${ShiftKey}+${figure}` as const).sort();
 export type CmdCtrlAltShiftFigureKey = typeof CmdCtrlAltShiftFigureKey[number];
 
-export const Accelerator: Accelerator[] = [...CmdFigureKey, ...CtrlFigureKey, ...ShiftFigureKey, ...AltFigureKey, ...CmdShiftKey, ...CtrlShiftKey, ...AltShiftKey, ...CmdAltFigureKey, ...CtrlAltFigureKey, ...CmdAltShiftFigureKey, ...CtrlAltShiftFigureKey, ...CmdCtrlAltShiftFigureKey].sort();
-export type Accelerator = CmdFigureKey | CtrlFigureKey | ShiftFigureKey | AltFigureKey | CmdShiftKey | CtrlShiftKey | AltShiftKey | CmdAltFigureKey | CtrlAltFigureKey | CmdAltShiftFigureKey | CtrlAltShiftFigureKey | CmdCtrlAltShiftFigureKey;
+export const Accelerator: Accelerator[] = [...CmdFigureKey, ...CtrlFigureKey, ...CmdOrCtrlFigureKey, ...ShiftFigureKey, ...AltFigureKey, ...CmdShiftKey, ...CtrlShiftKey, ...CmdOrCtrlShiftKey, ...AltShiftKey, ...CmdAltFigureKey, ...CtrlAltFigureKey, ...CmdOrCtrlAltFigureKey, ...CmdAltShiftFigureKey, ...CtrlAltShiftFigureKey, ...CmdOrCtrlAltShiftFigureKey, ...CmdCtrlAltShiftFigureKey].sort();
+export type Accelerator = CmdFigureKey | CtrlFigureKey | CmdOrCtrlFigureKey | ShiftFigureKey | AltFigureKey | CmdShiftKey | CtrlShiftKey | CmdOrCtrlShiftKey | AltShiftKey | CmdAltFigureKey | CtrlAltFigureKey | CmdOrCtrlAltFigureKey | CmdAltShiftFigureKey | CtrlAltShiftFigureKey | CmdOrCtrlAltShiftFigureKey | CmdCtrlAltShiftFigureKey;
