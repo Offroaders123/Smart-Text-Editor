@@ -4,20 +4,26 @@ import { Header } from "./Header.tsx";
 import { Preview } from "./Preview.tsx";
 
 export default function App() {
-  const [getValue, setValue] = createSignal<string>("");
-
   return (
     <>
       <Header
         hasEditor={() => true}
       />
-      <Editor
-        getValue={getValue}
-        setValue={setValue}
-      />
+      <Workspace />
       <Preview
         getSrc={getValue}
       />
     </>
+  );
+}
+
+function Workspace() {
+  const [getValue, setValue] = createSignal<string>("");
+
+  return (
+    <Editor
+      getValue={getValue}
+      setValue={setValue}
+    />
   );
 }
