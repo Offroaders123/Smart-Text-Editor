@@ -1,4 +1,4 @@
-import { Accelerator, AltKey, CmdKey, CtrlKey, FigureKey, ShiftKey } from "./accelerator.ts";
+import { type Accelerator, AltKey, CmdKey, CtrlKey, FigureKey, ShiftKey } from "./accelerator.ts";
 
 export const appleDevice: boolean = /(macOS|Mac|iPhone|iPad|iPod)/i.test(navigator.userAgentData?.platform ?? navigator.platform);
 

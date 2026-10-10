@@ -1,5 +1,5 @@
 import { onCleanup, onMount } from "solid-js";
-import { Accelerator } from "./accelerator.ts";
+import { type Accelerator } from "./accelerator.ts";
 import { toAccelerator } from "./keyboard.ts";
 
 export function MenuItem(props: {
