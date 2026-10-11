@@ -7,7 +7,7 @@ export function Header(props: {
 }) {
   return (
     <header>
-      <Menu id="file-menu" title="File">
+      <Menu title="File">
         <MenuItem accelerator="Cmd+N">New File</MenuItem>
         <MenuItem accelerator="Cmd+O">Open...</MenuItem>
         <MenuItem accelerator="Cmd+S">Save</MenuItem>
