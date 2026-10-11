@@ -1,0 +1,6 @@
+.MenuList {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  position-area: block-end span-inline-start;
+}
