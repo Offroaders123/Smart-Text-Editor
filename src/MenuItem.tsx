@@ -3,8 +3,8 @@ import { type Accelerator } from "./accelerator.ts";
 import { toAccelerator } from "./keyboard.ts";
 
 export function MenuItem(props: {
-  accelerator: Accelerator,
-  children: string,
+  accelerator: Accelerator;
+  children: string;
 }) {
   onMount(() => {
     const controller = new AbortController();

@@ -1,7 +1,7 @@
 export function WindowControls(props: {
-  onClose: () => void,
-  onMinimize: () => void,
-  onMaximize: () => void,
+  onClose: () => void;
+  onMinimize: () => void;
+  onMaximize: () => void;
 }) {
   return (
     <div class="window-controls">
@@ -30,8 +30,8 @@ const Control = {
 type Control = keyof typeof Control;
 
 function WindowControl(props: {
-  control: Control,
-  onClick: () => void,
+  control: Control;
+  onClick: () => void;
 }) {
   return (
     <button

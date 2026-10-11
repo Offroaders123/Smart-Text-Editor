@@ -1,7 +1,7 @@
 import { type FlowProps } from "solid-js";
 
 export function Menu(props: FlowProps<{
-  title: string,
+  title: string;
 }>) {
   return (
     <div>

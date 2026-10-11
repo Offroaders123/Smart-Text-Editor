@@ -3,7 +3,7 @@ import { Menu } from "./Menu.tsx";
 import { MenuItem } from "./MenuItem.tsx";
 
 export function Header(props: {
-  hasEditor: () => boolean,
+  hasEditor: () => boolean;
 }) {
   return (
     <header>

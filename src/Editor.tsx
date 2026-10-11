@@ -1,8 +1,8 @@
 import { createEffect } from "solid-js";
 
 export function Editor(props: {
-  getValue: () => string,
-  setValue: (value: string) => void,
+  getValue: () => string;
+  setValue: (value: string) => void;
 }) {
   let ref: HTMLTextAreaElement;
 

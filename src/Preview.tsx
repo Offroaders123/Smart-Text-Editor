@@ -1,5 +1,5 @@
 export function Preview(props: {
-  getSrc: () => string,
+  getSrc: () => string;
 }) {
   return (
     <iframe
