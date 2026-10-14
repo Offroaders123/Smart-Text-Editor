@@ -8,7 +8,17 @@ export function Menu(props: FlowProps<{
   let list: HTMLOListElement;
 
   function toggleList(): void {
-    list!.togglePopover({ source: opener! });
+    // list!.togglePopover({ source: opener! });
+
+    if (isOpen()) {
+      list!.hidePopover();
+    } else {
+      list!.showPopover({ source: opener! });
+    }
+  }
+
+  function isOpen(): boolean {
+    return list!.matches(":popover-open");
   }
 
   return (
