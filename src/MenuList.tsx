@@ -7,6 +7,7 @@ export function MenuList(props: FlowProps<{
   return (
     <ol
       ref={props.ref}
+      class="MenuList"
       popover="auto"
       on:toggle={event => {
         props.setIsOpen(event.newState === "open");
