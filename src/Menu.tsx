@@ -7,11 +7,15 @@ export function Menu(props: FlowProps<{
   let opener: HTMLButtonElement;
   let list: HTMLOListElement;
 
+  function toggleList(): void {
+    list!.togglePopover({ source: opener! });
+  }
+
   return (
     <div class="Menu">
       <button
         ref={opener!}
-        on:click={() => list!.togglePopover({ source: opener! })}>
+        on:click={toggleList}>
         {props.title}
       </button>
       <ol
