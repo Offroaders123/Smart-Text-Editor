@@ -1,5 +1,6 @@
 import { createEffect, createSignal, type FlowProps } from "solid-js";
 import "./Menu.css";
+import { MenuList } from "./MenuList.tsx";
 import { MenuOpener } from "./MenuOpener.tsx";
 
 export function Menu(props: FlowProps<{
@@ -29,14 +30,11 @@ export function Menu(props: FlowProps<{
         toggleIsOpen={toggleIsOpen}
         title={props.title}
       />
-      <ol
+      <MenuList
         ref={list!}
-        popover="auto"
-        on:toggle={event => {
-          setIsOpen(event.newState === "open");
-        }}>
+        setIsOpen={setIsOpen}>
         {props.children}
-      </ol>
+      </MenuList>
     </div>
   );
 }
