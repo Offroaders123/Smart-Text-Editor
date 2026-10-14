@@ -1,4 +1,9 @@
 .Menu ol {
   position-area: block-end span-inline-start;
   position-try-fallbacks: flip-block;
+
+  &:popover-open {
+    color: green;
+    background: orange;
+  }
 }

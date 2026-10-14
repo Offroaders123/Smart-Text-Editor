@@ -10,6 +10,8 @@ export function Menu(props: FlowProps<{
   function toggleList(): void {
     // list!.togglePopover({ source: opener! });
 
+    console.log(isOpen());
+
     if (isOpen()) {
       list!.hidePopover();
     } else {
