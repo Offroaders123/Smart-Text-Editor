@@ -8,17 +8,18 @@ export function Menu(props: FlowProps<{
   let list: HTMLOListElement;
 
   const [isOpen, setIsOpen] = createSignal<boolean>(false);
-  const toggleIsOpen = (): boolean => setIsOpen(prev => !prev);
 
   createEffect(() => {
     console.log(isOpen());
-
-    if (isOpen()) {
-      list!.showPopover({ source: opener! });
-    } else {
-      list!.hidePopover();
-    }
   });
+
+  function toggleIsOpen(): void {
+    if (isOpen()) {
+      list!.hidePopover();
+    } else {
+      list!.showPopover({ source: opener! });
+    }
+  }
 
   return (
     <div class="Menu">
@@ -29,7 +30,10 @@ export function Menu(props: FlowProps<{
       </button>
       <ol
         ref={list!}
-        popover="auto">
+        popover="auto"
+        on:toggle={event => {
+          setIsOpen(event.newState === "open");
+        }}>
         {props.children}
       </ol>
     </div>
