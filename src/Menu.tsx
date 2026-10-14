@@ -4,10 +4,10 @@ import "./Menu.css";
 export function Menu(props: FlowProps<{
   title: string;
 }>) {
+  const [isOpen, setIsOpen] = createSignal<boolean>(false);
+
   let opener: HTMLButtonElement;
   let list: HTMLOListElement;
-
-  const [isOpen, setIsOpen] = createSignal<boolean>(false);
 
   createEffect(() => {
     console.log(isOpen());
