@@ -1,4 +1,4 @@
-import { type FlowProps } from "solid-js";
+import { createEffect, createSignal, type FlowProps } from "solid-js";
 import "./Menu.css";
 
 export function Menu(props: FlowProps<{
@@ -7,27 +7,24 @@ export function Menu(props: FlowProps<{
   let opener: HTMLButtonElement;
   let list: HTMLOListElement;
 
-  function toggleList(): void {
-    // list!.togglePopover({ source: opener! });
+  const [isOpen, setIsOpen] = createSignal<boolean>(false);
+  const toggleIsOpen = (): boolean => setIsOpen(prev => !prev);
 
+  createEffect(() => {
     console.log(isOpen());
 
     if (isOpen()) {
-      list!.hidePopover();
-    } else {
       list!.showPopover({ source: opener! });
+    } else {
+      list!.hidePopover();
     }
-  }
-
-  function isOpen(): boolean {
-    return list!.matches(":popover-open");
-  }
+  });
 
   return (
     <div class="Menu">
       <button
         ref={opener!}
-        on:click={toggleList}>
+        on:click={toggleIsOpen}>
         {props.title}
       </button>
       <ol
