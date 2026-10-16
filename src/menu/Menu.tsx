@@ -5,8 +5,9 @@ import { MenuOpener } from "./MenuOpener.tsx";
 
 interface MenuContextValue {
   isOpen: () => boolean;
-  setIsOpen: (value: boolean) => void;
-  toggleIsOpen: () => boolean;
+  open: () => void;
+  close: () => void;
+  toggle: () => void;
 }
 
 const MenuContext = createContext<MenuContextValue>();
@@ -25,7 +26,9 @@ export function Menu(props: FlowProps<{
   title: string;
 }>) {
   const [isOpen, setIsOpen] = createSignal<boolean>(false);
-  const toggleIsOpen = () => setIsOpen(prev => !prev);
+  const open = (): void => void setIsOpen(true);
+  const close = (): void => void setIsOpen(false);
+  const toggle = (): void => void setIsOpen(prev => !prev);
 
   let opener: HTMLButtonElement;
   let list: HTMLOListElement;
@@ -43,7 +46,7 @@ export function Menu(props: FlowProps<{
   return (
     <div class="Menu">
       <MenuContext.Provider
-        value={{ isOpen, setIsOpen, toggleIsOpen }}>
+        value={{ isOpen, open, close, toggle }}>
         <MenuOpener
           ref={opener!}
           title={props.title}

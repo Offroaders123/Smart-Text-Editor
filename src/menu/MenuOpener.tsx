@@ -12,7 +12,7 @@ export function MenuOpener(props: {
     <button
       ref={props.ref}
       class="MenuOpener"
-      on:click={menu.toggleIsOpen}>
+      on:click={menu.toggle}>
       {props.title}
     </button>
   );

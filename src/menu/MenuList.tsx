@@ -13,7 +13,11 @@ export function MenuList(props: FlowProps<{
       class="MenuList"
       popover="auto"
       on:toggle={event => {
-        menu.setIsOpen(event.newState === "open");
+        if (event.newState === "open") {
+          menu.open();
+        } else {
+          menu.close();
+        }
       }}>
       {props.children}
     </ol>
