@@ -1,4 +1,5 @@
 import { type FlowProps, type Ref } from "solid-js";
+import "./MenuList.css";
 
 export function MenuList(props: FlowProps<{
   ref: Ref<HTMLOListElement>;
