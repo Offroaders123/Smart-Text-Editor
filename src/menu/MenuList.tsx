@@ -1,17 +1,19 @@
 import { type FlowProps, type Ref } from "solid-js";
+import { useMenu } from "./Menu.tsx";
 import "./MenuList.css";
 
 export function MenuList(props: FlowProps<{
   ref: Ref<HTMLOListElement>;
-  setIsOpen: (value: boolean) => void;
 }>) {
+  const menu = useMenu();
+
   return (
     <ol
       ref={props.ref}
       class="MenuList"
       popover="auto"
       on:toggle={event => {
-        props.setIsOpen(event.newState === "open");
+        menu.setIsOpen(event.newState === "open");
       }}>
       {props.children}
     </ol>

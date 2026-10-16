@@ -1,7 +1,25 @@
-import { createEffect, createSignal, type FlowProps } from "solid-js";
+import { createContext, createEffect, createSignal, useContext, type FlowProps } from "solid-js";
 import "./Menu.css";
 import { MenuList } from "./MenuList.tsx";
 import { MenuOpener } from "./MenuOpener.tsx";
+
+interface MenuContextValue {
+  isOpen: () => boolean;
+  setIsOpen: (value: boolean) => void;
+  toggleIsOpen: () => boolean;
+}
+
+const MenuContext = createContext<MenuContextValue>();
+
+export function useMenu(): MenuContextValue {
+  const value: MenuContextValue | undefined = useContext(MenuContext);
+
+  if (!value) {
+    throw new Error("Can't find MenuContext");
+  }
+
+  return value;
+}
 
 export function Menu(props: FlowProps<{
   title: string;
@@ -24,16 +42,17 @@ export function Menu(props: FlowProps<{
 
   return (
     <div class="Menu">
-      <MenuOpener
-        ref={opener!}
-        toggleIsOpen={toggleIsOpen}
-        title={props.title}
-      />
-      <MenuList
-        ref={list!}
-        setIsOpen={setIsOpen}>
-        {props.children}
-      </MenuList>
+      <MenuContext.Provider
+        value={{ isOpen, setIsOpen, toggleIsOpen }}>
+        <MenuOpener
+          ref={opener!}
+          title={props.title}
+        />
+        <MenuList
+          ref={list!}>
+          {props.children}
+        </MenuList>
+      </MenuContext.Provider>
     </div>
   );
 }
