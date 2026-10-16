@@ -1,4 +1,5 @@
 .MenuList {
   position-area: block-end span-inline-start;
   position-try-fallbacks: flip-block;
+  border: 3px double;
 }

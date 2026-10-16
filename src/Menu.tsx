@@ -1,4 +1,5 @@
 import { createEffect, createSignal, type FlowProps } from "solid-js";
+import "./Menu.css";
 import { MenuList } from "./MenuList.tsx";
 import { MenuOpener } from "./MenuOpener.tsx";
 

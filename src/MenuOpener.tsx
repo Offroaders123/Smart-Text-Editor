@@ -1,4 +1,5 @@
 import { type Ref } from "solid-js";
+import "./MenuOpener.css";
 
 export function MenuOpener(props: {
   ref: Ref<HTMLButtonElement>;
@@ -8,6 +9,7 @@ export function MenuOpener(props: {
   return (
     <button
       ref={props.ref}
+      class="MenuOpener"
       on:click={props.toggleIsOpen}>
       {props.title}
     </button>

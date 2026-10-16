@@ -1,6 +1,7 @@
 import { onCleanup, onMount } from "solid-js";
 import { type Accelerator } from "./accelerator.ts";
 import { toAccelerator } from "./keyboard.ts";
+import "./MenuItem.css";
 
 export function MenuItem(props: {
   accelerator: Accelerator;
@@ -24,6 +25,6 @@ export function MenuItem(props: {
   }
 
   return (
-    <li>{props.children} <code>{props.accelerator}</code></li>
+    <li class="MenuItem">{props.children} <code class="shortcut">{props.accelerator}</code></li>
   );
 }
