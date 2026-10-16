@@ -6,21 +6,20 @@ export function Menu(props: FlowProps<{
   title: string;
 }>) {
   const [isOpen, setIsOpen] = createSignal<boolean>(false);
+  const toggleIsOpen = () => setIsOpen(prev => !prev);
 
   let opener: HTMLButtonElement;
   let list: HTMLOListElement;
 
   createEffect(() => {
     console.log(isOpen());
-  });
 
-  function toggleIsOpen(): void {
     if (isOpen()) {
-      list!.hidePopover();
-    } else {
       list!.showPopover({ source: opener! });
+    } else {
+      list!.hidePopover();
     }
-  }
+  });
 
   return (
     <div class="Menu">
