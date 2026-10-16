@@ -1,6 +1,6 @@
 import { Match, Switch } from "solid-js";
-import { Menu } from "./Menu.tsx";
-import { MenuItem } from "./MenuItem.tsx";
+import { Menu } from "./menu/Menu.tsx";
+import { MenuItem } from "./menu/MenuItem.tsx";
 
 export function Header(props: {
   hasEditor: () => boolean;
