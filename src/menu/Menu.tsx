@@ -3,8 +3,8 @@ import "./Menu.css";
 
 export function Menu(props: FlowProps) {
   return (
-    <ul>
+    <div>
       {props.children}
-    </ul>
+    </div>
   );
 }
