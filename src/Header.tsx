@@ -1,13 +1,11 @@
 import { Match, Switch } from "solid-js";
-import { Menu } from "./menu/Menu.tsx";
 
 export function Header(props: {
   hasEditor: () => boolean;
 }) {
   return (
     <header>
-      <Menu>
-        <li>
+      <div>
           <button>File</button>
           <ul>
             <li data-accelerator="Cmd+N">
@@ -52,8 +50,7 @@ export function Header(props: {
               </Match>
             </Switch>
           </ul>
-        </li>
-      </Menu>
+      </div>
     </header>
   );
 }
