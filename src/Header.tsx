@@ -1,5 +1,6 @@
 import { Match, Switch } from "solid-js";
 import { Menu } from "./menu/Menu.tsx";
+import { MenuOpener } from "./menu/MenuOpener.tsx";
 
 export function Header(props: {
   hasEditor: () => boolean;
@@ -7,7 +8,7 @@ export function Header(props: {
   return (
     <header>
       <Menu>
-        <button>File</button>
+        <MenuOpener>File</MenuOpener>
         <ul>
           <li data-accelerator="Cmd+N">
             <button>New File</button>

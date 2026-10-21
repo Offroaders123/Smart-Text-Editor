@@ -1,19 +1,10 @@
-import { type Ref } from "solid-js";
-import { useMenu } from "./Menu.tsx";
+import { type FlowProps } from "solid-js";
 import "./MenuOpener.css";
 
-export function MenuOpener(props: {
-  ref: Ref<HTMLButtonElement>;
-  title: string;
-}) {
-  const menu = useMenu();
-
+export function MenuOpener(props: FlowProps) {
   return (
-    <button
-      ref={props.ref}
-      class="MenuOpener"
-      on:click={menu.toggle}>
-      {props.title}
+    <button>
+      {props.children}
     </button>
   );
 }
