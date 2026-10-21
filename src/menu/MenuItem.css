@@ -1,11 +1,1 @@
-.MenuItem {
-  padding: 3px 13px;
-  display: flex;
-  gap: 2em;
-  align-items: center;
-}
 
-.MenuItem .shortcut {
-  margin-left: auto;
-  pointer-events: none;
-}
