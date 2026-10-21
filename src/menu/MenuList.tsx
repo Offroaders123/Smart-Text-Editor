@@ -1,6 +1,25 @@
-import { type FlowProps, type Ref } from "solid-js";
+import { createContext, useContext, type FlowProps, type Ref } from "solid-js";
 import { useMenu } from "./Menu.tsx";
 import "./MenuList.css";
+
+interface MenuListContextValue {
+  isOpen: () => boolean;
+  open: () => void;
+  close: () => void;
+  toggle: () => void;
+}
+
+const MenuListContext = createContext<MenuListContextValue>();
+
+export function useMenuList(): MenuListContextValue {
+  const value: MenuListContextValue | undefined = useContext(MenuListContext);
+
+  if (!value) {
+    throw new Error("Can't find MenuListContext");
+  }
+
+  return value;
+}
 
 export function MenuList(props: FlowProps<{
   ref: Ref<HTMLOListElement>;
