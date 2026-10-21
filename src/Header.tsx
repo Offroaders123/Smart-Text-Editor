@@ -1,5 +1,6 @@
 import { Match, Switch } from "solid-js";
 import { Menu } from "./menu/Menu.tsx";
+import { MenuItem } from "./menu/MenuItem.tsx";
 import { MenuOpener } from "./menu/MenuOpener.tsx";
 
 export function Header(props: {
@@ -10,45 +11,25 @@ export function Header(props: {
       <Menu>
         <MenuOpener>File</MenuOpener>
         <ul>
-          <li data-accelerator="Cmd+N">
-            <button>New File</button>
-          </li>
-          <li data-accelerator="Cmd+O">
-            <button>Open...</button>
-          </li>
-          <li data-accelerator="Cmd+S">
-            <button>Save</button>
-          </li>
-          <li data-accelerator="Cmd+Shift+S">
+          <MenuItem accelerator="Cmd+N">New File</MenuItem>
+          <MenuItem accelerator="Cmd+O">Open...</MenuItem>
+          <MenuItem accelerator="Cmd+S">Save</MenuItem>
+          <MenuItem accelerator="Cmd+Shift+S">
             <button>Save As...</button>
             <ul>
-              <li>
-                <button>Plain Text</button>
-              </li>
-              <li>
-                <button>JavaScript</button>
-              </li>
-              <li>
-                <button>TypeScript</button>
-              </li>
-              <li>
-                <button>Markdown</button>
-              </li>
-              <li>
-                <button>Rust</button>
-              </li>
+              <MenuItem>Plain Text</MenuItem>
+              <MenuItem>JavaScript</MenuItem>
+              <MenuItem>TypeScript</MenuItem>
+              <MenuItem>Markdown</MenuItem>
+              <MenuItem>Rust</MenuItem>
             </ul>
-          </li>
+          </MenuItem>
           <Switch>
             <Match when={props.hasEditor()}>
-              <li data-accelerator="Cmd+W">
-                <button>Close Editor</button>
-              </li>
+              <MenuItem accelerator="Cmd+W">Close Editor</MenuItem>
             </Match>
             <Match when={props.hasEditor() === false}>
-              <li data-accelerator="Cmd+W">
-                <button>Close Window</button>
-              </li>
+              <MenuItem accelerator="Cmd+W">Close Window</MenuItem>
             </Match>
           </Switch>
         </ul>
